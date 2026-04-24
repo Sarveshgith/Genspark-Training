@@ -1,0 +1,100 @@
+👤 Users
+id → UUID (PK, auto-generated)
+name → VARCHAR(100), NOT NULL
+email → VARCHAR(150), NOT NULL, UNIQUE
+phone → VARCHAR(15), NOT NULL, UNIQUE
+password_hash → TEXT, NOT NULL
+role → ENUM('user','operator','admin'), DEFAULT 'user'
+created_at → TIMESTAMP, DEFAULT NOW()
+
+🏢 Operators
+user_id → UUID (PK, FK → Users.id, ON DELETE CASCADE)
+license_number → VARCHAR(50), NOT NULL
+status → ENUM('pending','approved','rejected','suspended'), DEFAULT 'pending'
+approved_by → UUID (FK → Users.id, NULLABLE)
+created_at → TIMESTAMP, DEFAULT NOW()
+
+📍 Locations
+id → UUID (PK)
+city → VARCHAR(100), NOT NULL
+state → VARCHAR(100), NOT NULL
+status → ENUM('pending','approved','rejected'), DEFAULT 'pending'
+created_at → TIMESTAMP, DEFAULT NOW()
+Constraints:
+UNIQUE(city, state)
+
+🛣️ Routes
+id → UUID (PK)
+from_id → UUID (FK → Locations.id, NOT NULL)
+to_id → UUID (FK → Locations.id, NOT NULL)
+status → ENUM('active','inactive'), DEFAULT 'active'
+created_by → UUID (FK → Users.id)
+created_at → TIMESTAMP, DEFAULT NOW()
+Constraints:
+UNIQUE(from_id, to_id)
+CHECK(from_id != to_id)
+
+📌 Operator_Locations
+id → UUID (PK)
+operator_id → UUID (FK → Operators.user_id, NOT NULL)
+location_id → UUID (FK → Locations.id, NOT NULL)
+address → TEXT, NOT NULL
+is_active → BOOLEAN, DEFAULT TRUE
+Notes:
+Controls where operator operates
+
+🧩 Bus_Layouts
+id → UUID (PK)
+total_seats → INTEGER, NOT NULL
+config → JSONB, NOT NULL
+created_at → TIMESTAMP, DEFAULT NOW()
+Notes:
+config stores:
+grid layout
+seat numbers
+seat type (normal / female)
+
+🚍 Buses
+id → UUID (PK)
+operator_id → UUID (FK → Operators.user_id, NOT NULL)
+layout_id → UUID (FK → Bus_Layouts.id, NOT NULL)
+vehicle_number → VARCHAR(20), NOT NULL, UNIQUE
+status → ENUM('pending','approved','rejected','inactive'), DEFAULT 'pending'
+approved_by → UUID (FK → Users.id, NULLABLE)
+approved_at → TIMESTAMP, NULLABLE
+created_at → TIMESTAMP, DEFAULT NOW()
+
+📅 Trips
+id → UUID (PK)
+bus_id → UUID (FK → Buses.id, NOT NULL)
+route_id → UUID (FK → Routes.id, NOT NULL)
+status → ENUM('scheduled','active','completed','cancelled'), DEFAULT 'scheduled'
+departure_time → TIMESTAMP, NOT NULL
+arrival_time → TIMESTAMP, NOT NULL
+price_per_seat → NUMERIC(10,2), NOT NULL
+created_at → TIMESTAMP, DEFAULT NOW()
+
+🎟️ Tickets
+id → UUID (PK)
+booking_ref → VARCHAR(50), NOT NULL, UNIQUE
+user_id → UUID (FK → Users.id, NOT NULL)
+trip_id → UUID (FK → Trips.id, NOT NULL)
+status → ENUM('pending','confirmed','cancelled'), DEFAULT 'pending'
+base_amount → NUMERIC(10,2), NOT NULL
+total_amount → NUMERIC(10,2), NOT NULL
+payment_status → ENUM('pending','success','failed'), DEFAULT 'pending'
+payment_ref → VARCHAR(100), NULLABLE
+created_at → TIMESTAMP, DEFAULT NOW()
+
+💺 Seat_Bookings
+id → UUID (PK)
+ticket_id → UUID (FK → Tickets.id, NOT NULL)
+user_id → UUID (FK → Users.id, NOT NULL)
+trip_id → UUID (FK → Trips.id, NOT NULL)
+seat_number → VARCHAR(10), NOT NULL
+passenger_name → VARCHAR(100), NULLABLE
+passenger_age → INTEGER, NULLABLE
+passenger_gender → ENUM('male','female','other'), NULLABLE
+status → ENUM('reserved','confirmed','cancelled'), DEFAULT 'reserved'
+reserved_until → TIMESTAMP, NULLABLE
+created_at → TIMESTAMP, DEFAULT NOW()

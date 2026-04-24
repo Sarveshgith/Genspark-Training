@@ -1,0 +1,33 @@
+Users
+    id, name, email, phone, password_hash, role  ENUM('user','operator','admin'), created_at
+
+Operators
+    user_id FK, license_number, status ENUM, approved_by FK, created_at
+
+Locations
+    id, city, state, status, created_at => UNIQUE(city, state)
+
+Routes
+    id, from_id FK, to_id FK, status, created_by, created_at => UNIQUE(from, to), CHECK from != to
+
+Operator_locations
+    id, operator_id FK, location_id FK, address, is_active (control to Operator)
+
+Bus_layouts
+    id, total_seats, config JSONB, created_at => Stored in Grid
+
+Buses
+    id, operator_id FK, layout_id FK, vehicle_number UNIQUE, status, approved_by FK, approved_at, created_at
+
+Trips
+    id, bus_id, route_id, status, departure_time, arrival_time, price_per_seat, created_at
+
+Seat_Bookings
+    id, ticket_id FK, user_id FK, trip_id FK, seat_number, passenger_name, passenger_age, passenger_gender, status ENUM('reserved','confirmed','cancelled'), reserved_until TIMESTAMP, created_at => UNIQUE(trip_id, seat_number)
+
+tickets
+    id, booking_ref UNIQUE, user_id, trip_id FK, status ENUM, base_amount, total_amount, payment_status  ENUM, payment_ref, created_at
+
+Taxes and fees will be fixed and hardcoded
+Female seats = Mapped, If validation fails = retry or delete seat_booking row
+Only Cancelling Booked tickets will by Logged

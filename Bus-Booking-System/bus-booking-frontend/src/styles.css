@@ -1,0 +1,325 @@
+/* You can add global styles to this file, and also import other style files */
+
+@import 'tailwindcss';
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+:root {
+  --bg: #f4f7ff;
+  --surface: #ffffff;
+  --surface-soft: #f8fbff;
+  --text: #1f2937;
+  --muted: #6b7280;
+  --primary: #0f4c9c;
+  --primary-soft: #dbeafe;
+  --accent: #0f766e;
+  --border: #cfdbef;
+  --danger: #b91c1c;
+  --danger-soft: #fee2e2;
+  --success: #166534;
+  --success-soft: #dcfce7;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
+  color: var(--text);
+  background: radial-gradient(circle at top left, #eef6ff 0%, var(--bg) 55%, #edf2ff 100%);
+}
+
+a {
+  color: var(--primary);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+button {
+  border: 1px solid var(--border);
+  background: linear-gradient(180deg, #ffffff 0%, #f1f6ff 100%);
+  padding: 8px 12px;
+  cursor: pointer;
+  border-radius: 8px;
+  color: #0b3b78;
+  font-weight: 600;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+input,
+select,
+textarea {
+  padding: 8px;
+  border: 1px solid var(--border);
+  width: 100%;
+  border-radius: 8px;
+  background: #fff;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 2px solid #bfdbfe;
+  border-color: #7aa8e8;
+}
+
+label {
+  font-size: 14px;
+  margin-top: 8px;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 12px;
+}
+
+th,
+td {
+  border: 1px solid var(--border);
+  text-align: left;
+  padding: 8px;
+  vertical-align: top;
+}
+
+thead th {
+  background: #eaf2ff;
+  color: #18457a;
+}
+
+tbody tr:nth-child(even) {
+  background: #f9fbff;
+}
+
+.page-container {
+  max-width: 980px;
+  margin: 0 auto;
+  display: grid;
+  gap: 14px;
+  padding: 18px 14px;
+}
+
+.form-card,
+.card {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: 12px;
+  padding: 12px;
+  display: grid;
+  gap: 8px;
+  box-shadow: 0 4px 14px rgba(15, 76, 156, 0.08);
+}
+
+h2,
+h3,
+h4 {
+  margin: 0;
+  color: #133e72;
+}
+
+.grid-2 {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.error {
+  color: var(--danger);
+  background: var(--danger-soft);
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #fecaca;
+}
+
+.success {
+  color: var(--success);
+  background: var(--success-soft);
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #bbf7d0;
+}
+
+.seats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+  gap: 8px;
+}
+
+.bus-layout-shell {
+  border: 1px dashed #7aa8e8;
+  border-radius: 14px;
+  padding: 14px;
+  background: linear-gradient(180deg, #f8fbff 0%, #eef5ff 100%);
+}
+
+.bus-layout-header {
+  text-align: center;
+  font-weight: 700;
+  color: #18457a;
+  margin-bottom: 12px;
+  letter-spacing: 0.03em;
+}
+
+.seat {
+  border: 1px solid #9ab6da;
+  background: #e0ecff;
+  border-radius: 10px;
+  color: #0f2f5d;
+  min-height: 42px;
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.12s ease;
+}
+
+.seat-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(16, 64, 128, 0.15);
+}
+
+.seat-female {
+  background: #fde68a;
+  border-color: #eab308;
+}
+
+.seat-selected {
+  background: #86efac;
+  border-color: #16a34a;
+}
+
+.seat-reserved {
+  background: #fecaca;
+  border-color: #ef4444;
+}
+
+.seat-booked {
+  background: #f87171;
+  border-color: #b91c1c;
+  color: #1f2937;
+}
+
+.seat-top-meta {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 6px;
+}
+
+.seat-continue-btn {
+  position: sticky;
+  bottom: 10px;
+  z-index: 5;
+  box-shadow: 0 8px 18px rgba(15, 76, 156, 0.2);
+}
+
+.legend-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.legend-item {
+  border: 1px solid var(--border);
+  padding: 4px 8px;
+  background: #e0ecff;
+  border-radius: 8px;
+}
+
+.legend-female {
+  background: #fde68a;
+}
+
+.legend-reserved {
+  background: #fca5a5;
+}
+
+.legend-booked {
+  background: #f87171;
+}
+
+.status-pill {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.2;
+  border: 1px solid transparent;
+}
+
+.status-approved {
+  color: #065f46;
+  background: #d1fae5;
+  border-color: #34d399;
+}
+
+.status-not-approved {
+  color: #92400e;
+  background: #ffedd5;
+  border-color: #fdba74;
+}
+
+.status-pending {
+  color: #1e3a8a;
+  background: #dbeafe;
+  border-color: #93c5fd;
+}
+
+.status-rejected {
+  color: #7f1d1d;
+  background: #fee2e2;
+  border-color: #fca5a5;
+}
+
+.location-list {
+  display: grid;
+  gap: 6px;
+}
+
+.location-item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+@media (max-width: 900px) {
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 640px) {
+  .page-container {
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .form-card,
+  .card {
+    padding: 10px;
+    border-radius: 10px;
+  }
+
+  button {
+    width: 100%;
+  }
+
+  .legend-row {
+    gap: 6px;
+  }
+
+  .seat {
+    min-height: 38px;
+    border-radius: 8px;
+  }
+}

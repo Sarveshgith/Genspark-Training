@@ -1,0 +1,71 @@
+/auth =>
+    POST /register
+    POST /login
+    POST /admin/register
+
+/users =>
+    GET / -> admin access
+    GET /:id -> self or admin
+    PUT /:id -> self or admin
+    PATCH /:id/password -> self
+    DELETE /:id -> admin
+
+/operators =>
+    GET / 
+    GET /:operatorId 
+    GET /:operatorId/locations
+    PATCH /:operatorId/status
+    PATCH /:operatorId/locations/status/:id
+    POST /:operatorId/locations
+
+/locations => 
+    POST /locations
+    GET /locations
+    GET /locations/:id
+    PATCH /locations/:id
+    DELETE /locations/:id
+
+/routes =>
+    POST /
+    GET /
+    GET /:id
+    PATCH /:id
+
+/bus-layouts =>
+    POST /
+    GET /
+    GET /:id
+    PATCH /:id
+
+/buses =>
+    POST /
+    GET /
+    GET /:id
+    PATCH /:id
+    PATCH /:id/approve   → (admin)
+
+/trips =>
+    POST /
+    GET /                        → (search trips)
+    GET /:id
+    PATCH /:id
+    PATCH /:id/cancel
+    GET /:id/seats             
+
+/bookings =>
+    POST /reserve
+    POST /confirm
+    POST /release          → (cron/system or manual)
+    GET /my
+    GET /:ticketId
+    POST /:ticketId/cancel
+
+/tickets =>
+    GET /:ticketId
+    GET /booking-ref/:bookingRef
+    GET /:ticketId/print
+
+/admin =>
+    GET /pending/operators
+    GET /pending/buses
+    GET /dashboard/metrics

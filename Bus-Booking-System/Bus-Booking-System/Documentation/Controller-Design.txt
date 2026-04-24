@@ -1,0 +1,372 @@
+Bus Booking System - Controller Design
+
+Base URL: /api/v1
+Auth: JWT Bearer token
+Roles: user, operator, admin
+
+-----------------------------------------------------------------
+1) AuthController /auth
+-----------------------------------------------------------------
+
+1. POST /register
+    Access: Public
+    Purpose: Register normal user or operator account.
+    Body:
+      - name, email, phone, password
+      - role (optional, default: user)
+      - operator_details (required only when role=operator): license_number
+    Flow:
+      - Create row in Users.
+      - If role=operator, create row in Operators with status='pending'.
+    Tables: Users, Operators
+
+2. POST /admin/register
+    Access: Admin only (or internal seed endpoint)
+    Purpose: Create admin user directly.
+    Body: name, email, phone, password
+    Tables: Users
+
+3. POST /login
+    Access: Public
+    Purpose: Login with email/password and issue JWT.
+    Body: email, password
+    Tables: Users
+
+-----------------------------------------------------------------
+2) UserController
+-----------------------------------------------------------------
+
+1. GET /
+    Access: Admin
+    Purpose: Get all users with filters.
+    Query: role, created_from, created_to, page, limit
+    Tables: Users
+
+2. GET /:id
+    Access: Authenticated
+    Purpose: Get one user details.
+    Tables: Users, Operators
+
+OPTIONAL
+
+3. PATCH /:id
+    Access: Admin or self (restricted fields)
+    Purpose: Update user profile.
+    Body: name, phone
+    Tables: Users
+
+4. PATCH /:id/password
+    Access: Admin or self
+    Purpose: Update password.
+    Body: old_password, new_password
+    Tables: Users
+
+-----------------------------------------------------------------
+3) OperatorController
+-----------------------------------------------------------------
+
+2. GET /operators/:operatorId
+    Access: Admin or owner operator
+    Purpose: Fetch operator profile.
+    Tables: Operators, Users
+
+3. PATCH /operators/:operatorId
+    Access: Owner operator
+    Purpose: Update operator details.
+    Body: license_number
+    Tables: Operators
+
+4. PATCH /operators/:operatorId/status
+    Access: Admin
+    Purpose: Approve/reject/suspend operator.
+    Body: status
+    Rules: approved_by set for approved action.
+    Tables: Operators
+
+5. POST /operators/:operatorId/locations
+    Access: Owner operator or admin
+    Purpose: Add operator service location/address.
+    Body: location_id, address, is_active
+    Tables: Operator_locations
+
+6. GET /operators/:operatorId/locations
+    Access: Owner operator or admin
+    Purpose: List operator locations.
+    Tables: Operator_locations, Locations
+
+7. PATCH /operators/:operatorId/locations/:id
+    Access: Owner operator or admin
+    Purpose: Update address/is_active.
+    Tables: Operator_locations
+
+8. DELETE /operators/:operatorId/locations/:id
+    Access: Owner operator or admin
+    Purpose: Remove/disable operator location mapping.
+    Tables: Operator_locations
+
+-----------------------------------------------------------------
+4) LocationController
+-----------------------------------------------------------------
+
+1. POST /locations
+    Access: Admin
+    Purpose: Create city/state location.
+    Body: city, state
+    Rules: UNIQUE(city, state)
+    Tables: Locations
+
+2. GET /locations
+    Access: Authenticated
+    Purpose: List locations for search forms.
+    Query: city, state
+    Tables: Locations
+
+3. GET /locations/:id
+    Access: Authenticated
+    Purpose: Get one location.
+    Tables: Locations
+
+4. PATCH /locations/:id
+    Access: Admin
+    Purpose: Update city/state.
+    Tables: Locations
+
+5. DELETE /locations/:id
+    Access: Admin
+    Purpose: Delete location if not referenced.
+    Tables: Locations
+
+-----------------------------------------------------------------
+5) RouteController
+-----------------------------------------------------------------
+
+1. POST /routes
+    Access: Admin
+    Purpose: Create route.
+    Body: from_id, to_id, status
+    Rules: from_id != to_id; UNIQUE(from_id, to_id)
+    Tables: Routes
+
+2. GET /routes
+    Access: Authenticated
+    Purpose: List routes.
+    Query: from_id, to_id, status
+    Tables: Routes, Locations
+
+3. GET /routes/:id
+    Access: Authenticated
+    Purpose: Get route details.
+    Tables: Routes, Locations
+
+4. PATCH /routes/:id
+    Access: Admin
+    Purpose: Update route status.
+    Body: status
+    Tables: Routes
+
+5. DELETE /routes/:id
+    Access: Admin
+    Purpose: Remove inactive route if unused.
+    Tables: Routes
+
+-----------------------------------------------------------------
+6) BusLayoutController
+-----------------------------------------------------------------
+
+1. POST /bus-layouts
+    Access: Operator (approved) or admin
+    Purpose: Create layout template.
+    Body: total_seats, config
+    Note: config stores seat grid and female-seat mapping metadata.
+    Tables: Bus_layouts
+
+2. GET /bus-layouts
+    Access: Operator/admin
+    Purpose: List layouts.
+    Tables: Bus_layouts
+
+3. GET /bus-layouts/:id
+    Access: Operator/admin
+    Purpose: Get layout details.
+    Tables: Bus_layouts
+
+4. PATCH /bus-layouts/:id
+    Access: Owner operator/admin
+    Purpose: Update layout config/seat count.
+    Tables: Bus_layouts
+
+5. DELETE /bus-layouts/:id
+    Access: Owner operator/admin
+    Purpose: Delete unused layout.
+    Tables: Bus_layouts
+
+-----------------------------------------------------------------
+7) BusController
+-----------------------------------------------------------------
+
+1. POST /buses
+    Access: Operator (approved) or admin
+    Purpose: Register bus.
+    Body: operator_id, layout_id, vehicle_number, status
+    Rules: vehicle_number UNIQUE
+    Tables: Buses
+
+2. GET /buses
+    Access: Authenticated
+    Purpose: List buses (operator-wise or admin-wide).
+    Query: operator_id, status
+    Tables: Buses, Bus_layouts
+
+3. GET /buses/:id
+    Access: Authenticated
+    Purpose: Fetch bus details.
+    Tables: Buses, Bus_layouts
+
+4. PATCH /buses/:id
+    Access: Owner operator/admin
+    Purpose: Update bus status/layout.
+    Tables: Buses
+
+5. PATCH /buses/:id/approve
+    Access: Admin
+    Purpose: Approve/reject bus.
+    Body: status
+    Rules: approved_by and approved_at set when approved.
+    Tables: Buses
+
+-----------------------------------------------------------------
+8) TripController
+-----------------------------------------------------------------
+
+1. POST /trips
+    Access: Owner operator/admin
+    Purpose: Create trip schedule.
+    Body: bus_id, route_id, departure_time, arrival_time, price_per_seat, status
+    Tables: Trips
+
+2. GET /trips
+    Access: Authenticated
+    Purpose: Search trips.
+    Query: from_id, to_id, date, status, operator_id
+    Tables: Trips, Routes, Buses
+
+3. GET /trips/:id
+    Access: Authenticated
+    Purpose: Trip details with seat summary.
+    Tables: Trips, Routes, Buses, Seat_Bookings
+
+4. PATCH /trips/:id
+    Access: Owner operator/admin
+    Purpose: Update schedule/price/status.
+    Tables: Trips
+
+5. PATCH /trips/:id/cancel
+    Access: Owner operator/admin
+    Purpose: Cancel trip.
+    Rules: trigger refund/cancellation workflow for confirmed tickets.
+    Tables: Trips, Tickets
+
+6. GET /trips/:id/seats
+    Access: Authenticated
+    Purpose: Seat map + live availability.
+    Tables: Trips, Buses, Bus_layouts, Seat_Bookings
+
+-----------------------------------------------------------------
+9) BookingController
+-----------------------------------------------------------------
+
+1. POST /bookings/reserve
+    Access: Authenticated user
+    Purpose: Soft-lock selected seats before payment.
+    Body:
+      - trip_id
+      - seats: [{seat_number, passenger_name, passenger_age, passenger_gender}]
+    Rules:
+      - Create Seat_Bookings rows with status='reserved'.
+      - Set reserved_until.
+      - Enforce UNIQUE(trip_id, seat_number).
+      - Validate female-seat mapping; if validation fails retry once else delete failed seat booking row.
+    Tables: Seat_Bookings
+
+2. POST /bookings/confirm
+    Access: Authenticated user
+    Purpose: Confirm reservation and create ticket.
+    Body: trip_id, payment_ref
+    Flow:
+      - Validate reserved seats belong to user and are not expired.
+      - Create Tickets row with booking_ref, base_amount, total_amount, payment_status.
+      - Map reserved seats to ticket_id and mark as confirmed.
+    Tables: Seat_Bookings, Tickets
+
+3. POST /bookings/release
+    Access: Authenticated user or system job
+    Purpose: Release expired reservations.
+    Body: trip_id (optional)
+    Tables: Seat_Bookings
+
+4. GET /bookings/my
+    Access: Authenticated user
+    Purpose: List my bookings.
+    Query: status, from_date, to_date, page, limit
+    Tables: Tickets, Trips, Routes
+
+5. GET /bookings/:ticketId
+    Access: Authenticated user (owner), operator (related), or admin
+    Purpose: Booking + passenger seat details.
+    Tables: Tickets, Seat_Bookings, Trips
+
+6. POST /bookings/:ticketId/cancel
+    Access: Authenticated user (owner) or admin
+    Purpose: Cancel booked ticket.
+    Rules:
+      - Only booked/confirmed tickets are cancellable.
+      - Update ticket status and payment_status (based on refund policy).
+      - Update related seat bookings to cancelled and free seat.
+      - Log only booked ticket cancellations.
+    Tables: Tickets, Seat_Bookings
+
+-----------------------------------------------------------------
+10) TicketController
+-----------------------------------------------------------------
+
+1. GET /tickets/:ticketId
+    Access: Owner user/operator/admin
+    Purpose: Fetch ticket details for viewing/downloading.
+    Tables: Tickets, Seat_Bookings, Trips, Routes, Users
+
+2. GET /tickets/booking-ref/:bookingRef
+    Access: Owner user/operator/admin
+    Purpose: Lookup ticket by booking reference.
+    Tables: Tickets
+
+3. GET /tickets/:ticketId/print
+    Access: Owner user/operator/admin
+    Purpose: Return printable ticket payload.
+
+-----------------------------------------------------------------
+11) AdminOpsController (recommended)
+-----------------------------------------------------------------
+
+1. GET /admin/pending/operators
+    Access: Admin
+    Purpose: Pending operator approvals.
+
+2. GET /admin/pending/buses
+    Access: Admin
+    Purpose: Pending bus approvals.
+
+3. GET /admin/dashboard/metrics
+    Access: Admin
+    Purpose: Aggregated counts (users, operators, buses, trips, bookings, cancellations).
+
+-----------------------------------------------------------------
+12) Validation and Business Rules Summary
+-----------------------------------------------------------------
+
+1. Users.email, Users.phone, Buses.vehicle_number, Tickets.booking_ref must be unique.
+2. Route from and to cannot be same.
+3. Seat locking must be transactional to avoid double booking.
+4. Reservation expiry check required before confirmation.
+5. Taxes/fees are fixed and hardcoded by server side config.
+6. Female seat mapping validation must run during reserve and confirm.
+7. Cancellation logs should be created only for booked tickets.

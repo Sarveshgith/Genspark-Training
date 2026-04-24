@@ -1,0 +1,53 @@
+<div class="app-shell">
+  <header class="top-bar">
+    <h1>Bus Booking System</h1>
+
+    <nav *ngIf="isLoggedIn()" class="nav-links">
+      <a *ngIf="role() === 'User'" routerLink="/trips" routerLinkActive="active-link">Trips</a>
+      <a *ngIf="role() === 'User'" routerLink="/my-bookings" routerLinkActive="active-link"
+        >My Bookings</a
+      >
+
+      <a
+        *ngIf="role() === 'Operator'"
+        routerLink="/operator/dashboard"
+        routerLinkActive="active-link"
+        >Dashboard</a
+      >
+      <a *ngIf="role() === 'Operator'" routerLink="/operator/layouts" routerLinkActive="active-link"
+        >Layouts</a
+      >
+      <a *ngIf="role() === 'Operator'" routerLink="/operator/buses" routerLinkActive="active-link"
+        >Buses</a
+      >
+      <a *ngIf="role() === 'Operator'" routerLink="/operator/trips" routerLinkActive="active-link"
+        >Trips</a
+      >
+      <a
+        *ngIf="role() === 'Operator'"
+        routerLink="/operator/locations"
+        routerLinkActive="active-link"
+        >Locations</a
+      >
+
+      <a *ngIf="role() === 'Admin'" routerLink="/admin/dashboard" routerLinkActive="active-link"
+        >Dashboard</a
+      >
+      <a *ngIf="role() === 'Admin'" routerLink="/admin/operators" routerLinkActive="active-link"
+        >Operators</a
+      >
+      <a *ngIf="role() === 'Admin'" routerLink="/admin/buses" routerLinkActive="active-link"
+        >Buses</a
+      >
+      <a *ngIf="role() === 'Admin'" routerLink="/admin/locations" routerLinkActive="active-link"
+        >Locations</a
+      >
+
+      <button type="button" (click)="logout()">Logout</button>
+    </nav>
+  </header>
+
+  <main class="main-content">
+    <router-outlet></router-outlet>
+  </main>
+</div>
