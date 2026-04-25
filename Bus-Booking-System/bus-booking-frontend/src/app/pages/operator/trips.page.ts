@@ -30,7 +30,7 @@ interface LocationOption {
         <select formControlName="busId">
           <option value="">Select bus</option>
           <option *ngFor="let bus of buses" [value]="bus.id">
-            {{ bus.vehicleNumber }} ({{ bus.status }})
+            {{ bus.vehicleNumber }}
           </option>
         </select>
 
@@ -51,10 +51,10 @@ interface LocationOption {
         </select>
 
         <label>Departure Time</label>
-        <input type="datetime-local" formControlName="departureTime" />
+        <input type="datetime-local" formControlName="departureTime" [attr.min]="minDateTimeLocal" />
 
         <label>Arrival Time</label>
-        <input type="datetime-local" formControlName="arrivalTime" />
+        <input type="datetime-local" formControlName="arrivalTime" [attr.min]="form.value.departureTime || minDateTimeLocal" />
 
         <label>Price Per Seat</label>
         <input type="number" formControlName="pricePerSeat" min="1" />
@@ -83,6 +83,7 @@ interface LocationOption {
             <th>Departure</th>
             <th>Arrival</th>
             <th>Price</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -93,6 +94,15 @@ interface LocationOption {
             <td>{{ trip.departureTime | date: 'short' }}</td>
             <td>{{ trip.arrivalTime | date: 'short' }}</td>
             <td>{{ trip.pricePerSeat }}</td>
+            <td>
+              <button
+                type="button"
+                (click)="cancelTrip(trip.id)"
+                [disabled]="trip.status === 'Cancelled' || cancellingTripId === trip.id"
+              >
+                {{ cancellingTripId === trip.id ? 'Cancelling...' : 'Cancel Trip' }}
+              </button>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -118,8 +128,10 @@ export class OperatorTripsPageComponent implements OnInit {
   locations: LocationOption[] = [];
   trips: TripSummary[] = [];
   creating = false;
+  cancellingTripId = '';
   loadingData = false;
   errorMessage = '';
+  readonly minDateTimeLocal = this.toLocalDateTimeInput(new Date());
 
   ngOnInit(): void {
     this.loadBuses();
@@ -152,6 +164,31 @@ export class OperatorTripsPageComponent implements OnInit {
       return;
     }
 
+    const departure = new Date(departureRaw);
+    const arrival = new Date(arrivalRaw);
+    const now = new Date();
+
+    if (Number.isNaN(departure.getTime()) || Number.isNaN(arrival.getTime())) {
+      this.errorMessage = 'Departure and arrival times are invalid.';
+      return;
+    }
+
+    if (departure <= now) {
+      this.errorMessage = 'Departure time cannot be in the past.';
+      return;
+    }
+
+    if (arrival <= departure) {
+      this.errorMessage = 'Arrival time must be later than departure time.';
+      return;
+    }
+
+    const durationMinutes = (arrival.getTime() - departure.getTime()) / 60000;
+    if (durationMinutes < 15) {
+      this.errorMessage = 'Trip duration must be at least 15 minutes.';
+      return;
+    }
+
     this.creating = true;
     this.api
       .post('trips', {
@@ -159,8 +196,8 @@ export class OperatorTripsPageComponent implements OnInit {
         fromId,
         toId,
         status: this.form.value.status,
-        departureTime: new Date(departureRaw).toISOString(),
-        arrivalTime: new Date(arrivalRaw).toISOString(),
+        departureTime: departure.toISOString(),
+        arrivalTime: arrival.toISOString(),
         pricePerSeat: this.form.value.pricePerSeat,
       })
       .subscribe({
@@ -173,16 +210,38 @@ export class OperatorTripsPageComponent implements OnInit {
         error: (error) => {
           console.error(error);
           this.creating = false;
-          this.errorMessage = 'Failed to create trip.';
+          this.errorMessage = this.extractError(error, 'Failed to create trip.');
           this.cdr.detectChanges();
         },
       });
   }
 
+  cancelTrip(tripId: string): void {
+    if (this.cancellingTripId) {
+      return;
+    }
+
+    this.cancellingTripId = tripId;
+    this.errorMessage = '';
+    this.api.patch(`trips/${tripId}/cancel`, {}).subscribe({
+      next: () => {
+        this.cancellingTripId = '';
+        this.loadTrips();
+        this.cdr.detectChanges();
+      },
+      error: (error) => {
+        console.error(error);
+        this.cancellingTripId = '';
+        this.errorMessage = this.extractError(error, 'Failed to cancel trip.');
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
   private loadBuses(): void {
     this.api.get<BusOption[]>('buses').subscribe({
       next: (response) => {
-        this.buses = response;
+        this.buses = response.filter((bus) => bus.status === 'Approved');
         this.cdr.detectChanges();
       },
       error: (error) => {
@@ -220,5 +279,28 @@ export class OperatorTripsPageComponent implements OnInit {
         this.cdr.detectChanges();
       },
     });
+  }
+
+  private extractError(error: unknown, fallback: string): string {
+    if (typeof error === 'object' && error !== null && 'error' in error) {
+      const payload = (error as { error?: unknown }).error;
+      if (typeof payload === 'string') {
+        return payload;
+      }
+
+      if (typeof payload === 'object' && payload !== null && 'message' in payload) {
+        const message = (payload as { message?: unknown }).message;
+        if (typeof message === 'string' && message.trim().length > 0) {
+          return message;
+        }
+      }
+    }
+
+    return fallback;
+  }
+
+  private toLocalDateTimeInput(value: Date): string {
+    const local = new Date(value.getTime() - value.getTimezoneOffset() * 60000);
+    return local.toISOString().slice(0, 16);
   }
 }

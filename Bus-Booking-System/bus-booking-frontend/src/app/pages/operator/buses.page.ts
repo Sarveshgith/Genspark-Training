@@ -7,6 +7,11 @@ import { AuthService } from '../../core/auth.service';
 interface LayoutOption {
   id: string;
   totalSeats: number;
+  config: {
+    rows?: number;
+    cols?: number;
+    seats?: Array<{ seatNumber: string; femaleOnly: boolean }>;
+  };
 }
 
 interface BusRow {
@@ -18,6 +23,10 @@ interface BusRow {
   createdAt: string;
 }
 
+interface OperatorStatusResponse {
+  status: string;
+}
+
 @Component({
   selector: 'app-operator-buses-page',
   standalone: true,
@@ -26,25 +35,29 @@ interface BusRow {
     <div class="page-container">
       <h2>Bus Management</h2>
 
+      <p class="error" *ngIf="!isOperatorApproved">
+        Your operator account is {{ operatorStatus || 'Pending' }}. Bus creation is enabled only after admin approval.
+      </p>
+
       <form [formGroup]="form" (ngSubmit)="createBus()" class="form-card">
         <label>Vehicle Number</label>
-        <input type="text" formControlName="vehicleNumber" />
+        <input type="text" formControlName="vehicleNumber" [disabled]="!isOperatorApproved" />
 
         <label>Layout</label>
-        <select formControlName="layoutId">
+        <select formControlName="layoutId" [disabled]="!isOperatorApproved">
           <option value="">Select layout</option>
           <option *ngFor="let layout of layouts" [value]="layout.id">
-            {{ layout.id }} ({{ layout.totalSeats }} seats)
+            {{ layoutDisplayName(layout) }}
           </option>
         </select>
 
         <label>Status</label>
-        <select formControlName="status">
+        <select formControlName="status" [disabled]="!isOperatorApproved">
           <option value="Pending">Pending</option>
           <option value="Inactive">Inactive</option>
         </select>
 
-        <button type="submit" [disabled]="form.invalid || creating">
+        <button type="submit" [disabled]="form.invalid || creating || !isOperatorApproved">
           {{ creating ? 'Adding Bus...' : 'Add Bus' }}
         </button>
       </form>
@@ -57,7 +70,7 @@ interface BusRow {
         <thead>
           <tr>
             <th>Vehicle Number</th>
-            <th>Layout ID</th>
+            <th>Layout</th>
             <th>Status</th>
             <th>Approval</th>
             <th>Created</th>
@@ -66,7 +79,7 @@ interface BusRow {
         <tbody>
           <tr *ngFor="let bus of buses">
             <td>{{ bus.vehicleNumber }}</td>
-            <td>{{ bus.layoutId }}</td>
+            <td>{{ layoutNameById(bus.layoutId) }}</td>
             <td>
               <span class="status-pill" [ngClass]="statusClass(bus.status)">{{ bus.status }}</span>
             </td>
@@ -99,11 +112,17 @@ export class OperatorBusesPageComponent implements OnInit {
 
   layouts: LayoutOption[] = [];
   buses: BusRow[] = [];
+  operatorStatus = '';
   creating = false;
   loadingData = false;
   errorMessage = '';
 
+  get isOperatorApproved(): boolean {
+    return this.operatorStatus === 'Approved';
+  }
+
   ngOnInit(): void {
+    this.loadOperatorStatus();
     this.loadLayouts();
     this.loadBuses();
   }
@@ -116,6 +135,11 @@ export class OperatorBusesPageComponent implements OnInit {
     const operatorId = this.authService.getUserId();
     if (!operatorId) {
       this.errorMessage = 'Operator session missing user id.';
+      return;
+    }
+
+    if (!this.isOperatorApproved) {
+      this.errorMessage = 'Bus creation is available only for approved operators.';
       return;
     }
 
@@ -138,10 +162,28 @@ export class OperatorBusesPageComponent implements OnInit {
         error: (error) => {
           console.error(error);
           this.creating = false;
-          this.errorMessage = 'Failed to create bus.';
+          this.errorMessage = this.extractError(error, 'Failed to create bus.');
           this.cdr.detectChanges();
         },
       });
+  }
+
+  loadOperatorStatus(): void {
+    const operatorId = this.authService.getUserId();
+    if (!operatorId) {
+      return;
+    }
+
+    this.api.get<OperatorStatusResponse>(`operators/${operatorId}`).subscribe({
+      next: (response) => {
+        this.operatorStatus = response.status;
+        this.cdr.detectChanges();
+      },
+      error: (error) => {
+        console.error(error);
+        this.cdr.detectChanges();
+      },
+    });
   }
 
   loadLayouts(): void {
@@ -184,5 +226,44 @@ export class OperatorBusesPageComponent implements OnInit {
     }
 
     return 'status-pending';
+  }
+
+  layoutDisplayName(layout: LayoutOption): string {
+    const rows = layout.config?.rows;
+    const cols = layout.config?.cols;
+    const femaleSeats = layout.config?.seats?.filter((seat) => seat.femaleOnly).length ?? 0;
+
+    if (typeof rows === 'number' && typeof cols === 'number') {
+      return `${rows}x${cols}f${femaleSeats} (${layout.totalSeats} seats)`;
+    }
+
+    return `${layout.id} (${layout.totalSeats} seats)`;
+  }
+
+  layoutNameById(layoutId: string): string {
+    const layout = this.layouts.find((row) => row.id === layoutId);
+    if (!layout) {
+      return layoutId;
+    }
+
+    return this.layoutDisplayName(layout);
+  }
+
+  private extractError(error: unknown, fallback: string): string {
+    if (typeof error === 'object' && error !== null && 'error' in error) {
+      const payload = (error as { error?: unknown }).error;
+      if (typeof payload === 'string') {
+        return payload;
+      }
+
+      if (typeof payload === 'object' && payload !== null && 'message' in payload) {
+        const message = (payload as { message?: unknown }).message;
+        if (typeof message === 'string' && message.trim().length > 0) {
+          return message;
+        }
+      }
+    }
+
+    return fallback;
   }
 }

@@ -18,9 +18,15 @@ public class BusesController(AppDbContext dbContext) : ControllerBase
     [Authorize(Roles = nameof(UserRole.Operator) + "," + nameof(UserRole.Admin))]
     public async Task<IActionResult> CreateBus([FromBody] CreateBusRequest request)
     {
-        if (!await dbContext.Operators.AnyAsync(x => x.UserId == request.OperatorId))
+        var operatorRow = await dbContext.Operators.FirstOrDefaultAsync(x => x.UserId == request.OperatorId);
+        if (operatorRow is null)
         {
             return BadRequest("Invalid operator id.");
+        }
+
+        if (!User.IsInRole(nameof(UserRole.Admin)) && operatorRow.Status != OperatorStatus.Approved)
+        {
+            return BadRequest("Operator account is not approved. Bus creation is allowed only for approved operators.");
         }
 
         if (!await dbContext.BusLayouts.AnyAsync(x => x.Id == request.LayoutId))

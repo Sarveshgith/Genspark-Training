@@ -6,7 +6,11 @@ import { ApiService } from '../../core/api.service';
 interface LayoutResponse {
   id: string;
   totalSeats: number;
-  config: unknown;
+  config: {
+    rows?: number;
+    cols?: number;
+    seats?: Array<{ seatNumber: string; femaleOnly: boolean }>;
+  };
   createdAt: string;
 }
 
@@ -40,6 +44,7 @@ interface LayoutResponse {
       <table *ngIf="!loadingData && layouts.length > 0">
         <thead>
           <tr>
+            <th>Name</th>
             <th>ID</th>
             <th>Total Seats</th>
             <th>Created</th>
@@ -47,6 +52,7 @@ interface LayoutResponse {
         </thead>
         <tbody>
           <tr *ngFor="let layout of layouts">
+            <td>{{ layoutName(layout) }}</td>
             <td>{{ layout.id }}</td>
             <td>{{ layout.totalSeats }}</td>
             <td>{{ layout.createdAt | date: 'short' }}</td>
@@ -139,5 +145,17 @@ export class OperatorLayoutsPageComponent implements OnInit {
         this.cdr.detectChanges();
       },
     });
+  }
+
+  layoutName(layout: LayoutResponse): string {
+    const rows = layout.config?.rows;
+    const cols = layout.config?.cols;
+    const femaleSeats = layout.config?.seats?.filter((seat) => seat.femaleOnly).length ?? 0;
+
+    if (typeof rows === 'number' && typeof cols === 'number') {
+      return `${rows}x${cols}f${femaleSeats}`;
+    }
+
+    return `Custom-${layout.id.slice(0, 8)}`;
   }
 }
