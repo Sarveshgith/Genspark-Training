@@ -38,6 +38,11 @@ public class BookingsController(AppDbContext dbContext, IConfiguration configura
             return BadRequest("Invalid trip id.");
         }
 
+        if (!IsTripBookableForUser(trip))
+        {
+            return BadRequest("This trip is not available for booking.");
+        }
+
         if (request.Seats.Count == 0)
         {
             return BadRequest("At least one seat is required.");
@@ -131,6 +136,11 @@ public class BookingsController(AppDbContext dbContext, IConfiguration configura
             return Forbid();
         }
 
+        if (!IsTripBookableForUser(ticket.Trip))
+        {
+            return BadRequest("This trip is no longer available for payment.");
+        }
+
         var breakdown = BuildPaymentBreakdown(ticket.BaseAmount);
 
         return Ok(new
@@ -186,6 +196,11 @@ public class BookingsController(AppDbContext dbContext, IConfiguration configura
             return Forbid();
         }
 
+        if (!IsTripBookableForUser(ticket.Trip))
+        {
+            return BadRequest("This trip is no longer available for payment.");
+        }
+
         if (ticket.PaymentStatus == PaymentStatus.Success)
         {
             return Conflict("Booking is already paid.");
@@ -208,11 +223,6 @@ public class BookingsController(AppDbContext dbContext, IConfiguration configura
         }
 
         var breakdown = BuildPaymentBreakdown(ticket.BaseAmount);
-        var emailSent = await TrySendBookingEmailAsync(ticket, breakdown);
-        if (!emailSent)
-        {
-            return BadRequest("Payment not completed. Email could not be sent. Configure SMTP and retry.");
-        }
 
         ticket.PaymentRef = request.PaymentRef.Trim();
         ticket.TotalAmount = breakdown.Total;
@@ -226,6 +236,9 @@ public class BookingsController(AppDbContext dbContext, IConfiguration configura
         }
 
         await dbContext.SaveChangesAsync();
+
+        // Send confirmation email asynchronously as best-effort (fire and forget)
+        _ = TrySendBookingEmailAsync(ticket, breakdown);
 
         return Ok(new
         {
@@ -400,6 +413,22 @@ public class BookingsController(AppDbContext dbContext, IConfiguration configura
     private static string BuildRouteDisplay(string fromCity, string fromState, string toCity, string toState)
     {
         return $"{fromCity}, {fromState} -> {toCity}, {toState}";
+    }
+
+    private static bool IsTripBookableForUser(Trip trip)
+    {
+        if (trip.Bus is null || trip.Route is null || trip.Route.From is null || trip.Route.To is null)
+        {
+            return false;
+        }
+
+        var isTripStatusBookable = trip.Status == TripStatus.Scheduled || trip.Status == TripStatus.Active;
+        return isTripStatusBookable &&
+               trip.DepartureTime > DateTime.UtcNow &&
+               trip.Bus.Status == BusStatus.Approved &&
+               trip.Route.Status == RouteStatus.Active &&
+               trip.Route.From.Status == LocationStatus.Approved &&
+               trip.Route.To.Status == LocationStatus.Approved;
     }
 
     private async Task<bool> TrySendBookingEmailAsync(Ticket ticket, (decimal ConvenienceFee, decimal ServiceFee, decimal TaxAmount, decimal Total) breakdown)

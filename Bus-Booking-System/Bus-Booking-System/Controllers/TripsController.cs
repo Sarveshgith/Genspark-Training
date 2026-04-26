@@ -148,6 +148,18 @@ public class TripsController(AppDbContext dbContext, IConfiguration configuratio
             query = query.Where(x => x.DepartureTime >= day && x.DepartureTime < next);
         }
 
+        if (User.IsInRole(nameof(UserRole.User)))
+        {
+            var now = DateTime.UtcNow;
+            query = query.Where(x =>
+                (x.Status == TripStatus.Scheduled || x.Status == TripStatus.Active) &&
+                x.DepartureTime > now &&
+                x.Bus.Status == BusStatus.Approved &&
+                x.Route.Status == RouteStatus.Active &&
+                x.Route.From.Status == LocationStatus.Approved &&
+                x.Route.To.Status == LocationStatus.Approved);
+        }
+
         var trips = await query
             .OrderBy(x => x.DepartureTime)
             .Select(x => new
@@ -312,6 +324,9 @@ public class TripsController(AppDbContext dbContext, IConfiguration configuratio
         if (trip is null)
             return NotFound("Trip not found.");
 
+        if (User.IsInRole(nameof(UserRole.User)) && !IsTripBookableForUser(trip))
+            return BadRequest("This trip is not available for booking.");
+
         if (trip.Bus is null || trip.Bus.Layout is null)
             return BadRequest("Bus layout is not configured for this trip.");
 
@@ -385,6 +400,22 @@ public class TripsController(AppDbContext dbContext, IConfiguration configuratio
             DateTimeKind.Local => value.ToUniversalTime(),
             _ => DateTime.SpecifyKind(value, DateTimeKind.Utc)
         };
+    }
+
+    private static bool IsTripBookableForUser(Trip trip)
+    {
+        if (trip.Bus is null || trip.Route is null || trip.Route.From is null || trip.Route.To is null)
+        {
+            return false;
+        }
+
+        var isTripStatusBookable = trip.Status == TripStatus.Scheduled || trip.Status == TripStatus.Active;
+        return isTripStatusBookable &&
+               trip.DepartureTime > DateTime.UtcNow &&
+               trip.Bus.Status == BusStatus.Approved &&
+               trip.Route.Status == RouteStatus.Active &&
+               trip.Route.From.Status == LocationStatus.Approved &&
+               trip.Route.To.Status == LocationStatus.Approved;
     }
 
     private async Task<bool> TrySendTripCancellationEmailAsync(Trip trip, IReadOnlyCollection<string> recipients)
