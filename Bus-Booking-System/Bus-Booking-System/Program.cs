@@ -6,6 +6,7 @@ using Microsoft.OpenApi.Models;
 using System.Text;
 using System.Text.Json.Serialization;
 
+LoadEnvironmentFile();
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers()
@@ -108,3 +109,54 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 app.Run();
+
+static void LoadEnvironmentFile()
+{
+    var currentDirectory = new DirectoryInfo(AppContext.BaseDirectory);
+
+    while (currentDirectory is not null)
+    {
+        var envFilePath = Path.Combine(currentDirectory.FullName, ".env");
+        if (File.Exists(envFilePath))
+        {
+            foreach (var rawLine in File.ReadAllLines(envFilePath))
+            {
+                var line = rawLine.Trim();
+
+                if (line.Length == 0 || line.StartsWith('#'))
+                {
+                    continue;
+                }
+
+                if (line.StartsWith("export ", StringComparison.OrdinalIgnoreCase))
+                {
+                    line = line[7..].Trim();
+                }
+
+                var equalsIndex = line.IndexOf('=');
+                if (equalsIndex <= 0)
+                {
+                    continue;
+                }
+
+                var key = line[..equalsIndex].Trim();
+                var value = line[(equalsIndex + 1)..].Trim();
+
+                if (value.Length >= 2 &&
+                    ((value.StartsWith('"') && value.EndsWith('"')) || (value.StartsWith('\'') && value.EndsWith('\''))))
+                {
+                    value = value[1..^1];
+                }
+
+                if (Environment.GetEnvironmentVariable(key) is null)
+                {
+                    Environment.SetEnvironmentVariable(key, value);
+                }
+            }
+
+            return;
+        }
+
+        currentDirectory = currentDirectory.Parent;
+    }
+}
