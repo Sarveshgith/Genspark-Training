@@ -68,7 +68,15 @@ interface LocationOption {
             <td>{{ trip.arrivalTime | date: 'short' }}</td>
             <td>{{ trip.pricePerSeat }}</td>
             <td>{{ trip.status }}</td>
-            <td><a [routerLink]="['/trips', trip.id, 'seats']">Select Seats</a></td>
+            <td>
+              <a
+                *ngIf="isBookableStatus(trip.status)"
+                [routerLink]="['/trips', trip.id, 'seats']"
+              >
+                Select Seats
+              </a>
+              <span *ngIf="!isBookableStatus(trip.status)">Not available</span>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -130,7 +138,7 @@ export class TripsPageComponent implements OnInit {
       })
       .subscribe({
         next: (response) => {
-          this.trips = response;
+          this.trips = response.filter((trip) => this.isBookableStatus(trip.status));
           this.searching = false;
           this.cdr.detectChanges();
         },
@@ -141,5 +149,9 @@ export class TripsPageComponent implements OnInit {
           this.cdr.detectChanges();
         },
       });
+  }
+
+  isBookableStatus(status: string): boolean {
+    return status === 'Scheduled' || status === 'Active';
   }
 }

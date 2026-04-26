@@ -48,7 +48,17 @@ interface MyBookingRow {
             <td>{{ booking.paymentStatus }}</td>
             <td>{{ booking.totalAmount }}</td>
             <td>{{ booking.createdAt | date: 'short' }}</td>
-            <td><a [routerLink]="['/booking', booking.id]">View</a></td>
+            <td>
+              <a [routerLink]="['/booking', booking.id]">View</a>
+              <button 
+                type="button" 
+                (click)="downloadPdf(booking.id, booking.bookingRef)"
+                [disabled]="booking.status !== 'Confirmed' || downloadingId === booking.id"
+                [title]="booking.status !== 'Confirmed' ? 'Only confirmed tickets can be downloaded' : ''"
+              >
+                {{ downloadingId === booking.id ? 'Downloading...' : 'Download PDF' }}
+              </button>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -63,6 +73,7 @@ export class MyBookingsPageComponent implements OnInit {
 
   bookings: MyBookingRow[] = [];
   errorMessage = '';
+  downloadingId = '';
 
   ngOnInit(): void {
     this.loadBookings();
@@ -81,5 +92,47 @@ export class MyBookingsPageComponent implements OnInit {
         this.cdr.detectChanges();
       },
     });
+  }
+
+  downloadPdf(ticketId: string, bookingRef: string): void {
+    this.downloadingId = ticketId;
+    this.api.getBlob(`tickets/${ticketId}/download-pdf`).subscribe({
+      next: (blob) => {
+        const link = document.createElement('a');
+        link.href = window.URL.createObjectURL(blob);
+        link.download = `Ticket_${bookingRef}.pdf`;
+        link.click();
+        window.URL.revokeObjectURL(link.href);
+        this.downloadingId = '';
+        this.cdr.detectChanges();
+      },
+      error: (error) => {
+        console.error(error);
+        this.downloadingId = '';
+        void this.setDownloadErrorMessage(error);
+      },
+    });
+  }
+
+  private async setDownloadErrorMessage(error: unknown): Promise<void> {
+    const payload = (error as { error?: unknown })?.error;
+
+    if (payload instanceof Blob) {
+      const text = (await payload.text()).trim();
+      this.errorMessage = text.length > 0
+        ? text
+        : 'Failed to download PDF. Only confirmed tickets can be downloaded.';
+      this.cdr.detectChanges();
+      return;
+    }
+
+    if (typeof payload === 'string' && payload.trim().length > 0) {
+      this.errorMessage = payload;
+      this.cdr.detectChanges();
+      return;
+    }
+
+    this.errorMessage = 'Failed to download PDF. Only confirmed tickets can be downloaded.';
+    this.cdr.detectChanges();
   }
 }

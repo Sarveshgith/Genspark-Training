@@ -9,7 +9,16 @@ export class ApiService {
     (globalThis as { __apiBaseUrl?: string }).__apiBaseUrl ?? 'http://localhost:5039';
 
   get<T>(path: string, params?: Record<string, unknown>): Observable<T> {
-    return this.http.get<T>(this.url(path), { params: this.buildParams(params) });
+  return this.http.get<T>(this.url(path), {
+    params: this.buildParams(params)
+  });
+  }
+
+  getBlob(path: string, params?: Record<string, unknown>): Observable<Blob> {
+    return this.http.get(this.url(path), {
+      params: this.buildParams(params),
+      responseType: 'blob'
+    });
   }
 
   post<T>(path: string, body: unknown): Observable<T> {
