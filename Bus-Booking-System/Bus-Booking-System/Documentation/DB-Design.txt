@@ -28,6 +28,13 @@ Seat_Bookings
 tickets
     id, booking_ref UNIQUE, user_id, trip_id FK, status ENUM, base_amount, total_amount, payment_status  ENUM, payment_ref, created_at
 
-Taxes and fees will be fixed and hardcoded
-Female seats = Mapped, If validation fails = retry or delete seat_booking row
-Only Cancelling Booked tickets will by Logged
+Assumptions:
+    Taxes and fees will be fixed and hardcoded
+    Female seats = Mapped, If validation fails = retry or delete seat_booking row
+    Only Cancelling Booked tickets will by Logged
+
+Normalization check:
+    Seat_bookings = Use only ticket_id, other id - already in ticket table
+    Having different sub-tables instead of ENUMS
+    No need for ID where candidate / composite can be established
+    Have a seperate for JSON Blobs
