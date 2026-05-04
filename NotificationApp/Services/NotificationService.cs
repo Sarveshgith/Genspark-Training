@@ -10,16 +10,36 @@ internal class NotificationService
 
     public User CreateUser()
     {
-        Console.WriteLine($"Enter user details:");
-        Console.Write($"Name: ");
-        string name = Console.ReadLine() ?? string.Empty;
-        Console.Write($"Email: ");
-        string email = Console.ReadLine() ?? string.Empty;
-        Console.Write($"Phone number: ");
-        string phoneNo = Console.ReadLine() ?? string.Empty;
+        Console.WriteLine("Enter user details:");
+
+        string name;
+        while (true)
+        {
+            Console.Write("Name: ");
+            name = Console.ReadLine()?.Trim() ?? string.Empty;
+            if (Validation.IsNonEmptyName(name)) break;
+            Console.WriteLine("Name cannot be empty. Please enter a valid name.");
+        }
+
+        string email;
+        while (true)
+        {
+            Console.Write("Email: ");
+            email = Console.ReadLine()?.Trim() ?? string.Empty;
+            if (Validation.IsValidEmail(email)) break;
+            Console.WriteLine("Invalid email format. Please enter a valid email.");
+        }
+
+        string phoneNo;
+        while (true)
+        {
+            Console.Write("Phone number: ");
+            phoneNo = Console.ReadLine()?.Trim() ?? string.Empty;
+            if (Validation.IsValidPhone(phoneNo)) break;
+            Console.WriteLine("Invalid phone number. Use digits and optional +, -, parentheses or spaces.");
+        }
 
         User user = new User(name, email, phoneNo);
-
         users.Add(user);
         return user;
     }
