@@ -1,9 +1,9 @@
-using System;
 using NotificationApp.Models;
 using NotificationApp.Services;
 
 namespace NotificationApp;
 
+//Do Refer Documentation for the total workflow and DesignModel.
 internal class Program
 {
 	static void Main(string[] args)
@@ -15,24 +15,73 @@ internal class Program
 			Console.WriteLine("\nNotification System");
 			Console.WriteLine("1) Create user");
 			Console.WriteLine("2) List users");
-			Console.WriteLine("3) Send Email");
-			Console.WriteLine("4) Send SMS");
-			Console.WriteLine("5) Exit");
+			Console.WriteLine("3) Update user");
+			Console.WriteLine("4) Delete user");
+			Console.WriteLine("5) Send Email");
+			Console.WriteLine("6) Send SMS");
+			Console.WriteLine("7) Exit");
 			Console.Write("Choose: ");
 			var choice = Console.ReadLine();
 
+			//Create User
 			if (choice == "1")
 			{
 				var u = service.CreateUser();
 				Console.WriteLine($"Created user: {u.Name}");
 			}
 
+			//List Users
 			else if (choice == "2")
 			{
 				service.PrintUsers();
 			}
 
-			else if (choice == "3" || choice == "4")
+			//Update User
+			else if (choice == "3")
+			{
+				var users = service.GetUsers();
+				if (users.Count == 0)
+				{
+					Console.WriteLine("No users. Create one first.");
+					continue;
+				}
+				Console.WriteLine("Select user index to update:");
+				for (int i = 0; i < users.Count; i++) 
+                    Console.WriteLine($"{i}) {users[i].Name}");
+
+				Console.Write("Index: ");
+				if (!int.TryParse(Console.ReadLine(), out int idx) || idx < 0 || idx >= users.Count)
+				{
+					Console.WriteLine("Invalid index.");
+					continue;
+				}
+				service.UpdateUser(users[idx].Email, users[idx]);
+			}
+
+			//Delete User
+			else if (choice == "4")
+			{
+				var users = service.GetUsers();
+				if (users.Count == 0)
+				{
+					Console.WriteLine("No users. Create one first.");
+					continue;
+				}
+				Console.WriteLine("Select user index to delete:");
+				for (int i = 0; i < users.Count; i++) 
+                    Console.WriteLine($"{i}) {users[i].Name}");
+
+				Console.Write("Index: ");
+				if (!int.TryParse(Console.ReadLine(), out int idx) || idx < 0 || idx >= users.Count)
+				{
+					Console.WriteLine("Invalid index.");
+					continue;
+				}
+				service.DeleteUser(users[idx].Email);
+			}
+
+			//Send Notification
+			else if (choice == "5" || choice == "6")
 			{
 				var users = service.GetUsers();
 				if (users.Count == 0)
@@ -51,11 +100,9 @@ internal class Program
 					continue;
 				}
 				User user = users[idx];
-				Console.Write("Message: ");
-				string msg = Console.ReadLine() ?? string.Empty;
-				Notification notif = new Notification { Message = msg, SentTime = DateTime.Now };
+				Notification notif = service.CreateNotification();
 
-				if (choice == "3")
+				if (choice == "5")
 				{
 					var email = new EmailNotification();
 					service.SendNotification(email, user, notif);
@@ -66,7 +113,7 @@ internal class Program
 					service.SendNotification(sms, user, notif);
 				}
 			}
-			else if (choice == "5") break;
+			else if (choice == "7") break;
             else Console.WriteLine("Invalid choice.");
 		}
 	}
