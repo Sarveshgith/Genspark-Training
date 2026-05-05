@@ -4,6 +4,7 @@ using NotificationApp.Services;
 
 namespace NotificationApp;
 
+//Do Refer Documentation for the total workflow and DesignModel.
 internal class Program
 {
 	static void Main(string[] args)
@@ -21,17 +22,20 @@ internal class Program
 			Console.Write("Choose: ");
 			var choice = Console.ReadLine();
 
+			//Create User
 			if (choice == "1")
 			{
 				var u = service.CreateUser();
 				Console.WriteLine($"Created user: {u.Name}");
 			}
 
+			//List Users
 			else if (choice == "2")
 			{
 				service.PrintUsers();
 			}
 
+			//Send Notification
 			else if (choice == "3" || choice == "4")
 			{
 				var users = service.GetUsers();
@@ -55,11 +59,13 @@ internal class Program
 				string msg = Console.ReadLine() ?? string.Empty;
 				Notification notif = new Notification { Message = msg, SentTime = DateTime.Now };
 
+				//Send Email
 				if (choice == "3")
 				{
 					var email = new EmailNotification();
 					service.SendNotification(email, user, notif);
 				}
+				//Send SMS
 				else
 				{
 					var sms = new SMSNotification();

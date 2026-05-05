@@ -44,6 +44,7 @@ internal class NotificationService
         return user;
     }
 
+    //Returns a read-only list of users to prevent external modification of the internal users list.
     public IReadOnlyList<User> GetUsers()
     {
         return users.AsReadOnly();
@@ -65,6 +66,7 @@ internal class NotificationService
         return;
     }
 
+    //Sends a notification using the provided INotification implementation (Email or SMS) and stores the sent notification in the notifications list.
     public void SendNotification(INotification notificationSender, User user, Notification notification)
     {
         notificationSender.SendNotif(user, notification);

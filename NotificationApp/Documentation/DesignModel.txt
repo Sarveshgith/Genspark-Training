@@ -1,13 +1,16 @@
-User => Model class
-Notification => Model class
+MODEL LAYER
+    User => Model class
+    Notification => Model class
 
-Notification => Interface  
-    Send(User, Notification)
+INTERFACE LAYER
+    Notification => Interface  
+        Send(User, Notification)
 
-Notification Interface implemented by => Email, SMS Classes
+    Notification Interface implemented by => Email, SMS Classes
 
-Notification Service =>
-    Data initialisation
-    User input
-    validations
-    Send Data
+SERVICE LAYER
+    Notification Service =>
+        Data initialisation
+        User input
+        validations
+        Send Data
