@@ -27,7 +27,14 @@ internal class Game
 
     public void Start()
     {
-        string targetWord = wordProvider.GetRandomWord().ToUpper();
+        Console.Write("Select difficulty - (E)asy, (M)edium, (H)ard [E]: ");
+        string diffInput = (Console.ReadLine() ?? string.Empty).Trim().ToUpper();
+        var difficulty = WordProvider.Difficulty.Easy;
+        if (diffInput.StartsWith("M")) difficulty = WordProvider.Difficulty.Medium;
+        else if (diffInput.StartsWith("H")) difficulty = WordProvider.Difficulty.Hard;
+
+        string hiddenWord = wordProvider.GetRandomWord(difficulty);
+        string targetWord = hiddenWord.ToUpper();
 
         int maxAttempts = 6;
 
@@ -71,6 +78,6 @@ internal class Game
             }
         }
 
-        consoleCommenter.PrintLoseComment(targetWord);
+        consoleCommenter.PrintLoseComment(hiddenWord);
     }
 }

@@ -2,19 +2,49 @@ using System;
 
 namespace GuessGameApp.Services;
 
-//Chooses the word for guessing and provides it to game logic.
 internal class WordProvider
 {
-    private readonly List<string> words = new List<string>
+    public enum Difficulty
     {
-        "apple", "grape", "peach", "berry",
-        "melon", "mango", "lemon"
+        Easy,
+        Medium,
+        Hard
+    }
 
+    private readonly List<string> easyWords = new()
+    {
+        "apple", "grape", "peach", "berry", "melon", "mango", "lemon"
     };
 
-    public string GetRandomWord()
+    private readonly List<string> mediumWords = new()
     {
-        int index = Random.Shared.Next(words.Count);
-        return words[index];
+        "olive", "cider", "prune", "basil", "spice", "cocoa", "papaw"
+    };
+
+    private readonly List<string> hardWords = new()
+    {
+        "fjord", "glyph", "nymph", "crypt", "vexed", "zesty", "brynd"
+    };
+
+    public string GetRandomWord(Difficulty difficulty)
+    {
+        List<string> selectedWords;
+
+        if (difficulty == Difficulty.Easy)
+        {
+            selectedWords = easyWords;
+        }
+        else if (difficulty == Difficulty.Medium)
+        {
+            selectedWords = mediumWords;
+        }
+        else
+        {
+            selectedWords = hardWords;
+        }
+
+        int index = Random.Shared.Next(selectedWords.Count);
+
+        return selectedWords[index];
     }
 }

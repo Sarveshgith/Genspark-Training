@@ -64,6 +64,8 @@ dotnet build
 
 ![Game Output](./01.png)
 
+![Game Output](./02.png)
+
 ---
 
 ## OOP Concepts Implemented
