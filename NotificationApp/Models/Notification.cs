@@ -2,6 +2,7 @@ using System;
 
 namespace NotificationApp.Models;
 
+//This Class handles the properties and constructors of the Notification class.
 internal class Notification
 {
     public required string Message {get; set;} = string.Empty;
