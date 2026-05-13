@@ -173,23 +173,6 @@ The application validates and handles:
 
 ---
 
-## Potential Future Enhancements
-
-- **Password Hashing** (bcrypt) for better security
-- **Leaderboard CLI** displaying top players by score or win rate
-- **Difficulty-specific Stats** (best scores per difficulty level)
-- **Streaks & Achievements** (e.g., 5-game winning streak)
-- **Hints System** (reveal random letters, costs points)
-- **Word Categories** (animals, cities, etc.)
-- **Multiplayer Mode** (race to solve same word)
-- **REST API** with Swagger documentation
-- **Web UI** (Blazor or React)
-- **Player Profiles** (custom names, avatars)
-- **Statistics Export** (CSV/JSON of game history)
-- **Input Optimization** (cache word lists, batch DB queries)
-
----
-
 ## Output Screenshot
 
 ![Game Output](./01.png)
