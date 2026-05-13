@@ -2,26 +2,33 @@ using System;
 using GuessGameApp.Exceptions;
 using GuessGameApp.Helpers;
 using GuessGameApp.Services;
+using GuessGameApp.Models;
 
 namespace GuessGameApp.Main;
 
 //Main game loop and logic aggregations class.
-internal class Game
+internal class GuessGame
 {
     private readonly WordProvider wordProvider;
     private readonly GuessValidator guessValidator;
     private readonly FeedbackGenerator feedbackGenerator;
     private readonly ConsoleCommenter consoleCommenter;
+    private readonly ScoreCalculator scoreCalculator;
+    private readonly Repositories.GameSessionRepository gameSessionRepository;
 
     private readonly HashSet<string> previousGuesses;
+    private readonly Models.User currentUser;
 
-    public Game()
+    public GuessGame(User user)
     {
+        currentUser = user;
         wordProvider = new WordProvider();
         guessValidator = new GuessValidator();
         feedbackGenerator = new FeedbackGenerator();
         consoleCommenter = new ConsoleCommenter();
-        
+        scoreCalculator = new ScoreCalculator();
+        gameSessionRepository = new Repositories.GameSessionRepository();
+
         previousGuesses = new HashSet<string>();
     }
 
@@ -61,6 +68,21 @@ internal class Game
                 if(guess == targetWord)
                 {
                     consoleCommenter.PrintWinComment(attempt);
+
+                    int score = scoreCalculator.CalculateScore(attempt);
+
+                    var gameModel = new Game
+                    {
+                        userId = currentUser.id,
+                        difficultyLvl = difficulty.ToString(),
+                        isWin = true,
+                        attempts = attempt,
+                        score = score,
+                        createdAt = DateTime.Now
+                    };
+
+                    gameSessionRepository.SaveGameSession(gameModel);
+
                     return;
                 }
                 else
@@ -79,5 +101,17 @@ internal class Game
         }
 
         consoleCommenter.PrintLoseComment(hiddenWord);
+
+        var loseModel = new Game
+        {
+            userId = currentUser.id,
+            difficultyLvl = difficulty.ToString(),
+            isWin = false,
+            attempts = maxAttempts,
+            score = 0,
+            createdAt = DateTime.Now
+        };
+
+        gameSessionRepository.SaveGameSession(loseModel);
     }
 }

@@ -8,9 +8,22 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Folder Include="Data/" />
     <Folder Include="Exceptions/" />
+    <Folder Include="Interfaces/" />
     <Folder Include="Main/" />
+    <Folder Include="Models/" />
+    <Folder Include="Repositories/" />
     <Folder Include="Services/" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Npgsql" Version="7.0.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Npgsql" Version="10.0.2" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.9.1" />
   </ItemGroup>
 
 </Project>
