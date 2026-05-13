@@ -54,6 +54,35 @@ public class DatabaseInitializer
         using var createPlayerStatsCommand = new NpgsqlCommand(createPlayerStatsQuery, connection);
         createPlayerStatsCommand.ExecuteNonQuery();
 
+        string createWordsTableQuery = @"
+            CREATE TABLE IF NOT EXISTS words (
+                id SERIAL PRIMARY KEY,
+                word VARCHAR(255) NOT NULL,
+                difficulty VARCHAR(50) NOT NULL
+            );
+        ";
+
+        using var createWordsTableCommand = new NpgsqlCommand(createWordsTableQuery, connection);
+        createWordsTableCommand.ExecuteNonQuery();
+
+        // Seed words if table is empty
+        string countWordsQuery = "SELECT COUNT(*) FROM words";
+        using var countCmd = new NpgsqlCommand(countWordsQuery, connection);
+        var count = Convert.ToInt32(countCmd.ExecuteScalar());
+
+        if (count == 0)
+        {
+            string seedWordsQuery = @"
+                INSERT INTO words (word, difficulty) VALUES
+                ('apple','Easy'),('grape','Easy'),('peach','Easy'),('berry','Easy'),('melon','Easy'),('mango','Easy'),('lemon','Easy'),
+                ('olive','Medium'),('cider','Medium'),('prune','Medium'),('basil','Medium'),('spice','Medium'),('cocoa','Medium'),('papaw','Medium'),
+                ('fjord','Hard'),('glyph','Hard'),('nymph','Hard'),('crypt','Hard'),('vexed','Hard'),('zesty','Hard'),('brynd','Hard');
+            ";
+
+            using var seedCmd = new NpgsqlCommand(seedWordsQuery, connection);
+            seedCmd.ExecuteNonQuery();
+        }
+
         connection.Close();
     }
 }

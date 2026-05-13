@@ -1,4 +1,6 @@
 using System;
+using GuessGameApp.Data;
+using Npgsql;
 
 namespace GuessGameApp.Services;
 
@@ -11,40 +13,27 @@ internal class WordProvider
         Hard
     }
 
-    private readonly List<string> easyWords = new()
-    {
-        "apple", "grape", "peach", "berry", "melon", "mango", "lemon"
-    };
-
-    private readonly List<string> mediumWords = new()
-    {
-        "olive", "cider", "prune", "basil", "spice", "cocoa", "papaw"
-    };
-
-    private readonly List<string> hardWords = new()
-    {
-        "fjord", "glyph", "nymph", "crypt", "vexed", "zesty", "brynd"
-    };
-
     public string GetRandomWord(Difficulty difficulty)
     {
-        List<string> selectedWords;
+        string difficultyStr = difficulty.ToString();
 
-        if (difficulty == Difficulty.Easy)
+        using var connection = DbConnectionFactory.CreateConnection();
+        connection.Open();
+
+        string query = @"SELECT word FROM words WHERE difficulty = @difficulty ORDER BY RANDOM() LIMIT 1";
+
+        using var cmd = new NpgsqlCommand(query, connection);
+        cmd.Parameters.AddWithValue("@difficulty", difficultyStr);
+
+        var result = cmd.ExecuteScalar();
+        connection.Close();
+
+        if (result != null && result != DBNull.Value)
         {
-            selectedWords = easyWords;
-        }
-        else if (difficulty == Difficulty.Medium)
-        {
-            selectedWords = mediumWords;
-        }
-        else
-        {
-            selectedWords = hardWords;
+            return result.ToString() ?? "apple";
         }
 
-        int index = Random.Shared.Next(selectedWords.Count);
-
-        return selectedWords[index];
+        // Fallback if no word found
+        return "apple";
     }
 }

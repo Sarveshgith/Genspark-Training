@@ -7,7 +7,7 @@ A database-backed console word guessing game inspired by Wordle. Features user a
 ## Features
 
 ### Core Gameplay
-- Random word selection across 3 difficulty levels (Easy, Medium, Hard)
+- Random word selection from database across 3 difficulty levels (Easy, Medium, Hard)
 - Maximum of 6 attempts per game
 - Real-time feedback system:
   - `G` → Correct letter in correct position
@@ -83,14 +83,18 @@ total_score (INTEGER DEFAULT 0)
 updated_at (TIMESTAMP DEFAULT CURRENT_TIMESTAMP)
 ```
 
+### `words` Table
+```sql
+id (SERIAL PRIMARY KEY)
+word (VARCHAR(255) NOT NULL)
+difficulty (VARCHAR(50) NOT NULL)
+```
+- Pre-seeded with 21 words (7 Easy, 7 Medium, 7 Hard)
+- Auto-populated on first run
+
 ---
 
 ## Setup & Prerequisites
-
-### Requirements
-- .NET SDK 10.0+
-- PostgreSQL 12+ running locally
-- Npgsql 7.0.5+
 
 ### Database Configuration
 
