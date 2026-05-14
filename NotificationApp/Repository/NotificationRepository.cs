@@ -1,5 +1,4 @@
-using Npgsql;
-using NotificationApp.Data;
+using NotificationApp.Contexts;
 using NotificationApp.Interfaces;
 using NotificationApp.Models;
 
@@ -7,157 +6,66 @@ namespace NotificationApp.Repository;
 
 internal class NotificationRepository : INotificationRepository
 {
+    private readonly NotifContext _context;
+
+    public NotificationRepository(NotifContext context = null)
+    {
+        _context = context ?? new NotifContext();
+    }
+
     public Notification Create(Notification item)
     {
-        using var connection = DbConnectionFactory.CreateConnection();
-        connection.Open();
-
-        const string query = @"
-            INSERT INTO notifications (user_id, message, notif_type, sent_date)
-            VALUES (@user_id, @message, @notif_type, @sent_date);
-        ";
-
-        using var cmd = new NpgsqlCommand(query, connection);
-        cmd.Parameters.AddWithValue("@user_id", item.UserId);
-        cmd.Parameters.AddWithValue("@message", item.Message);
-        cmd.Parameters.AddWithValue("@notif_type", item.NotifType);
-        cmd.Parameters.AddWithValue("@sent_date", item.SentDate);
-
-        cmd.ExecuteNonQuery();
+        _context.Notifications.Add(item);
+        _context.SaveChanges();
         return item;
     }
 
-    public Notification? Get(DateTime sentDate)
+    public Notification? Get(int id)
     {
-        using var connection = DbConnectionFactory.CreateConnection();
-        connection.Open();
-
-        const string query = @"
-            SELECT user_id, message, notif_type, sent_date
-            FROM notifications
-            WHERE sent_date = @sent_date
-            LIMIT 1;
-        ";
-
-        using var cmd = new NpgsqlCommand(query, connection);
-        cmd.Parameters.AddWithValue("@sent_date", sentDate);
-        using var reader = cmd.ExecuteReader();
-
-        if (!reader.Read())
-        {
-            return null;
-        }
-
-        return Map(reader);
+        return _context.Notifications.FirstOrDefault(n => n.Id == id);
     }
 
     public List<Notification> GetAll()
     {
-        var result = new List<Notification>();
-
-        using var connection = DbConnectionFactory.CreateConnection();
-        connection.Open();
-
-        const string query = @"
-            SELECT user_id, message, notif_type, sent_date
-            FROM notifications
-            ORDER BY sent_date DESC;
-        ";
-
-        using var cmd = new NpgsqlCommand(query, connection);
-        using var reader = cmd.ExecuteReader();
-
-        while (reader.Read())
-        {
-            result.Add(Map(reader));
-        }
-
-        return result;
+        return _context.Notifications
+            .OrderByDescending(n => n.SentDate)
+            .ToList();
     }
 
     public List<Notification> GetByUserId(int userId)
     {
-        var result = new List<Notification>();
-
-        using var connection = DbConnectionFactory.CreateConnection();
-        connection.Open();
-
-        const string query = @"
-            SELECT user_id, message, notif_type, sent_date
-            FROM notifications
-            WHERE user_id = @user_id
-            ORDER BY sent_date DESC;
-        ";
-
-        using var cmd = new NpgsqlCommand(query, connection);
-        cmd.Parameters.AddWithValue("@user_id", userId);
-        using var reader = cmd.ExecuteReader();
-
-        while (reader.Read())
-        {
-            result.Add(Map(reader));
-        }
-
-        return result;
+        return _context.Notifications
+            .Where(n => n.UserId == userId)
+            .OrderByDescending(n => n.SentDate)
+            .ToList();
     }
 
-    public Notification? Update(DateTime sentDate, Notification item)
+    public Notification? Update(int id, Notification item)
     {
-        using var connection = DbConnectionFactory.CreateConnection();
-        connection.Open();
-
-        const string query = @"
-            UPDATE notifications
-            SET user_id = @user_id,
-                message = @message,
-                notif_type = @notif_type,
-                sent_date = @new_sent_date
-            WHERE sent_date = @sent_date;
-        ";
-
-        using var cmd = new NpgsqlCommand(query, connection);
-        cmd.Parameters.AddWithValue("@sent_date", sentDate);
-        cmd.Parameters.AddWithValue("@user_id", item.UserId);
-        cmd.Parameters.AddWithValue("@message", item.Message);
-        cmd.Parameters.AddWithValue("@notif_type", item.NotifType);
-        cmd.Parameters.AddWithValue("@new_sent_date", item.SentDate);
-
-        var affected = cmd.ExecuteNonQuery();
-        if (affected == 0)
-        {
-            return null;
-        }
-
-        return item;
-    }
-
-    public Notification? Delete(DateTime sentDate)
-    {
-        var existing = Get(sentDate);
+        var existing = _context.Notifications.FirstOrDefault(n => n.Id == id);
         if (existing == null)
         {
             return null;
         }
 
-        using var connection = DbConnectionFactory.CreateConnection();
-        connection.Open();
-
-        const string query = "DELETE FROM notifications WHERE sent_date = @sent_date";
-        using var cmd = new NpgsqlCommand(query, connection);
-        cmd.Parameters.AddWithValue("@sent_date", sentDate);
-        cmd.ExecuteNonQuery();
-
+        existing.UserId = item.UserId;
+        existing.Message = item.Message;
+        existing.NotifType = item.NotifType;
+        existing.SentDate = item.SentDate;
+        _context.SaveChanges();
         return existing;
     }
 
-    private static Notification Map(NpgsqlDataReader reader)
+    public Notification? Delete(int id)
     {
-        return new Notification
+        var notif = _context.Notifications.FirstOrDefault(n => n.Id == id);
+        if (notif == null)
         {
-            UserId = reader.GetInt32(0),
-            Message = reader.GetString(1),
-            NotifType = reader.GetString(2),
-            SentDate = reader.GetDateTime(3)
-        };
+            return null;
+        }
+
+        _context.Notifications.Remove(notif);
+        _context.SaveChanges();
+        return notif;
     }
 }

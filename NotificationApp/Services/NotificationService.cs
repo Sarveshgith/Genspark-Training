@@ -10,10 +10,10 @@ internal class NotificationService
     public readonly IUserRepository userRepository;
     public readonly INotificationRepository notificationRepository;
 
-    public NotificationService()
+    public NotificationService(IUserRepository userRepo, INotificationRepository notifRepo)
     {
-        userRepository = new UserRepository();
-        notificationRepository = new NotificationRepository();
+        userRepository = userRepo;
+        notificationRepository = notifRepo;
     }
 
     //-------------------USER METHODS--------------------

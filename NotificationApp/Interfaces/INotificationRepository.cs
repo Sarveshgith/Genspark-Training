@@ -2,7 +2,7 @@ using NotificationApp.Models;
 
 namespace NotificationApp.Interfaces;
 
-internal interface INotificationRepository : IRepository<DateTime, Notification>
+internal interface INotificationRepository : IRepository<int, Notification>
 {
     List<Notification> GetByUserId(int userId);
 }

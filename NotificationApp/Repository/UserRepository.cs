@@ -1,175 +1,74 @@
-using Npgsql;
-using NotificationApp.Data;
+using NotificationApp.Contexts;
 using NotificationApp.Interfaces;
 using NotificationApp.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace NotificationApp.Repository;
 
 internal class UserRepository : IUserRepository
 {
+    private readonly NotifContext _context;
+
+    public UserRepository(NotifContext context = null)
+    {
+        _context = context ?? new NotifContext();
+    }
+
     public User Create(User item)
     {
-        using var connection = DbConnectionFactory.CreateConnection();
-        connection.Open();
-
-        string query = @"
-            INSERT INTO users (name, email, phone_no)
-            VALUES (@name, @email, @phone_no)
-            RETURNING id;
-        ";
-
-        using var cmd = new NpgsqlCommand(query, connection);
-        cmd.Parameters.AddWithValue("@email", item.Email);
-        cmd.Parameters.AddWithValue("@name", item.Name);
-        cmd.Parameters.AddWithValue("@phone_no", item.PhoneNo);
-        item.Id = Convert.ToInt32(cmd.ExecuteScalar());
-
+        _context.Users.Add(item);
+        _context.SaveChanges();
         return item;
     }
 
     public User? Get(int id)
     {
-        using var connection = DbConnectionFactory.CreateConnection();
-        connection.Open();
-
-        const string query = "SELECT id, name, email, phone_no FROM users WHERE id = @id";
-        using var cmd = new NpgsqlCommand(query, connection);
-        cmd.Parameters.AddWithValue("@id", id);
-
-        using var reader = cmd.ExecuteReader();
-        if (!reader.Read())
-        {
-            return null;
-        }
-
-        return new User
-        {
-            Id = reader.GetInt32(0),
-            Name = reader.GetString(1),
-            Email = reader.GetString(2),
-            PhoneNo = reader.GetString(3)
-        };
+        return _context.Users.FirstOrDefault(u => u.Id == id);
     }
 
     public User? GetByEmail(string email)
     {
-        using var connection = DbConnectionFactory.CreateConnection();
-        connection.Open();
-
-        const string query = "SELECT id, name, email, phone_no FROM users WHERE email = @email";
-        using var cmd = new NpgsqlCommand(query, connection);
-        cmd.Parameters.AddWithValue("@email", email);
-
-        using var reader = cmd.ExecuteReader();
-        if (!reader.Read())
-        {
-            return null;
-        }
-
-        return new User
-        {
-            Id = reader.GetInt32(0),
-            Name = reader.GetString(1),
-            Email = reader.GetString(2),
-            PhoneNo = reader.GetString(3)
-        };
+        return _context.Users.FirstOrDefault(u => u.Email == email);
     }
 
     public User? GetByPhone(string phoneNo)
     {
-        using var connection = DbConnectionFactory.CreateConnection();
-        connection.Open();
-
-        const string query = "SELECT id, name, email, phone_no FROM users WHERE phone_no = @phone_no";
-        using var cmd = new NpgsqlCommand(query, connection);
-        cmd.Parameters.AddWithValue("@phone_no", phoneNo);
-
-        using var reader = cmd.ExecuteReader();
-        if (!reader.Read())
-        {
-            return null;
-        }
-
-        return new User
-        {
-            Id = reader.GetInt32(0),
-            Name = reader.GetString(1),
-            Email = reader.GetString(2),
-            PhoneNo = reader.GetString(3)
-        };
+        return _context.Users.FirstOrDefault(u => u.PhoneNo == phoneNo);
     }
 
     public List<User> GetAll()
     {
-        var users = new List<User>();
-
-        using var connection = DbConnectionFactory.CreateConnection();
-        connection.Open();
-
-        const string query = "SELECT id, name, email, phone_no FROM users";
-        using var cmd = new NpgsqlCommand(query, connection);
-        using var reader = cmd.ExecuteReader();
-
-        while (reader.Read())
-        {
-            users.Add(new User
-            {
-                Id = reader.GetInt32(0),
-                Name = reader.GetString(1),
-                Email = reader.GetString(2),
-                PhoneNo = reader.GetString(3)
-            });
-        }
-
-        return users.OrderBy(u => u.Name).ThenBy(u => u.Email).ToList();
+        return _context.Users
+            .OrderBy(u => u.Name)
+            .ThenBy(u => u.Email)
+            .ToList();
     }
 
     public User? Update(int id, User item)
     {
-        using var connection = DbConnectionFactory.CreateConnection();
-        connection.Open();
-
-        const string query = @"
-            UPDATE users
-            SET name = @name,
-                email = @email,
-                phone_no = @phone_no,
-                updated_at = CURRENT_TIMESTAMP
-            WHERE id = @id;
-        ";
-
-        using var cmd = new NpgsqlCommand(query, connection);
-        cmd.Parameters.AddWithValue("@id", id);
-        cmd.Parameters.AddWithValue("@name", item.Name);
-        cmd.Parameters.AddWithValue("@email", item.Email);
-        cmd.Parameters.AddWithValue("@phone_no", item.PhoneNo);
-
-        var affected = cmd.ExecuteNonQuery();
-        if (affected == 0)
-        {
-            return null;
-        }
-
-        item.Id = id;
-        return item;
-    }
-
-    public User? Delete(int id)
-    {
-        var existing = Get(id);
+        var existing = _context.Users.FirstOrDefault(u => u.Id == id);
         if (existing == null)
         {
             return null;
         }
 
-        using var connection = DbConnectionFactory.CreateConnection();
-        connection.Open();
-
-        const string query = "DELETE FROM users WHERE id = @id";
-        using var cmd = new NpgsqlCommand(query, connection);
-        cmd.Parameters.AddWithValue("@id", id);
-        cmd.ExecuteNonQuery();
-
+        existing.Name = item.Name;
+        existing.Email = item.Email;
+        existing.PhoneNo = item.PhoneNo;
+        _context.SaveChanges();
         return existing;
+    }
+
+    public User? Delete(int id)
+    {
+        var user = _context.Users.FirstOrDefault(u => u.Id == id);
+        if (user == null)
+        {
+            return null;
+        }
+
+        _context.Users.Remove(user);
+        _context.SaveChanges();
+        return user;
     }
 }
