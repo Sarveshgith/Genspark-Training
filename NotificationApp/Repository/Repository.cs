@@ -19,10 +19,9 @@ internal abstract class Repository<K, T> : IRepository<K, T> where K : notnull w
     //Count = 0. Handled in Client Layer => Program.cs
     public List<T> GetAll()
     {
-        List<T> items = _items.Values.ToList();
-        //Sorting by SentTime for Notifications, and by Name and Email for Users
-        items.Sort();
-        return items;
+        return _items.Values
+            .OrderBy(item => item.ToString())
+            .ToList();
     }
 
     public T? Update(K id, T item)

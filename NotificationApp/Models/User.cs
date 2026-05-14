@@ -5,7 +5,7 @@ namespace NotificationApp.Models;
 //This Partial class handles the properties and constructors of the User class.
 internal partial class User
 {
-    //Assuming Email is the PK
+    public int Id { get; set; }
     public string Name { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
     public string PhoneNo { get; set; } = string.Empty;

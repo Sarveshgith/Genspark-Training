@@ -11,7 +11,7 @@ internal class EmailNotification : INotification
         Console.WriteLine($"Sending email...");
         Console.WriteLine($"To: {user.Email}");
         Console.WriteLine($"Message: {notification.Message}");
-        Console.WriteLine($"Sent at: {notification.SentTime}");
+        Console.WriteLine($"Sent at: {notification.SentDate}");
         Console.WriteLine($"Email sent successfully!");
         Console.WriteLine("-----------------------------");
     }

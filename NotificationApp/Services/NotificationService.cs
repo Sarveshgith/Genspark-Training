@@ -1,13 +1,14 @@
 using NotificationApp.Interfaces;
 using NotificationApp.Models;
 using NotificationApp.Repository;
+using System.Linq;
 
 namespace NotificationApp.Services;
 
 internal class NotificationService
 {
-    public readonly UserRepository userRepository;
-    public readonly NotificationRepository notificationRepository;
+    public readonly IUserRepository userRepository;
+    public readonly INotificationRepository notificationRepository;
 
     public NotificationService()
     {
@@ -50,6 +51,19 @@ internal class NotificationService
         }
 
         User user = new User(name, email, phoneNo);
+
+        if (userRepository.GetByEmail(user.Email) != null)
+        {
+            Console.WriteLine("User with this email already exists.");
+            return user;
+        }
+
+        if (userRepository.GetByPhone(user.PhoneNo) != null)
+        {
+            Console.WriteLine("User with this phone number already exists.");
+            return user;
+        }
+
         userRepository.Create(user);
         return user;
     }
@@ -57,7 +71,11 @@ internal class NotificationService
     //Get All Users
     public IReadOnlyList<User> GetUsers()
     {
-        return userRepository.GetAll().AsReadOnly();
+        return userRepository.GetAll()
+            .OrderBy(u => u.Name)
+            .ThenBy(u => u.Email)
+            .ToList()
+            .AsReadOnly();
     }
 
     //Print All Users
@@ -86,7 +104,7 @@ internal class NotificationService
     }
 
     //Update User
-    public void UpdateUser(string userEmail, User user)
+    public void UpdateUser(int userId, User user)
     {
         Console.WriteLine("Update user details:");
 
@@ -121,14 +139,28 @@ internal class NotificationService
         user.Email = email;
         user.PhoneNo = phoneNo;
         
-        userRepository.Update(userEmail, user);
-        Console.WriteLine("User updated successfully.");
+        var existingByEmail = userRepository.GetByEmail(email);
+        if (existingByEmail != null && existingByEmail.Id != userId)
+        {
+            Console.WriteLine("Another user already has this email.");
+            return;
+        }
+
+        var existingByPhone = userRepository.GetByPhone(phoneNo);
+        if (existingByPhone != null && existingByPhone.Id != userId)
+        {
+            Console.WriteLine("Another user already has this phone number.");
+            return;
+        }
+
+        var updated = userRepository.Update(userId, user);
+        Console.WriteLine(updated != null ? "User updated successfully." : "User not found.");
     }
 
     //Delete User
-    public void DeleteUser(string userEmail)
+    public void DeleteUser(int userId)
     {
-        var deletedUser = userRepository.Delete(userEmail);
+        var deletedUser = userRepository.Delete(userId);
         if (deletedUser != null)
         {
             Console.WriteLine($"User {deletedUser.Name} deleted successfully.");
@@ -146,8 +178,7 @@ internal class NotificationService
     {
         Console.Write("Enter notification message: ");
         string message = Console.ReadLine() ?? string.Empty;
-        Notification notification = new Notification { Message = message, SentTime = DateTime.Now };
-        notificationRepository.Create(notification);
+        Notification notification = new Notification { Message = message, SentDate = DateTime.Now };
         return notification;
     }
 
@@ -159,7 +190,20 @@ internal class NotificationService
 
     public void SendNotification(INotification notificationSender, User user, Notification notification)
     {
+        notification.UserId = user.Id;
+        notification.NotifType = notificationSender is EmailNotification ? "Email" : "SMS";
+        notification.SentDate = DateTime.Now;
         notificationSender.SendNotif(user, notification);
         notificationRepository.Create(notification);
+    }
+
+    public User? GetUserByEmail(string email)
+    {
+        return userRepository.GetByEmail(email);
+    }
+
+    public User? GetUserByPhone(string phoneNo)
+    {
+        return userRepository.GetByPhone(phoneNo);
     }
 }

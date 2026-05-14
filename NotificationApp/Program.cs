@@ -1,5 +1,6 @@
 using NotificationApp.Models;
 using NotificationApp.Services;
+using NotificationApp.Data;
 
 namespace NotificationApp;
 
@@ -8,6 +9,8 @@ internal class Program
 {
 	static void Main(string[] args)
 	{
+		DatabaseInitializer.Initialize();
+
 		var service = new NotificationService();
 
 		while (true)
@@ -55,7 +58,7 @@ internal class Program
 					Console.WriteLine("Invalid index.");
 					continue;
 				}
-				service.UpdateUser(users[idx].Email, users[idx]);
+				service.UpdateUser(users[idx].Id, users[idx]);
 			}
 
 			//Delete User
@@ -77,7 +80,7 @@ internal class Program
 					Console.WriteLine("Invalid index.");
 					continue;
 				}
-				service.DeleteUser(users[idx].Email);
+				service.DeleteUser(users[idx].Id);
 			}
 
 			//Send Notification

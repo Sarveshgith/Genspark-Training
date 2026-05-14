@@ -2,11 +2,11 @@ using NotificationApp.Models;
 
 namespace NotificationApp.Interfaces;
 
-internal interface IRepository<K, T> where T : class
+internal interface IRepository<K, T> where K : notnull where T : class
 {
-    public T Create(T item);
-    public T? Get(K id);
-    public List<T> GetAll();
-    public T? Update(K id, T item);
-    public T? Delete(K id);
+    T Create(T item);
+    T? Get(K id);
+    List<T> GetAll();
+    T? Update(K id, T item);
+    T? Delete(K id);
 }

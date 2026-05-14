@@ -11,7 +11,7 @@ internal class SMSNotification : INotification
         Console.WriteLine($"Sending SMS...");
         Console.WriteLine($"To: {user.PhoneNo}");
         Console.WriteLine($"Message: {notification.Message}");
-        Console.WriteLine($"Sent at: {notification.SentTime}");
+        Console.WriteLine($"Sent at: {notification.SentDate}");
         Console.WriteLine($"SMS sent successfully!");
         Console.WriteLine("-----------------------------");
     }
