@@ -1,0 +1,172 @@
+using System;
+using System.Linq;
+using System.Collections.Generic;
+using LibraryManagementApp.Models;
+using LibraryManagementApp.Models.Exceptions;
+using LibraryManagementApp.Repositories;
+using LibraryManagementApp.Utils;
+using LibraryManagementApp.Enums;
+using LibraryManagementApp.Contexts;
+
+namespace LibraryManagementApp.Services;
+
+internal class BorrowService
+{
+	private readonly BorrowRepository _borrowRepo;
+	private readonly MemberRepository _memberRepo;
+	private readonly BookRepository _bookRepo;
+	private readonly BookCopyRepository _copyRepo;
+	private readonly MembershipRepository _membershipRepo;
+	private readonly FineRepository _fineRepo;
+    private readonly LibraryDbContext _context;
+
+	public BorrowService(LibraryDbContext context,BorrowRepository borrowRepo, MemberRepository memberRepo, BookRepository bookRepo, BookCopyRepository copyRepo, MembershipRepository membershipRepo, FineRepository fineRepo)
+	{
+        _context = context;
+		_borrowRepo = borrowRepo;
+		_memberRepo = memberRepo;
+		_bookRepo = bookRepo;
+		_copyRepo = copyRepo;
+		_membershipRepo = membershipRepo;
+		_fineRepo = fineRepo;
+	}
+
+	public Borrow BorrowBook(int userId, int bookId)
+	{
+        using var transaction = _context.Database.BeginTransaction();
+
+        try{
+            //Validate Member
+            if (userId <= 0)
+                throw new InvalidArgumentException("Invalid user ID. It must be a positive number.");
+
+            var user = _memberRepo.Get(userId);
+            if (user is null)
+                throw new NotFoundException("User not found.");
+            
+            if (user.Status != MemberStatus.Active)
+                throw new InvalidArgumentException("User is not active.");
+
+			var membership = _membershipRepo.Get(user.MembershipId);
+			if (membership is null)
+				throw new InvalidArgumentException("Membership not found for this user.");
+
+            //Validate Book
+            if (bookId <= 0)
+                throw new InvalidArgumentException("Invalid book ID. It must be a positive number.");
+
+            var book = _bookRepo.Get(bookId);
+		    if (book is null)
+		        throw new NotFoundException("Book not found.");
+
+            //Validate Unpaid Fines
+            decimal pendingFine = _fineRepo.GetTotalPendingFine(userId);
+            if (pendingFine > 500m)
+                throw new InvalidArgumentException("Cannot borrow books while unpaid fines are above Rs. 500.");
+
+            //Check active borrowing count
+            var activeBorrowings = _borrowRepo.GetActiveBorrowings(userId).Count;
+			if(activeBorrowings >= membership.MaxBrwBooks)
+				throw new InvalidArgumentException($"Borrowing limit reached for {membership.Type} membership.");
+
+            //Check duplicate borrowing for same book
+            if (_borrowRepo.HasActiveBorrowing(userId, bookId))
+		        throw new InvalidArgumentException("User already has an active borrowing for this book.");
+
+            //Get available copy
+            var copy = _copyRepo.GetAvailableCopy(bookId);
+            if (copy is null)
+                throw new InvalidArgumentException("No available copies.");
+
+            //Create borrow record
+            var borrow = new Borrow
+            {
+                UserId = userId,
+                BookId = bookId,
+                BookCopyId = copy.Id,
+                BorrowDate = DateTime.UtcNow,
+				DueDate = DateTime.UtcNow.AddDays(membership.MaxBrwDays),
+                Status = BorrowStatus.Borrowed
+            };
+            
+            copy.Status = BookCopyStatus.Borrowed;
+            _context.BookCopies.Update(copy);
+
+            _context.Borrows.Add(borrow);
+            _context.SaveChanges();
+
+            transaction.Commit();
+            return borrow;
+        }
+        catch
+        {
+            transaction.Rollback();
+            throw;
+        }
+	}
+
+	public void ReturnBook(int borrowId)
+	{
+		if (borrowId <= 0)
+			throw new InvalidArgumentException("Invalid borrow ID. It must be a positive number.");
+
+		var borrow = _borrowRepo.Get(borrowId);
+		if (borrow is null)
+			throw new InvalidArgumentException("Borrow record not found.");
+
+		if (borrow.Status == BorrowStatus.Returned)
+			throw new InvalidArgumentException("Book already returned.");
+
+		borrow.ReturnDate = DateTime.UtcNow;
+
+		if (borrow.ReturnDate > borrow.DueDate)
+		{
+			int daysOver = (borrow.ReturnDate.Value - borrow.DueDate).Days;
+			if (daysOver > 0)
+			{
+				var fine = new Fine
+				{
+					UserId = borrow.UserId,
+					BorrowId = borrow.Id,
+					Amount = daysOver * 10.0m,
+					IsPaid = false
+				};
+
+				_fineRepo.Add(fine);
+			}
+		}
+
+		borrow.Status = BorrowStatus.Returned;
+		_borrowRepo.Update(borrow.Id, borrow);
+		_copyRepo.UpdateStatus(borrow.BookCopyId, BookCopyStatus.Available);
+	}
+
+	public List<Borrow> GetActiveBorrowings(int userId)
+	{
+		if (userId <= 0)
+			throw new InvalidArgumentException("Invalid user ID. It must be a positive number.");
+
+		var user = _memberRepo.Get(userId);
+		if (user is null)
+			throw new InvalidArgumentException("User not found.");
+
+		return _borrowRepo.GetActiveBorrowings(userId);
+	}
+
+	public List<Borrow> GetBorrowHistory(int userId)
+	{
+		if (userId <= 0)
+			throw new InvalidArgumentException("Invalid user ID. It must be a positive number.");
+
+		var user = _memberRepo.Get(userId);
+		if (user is null)
+			throw new InvalidArgumentException("User not found.");
+
+		return _borrowRepo.GetBorrowHistory(userId);
+	}
+
+	public List<Borrow> GetOverdueBorrowings()
+	{
+		return _borrowRepo.GetOverdueBorrowings();
+	}
+}

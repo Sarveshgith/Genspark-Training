@@ -1,0 +1,22 @@
+Database Design for Library Management System
+
+Members
+Id, Username, Password, Name, Phoneno, Email, Role (Admin, User), Status, MembershipId, CreatedAt
+
+Memberships
+Id, Type, MaxBrwDays, MaxBrwBooks
+
+Books
+Id, ISBN, Title, Author, CategoryId, CreatedAt
+
+BookCopies
+Id, BookId, Status, CreatedAt
+
+Categories
+Id, Category, CreatedAt
+
+Borrow
+UserId, BookId, BorrowDate, BookCopyId, DueDate, ReturnDate, Status, CreatedAt
+
+FineId
+Id, UserId, BorrowId, Amount, IsPaid, CreatedAt
