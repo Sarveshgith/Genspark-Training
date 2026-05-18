@@ -2,15 +2,15 @@ using System;
 using LibraryManagementApp.Models;
 using LibraryManagementApp.Utils;
 using LibraryManagementApp.Models.Exceptions;
-using LibraryManagementApp.Repositories;
+using LibraryManagementApp.Interfaces;
 using LibraryManagementApp.Contexts;
 
 namespace LibraryManagementApp.Services;
 
 internal class MemberService
 {
-    private readonly MemberRepository memberRepository;
-    public MemberService(MemberRepository memberRepository)
+    private readonly IMemberRepository memberRepository;
+    public MemberService(IMemberRepository memberRepository)
     {
         this.memberRepository = memberRepository;
     }

@@ -3,7 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using LibraryManagementApp.Models;
 using LibraryManagementApp.Models.Exceptions;
-using LibraryManagementApp.Repositories;
+using LibraryManagementApp.Interfaces;
 using LibraryManagementApp.Utils;
 using LibraryManagementApp.Enums;
 
@@ -11,11 +11,11 @@ namespace LibraryManagementApp.Services;
 
 internal class BookService
 {
-	private readonly BookRepository _bookRepo;
-	private readonly BookCopyRepository _copyRepo;
-	private readonly CategoryRepository _categoryRepo;
+	private readonly IBookRepository _bookRepo;
+	private readonly IBookCopyRepository _copyRepo;
+	private readonly ICategoryRepository _categoryRepo;
 
-	public BookService(BookRepository bookRepo, BookCopyRepository copyRepo, CategoryRepository categoryRepo)
+	public BookService(IBookRepository bookRepo, IBookCopyRepository copyRepo, ICategoryRepository categoryRepo)
 	{
 		_bookRepo = bookRepo;
 		_copyRepo = copyRepo;

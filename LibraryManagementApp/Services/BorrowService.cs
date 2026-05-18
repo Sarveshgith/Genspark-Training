@@ -3,7 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using LibraryManagementApp.Models;
 using LibraryManagementApp.Models.Exceptions;
-using LibraryManagementApp.Repositories;
+using LibraryManagementApp.Interfaces;
 using LibraryManagementApp.Utils;
 using LibraryManagementApp.Enums;
 using LibraryManagementApp.Contexts;
@@ -12,15 +12,15 @@ namespace LibraryManagementApp.Services;
 
 internal class BorrowService
 {
-	private readonly BorrowRepository _borrowRepo;
-	private readonly MemberRepository _memberRepo;
-	private readonly BookRepository _bookRepo;
-	private readonly BookCopyRepository _copyRepo;
-	private readonly MembershipRepository _membershipRepo;
-	private readonly FineRepository _fineRepo;
+	private readonly IBorrowRepository _borrowRepo;
+	private readonly IMemberRepository _memberRepo;
+	private readonly IBookRepository _bookRepo;
+	private readonly IBookCopyRepository _copyRepo;
+	private readonly IMembershipRepository _membershipRepo;
+	private readonly IFineRepository _fineRepo;
     private readonly LibraryDbContext _context;
 
-	public BorrowService(LibraryDbContext context,BorrowRepository borrowRepo, MemberRepository memberRepo, BookRepository bookRepo, BookCopyRepository copyRepo, MembershipRepository membershipRepo, FineRepository fineRepo)
+	public BorrowService(LibraryDbContext context, IBorrowRepository borrowRepo, IMemberRepository memberRepo, IBookRepository bookRepo, IBookCopyRepository copyRepo, IMembershipRepository membershipRepo, IFineRepository fineRepo)
 	{
         _context = context;
 		_borrowRepo = borrowRepo;

@@ -1,17 +1,18 @@
 ﻿using LibraryManagementApp.Contexts;
+using LibraryManagementApp.Interfaces;
 using LibraryManagementApp.Presentation;
 using LibraryManagementApp.Repositories;
 using LibraryManagementApp.Services;
 
 using var context = new LibraryDbContext();
 
-var memberRepository = new MemberRepository(context);
-var membershipRepository = new MembershipRepository(context);
-var categoryRepository = new CategoryRepository(context);
-var bookRepository = new BookRepository(context);
-var bookCopyRepository = new BookCopyRepository(context);
-var borrowRepository = new BorrowRepository(context);
-var fineRepository = new FineRepository(context);
+IMemberRepository memberRepository = new MemberRepository(context);
+IMembershipRepository membershipRepository = new MembershipRepository(context);
+ICategoryRepository categoryRepository = new CategoryRepository(context);
+IBookRepository bookRepository = new BookRepository(context);
+IBookCopyRepository bookCopyRepository = new BookCopyRepository(context);
+IBorrowRepository borrowRepository = new BorrowRepository(context);
+IFineRepository fineRepository = new FineRepository(context);
 
 var memberService = new MemberService(memberRepository);
 var bookService = new BookService(bookRepository, bookCopyRepository, categoryRepository);

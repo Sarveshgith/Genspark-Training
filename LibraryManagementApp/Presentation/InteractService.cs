@@ -2,7 +2,7 @@ using System;
 using LibraryManagementApp.Enums;
 using LibraryManagementApp.Models;
 using LibraryManagementApp.Models.Exceptions;
-using LibraryManagementApp.Repositories;
+using LibraryManagementApp.Interfaces;
 using LibraryManagementApp.Services;
 using LibraryManagementApp.Utils;
 
@@ -13,12 +13,12 @@ internal class InteractService
 	private readonly MemberService _memberService;
 	private readonly BookService _bookService;
 	private readonly BorrowService _borrowService;
-	private readonly CategoryRepository _categoryRepository;
-	private readonly MembershipRepository _membershipRepository;
+	private readonly ICategoryRepository _categoryRepository;
+	private readonly IMembershipRepository _membershipRepository;
 
 	private Member? _currentUser;
 
-	public InteractService(MemberService memberService, BookService bookService, BorrowService borrowService, CategoryRepository categoryRepository, MembershipRepository membershipRepository)
+	public InteractService(MemberService memberService, BookService bookService, BorrowService borrowService, ICategoryRepository categoryRepository, IMembershipRepository membershipRepository)
 	{
 		_memberService = memberService;
 		_bookService = bookService;
