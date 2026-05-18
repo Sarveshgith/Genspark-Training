@@ -1,3 +1,4 @@
+-- Calculate total fines for a member
 CREATE OR REPLACE FUNCTION calculate_member_fine(member_id INT)
 RETURNS DECIMAL
 AS
@@ -18,6 +19,7 @@ END;
 $$
 LANGUAGE plpgsql;
 
+-- Get available books by category
 CREATE OR REPLACE FUNCTION get_available_books_by_category(category_id_param INT)
 RETURNS TABLE(
     book_id INT,
@@ -55,6 +57,35 @@ BEGIN
         b."Title",
         b."Author",
         c."CategoryName";
+END;
+$$
+LANGUAGE plpgsql;
+
+-- Get most borrowed books
+CREATE OR REPLACE FUNCTION get_most_borrowed_books()
+RETURNS TABLE(
+    book_id INT,
+    title TEXT,
+    author TEXT,
+    borrow_count BIGINT
+)
+AS
+$$
+BEGIN
+    RETURN QUERY
+
+    SELECT
+        b."Id",
+        b."Title",
+        b."Author",
+        COUNT(br."Id") AS borrow_count
+    FROM "Books" b
+    JOIN "Borrows" br
+        ON b."Id" = br."BookId"
+    WHERE br."Status" != 2
+    GROUP BY b."Id", b."Title", b."Author"
+    ORDER BY borrow_count DESC
+    LIMIT 5;
 END;
 $$
 LANGUAGE plpgsql;

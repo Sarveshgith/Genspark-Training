@@ -51,3 +51,21 @@ LibraryManagementApp.Models.Exceptions.InvalidInputException: Invalid fine index
 2026-05-18 15:08:04.817 [INF] Fine paid successfully. UserId=2, FineId=2, Amount=30.0
 
 2026-05-18 15:08:17.155 [INF] Application stopped normally
+
+2026-05-18 16:08:54.482 [INF] Application starting
+
+2026-05-18 16:09:08.440 [INF] Member login succeeded. MemberId=1, Email=admin@library.com
+
+2026-05-18 16:09:15.599 [INF] Fetched borrow history. UserId=2, Count=4
+
+2026-05-18 16:09:20.953 [INF] Fetched books by category. CategoryId=1, Count=2
+
+2026-05-18 16:09:20.970 [INF] Fetched available copies. BookId=2, Count=4
+
+2026-05-18 16:09:20.974 [INF] Fetched available copies. BookId=1, Count=2
+
+2026-05-18 16:09:55.021 [INF] Member login succeeded. MemberId=2, Email=sarvesh@sarvesh.com
+
+2026-05-18 16:09:57.538 [INF] Fetched fine history. UserId=2, Count=2
+
+2026-05-18 16:10:02.280 [INF] Application stopped normally

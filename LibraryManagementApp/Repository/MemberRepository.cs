@@ -61,13 +61,6 @@ internal class MemberRepository : Repository<int, Member>, IMemberRepository
 
     public List<Member> GetMembersWithPendingFines()
     {
-        // var userIdsWithPending = _context.Fines
-        //     .Where(f => !f.IsPaid)
-        //     .Select(f => f.UserId)
-        //     .Distinct()
-        //     .ToList();
-
-        // return _dbSet.Where(m => userIdsWithPending.Contains(m.Id)).ToList();
         return _dbSet.Where(m => _context.Fines.Any(f => !f.IsPaid && f.UserId == m.Id))
             .ToList();
     }

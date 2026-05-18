@@ -14,4 +14,6 @@ internal interface IBorrowRepository : IRepository<int, Borrow>
     Borrow? GetActiveBorrowByBookCopy(int copyId);
 
     bool HasActiveBorrowing(int userId, int bookId);
+
+    List<Borrow> GetAllActiveBorrowings();
 }

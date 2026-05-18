@@ -221,4 +221,30 @@ internal class BorrowService
 		Log.Information("Fetched overdue borrowings. Count={Count}", overdueBorrowings.Count);
 		return overdueBorrowings;
 	}
+
+	public List<Borrow> GetCurrentBorrowings()
+	{
+		var activeBorrowings = _borrowRepo.GetAllActiveBorrowings();
+
+		Log.Information("Fetched all current borrowings. Count={Count}", activeBorrowings.Count);
+		return activeBorrowings;
+	}
+
+	public List<(int BookId, string Title, int BorrowCount)> GetMostBorrowedBooks(int topN = 5)
+	{
+		if (topN <= 0)
+			throw new InvalidArgumentException("Top N must be a positive number.");
+
+		var result = _borrowRepo
+			.GetAll()
+			.GroupBy(b => new {b.BookId, b.Book.Title})
+			.Select(g => (BookId: g.Key.BookId, Title: g.Key.Title, BorrowCount: g.Count()))
+			.OrderByDescending(x => x.BorrowCount)
+			.ThenBy(x => x.BookId)
+			.Take(topN)
+			.ToList();
+
+		Log.Information("Fetched most borrowed books. TopN={TopN}, ResultCount={Count}", topN, result.Count);
+		return result;
+	}
 }

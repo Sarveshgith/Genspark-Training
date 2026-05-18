@@ -98,7 +98,7 @@ internal class InteractService
 			Console.WriteLine("9. Update Book Copy Status");
 
 			ConsolePrinter.PrintSection("System");
-			Console.WriteLine("10. View Overdue Borrowings");
+			Console.WriteLine("10. Reports");
 			Console.WriteLine("11. Logout");
 
 			int choice = ConsolePrinter.ReadInt("\nChoose an option: ");
@@ -135,7 +135,7 @@ internal class InteractService
 						UpdateBookCopyStatus();
 						break;
 					case 10:
-						ViewOverdueBorrowings();
+						ShowReportsMenu();
 						break;
 					case 11:
 						logout = true;
@@ -370,6 +370,162 @@ internal class InteractService
 		foreach (var borrow in overdues)
 		{
 			ConsolePrinter.WriteInfo($"Borrow Id: {borrow.Id} | User Id: {borrow.UserId} | Book Id: {borrow.BookId} | Due Date: {borrow.DueDate:d} | Status: {borrow.Status}");
+		}
+	}
+
+	private void ShowReportsMenu()
+	{
+		bool back = false;
+
+		while (!back)
+		{
+			Console.WriteLine();
+			ConsolePrinter.PrintHeader("REPORTS");
+			Console.WriteLine("1. Books currently borrowed");
+			Console.WriteLine("2. Overdue books");
+			Console.WriteLine("3. Members with pending fines");
+			Console.WriteLine("4. Most borrowed books");
+			Console.WriteLine("5. Available books by category");
+			Console.WriteLine("6. Member borrowing history");
+			Console.WriteLine("7. Back");
+
+			int choice = ConsolePrinter.ReadInt("\nChoose an option: ");
+
+			try
+			{
+				switch (choice)
+				{
+					case 1:
+						ViewCurrentBorrowedBooks();
+						break;
+					case 2:
+						ViewOverdueBorrowings();
+						break;
+					case 3:
+						ViewMembersWithPendingFines();
+						break;
+					case 4:
+						ViewMostBorrowedBooks();
+						break;
+					case 5:
+						ViewAvailableBooksByCategoryReport();
+						break;
+					case 6:
+						ViewMemberBorrowHistoryReport();
+						break;
+					case 7:
+						back = true;
+						break;
+					default:
+						Console.WriteLine("Invalid option. Try again.");
+						break;
+				}
+			}
+			catch (Exception ex)
+			{
+				GlobalExceptionHandler.HandleException(ex);
+			}
+		}
+	}
+
+	private void ViewCurrentBorrowedBooks()
+	{
+		var currentBorrowings = _borrowService.GetCurrentBorrowings();
+		if (currentBorrowings.Count == 0)
+		{
+			Console.WriteLine();
+			ConsolePrinter.WriteWarning("No books are currently borrowed.");
+			return;
+		}
+
+		ConsolePrinter.PrintSection("Books Currently Borrowed");
+		foreach (var borrow in currentBorrowings)
+		{
+			ConsolePrinter.WriteInfo($"Borrow Id: {borrow.Id} | User Id: {borrow.UserId} | Book Id: {borrow.BookId} | Borrowed On: {borrow.BorrowDate:d} | Due Date: {borrow.DueDate:d}");
+		}
+	}
+
+	private void ViewMembersWithPendingFines()
+	{
+		var members = _memberService.GetMembersWithPendingFines();
+		if (members.Count == 0)
+		{
+			Console.WriteLine();
+			ConsolePrinter.WriteWarning("No members with pending fines.");
+			return;
+		}
+
+		ConsolePrinter.PrintSection("Members With Pending Fines");
+		foreach (var member in members)
+		{
+			var pendingFine = _borrowService.GetFineHistory(member.Id)
+				.Where(f => !f.IsPaid)
+				.Sum(f => f.Amount);
+
+			ConsolePrinter.WriteInfo($"Member Id: {member.Id} | Username: {member.Username} | Email: {member.Email} | Pending Fine: Rs. {pendingFine:0.00}");
+		}
+	}
+
+	private void ViewMostBorrowedBooks()
+	{
+		int topN = ConsolePrinter.ReadInt("Top N books: ");
+		var summary = _borrowService.GetMostBorrowedBooks(topN);
+		if (summary.Count == 0)
+		{
+			Console.WriteLine();
+			ConsolePrinter.WriteWarning("No borrowing records found.");
+			return;
+		}
+
+		ConsolePrinter.PrintSection("Most Borrowed Books");
+		foreach (var entry in summary)
+		{
+			ConsolePrinter.WriteInfo($"Book Id: {entry.BookId} | Title: {entry.Title} | Times Borrowed: {entry.BorrowCount}");
+		}
+	}
+
+	private void ViewAvailableBooksByCategoryReport()
+	{
+		int categoryId = SelectCategory();
+		var books = _bookService.GetBooksByCategory(categoryId);
+		var available = books
+			.Select(book => new
+			{
+				Book = book,
+				AvailableCount = _bookService.GetAvailableCopies(book.Id).Count
+			})
+			.Where(x => x.AvailableCount > 0)
+			.ToList();
+
+		if (available.Count == 0)
+		{
+			Console.WriteLine();
+			ConsolePrinter.WriteWarning("No available books found in this category.");
+			return;
+		}
+
+		ConsolePrinter.PrintSection("Available Books By Category");
+		foreach (var item in available)
+		{
+			ConsolePrinter.WriteInfo($"Book Id: {item.Book.Id} | Title: {item.Book.Title} | Author: {item.Book.Author} | Available Copies: {item.AvailableCount}");
+		}
+	}
+
+	private void ViewMemberBorrowHistoryReport()
+	{
+		int memberId = ConsolePrinter.ReadInt("Member Id: ");
+		var history = _borrowService.GetBorrowHistory(memberId);
+		if (history.Count == 0)
+		{
+			Console.WriteLine();
+			ConsolePrinter.WriteWarning("No borrowing history found for this member.");
+			return;
+		}
+
+		ConsolePrinter.PrintSection("Member Borrowing History");
+		foreach (var borrow in history)
+		{
+			ConsolePrinter.WriteInfo($"Borrow Id: {borrow.Id} | Book Id: {borrow.BookId} | Borrowed On: {borrow.BorrowDate:d} | Due Date: {borrow.DueDate:d} | Returned On: {(borrow.ReturnDate.HasValue ? borrow.ReturnDate.Value.ToString("d") : "N/A")} | Status: {borrow.Status}");
 		}
 	}
 

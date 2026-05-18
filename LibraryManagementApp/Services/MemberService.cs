@@ -85,6 +85,13 @@ internal class MemberService
         Log.Information("Toggled member status. MemberId={MemberId}, FromStatus={FromStatus}, ToStatus={ToStatus}", id, member.Status, updatedMember?.Status);
         return updatedMember;
     }
+
+    public List<Member> GetMembersWithPendingFines()
+    {
+        var members = memberRepository.GetMembersWithPendingFines();
+        Log.Information("Fetched members with pending fines. Count={Count}", members.Count);
+        return members.OrderBy(m => m.Username).ToList();
+    }
 }
 
 //Membership check

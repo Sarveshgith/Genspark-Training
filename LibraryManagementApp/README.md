@@ -30,6 +30,12 @@ This project is organized into clear layers so each responsibility stays focused
 - Dates are stored in UTC to maintain compatibility with PostgreSQL timestamptz
 - Uses a database function (`calculate_member_fine`) for fine calculation, called from the repository
 
+- Admin reports: current borrowings, overdue list, members with pending fines, and "most borrowed" books
+- Uses a PostgreSQL database function `get_most_borrowed_books()` (queried from the repository) for the most-borrowed report
+- Application logging with Serilog: timestamped, daily-rolling log files are written to `Logs/library-management-.log`
+- Service-level informational logs added for major operations (fetch/add/update/process) to aid debugging and audits
+- Exception refactor: clearer, domain-specific exception types (e.g. `InvalidInputException`, `ConflictException`, `UnauthorizedException`, `AuthenticationException`, `NotFoundException`)
+
 ## Project Structure Checklist
 
 ### `Program`
@@ -136,6 +142,14 @@ This project is organized into clear layers so each responsibility stays focused
 - `Fine history` shows all fine records for the logged-in member
 - `Pay Fine` lists unpaid fines and lets the member pay one by selecting its index
 
+## Reports (Admin)
+
+- Access the `Reports` menu from the admin flow to view:
+	- Current active borrowings
+	- Overdue borrowings
+	- Members with pending fines
+	- Most-borrowed books (uses the `get_most_borrowed_books()` DB function)
+
 ## Prerequisites
 
 - .NET SDK installed
@@ -153,3 +167,7 @@ dotnet run
 - Dates are stored using UTC to stay compatible with PostgreSQL `timestamp with time zone` columns.
 - The app currently uses a single shared `LibraryDbContext` across repositories and services.
 - If you change the schema, add a new EF Core migration instead of editing old migrations.
+
+- Logging: Serilog is configured to emit timestamped logs to console and to daily-rolling files under `Logs/` (file name pattern `library-management-.log`). Keep `Logs/` writable for logging to work.
+- Database functions: Some heavy aggregates and fine calculations are implemented as server-side functions and are called from repository code to improve performance and keep reporting logic close to the data.
+- Exceptions: The codebase now uses more specific exception types for clearer error handling and better mapping of user-facing messages.

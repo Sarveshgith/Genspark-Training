@@ -37,4 +37,9 @@ internal class BorrowRepository : Repository<int, Borrow>, IBorrowRepository
 	{
 		return _dbSet.Any(b => b.UserId == userId && b.BookId == bookId && b.Status != BorrowStatus.Returned);
 	}
+
+	public List<Borrow> GetAllActiveBorrowings()
+	{
+		return _dbSet.Where(b => b.Status != BorrowStatus.Returned).ToList();
+	}
 }
