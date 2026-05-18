@@ -41,42 +41,42 @@ internal class BorrowService
                 throw new InvalidArgumentException("Invalid user ID. It must be a positive number.");
 
             var user = _memberRepo.Get(userId);
-            if (user is null)
-                throw new NotFoundException("User not found.");
-            
-            if (user.Status != MemberStatus.Active)
-                throw new InvalidArgumentException("User is not active.");
+			if (user is null)
+				throw new NotFoundException("User not found.");
+
+			if (user.Status != MemberStatus.Active)
+				throw new BusinessRuleException("User is not active.");
 
 			var membership = _membershipRepo.Get(user.MembershipId);
 			if (membership is null)
-				throw new InvalidArgumentException("Membership not found for this user.");
+				throw new NotFoundException("Membership not found for this user.");
 
             //Validate Book
             if (bookId <= 0)
                 throw new InvalidArgumentException("Invalid book ID. It must be a positive number.");
 
-            var book = _bookRepo.Get(bookId);
-		    if (book is null)
-		        throw new NotFoundException("Book not found.");
+			var book = _bookRepo.Get(bookId);
+			if (book is null)
+				throw new NotFoundException("Book not found.");
 
             //Validate Unpaid Fines
             decimal pendingFine = _fineRepo.GetTotalPendingFine(userId);
-            if (pendingFine > 500m)
-                throw new InvalidArgumentException("Cannot borrow books while unpaid fines are above Rs. 500.");
+			if (pendingFine > 500m)
+				throw new BusinessRuleException("Cannot borrow books while unpaid fines are above Rs. 500.");
 
             //Check active borrowing count
             var activeBorrowings = _borrowRepo.GetActiveBorrowings(userId).Count;
 			if(activeBorrowings >= membership.MaxBrwBooks)
-				throw new InvalidArgumentException($"Borrowing limit reached for {membership.Type} membership.");
+				throw new BusinessRuleException($"Borrowing limit reached for {membership.Type} membership.");
 
             //Check duplicate borrowing for same book
-            if (_borrowRepo.HasActiveBorrowing(userId, bookId))
-		        throw new InvalidArgumentException("User already has an active borrowing for this book.");
+			if (_borrowRepo.HasActiveBorrowing(userId, bookId))
+				throw new BusinessRuleException("User already has an active borrowing for this book.");
 
             //Get available copy
-            var copy = _copyRepo.GetAvailableCopy(bookId);
-            if (copy is null)
-                throw new InvalidArgumentException("No available copies.");
+			var copy = _copyRepo.GetAvailableCopy(bookId);
+			if (copy is null)
+				throw new BusinessRuleException("No available copies.");
 
             //Create borrow record
             var borrow = new Borrow
@@ -112,10 +112,10 @@ internal class BorrowService
 
 		var borrow = _borrowRepo.Get(borrowId);
 		if (borrow is null)
-			throw new InvalidArgumentException("Borrow record not found.");
+			throw new NotFoundException("Borrow record not found.");
 
 		if (borrow.Status == BorrowStatus.Returned)
-			throw new InvalidArgumentException("Book already returned.");
+			throw new BusinessRuleException("Book already returned.");
 
 		decimal fineAmount = 0m;
 		borrow.ReturnDate = DateTime.UtcNow;
@@ -151,7 +151,7 @@ internal class BorrowService
 
 		var user = _memberRepo.Get(userId);
 		if (user is null)
-			throw new InvalidArgumentException("User not found.");
+			throw new NotFoundException("User not found.");
 
 		return _borrowRepo.GetActiveBorrowings(userId);
 	}
@@ -163,7 +163,7 @@ internal class BorrowService
 
 		var user = _memberRepo.Get(userId);
 		if (user is null)
-			throw new InvalidArgumentException("User not found.");
+			throw new NotFoundException("User not found.");
 
 		return _borrowRepo.GetBorrowHistory(userId);
 	}
@@ -175,7 +175,7 @@ internal class BorrowService
 
 		var user = _memberRepo.Get(userId);
 		if (user is null)
-			throw new InvalidArgumentException("User not found.");
+			throw new NotFoundException("User not found.");
 
 		return _fineRepo.GetFineHistory(userId);
 	}
@@ -190,17 +190,17 @@ internal class BorrowService
 
 		var user = _memberRepo.Get(userId);
 		if (user is null)
-			throw new InvalidArgumentException("User not found.");
+			throw new NotFoundException("User not found.");
 
 		var fine = _fineRepo.Get(fineId);
 		if (fine is null)
-			throw new InvalidArgumentException("Fine record not found.");
+			throw new NotFoundException("Fine record not found.");
 
 		if (fine.UserId != userId)
-			throw new InvalidArgumentException("You can only pay your own fines.");
+			throw new UnauthorizedException("You can only pay your own fines.");
 
 		if (fine.IsPaid)
-			throw new InvalidArgumentException("Fine is already paid.");
+			throw new BusinessRuleException("Fine is already paid.");
 
 		_fineRepo.PayFine(fineId);
 	}

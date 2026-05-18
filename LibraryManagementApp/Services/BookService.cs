@@ -38,11 +38,11 @@ internal class BookService
 
 		var category = _categoryRepo.Get(book.CategoryId);
 		if (category is null)
-			throw new InvalidArgumentException("Category does not exist.");
+			throw new NotFoundException("Category does not exist.");
 
 		// Check duplicate ISBN
 		if (_bookRepo.GetAll().Any(b => b.ISBN == book.ISBN))
-			throw new InvalidArgumentException("Book with same ISBN already exists.");
+			throw new ConflictException("Book with same ISBN already exists.");
 
 		_bookRepo.Add(book);
 	}
@@ -57,7 +57,7 @@ internal class BookService
 
 		var book = _bookRepo.Get(bookId);
 		if (book is null)
-			throw new InvalidArgumentException("Book not found.");
+			throw new NotFoundException("Book not found.");
 
 		for (int i = 0; i < count; i++)
 		{
@@ -116,7 +116,7 @@ internal class BookService
 
 		var copy = _copyRepo.Get(copyId);
 		if (copy is null)
-			throw new InvalidArgumentException("Book copy not found.");
+			throw new NotFoundException("Book copy not found.");
 
 		_copyRepo.UpdateStatus(copyId, status);
 	}
@@ -128,7 +128,7 @@ internal class BookService
 
 		var category = _categoryRepo.Get(categoryId);
 		if (category is null)
-			throw new InvalidArgumentException("Category does not exist.");
+			throw new NotFoundException("Category does not exist.");
 
 		var books = _bookRepo.GetAll().Where(b => b.CategoryId == categoryId).OrderBy(b => b.Title).ToList();
 		return books;

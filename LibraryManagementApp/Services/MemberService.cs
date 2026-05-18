@@ -30,7 +30,7 @@ internal class MemberService
             throw new InvalidArgumentException("Invalid phone number. It must be a 10-digit number.");
 
         if(memberRepository.GetMember(email: member.Email) != null || memberRepository.GetMember(phoneNo: member.PhoneNo) != null)
-            throw new InvalidArgumentException("User already exists");
+            throw new ConflictException("User already exists");
 
         memberRepository.Add(member);
     }
@@ -46,7 +46,7 @@ internal class MemberService
         Member? member = memberRepository.Login(email, password);
 
         if(member == null)
-            throw new InvalidArgumentException("Invalid email or password.");
+            throw new AuthenticationException("Invalid email or password.");
         
         return member;
     }
@@ -59,7 +59,10 @@ internal class MemberService
 
     public Member? SearchMember(string? email = null, string? phoneNo = null)
     {
-        if(!ValidationHelper.IsValidEmail(email) && !ValidationHelper.IsValidPhone(phoneNo))
+        bool emailValid = !string.IsNullOrWhiteSpace(email) && ValidationHelper.IsValidEmail(email!);
+        bool phoneValid = !string.IsNullOrWhiteSpace(phoneNo) && ValidationHelper.IsValidPhone(phoneNo!);
+
+        if(!emailValid && !phoneValid)
             throw new InvalidArgumentException("Invalid email or phone number. They cannot be empty or whitespace.");
 
         return memberRepository.GetMember(email, phoneNo);
@@ -69,7 +72,7 @@ internal class MemberService
     {
         var member = memberRepository.Get(id);
         if (member is null)
-            throw new InvalidArgumentException("Member not found.");
+            throw new NotFoundException("Member not found.");
 
         return memberRepository.UpdateStatus(id);
     }

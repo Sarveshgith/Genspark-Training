@@ -20,7 +20,9 @@ internal static class ConsolePrinter
 
 	public static void WriteInfo(string message) => WriteColored(message, ConsoleColor.Gray);
 
-	public static void WriteColored(string message, ConsoleColor color)
+	public static void WriteError(string message) => WriteColored(message, ConsoleColor.Red);
+
+	private static void WriteColored(string message, ConsoleColor color)
 	{
 		var previousColor = Console.ForegroundColor;
 		Console.ForegroundColor = color;

@@ -4,6 +4,7 @@ using LibraryManagementApp.Models;
 using LibraryManagementApp.Models.Exceptions;
 using LibraryManagementApp.Repositories;
 using LibraryManagementApp.Services;
+using LibraryManagementApp.Utils;
 
 namespace LibraryManagementApp.Presentation;
 
@@ -71,7 +72,7 @@ internal class InteractService
 		}
 		catch (Exception ex)
 		{
-			Console.WriteLine($"Login failed: {ex.Message}");
+			GlobalExceptionHandler.HandleException(ex);
 		}
 	}
 
@@ -83,16 +84,22 @@ internal class InteractService
 		{
 			Console.WriteLine();
 			ConsolePrinter.PrintHeader("ADMIN MENU");
+			ConsolePrinter.PrintSection("Member Management");
 			Console.WriteLine("1. Add Member");
 			Console.WriteLine("2. View Members");
-			Console.WriteLine("3. Add Category");
-			Console.WriteLine("4. Add Book");
-			Console.WriteLine("5. Add Book Copies");
-			Console.WriteLine("6. View All Books");
-			Console.WriteLine("7. Search Books");
-			Console.WriteLine("8. Update Book Copy Status");
-			Console.WriteLine("9. View Overdue Borrowings");
-			Console.WriteLine("10. Logout");
+			Console.WriteLine("3. Toggle Member Status");
+
+			ConsolePrinter.PrintSection("Catalog Management");
+			Console.WriteLine("4. Add Category");
+			Console.WriteLine("5. Add Book");
+			Console.WriteLine("6. Add Book Copies");
+			Console.WriteLine("7. View All Books");
+			Console.WriteLine("8. Search Books");
+			Console.WriteLine("9. Update Book Copy Status");
+
+			ConsolePrinter.PrintSection("System");
+			Console.WriteLine("10. View Overdue Borrowings");
+			Console.WriteLine("11. Logout");
 
 			int choice = ConsolePrinter.ReadInt("\nChoose an option: ");
 
@@ -107,27 +114,30 @@ internal class InteractService
 						ViewMembers();
 						break;
 					case 3:
-						AddCategory();
+						ToggleMemberStatus();
 						break;
 					case 4:
-						AddBook();
+						AddCategory();
 						break;
 					case 5:
-						AddBookCopies();
+						AddBook();
 						break;
 					case 6:
-						ViewAllBooks();
+						AddBookCopies();
 						break;
 					case 7:
-						SearchBooks();
+						ViewAllBooks();
 						break;
 					case 8:
-						UpdateBookCopyStatus();
+						SearchBooks();
 						break;
 					case 9:
-						ViewOverdueBorrowings();
+						UpdateBookCopyStatus();
 						break;
 					case 10:
+						ViewOverdueBorrowings();
+						break;
+					case 11:
 						logout = true;
 						_currentUser = null;
 						ConsolePrinter.WriteSuccess("Logged out.");
@@ -139,7 +149,7 @@ internal class InteractService
 			}
 			catch (Exception ex)
 			{
-				Console.WriteLine($"Operation failed: {ex.Message}");
+				GlobalExceptionHandler.HandleException(ex);
 			}
 		}
 	}
@@ -196,7 +206,7 @@ internal class InteractService
 			}
 			catch (Exception ex)
 			{
-				Console.WriteLine($"Operation failed: {ex.Message}");
+				GlobalExceptionHandler.HandleException(ex);
 			}
 		}
 	}
@@ -229,10 +239,10 @@ internal class InteractService
 
 		string categoryName = ConsolePrinter.ReadString("Category name: ");
 		if (string.IsNullOrWhiteSpace(categoryName))
-			throw new InvalidArgumentException("Category name cannot be empty.");
+			throw new InvalidInputException("Category name cannot be empty.");
 
 		if (_categoryRepository.GetCategoryByName(categoryName) is not null)
-			throw new InvalidArgumentException("Category already exists.");
+			throw new InvalidInputException("Category already exists.");
 
 		_categoryRepository.Add(new Category { CategoryName = categoryName.Trim() });
 		Console.WriteLine();
@@ -311,7 +321,7 @@ internal class InteractService
 		if (!string.IsNullOrWhiteSpace(categoryInput))
 		{
 			if (!int.TryParse(categoryInput, out int parsedCategoryId))
-				throw new InvalidArgumentException("Category Id must be a valid number.");
+				throw new InvalidInputException("Category Id must be a valid number.");
 
 			categoryId = parsedCategoryId;
 		}
@@ -392,7 +402,7 @@ internal class InteractService
 
 		int borrowId = ConsolePrinter.ReadInt("Borrow Id to return: ");
 		if (!activeBorrowings.Any(b => b.Id == borrowId))
-			throw new InvalidArgumentException("Invalid borrow Id for current user.");
+			throw new InvalidInputException("Invalid borrow Id for current user.");
 
 		decimal fineAmount = _borrowService.ReturnBook(borrowId);
 		Console.WriteLine();
@@ -492,7 +502,7 @@ internal class InteractService
 
 		int fineIndex = ConsolePrinter.ReadInt("Select fine index to pay: ");
 		if (fineIndex < 1 || fineIndex > fines.Count)
-			throw new InvalidArgumentException("Invalid fine index.");
+			throw new InvalidInputException("Invalid fine index.");
 
 		var selectedFine = fines[fineIndex - 1];
 		_borrowService.PayFine(_currentUser!.Id, selectedFine.Id);
@@ -504,7 +514,7 @@ internal class InteractService
 	{
 		var categories = _categoryRepository.GetAllCategories();
 		if (categories.Count == 0)
-			throw new InvalidArgumentException("No categories found. Add a category first.");
+			throw new InvalidInputException("No categories found. Add a category first.");
 
 		ConsolePrinter.PrintSection("Categories");
 		for (int i = 0; i < categories.Count; i++)
@@ -514,7 +524,7 @@ internal class InteractService
 
 		int choice = ConsolePrinter.ReadInt("Select category by number: ");
 		if (choice < 1 || choice > categories.Count)
-			throw new InvalidArgumentException("Invalid category selection.");
+			throw new InvalidInputException("Invalid category selection.");
 
 		return categories[choice - 1].Id;
 	}
@@ -523,7 +533,7 @@ internal class InteractService
 	{
 		var memberships = _membershipRepository.GetAll();
 		if (memberships.Count == 0)
-			throw new InvalidArgumentException("No membership types found.");
+			throw new InvalidInputException("No membership types found.");
 
 		ConsolePrinter.PrintSection("Membership Types");
 		for (int i = 0; i < memberships.Count; i++)
@@ -533,12 +543,10 @@ internal class InteractService
 
 		int choice = ConsolePrinter.ReadInt("Select membership type by number: ");
 		if (choice < 1 || choice > memberships.Count)
-			throw new InvalidArgumentException("Invalid membership selection.");
+			throw new InvalidInputException("Invalid membership selection.");
 
 		return memberships[choice - 1].Id;
 	}
-
-	
 
 	private static UserRole ReadRole(string prompt)
 	{
@@ -574,6 +582,16 @@ internal class InteractService
 	{
 		if (_currentUser is null)
 			throw new InvalidOperationException("No logged in user found.");
+	}
+
+	private void ToggleMemberStatus()
+	{
+		Console.WriteLine();
+		ConsolePrinter.PrintSection("Toggle Member Status");
+		int memberId = ConsolePrinter.ReadInt("Member Id: ");
+		var updated = _memberService.ToggleMemberStatus(memberId);
+		Console.WriteLine();
+		ConsolePrinter.WriteSuccess($"Member status toggled. Member Id: {updated?.Id}, New Status: {updated?.Status}");
 	}
 
 }

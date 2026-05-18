@@ -1,5 +1,3 @@
-using System;
-
 namespace LibraryManagementApp.Models.Exceptions;
 
 public class InvalidArgumentException : Exception
