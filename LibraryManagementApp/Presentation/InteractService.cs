@@ -156,8 +156,9 @@ internal class InteractService
 			Console.WriteLine("2. Borrow Book");
 			Console.WriteLine("3. Return Book");
 			Console.WriteLine("4. View All Books");
-			Console.WriteLine("5. View My Borrowings");
-			Console.WriteLine("6. Logout");
+			Console.WriteLine("5. History");
+			Console.WriteLine("6. Pay Fine");
+			Console.WriteLine("7. Logout");
 
 			int choice = ConsolePrinter.ReadInt("\nChoose an option: ");
 
@@ -178,9 +179,12 @@ internal class InteractService
 						ViewAllBooks();
 						break;
 					case 5:
-						ViewMyBorrowings();
+						ShowHistoryMenu();
 						break;
 					case 6:
+						PayFine();
+						break;
+					case 7:
 						logout = true;
 						_currentUser = null;
 						ConsolePrinter.WriteSuccess("Logged out.");
@@ -390,27 +394,110 @@ internal class InteractService
 		if (!activeBorrowings.Any(b => b.Id == borrowId))
 			throw new InvalidArgumentException("Invalid borrow Id for current user.");
 
-		_borrowService.ReturnBook(borrowId);
+		decimal fineAmount = _borrowService.ReturnBook(borrowId);
 		Console.WriteLine();
 		ConsolePrinter.WriteSuccess("Book returned successfully.");
+		if (fineAmount > 0m)
+			ConsolePrinter.WriteWarning($"This return is overdue. Fine to be paid: Rs. {fineAmount:0.00}");
 	}
 
-	private void ViewMyBorrowings()
+	private void ShowHistoryMenu()
 	{
 		EnsureLoggedInUser();
-		var borrowings = _borrowService.GetActiveBorrowings(_currentUser!.Id);
+		bool back = false;
+
+		while (!back)
+		{
+			Console.WriteLine();
+			ConsolePrinter.PrintHeader("HISTORY");
+			Console.WriteLine("1. Borrow history");
+			Console.WriteLine("2. Fine history");
+			Console.WriteLine("3. Back");
+
+			int choice = ConsolePrinter.ReadInt("\nChoose an option: ");
+
+			switch (choice)
+			{
+				case 1:
+					ViewBorrowHistory();
+					break;
+				case 2:
+					ViewFineHistory();
+					break;
+				case 3:
+					back = true;
+					break;
+				default:
+					Console.WriteLine("Invalid option. Try again.");
+					break;
+			}
+		}
+	}
+
+	private void ViewBorrowHistory()
+	{
+		var borrowings = _borrowService.GetBorrowHistory(_currentUser!.Id);
 		if (borrowings.Count == 0)
 		{
 			Console.WriteLine();
-			ConsolePrinter.WriteWarning("You have no active borrowings.");
+			ConsolePrinter.WriteWarning("You have no borrow history.");
 			return;
 		}
 
-		ConsolePrinter.PrintSection("My Borrowings");
+		ConsolePrinter.PrintSection("Borrow History");
 		foreach (var borrow in borrowings)
 		{
-			ConsolePrinter.WriteInfo($"Borrow Id: {borrow.Id} | Book Id: {borrow.BookId} | Borrowed On: {borrow.BorrowDate:d} | Due Date: {borrow.DueDate:d} | Status: {borrow.Status}");
+			ConsolePrinter.WriteInfo($"Borrow Id: {borrow.Id} | Book Id: {borrow.BookId} | Borrowed On: {borrow.BorrowDate:d} | Due Date: {borrow.DueDate:d} | Returned On: {(borrow.ReturnDate.HasValue ? borrow.ReturnDate.Value.ToString("d") : "N/A")} | Status: {borrow.Status}");
 		}
+	}
+
+	private void ViewFineHistory()
+	{
+		var fines = _borrowService.GetFineHistory(_currentUser!.Id);
+		if (fines.Count == 0)
+		{
+			Console.WriteLine();
+			ConsolePrinter.WriteWarning("You have no fine history.");
+			return;
+		}
+
+		ConsolePrinter.PrintSection("Fine History");
+		for (int i = 0; i < fines.Count; i++)
+		{
+			var fine = fines[i];
+			ConsolePrinter.WriteInfo($"{i + 1}. Fine Id: {fine.Id} | Borrow Id: {fine.BorrowId} | Amount: Rs. {fine.Amount:0.00} | Status: {(fine.IsPaid ? "Paid" : "Unpaid")} | Created At: {fine.CreatedAt:d}");
+		}
+	}
+
+	private void PayFine()
+	{
+		EnsureLoggedInUser();
+		var fines = _borrowService.GetFineHistory(_currentUser!.Id)
+			.Where(f => !f.IsPaid)
+			.ToList();
+
+		if (fines.Count == 0)
+		{
+			Console.WriteLine();
+			ConsolePrinter.WriteWarning("You have no unpaid fines.");
+			return;
+		}
+
+		ConsolePrinter.PrintSection("Unpaid Fines");
+		for (int i = 0; i < fines.Count; i++)
+		{
+			var fine = fines[i];
+			ConsolePrinter.WriteInfo($"{i + 1}. Fine Id: {fine.Id} | Borrow Id: {fine.BorrowId} | Amount: Rs. {fine.Amount:0.00} | Created At: {fine.CreatedAt:d}");
+		}
+
+		int fineIndex = ConsolePrinter.ReadInt("Select fine index to pay: ");
+		if (fineIndex < 1 || fineIndex > fines.Count)
+			throw new InvalidArgumentException("Invalid fine index.");
+
+		var selectedFine = fines[fineIndex - 1];
+		_borrowService.PayFine(_currentUser!.Id, selectedFine.Id);
+		Console.WriteLine();
+		ConsolePrinter.WriteSuccess($"Fine paid successfully. Fine Id: {selectedFine.Id}");
 	}
 
 	private int SelectCategory()

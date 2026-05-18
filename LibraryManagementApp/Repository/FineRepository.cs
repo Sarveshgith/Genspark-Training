@@ -14,7 +14,6 @@ internal class FineRepository : Repository<int, Fine>, IFineRepository
 	{
 	}
 
-
 	public decimal GetTotalPendingFine(int userId)
 	{
 		return _context.Database

@@ -21,13 +21,14 @@ This project is organized into clear layers so each responsibility stays focused
 
 - User login with admin and member flows
 - Add and manage members, categories, books, and book copies
-- Borrow and return books
+- Borrow and return books with overdue fine calculation
 - Track overdue borrowings and unpaid fines
-- View members, books, borrow history, and active borrowings
- - Custom exceptions for validation and domain errors (clear error messages and types)
- - Explicit transaction handling for critical multi-step operations (e.g. borrow)
- - Dates are stored in UTC to maintain compatibility with PostgreSQL timestamptz
- - Uses a database function (`calculate_member_fine`) for fine calculation, called from the repository
+- View borrow history and fine history from a single `History` menu
+- Pay unpaid fines from the member menu by selecting a fine index
+- Custom exceptions for validation and domain errors (clear error messages and types)
+- Explicit transaction handling for critical multi-step operations (e.g. borrow)
+- Dates are stored in UTC to maintain compatibility with PostgreSQL timestamptz
+- Uses a database function (`calculate_member_fine`) for fine calculation, called from the repository
 
 ## Project Structure Checklist
 
@@ -125,8 +126,15 @@ This project is organized into clear layers so each responsibility stays focused
 - [x] Mark the return date
 - [x] Calculate overdue days if needed
 - [x] Create a fine when applicable
+- [x] Show the fine amount immediately when the returned book is overdue
 - [x] Mark the borrow as returned
 - [x] Make the book copy available again
+
+## Member History And Fines
+
+- `History` opens a submenu with `Borrow history` and `Fine history`
+- `Fine history` shows all fine records for the logged-in member
+- `Pay Fine` lists unpaid fines and lets the member pay one by selecting its index
 
 ## Prerequisites
 
@@ -145,9 +153,3 @@ dotnet run
 - Dates are stored using UTC to stay compatible with PostgreSQL `timestamp with time zone` columns.
 - The app currently uses a single shared `LibraryDbContext` across repositories and services.
 - If you change the schema, add a new EF Core migration instead of editing old migrations.
-
-## Suggested Next Steps
-
-- [ ] Add a database setup section with restore and migration commands
-- [ ] Add screenshots or sample console sessions
-- [ ] Add a menu reference for admin and member actions
