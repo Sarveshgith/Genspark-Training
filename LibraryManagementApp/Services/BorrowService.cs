@@ -7,6 +7,7 @@ using LibraryManagementApp.Interfaces;
 using LibraryManagementApp.Utils;
 using LibraryManagementApp.Enums;
 using LibraryManagementApp.Contexts;
+using Serilog;
 
 namespace LibraryManagementApp.Services;
 
@@ -96,6 +97,7 @@ internal class BorrowService
             _context.SaveChanges();
 
             transaction.Commit();
+			Log.Information("Borrow created successfully. BorrowId={BorrowId}, UserId={UserId}, BookId={BookId}, CopyId={CopyId}, DueDate={DueDate}", borrow.Id, userId, bookId, copy.Id, borrow.DueDate);
             return borrow;
         }
         catch
@@ -141,6 +143,7 @@ internal class BorrowService
 		borrow.Status = BorrowStatus.Returned;
 		_borrowRepo.Update(borrow.Id, borrow);
 		_copyRepo.UpdateStatus(borrow.BookCopyId, BookCopyStatus.Available);
+		Log.Information("Borrow returned successfully. BorrowId={BorrowId}, UserId={UserId}, FineAmount={FineAmount}", borrow.Id, borrow.UserId, fineAmount);
 		return fineAmount;
 	}
 
@@ -153,7 +156,9 @@ internal class BorrowService
 		if (user is null)
 			throw new NotFoundException("User not found.");
 
-		return _borrowRepo.GetActiveBorrowings(userId);
+		var activeBorrowings = _borrowRepo.GetActiveBorrowings(userId);
+		Log.Information("Fetched active borrowings. UserId={UserId}, Count={Count}", userId, activeBorrowings.Count);
+		return activeBorrowings;
 	}
 
 	public List<Borrow> GetBorrowHistory(int userId)
@@ -165,7 +170,9 @@ internal class BorrowService
 		if (user is null)
 			throw new NotFoundException("User not found.");
 
-		return _borrowRepo.GetBorrowHistory(userId);
+		var history = _borrowRepo.GetBorrowHistory(userId);
+		Log.Information("Fetched borrow history. UserId={UserId}, Count={Count}", userId, history.Count);
+		return history;
 	}
 
 	public List<Fine> GetFineHistory(int userId)
@@ -177,7 +184,9 @@ internal class BorrowService
 		if (user is null)
 			throw new NotFoundException("User not found.");
 
-		return _fineRepo.GetFineHistory(userId);
+		var fines = _fineRepo.GetFineHistory(userId);
+		Log.Information("Fetched fine history. UserId={UserId}, Count={Count}", userId, fines.Count);
+		return fines;
 	}
 
 	public void PayFine(int userId, int fineId)
@@ -203,10 +212,13 @@ internal class BorrowService
 			throw new BusinessRuleException("Fine is already paid.");
 
 		_fineRepo.PayFine(fineId);
+		Log.Information("Fine paid successfully. UserId={UserId}, FineId={FineId}, Amount={Amount}", userId, fineId, fine.Amount);
 	}
 
 	public List<Borrow> GetOverdueBorrowings()
 	{
-		return _borrowRepo.GetOverdueBorrowings();
+		var overdueBorrowings = _borrowRepo.GetOverdueBorrowings();
+		Log.Information("Fetched overdue borrowings. Count={Count}", overdueBorrowings.Count);
+		return overdueBorrowings;
 	}
 }

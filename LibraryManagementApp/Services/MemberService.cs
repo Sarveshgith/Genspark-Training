@@ -4,6 +4,7 @@ using LibraryManagementApp.Utils;
 using LibraryManagementApp.Models.Exceptions;
 using LibraryManagementApp.Interfaces;
 using LibraryManagementApp.Contexts;
+using Serilog;
 
 namespace LibraryManagementApp.Services;
 
@@ -33,6 +34,7 @@ internal class MemberService
             throw new ConflictException("User already exists");
 
         memberRepository.Add(member);
+        Log.Information("Member added successfully. Username={Username}, Email={Email}, MembershipId={MembershipId}, Role={Role}", member.Username, member.Email, member.MembershipId, member.Role);
     }
 
     public Member? Login(string email, string password)
@@ -47,6 +49,8 @@ internal class MemberService
 
         if(member == null)
             throw new AuthenticationException("Invalid email or password.");
+
+        Log.Information("Member login succeeded. MemberId={MemberId}, Email={Email}", member.Id, email);
         
         return member;
     }
@@ -54,6 +58,7 @@ internal class MemberService
     public List<Member> GetAllMembers()
     {
         var members = memberRepository.GetAll();
+        Log.Information("Fetched all members. Count={Count}", members.Count);
         return members.OrderBy(m => m.Username).ToList();
     }
 
@@ -65,7 +70,9 @@ internal class MemberService
         if(!emailValid && !phoneValid)
             throw new InvalidArgumentException("Invalid email or phone number. They cannot be empty or whitespace.");
 
-        return memberRepository.GetMember(email, phoneNo);
+        var member = memberRepository.GetMember(email, phoneNo);
+        Log.Information("Searched member. Email={Email}, PhoneNo={PhoneNo}, Found={Found}", email, phoneNo, member is not null);
+        return member;
     }
 
     public Member? ToggleMemberStatus(int id)
@@ -74,7 +81,9 @@ internal class MemberService
         if (member is null)
             throw new NotFoundException("Member not found.");
 
-        return memberRepository.UpdateStatus(id);
+        var updatedMember = memberRepository.UpdateStatus(id);
+        Log.Information("Toggled member status. MemberId={MemberId}, FromStatus={FromStatus}, ToStatus={ToStatus}", id, member.Status, updatedMember?.Status);
+        return updatedMember;
     }
 }
 

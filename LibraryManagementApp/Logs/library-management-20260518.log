@@ -1,0 +1,53 @@
+2026-05-18 15:00:02.745 [INF] Application starting
+2026-05-18 15:00:19.118 [INF] Member login succeeded. MemberId=2, Email=sarvesh@sarvesh.com
+2026-05-18 15:00:58.385 [WRN] Business rule violation handled
+LibraryManagementApp.Models.Exceptions.BusinessRuleException: User already has an active borrowing for this book.
+   at LibraryManagementApp.Services.BorrowService.BorrowBook(Int32 userId, Int32 bookId) in /Users/sarveswaranb/Proggies/Presidio/Genspark-Training/LibraryManagementApp/Services/BorrowService.cs:line 75
+   at LibraryManagementApp.Presentation.InteractService.BorrowBook() in /Users/sarveswaranb/Proggies/Presidio/Genspark-Training/LibraryManagementApp/Presentation/InteractService.cs:line 381
+   at LibraryManagementApp.Presentation.InteractService.ShowMemberMenu() in /Users/sarveswaranb/Proggies/Presidio/Genspark-Training/LibraryManagementApp/Presentation/InteractService.cs:line 183
+2026-05-18 15:01:08.109 [INF] Fetched active borrowings. UserId=2, Count=1
+2026-05-18 15:01:10.541 [INF] Borrow returned successfully. BorrowId=2, UserId=2, FineAmount=0
+2026-05-18 15:01:37.172 [INF] Member login succeeded. MemberId=1, Email=admin@library.com
+2026-05-18 15:02:36.938 [INF] Book added successfully. BookId=2, Title=Dark Matter, ISBN=0306406152, CategoryId=1
+2026-05-18 15:02:47.803 [INF] Fetched all books. Count=2
+2026-05-18 15:02:47.812 [INF] Fetched available copies. BookId=2, Count=0
+2026-05-18 15:02:47.814 [INF] Fetched available copies. BookId=1, Count=2
+
+2026-05-18 15:03:54.465 [INF] Application starting
+
+2026-05-18 15:04:07.430 [INF] Member login succeeded. MemberId=2, Email=sarvesh@sarvesh.com
+
+2026-05-18 15:04:16.632 [INF] Fetched all books. Count=2
+
+2026-05-18 15:04:16.648 [INF] Fetched available copies. BookId=2, Count=0
+
+2026-05-18 15:04:16.662 [INF] Fetched available copies. BookId=1, Count=2
+
+2026-05-18 15:04:26.697 [WRN] Business rule violation handled
+LibraryManagementApp.Models.Exceptions.BusinessRuleException: No available copies.
+   at LibraryManagementApp.Services.BorrowService.BorrowBook(Int32 userId, Int32 bookId) in /Users/sarveswaranb/Proggies/Presidio/Genspark-Training/LibraryManagementApp/Services/BorrowService.cs:line 80
+   at LibraryManagementApp.Presentation.InteractService.BorrowBook() in /Users/sarveswaranb/Proggies/Presidio/Genspark-Training/LibraryManagementApp/Presentation/InteractService.cs:line 381
+   at LibraryManagementApp.Presentation.InteractService.ShowMemberMenu() in /Users/sarveswaranb/Proggies/Presidio/Genspark-Training/LibraryManagementApp/Presentation/InteractService.cs:line 183
+
+2026-05-18 15:04:43.378 [INF] Member login succeeded. MemberId=1, Email=admin@library.com
+
+2026-05-18 15:04:56.634 [INF] Book copies added successfully. BookId=2, Count=5
+
+2026-05-18 15:05:13.108 [INF] Member login succeeded. MemberId=2, Email=sarvesh@sarvesh.com
+
+2026-05-18 15:05:19.923 [INF] Borrow created successfully. BorrowId=4, UserId=2, BookId=2, CopyId=4, DueDate="2026-05-28T09:35:19.8897240Z"
+
+2026-05-18 15:05:28.639 [INF] Fetched borrow history. UserId=2, Count=4
+
+2026-05-18 15:05:57.263 [INF] Fetched fine history. UserId=2, Count=2
+
+2026-05-18 15:06:16.712 [WRN] Invalid input handled
+LibraryManagementApp.Models.Exceptions.InvalidInputException: Invalid fine index.
+   at LibraryManagementApp.Presentation.InteractService.PayFine() in /Users/sarveswaranb/Proggies/Presidio/Genspark-Training/LibraryManagementApp/Presentation/InteractService.cs:line 505
+   at LibraryManagementApp.Presentation.InteractService.ShowMemberMenu() in /Users/sarveswaranb/Proggies/Presidio/Genspark-Training/LibraryManagementApp/Presentation/InteractService.cs:line 195
+
+2026-05-18 15:08:00.910 [INF] Fetched fine history. UserId=2, Count=2
+
+2026-05-18 15:08:04.817 [INF] Fine paid successfully. UserId=2, FineId=2, Amount=30.0
+
+2026-05-18 15:08:17.155 [INF] Application stopped normally
