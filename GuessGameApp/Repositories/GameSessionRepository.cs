@@ -27,7 +27,6 @@ public class GameSessionRepository : IGameSessionRepository
 
         insertGameSessionCommand.ExecuteNonQuery();
 
-        // Upsert player_stats: create initial row or update aggregates
         string existsQuery = "SELECT COUNT(*) FROM player_stats WHERE user_id = @user_id";
         using var existsCmd = new NpgsqlCommand(existsQuery, connection);
         existsCmd.Parameters.AddWithValue("@user_id", gameSession.userId);

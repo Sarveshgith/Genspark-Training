@@ -64,16 +64,3 @@
 - `Validation` - Static helper for email, phone, message, type
 
 ---
-
-## Suggestions to Boost User-Friendliness
-
-1. **Search/Filter Users** - Find user by email or name pattern
-2. **Edit User Details** - Modify name, email, phone after creation
-3. **Notification History** - Show details per user (sent count, timestamps)
-4. **Bulk Send** - Send same message to multiple users
-5. **Templates** - Save/reuse common notification messages
-6. **Scheduled Notifications** - Send at specific time/date
-7. **Rich Status Display** - Show success/failure count per session
-8. **Undo/Retry** - Cancel or resend last notification
-9. **Export** - Download users or notifications as CSV
-10. **Confirmation Prompts** - Ask before sending to prevent accidents

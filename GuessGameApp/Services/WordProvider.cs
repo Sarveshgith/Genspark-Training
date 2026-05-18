@@ -33,7 +33,6 @@ internal class WordProvider
             return result.ToString() ?? "apple";
         }
 
-        // Fallback if no word found
         return "apple";
     }
 }
