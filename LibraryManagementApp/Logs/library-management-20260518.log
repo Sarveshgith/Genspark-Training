@@ -69,3 +69,52 @@ LibraryManagementApp.Models.Exceptions.InvalidInputException: Invalid fine index
 2026-05-18 16:09:57.538 [INF] Fetched fine history. UserId=2, Count=2
 
 2026-05-18 16:10:02.280 [INF] Application stopped normally
+
+2026-05-18 16:31:32.378 [INF] Application starting
+
+2026-05-18 16:31:44.627 [WRN] Authentication failure handled
+LibraryManagementApp.Models.Exceptions.AuthenticationException: Invalid email or password.
+   at LibraryManagementApp.Services.MemberService.Login(String email, String password) in /Users/sarveswaranb/Proggies/Presidio/Genspark-Training/LibraryManagementApp/Services/MemberService.cs:line 51
+   at LibraryManagementApp.Presentation.InteractService.HandleLogin() in /Users/sarveswaranb/Proggies/Presidio/Genspark-Training/LibraryManagementApp/Presentation/InteractService.cs:line 65
+
+2026-05-18 16:31:53.974 [INF] Application starting
+
+2026-05-18 16:32:05.266 [INF] Member login succeeded. MemberId=1, Email=admin@library.com
+
+2026-05-18 16:32:50.531 [INF] Member added successfully. Username=Jane Doe, Email=janedoe@lib.com, MembershipId=2, Role="User"
+
+2026-05-18 16:33:48.320 [INF] Book added successfully. BookId=3, Title=Thinkin' Slow and Fast, ISBN=9780306406156, CategoryId=2
+
+2026-05-18 16:33:58.117 [INF] Book copies added successfully. BookId=3, Count=5
+
+2026-05-18 16:34:17.766 [INF] Updated book copy status. CopyId=11, Status="Damaged"
+
+2026-05-18 16:34:35.005 [INF] Member login succeeded. MemberId=4, Email=janedoe@lib.com
+
+2026-05-18 16:34:45.274 [INF] Searched books. Title=null, Author=richard, CategoryId=null, ResultCount=1
+
+2026-05-18 16:34:45.285 [INF] Fetched available copies. BookId=3, Count=4
+
+2026-05-18 16:34:59.726 [INF] Borrow created successfully. BorrowId=5, UserId=4, BookId=3, CopyId=9, DueDate="2026-05-28T11:04:59.6938640Z"
+
+2026-05-18 16:35:15.478 [INF] Fetched all books. Count=3
+
+2026-05-18 16:35:15.483 [INF] Fetched available copies. BookId=2, Count=4
+
+2026-05-18 16:35:15.484 [INF] Fetched available copies. BookId=3, Count=3
+
+2026-05-18 16:35:15.485 [INF] Fetched available copies. BookId=1, Count=2
+
+2026-05-18 16:35:19.350 [INF] Fetched active borrowings. UserId=4, Count=1
+
+2026-05-18 16:35:22.621 [INF] Borrow returned successfully. BorrowId=5, UserId=4, FineAmount=0
+
+2026-05-18 16:35:32.879 [INF] Fetched fine history. UserId=4, Count=0
+
+2026-05-18 16:35:42.563 [INF] Fetched borrow history. UserId=4, Count=1
+
+2026-05-18 16:36:01.814 [INF] Member login succeeded. MemberId=2, Email=sarvesh@sarvesh.com
+
+2026-05-18 16:36:07.320 [INF] Fetched fine history. UserId=2, Count=2
+
+2026-05-18 16:36:12.534 [INF] Application stopped normally
