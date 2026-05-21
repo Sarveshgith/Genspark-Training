@@ -1,7 +1,10 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using LibraryManagementAPI.Data;
 using LibraryManagementAPI.Models;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace LibraryManagementAPI.Repository;
 
@@ -14,29 +17,32 @@ public class MemberRepository : IMemberRepository
         _context = context;
     }
 
-    public ActionResult<Member> AddMember(Member member)
+    public async Task<Member> AddMember(Member member)
     {
-        var duplicateEmailExists = _context.Members.Any(existingMember => existingMember.Email == member.Email);
+        var duplicateEmailExists = await _context.Members.AnyAsync(existingMember => existingMember.Email == member.Email);
         if (duplicateEmailExists)
-            return new ConflictObjectResult(new { message = $"Member with email {member.Email} already exists." });
+            throw new InvalidOperationException($"Member with email {member.Email} already exists.");
 
-        var duplicatePhoneExists = _context.Members.Any(existingMember => existingMember.PhoneNo == member.PhoneNo);
+        var duplicatePhoneExists = await _context.Members.AnyAsync(existingMember => existingMember.PhoneNo == member.PhoneNo);
         if (duplicatePhoneExists)
-            return new ConflictObjectResult(new { message = $"Member with phone number {member.PhoneNo} already exists." });
+            throw new InvalidOperationException($"Member with phone number {member.PhoneNo} already exists.");
 
-        _context.Members.Add(member);
-        _context.SaveChanges();
+        await _context.Members.AddAsync(member);
+        await _context.SaveChangesAsync();
         return member;
     }
 
-    public ActionResult<Member> GetMemberById(int id)
+    public async Task<Member> GetMemberById(int id)
     {
-        var member = _context.Members.Find(id);
+        var member = await _context.Members.FindAsync(id);
+        if (member == null)
+            throw new InvalidOperationException($"Member with ID {id} not found.");
+
         return member;
     }
 
-    public ActionResult<IEnumerable<Member>> GetAllMembers()
+    public async Task<IEnumerable<Member>> GetAllMembers()
     {
-        return _context.Members.ToList();
+        return await _context.Members.ToListAsync();
     }
 }

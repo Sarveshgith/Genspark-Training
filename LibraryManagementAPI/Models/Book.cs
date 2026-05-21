@@ -8,6 +8,7 @@ namespace LibraryManagementAPI.Models;
 [Index(nameof(ISBN), IsUnique = true)]
 public class Book
 {
+    [Key]
     public int BookId {get; set;}
 
     [Required]
@@ -18,7 +19,7 @@ public class Book
 
     //Example ISBN formats: "978-3-16-148410-0", "0-306-40615-2", "123456789X"
     [Required]
-    [RegularExpression(@"^[0-9Xx-]+$", ErrorMessage = "ISBN can contain only digits, hyphens, and X.")]
+    //[RegularExpression(@"^[0-9Xx-]+$", ErrorMessage = "ISBN can contain only digits, hyphens, and X.")]
     public string ISBN {get; set;} = string.Empty;
 
     public int PublicationYear {get; set;}

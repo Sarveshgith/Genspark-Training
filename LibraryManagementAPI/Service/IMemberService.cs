@@ -1,14 +1,14 @@
-using System;
-using LibraryManagementAPI.Models;
-using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using LibraryManagementAPI.Models.DTOs;
 
 namespace LibraryManagementAPI.Service;
 
 public interface IMemberService
 {
-    public ActionResult<Member> AddMember(Member member);
+    public Task<MemberDTO> AddMember(CreateMemberDTO member);
 
-    public ActionResult<Member> GetMemberById(int id);
+    public Task<MemberDTO> GetMemberById(int id);
 
-    public ActionResult<IEnumerable<Member>> GetAllMembers();
+    public Task<IEnumerable<MemberDTO>> GetAllMembers();
 }

@@ -1,20 +1,20 @@
-using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using LibraryManagementAPI.Models;
-using Microsoft.AspNetCore.Mvc;
 
 namespace LibraryManagementAPI.Repository;
 
 public interface IBookRepository
 {
-    public ActionResult<Book> AddBook(Book book);
-    
-    public ActionResult<Book> GetBookById(int id);
+    public Task<Book> AddBook(Book book);
 
-    public ActionResult<IEnumerable<Book>> GetAllBooks();
+    public Task<Book> GetBookById(int id);
 
-    public ActionResult<Book> UpdateBook(int id, Book book);
+    public Task<IEnumerable<Book>> GetAllBooks();
 
-    public ActionResult DeleteBook(int id);
+    public Task<Book> UpdateBook(int id, Book book);
 
-    public ActionResult<IEnumerable<Book>> SearchBooks(string title);
+    public Task DeleteBook(int id);
+
+    public Task<IEnumerable<Book>> SearchBooks(string title);
 }

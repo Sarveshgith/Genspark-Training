@@ -1,7 +1,10 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using LibraryManagementAPI.Models;
+using LibraryManagementAPI.Models.DTOs;
 using LibraryManagementAPI.Repository;
-using Microsoft.AspNetCore.Mvc;
 
 namespace LibraryManagementAPI.Service;
 
@@ -14,24 +17,48 @@ public class MemberService : IMemberService
         _memberRepository = memberRepository;
     }
 
-    public ActionResult<Member> AddMember(Member member)
+    public async Task<MemberDTO> AddMember(CreateMemberDTO memberDto)
     {
+        var member = MapCreateMemberDtoToMember(memberDto);
         member.MembershipDate = NormalizeMembershipDate(member.MembershipDate);
-        return _memberRepository.AddMember(member);
+
+        var createdMember = await _memberRepository.AddMember(member);
+        return MapMemberToDto(createdMember);
     }
 
-    public ActionResult<Member> GetMemberById(int id)
+    public async Task<MemberDTO> GetMemberById(int id)
     {
-        var member = _memberRepository.GetMemberById(id).Value;
-        if (member == null)
-            return new NotFoundObjectResult(new { message = $"Member with ID {id} not found." });
-        
-        return member;
+        var member = await _memberRepository.GetMemberById(id);
+        return MapMemberToDto(member);
     }
 
-    public ActionResult<IEnumerable<Member>> GetAllMembers()
+    public async Task<IEnumerable<MemberDTO>> GetAllMembers()
     {
-        return _memberRepository.GetAllMembers();
+        var members = await _memberRepository.GetAllMembers();
+        return members.Select(MapMemberToDto).ToList();
+    }
+
+    private static Member MapCreateMemberDtoToMember(CreateMemberDTO memberDto)
+    {
+        return new Member
+        {
+            FullName = memberDto.FullName,
+            Email = memberDto.Email,
+            PhoneNo = memberDto.PhoneNo,
+            MembershipDate = memberDto.MembershipDate
+        };
+    }
+
+    private static MemberDTO MapMemberToDto(Member member)
+    {
+        return new MemberDTO
+        {
+            MemberId = member.MemberId,
+            FullName = member.FullName,
+            Email = member.Email,
+            PhoneNo = member.PhoneNo,
+            MembershipDate = member.MembershipDate
+        };
     }
 
     private static DateTime NormalizeMembershipDate(DateTime membershipDate)

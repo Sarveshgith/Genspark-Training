@@ -12,16 +12,15 @@ public class Member
     public int MemberId {get; set;}
 
     [Required]
-    [StringLength(150, MinimumLength = 2)]
+    //[StringLength(150, MinimumLength = 2)]
     public string FullName {get; set;} = string.Empty;
 
     [Required]
     [EmailAddress]
-    [StringLength(200)]
     public string Email {get; set;} = string.Empty;
 
     [Required]
-    [RegularExpression(@"^[0-9]{10,15}$", ErrorMessage = "Phone number must contain only digits and be 10 to 15 characters long.")]
+    //[RegularExpression(@"^[0-9]{10}$", ErrorMessage = "Phone number must contain only digits and be 10characters long.")]
     public string PhoneNo {get; set;} = string.Empty;
 
     [Required]

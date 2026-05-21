@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
-using LibraryManagementAPI.Models;
+using System.Threading.Tasks;
+using LibraryManagementAPI.Models.DTOs;
 using LibraryManagementAPI.Service;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,47 +19,94 @@ public class BooksController : ControllerBase
     }
 
     [HttpGet]
-    public ActionResult<IEnumerable<Book>> GetAll()
+    public async Task<ActionResult<IEnumerable<BookDTO>>> GetAll()
     {
-        return _bookService.GetAllBooks();
+        try
+        {
+            var books = await _bookService.GetAllBooks();
+            return Ok(books);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 
     [HttpGet("{id}")]
-    public ActionResult<Book> GetById(int id)
+    public async Task<ActionResult<BookDTO>> GetById(int id)
     {
-        return _bookService.GetBookById(id);
+        try
+        {
+            var book = await _bookService.GetBookById(id);
+            return Ok(book);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 
     [HttpPost]
-    public ActionResult<Book> Create([FromBody] Book book)
+    public async Task<ActionResult<BookDTO>> Create([FromBody] CreateBookDTO bookDto)
     {
-        var result = _bookService.AddBook(book);
-        var created = result.Value;
-        return Ok(new {
-            message = "Book created successfully",
-            data = created
-        });
+        try
+        {
+            var book = await _bookService.AddBook(bookDto);
+            return Ok(new {
+                message = "Book created successfully",
+                book = book
+            });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 
     [HttpPut("{id}")]
-    public ActionResult<Book> Update([FromRoute] int id, [FromBody] Book book)
+    public async Task<ActionResult<BookDTO>> Update(int id, [FromBody] UpdateBookDTO bookDto)
     {
-        return _bookService.UpdateBook(id, book);
+        try
+        {
+            var book = await _bookService.UpdateBook(id, bookDto);
+            return Ok(new {
+                message = "Book updated successfully",
+                book = book
+            });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 
     [HttpDelete("{id}")]
-    public ActionResult Delete([FromRoute] int id)
+    public async Task<ActionResult> Delete(int id)
     {
-        return _bookService.DeleteBook(id);
+        try
+        {
+            await _bookService.DeleteBook(id);
+            return Ok(new { message = "Book deleted successfully" });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 
     [HttpGet("search")]
-    public ActionResult<IEnumerable<Book>> Search([FromQuery] string title)
+    public async Task<ActionResult<IEnumerable<BookDTO>>> Search([FromQuery] string title)
     {
-        if(string.IsNullOrWhiteSpace(title)){
-            return BadRequest("Title query parameter is required.");
-        }
+        try
+        {
+            if (string.IsNullOrWhiteSpace(title))
+                return BadRequest(new { message = "Title query parameter is required." });
 
-        return _bookService.SearchBooks(title);
+            return Ok(await _bookService.SearchBooks(title));
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 }

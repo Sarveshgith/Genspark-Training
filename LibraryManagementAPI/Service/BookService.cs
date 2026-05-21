@@ -1,7 +1,9 @@
-using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using LibraryManagementAPI.Models;
+using LibraryManagementAPI.Models.DTOs;
 using LibraryManagementAPI.Repository;
-using Microsoft.AspNetCore.Mvc;
 
 namespace LibraryManagementAPI.Service;
 
@@ -14,42 +16,77 @@ public class BookService : IBookService
         _bookRepository = bookRepository;
     }
 
-    public ActionResult<Book> AddBook(Book book)
+    public async Task<BookDTO> AddBook(CreateBookDTO bookDto)
     {
-        return _bookRepository.AddBook(book);
+        var book = MapCreateBookDtoToBook(bookDto);
+        var createdBook = await _bookRepository.AddBook(book);
+        return MapBookToDto(createdBook);
     }
 
-    public ActionResult<Book> GetBookById(int id)
+    public async Task<BookDTO> GetBookById(int id)
     {
-        var book = _bookRepository.GetBookById(id).Value;
-        if (book == null)
-            return new NotFoundObjectResult(new { message = $"Book with ID {id} not found." });
-        
-        return book;
+        var book = await _bookRepository.GetBookById(id);
+        return MapBookToDto(book);
     }
 
-    public ActionResult<IEnumerable<Book>> GetAllBooks()
+    public async Task<IEnumerable<BookDTO>> GetAllBooks()
     {
-        return _bookRepository.GetAllBooks();
+        var books = await _bookRepository.GetAllBooks();
+        return books.Select(MapBookToDto).ToList();
     }
 
-    public ActionResult<Book> UpdateBook(int id, Book book)
+    public async Task<BookDTO> UpdateBook(int id, UpdateBookDTO bookDto)
     {
-        var result = _bookRepository.UpdateBook(id, book);
-        var updatedBook = result.Value;
-        if (updatedBook == null)
-            return new NotFoundObjectResult(new { message = $"Book with ID {id} not found." });
-        
-        return updatedBook;
+        var book = MapUpdateBookDtoToBook(bookDto);
+        var updatedBook = await _bookRepository.UpdateBook(id, book);
+        return MapBookToDto(updatedBook);
     }
 
-    public ActionResult DeleteBook(int id)
+    public async Task DeleteBook(int id)
     {
-        return _bookRepository.DeleteBook(id);
+        await _bookRepository.DeleteBook(id);
     }
 
-    public ActionResult<IEnumerable<Book>> SearchBooks(string title)
+    public async Task<IEnumerable<BookDTO>> SearchBooks(string title)
     {
-        return _bookRepository.SearchBooks(title);
+        var books = await _bookRepository.SearchBooks(title);
+        return books.Select(MapBookToDto).ToList();
+    }
+
+    private static Book MapCreateBookDtoToBook(CreateBookDTO bookDto)
+    {
+        return new Book
+        {
+            Title = bookDto.Title,
+            Author = bookDto.Author,
+            ISBN = bookDto.ISBN,
+            PublicationYear = bookDto.PublicationYear,
+            AvailableCopies = bookDto.AvailableCopies
+        };
+    }
+
+    private static Book MapUpdateBookDtoToBook(UpdateBookDTO bookDto)
+    {
+        return new Book
+        {
+            Title = bookDto.Title,
+            Author = bookDto.Author,
+            ISBN = bookDto.ISBN,
+            PublicationYear = bookDto.PublicationYear,
+            AvailableCopies = bookDto.AvailableCopies
+        };
+    }
+
+    private static BookDTO MapBookToDto(Book book)
+    {
+        return new BookDTO
+        {
+            BookId = book.BookId,
+            Title = book.Title,
+            Author = book.Author,
+            ISBN = book.ISBN,
+            PublicationYear = book.PublicationYear,
+            AvailableCopies = book.AvailableCopies
+        };
     }
 }

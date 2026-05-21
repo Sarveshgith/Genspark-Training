@@ -1,7 +1,10 @@
+using System.Collections.Generic;
+using System.Linq;
 using System;
+using System.Threading.Tasks;
 using LibraryManagementAPI.Data;
 using LibraryManagementAPI.Models;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace LibraryManagementAPI.Repository;
 
@@ -14,60 +17,55 @@ public class BookRepository : IBookRepository
         _context = context;
     }
 
-    public ActionResult<Book> AddBook(Book book)
+    public async Task<Book> AddBook(Book book)
     {
-        if (_context.Books.Any(existingBook => existingBook.ISBN == book.ISBN))
-            return new ConflictObjectResult(new { message = $"Book with ISBN {book.ISBN} already exists." });
-
-        _context.Books.Add(book);
-        _context.SaveChanges();
+        await _context.Books.AddAsync(book);
+        await _context.SaveChangesAsync();
         return book;
     }
 
-    public ActionResult<Book> GetBookById(int id)
+    public async Task<Book> GetBookById(int id)
     {
-        var book = _context.Books.Find(id);
+        var book = await _context.Books.FindAsync(id);
+        if (book == null)
+            throw new InvalidOperationException($"Book with ID {id} not found.");
+
         return book;
     }
 
-    public ActionResult<IEnumerable<Book>> GetAllBooks()
+    public async Task<IEnumerable<Book>> GetAllBooks()
     {
-        return _context.Books.ToList();
+        return await _context.Books.ToListAsync();
     }
 
-    public ActionResult<Book> UpdateBook(int id, Book book)
+    public async Task<Book> UpdateBook(int id, Book book)
     {
-        var existingBook = _context.Books.Find(id);
+        var existingBook = await _context.Books.FindAsync(id);
         if (existingBook == null)
-            return null;
+            throw new InvalidOperationException($"Book with ID {id} not found.");
 
-        var duplicateIsbnExists = _context.Books.Any(candidate => candidate.BookId != id && candidate.ISBN == book.ISBN);
-        if (duplicateIsbnExists)
-            return new ConflictObjectResult(new { message = $"Book with ISBN {book.ISBN} already exists." });
-        
         existingBook.Title = book.Title;
         existingBook.Author = book.Author;
         existingBook.ISBN = book.ISBN;
         existingBook.PublicationYear = book.PublicationYear;
         existingBook.AvailableCopies = book.AvailableCopies;
 
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
         return existingBook;
     }
 
-    public ActionResult DeleteBook(int id)
+    public async Task DeleteBook(int id)
     {
-        var book = _context.Books.Find(id);
+        var book = await _context.Books.FindAsync(id);
         if (book == null)
-            return new NotFoundResult();
-        
+            throw new InvalidOperationException($"Book with ID {id} not found.");
+
         _context.Books.Remove(book);
-        _context.SaveChanges();
-        return new NoContentResult();
+        await _context.SaveChangesAsync();
     }
 
-    public ActionResult<IEnumerable<Book>> SearchBooks(string title)
+    public async Task<IEnumerable<Book>> SearchBooks(string title)
     {
-        return _context.Books.Where(b => b.Title.Contains(title)).ToList();
+        return await _context.Books.Where(b => b.Title.Contains(title)).ToListAsync();
     }
 }

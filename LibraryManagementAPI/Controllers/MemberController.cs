@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
-using LibraryManagementAPI.Models;
+using System.Threading.Tasks;
+using LibraryManagementAPI.Models.DTOs;
 using LibraryManagementAPI.Service;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,25 +19,45 @@ public class MemberController : ControllerBase
     }
 
     [HttpGet]
-    public ActionResult<IEnumerable<Member>> GetAll()
+    public async Task<ActionResult<IEnumerable<MemberDTO>>> GetAll()
     {
-        return _memberService.GetAllMembers();
+        try
+        {
+            return Ok(await _memberService.GetAllMembers());
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 
     [HttpGet("{id}")]
-    public ActionResult<Member> GetById([FromRoute] int id)
+    public async Task<ActionResult<MemberDTO>> GetById([FromRoute] int id)
     {
-        return _memberService.GetMemberById(id);
+        try
+        {
+            return Ok(await _memberService.GetMemberById(id));
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 
     [HttpPost]
-    public ActionResult<Member> Create([FromBody]Member member)
+    public async Task<ActionResult<MemberDTO>> Create([FromBody] CreateMemberDTO memberDto)
     {
-        var result = _memberService.AddMember(member);
-        var created = result.Value;
-        return Ok(new {
-            message = "Member created successfully",
-            data = created
-        });
+        try
+        {
+            var member = await _memberService.AddMember(memberDto);
+            return Ok(new {
+                message = "Member created successfully",
+                member = member
+            });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 }

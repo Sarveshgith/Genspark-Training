@@ -1,20 +1,20 @@
-using System;
-using LibraryManagementAPI.Models;
-using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using LibraryManagementAPI.Models.DTOs;
 
 namespace LibraryManagementAPI.Service;
 
 public interface IBookService
 {
-    public ActionResult<Book> AddBook(Book book);
+    public Task<BookDTO> AddBook(CreateBookDTO book);
 
-    public ActionResult<Book> GetBookById(int id);
+    public Task<BookDTO> GetBookById(int id);
 
-    public ActionResult<IEnumerable<Book>> GetAllBooks();
+    public Task<IEnumerable<BookDTO>> GetAllBooks();
 
-    public ActionResult<Book> UpdateBook(int id, Book book);
+    public Task<BookDTO> UpdateBook(int id, UpdateBookDTO book);
 
-    public ActionResult DeleteBook(int id);
+    public Task DeleteBook(int id);
 
-    public ActionResult<IEnumerable<Book>> SearchBooks(string title);
+    public Task<IEnumerable<BookDTO>> SearchBooks(string title);
 }
