@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using LibraryManagementAPI.Models.DTOs;
 using LibraryManagementAPI.Service;
 using Microsoft.AspNetCore.Mvc;
@@ -23,7 +20,8 @@ public class MemberController : ControllerBase
     {
         try
         {
-            return Ok(await _memberService.GetAllMembers());
+            var members = await _memberService.GetAllMembers();
+            return Ok(members);
         }
         catch (Exception ex)
         {
@@ -36,7 +34,8 @@ public class MemberController : ControllerBase
     {
         try
         {
-            return Ok(await _memberService.GetMemberById(id));
+            var member = await _memberService.GetMemberById(id);
+            return Ok(member);
         }
         catch (Exception ex)
         {

@@ -1,7 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
-using System;
-using System.Threading.Tasks;
 using LibraryManagementAPI.Data;
 using LibraryManagementAPI.Models;
 using Microsoft.EntityFrameworkCore;
