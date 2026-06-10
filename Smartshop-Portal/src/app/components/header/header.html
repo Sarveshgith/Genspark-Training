@@ -1,0 +1,12 @@
+@if (user$ | async; as user) {
+  <header class="flex justify-between items-center p-4 bg-gray-50 border-b border-gray-200">
+    <div class="text-sm font-semibold text-gray-700">
+      Hello, {{ user.firstName }}
+    </div>
+    <div class="flex gap-4 items-center">
+      <button (click)="logout()" class="px-3 py-1 bg-red-600 text-white rounded text-xs font-semibold hover:bg-red-700 transition">
+        Logout
+      </button>
+    </div>
+  </header>
+}
