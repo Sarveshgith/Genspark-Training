@@ -129,7 +129,7 @@ public class MenuService : IMenuService
     // Toggles the availability status of a menu item.
     public async Task<bool> ToggleAvailabilityAsync(int id, bool isAvailable)
     {
-        _logger.LogInformation("ToggleAvailabilityAsync started for Menu Item ID: {Id}, Available: {IsAvailable}", id, isAvailable);
+        _logger.LogInformation("ToggleAvailabilityAsync started for Menu Item ID: {Id}, Target Availability: {IsAvailable}", id, isAvailable);
         var menuItem = await _menuItemRepository.GetByIdAsync(id);
         if (menuItem == null)
         {
@@ -142,7 +142,7 @@ public class MenuService : IMenuService
             var canPrepare = await _itemService.CanPrepareMenuItemAsync(id, 1);
             if (!canPrepare)
             {
-                throw new BusinessRuleException($"Cannot enable item with zero stock");
+                throw new BusinessRuleException("Cannot enable item with zero stock");
             }
             menuItem.IsAvailable = true;
             menuItem.IsManuallyDisabled = false;

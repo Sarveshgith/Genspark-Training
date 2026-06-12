@@ -376,6 +376,7 @@ public class OrderService : IOrderService
         }
 
         order.AssignedUserId = userId;
+        order.Status = OrderStatus.InPrep;
         await _context.SaveChangesAsync();
         _logger.LogInformation("AssignOrderToUserAsync succeeded. OrderId: {OrderId} assigned to UserId: {UserId}", orderId, userId);
         return true;
