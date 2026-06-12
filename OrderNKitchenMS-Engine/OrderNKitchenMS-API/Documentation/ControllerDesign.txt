@@ -1,0 +1,80 @@
+AUTH            /api/auth
+  POST  /register
+  POST  /login
+  POST  /refresh              ← todo
+  POST  /logout               ← todo
+  GET   /me
+  POST  /guest-session        ← todo
+
+USERS           /api/users
+  GET   /
+  GET   /roles
+  GET   /{id}
+  PUT   /{id}
+  PATCH /{id}/password
+  DELETE /{id}
+
+CATEGORIES      /api/categories
+  GET   /
+  GET   /{id}
+  POST  /
+  PUT   /{id}
+  PATCH /{id}/active          ← missing
+  DELETE /{id}
+
+MENU            /api/menu
+  GET   /
+  GET   /{id}
+  POST  /
+  PUT   /{id}
+  PATCH /{id}/availability
+  DELETE /{id}
+
+TABLES          /api/tables
+  GET   /
+  GET   /{id}
+  POST  /
+  PUT   /{id}
+  PATCH /{id}/status
+  DELETE /{id}
+
+ORDERS          /api/orders
+  GET   /
+  GET   /active
+  GET   /{id:int}
+  GET   /table/{tableId}/active
+  POST  /
+  POST  /{id}/items
+  DELETE /{id}/items/{itemId}
+  PATCH /{id}/status
+
+KITCHEN         /api/kitchen  ← entire controller todo
+  GET   /queue
+  PATCH /queue/{id}/start
+  PATCH /queue/{id}/complete
+  GET   /queue/stats
+
+BILLS           /api/bills
+  GET   /
+  GET   /order/{orderId}
+  GET   /order/{orderId}/pdf
+  POST  /order/{orderId}
+  PUT /{id}
+  PATCH /{id}/status          (Pending → Paid or Failed only)
+  — remove PUT /{id}
+  — remove Cancelled from bill status
+
+INVENTORY       /api/inventory  ← entire controller todo
+  GET   /
+  GET   /{menuItemId}
+  PUT   /{menuItemId}
+  GET   /low-stock
+
+REPORTS         /api/reports    ← entire controller todo
+  GET   /revenue/daily
+  GET   /revenue/range
+  GET   /orders/summary
+  GET   /menu/top-items
+  GET   /menu/category-performance
+  GET   /kitchen/sla
+  GET   /tables/turnover

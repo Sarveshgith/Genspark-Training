@@ -1,0 +1,55 @@
+Users Table
+    Id (PK), Name, Email, PasswordHash, PhoneNumber?, Address?, RoleId (FK), IsDeleted, CreatedAt, UpdatedAt
+
+Roles Table
+    Id (PK), Name, CreatedAt, UpdatedAt
+    [ENUM: Admin = 1, Customer = 2, Chef = 3, Deliveryman = 4]
+
+Tables Table
+    Id (PK), Number (Unique), Status, Capacity, IsDeleted, CreatedAt, UpdatedAt
+    [ENUM: Available = 1, Occupied = 2, Reserved = 3]
+
+Categories Table
+    Id (PK), Name, IsNonVeg, IsDeleted, CreatedAt, UpdatedAt
+
+MenuItems Table
+    Id (PK), CategoryId (FK), Name, Description, Price, ImageUrl?, PreparationTime (mins), IsAvailable, IsManuallyDisabled, IsDeleted, CreatedAt, UpdatedAt
+
+MenuItemIngredients Table
+    Id (PK), MenuItemId (FK), ItemId (FK), QuantityRequired, CreatedAt, UpdatedAt
+
+Items Table (Inventory)
+    Id (PK), Name, Unit, StockQuantity, StockThreshold, CostPerUnit?, IsActive, CreatedAt, UpdatedAt
+    [ENUM: Grams = 1, Milliliters = 2, Units = 3, Kilograms = 4, Liters = 5]
+
+Orders Table
+    Id (PK), TableId (FK), AssignedUserId? (FK), Status, TotalAmount, CompletedAt?, CreatedAt, UpdatedAt
+    [ENUM: Pending = 1, InPrep = 2, Ready = 3, Served = 4, Completed = 5, Cancelled = 6]
+
+OrderItems Table
+    Id (PK), OrderId (FK), MenuItemId (FK), Quantity, UnitPrice, Notes, CreatedAt, UpdatedAt
+
+Bills Table
+    Id (PK), OrderId (FK), SubTotal, TaxRate, DiscountAmount, TotalAmount, Status, CreatedAt, UpdatedAt
+    [ENUM: Pending = 1, Paid = 2, Failed = 3]
+
+-----------------------------------------------------------------------------------
+
+Notes
+
+=> TotalAmount = SubTotal * (1 + TaxRate/100) - DiscountAmount
+=> QR Code is used for table reservation, table booking, and guest session tracking in real time.
+=> Waiter capability is assigned to users with Admin privilege or simulated roles. Guests log in with TableId and can only place/add items to their table's order.
+=> The system implements item-based inventory where menu items are composed of multiple raw ingredients (Items). Stock checks and availability toggles happen automatically via DB triggers and service-level validations.
+
+-----------------------------------------------------------------------------------
+
+Main Flow
+
+1) Admin/Chef sets up categories and raw items (Ingredients).
+2) Admin/Chef maps ingredients to menu items via MenuItemIngredients.
+3) Customer/Waiter orders menu items (automatically checking availability and deducting raw item stock quantity).
+4) Kitchen (Chef) receives order, starts preparation, and marks it ready.
+5) Waiter serves the order.
+6) Generate Bill (Order status must be Ready).
+7) Process payment: if marked Paid, order status becomes Completed and Table status resets to Available automatically.

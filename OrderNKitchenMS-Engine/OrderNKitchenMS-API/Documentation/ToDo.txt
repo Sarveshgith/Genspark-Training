@@ -1,0 +1,6 @@
+* Document = Check on the Set() vs get; set;
+* Where to use ? and null!
+
+Check all the models once more
+Check the updateStatus Functions
+Check the name of the DtosMapping functions
