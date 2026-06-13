@@ -27,14 +27,22 @@ public class ItemServiceTest
     private IMenuItemRepository _menuItemRepository = null!;
     private IItemService _itemService = null!;
 
+    private Microsoft.Data.Sqlite.SqliteConnection _connection = null!;
+
     [SetUp]
     public void Setup()
     {
+        _connection = new Microsoft.Data.Sqlite.SqliteConnection("Filename=:memory:");
+        _connection.Open();
+
         var options = new DbContextOptionsBuilder<AppDbContext>()
-            .UseInMemoryDatabase(databaseName: "OrderNKitchenDb")
+            .UseSqlite(_connection)
             .Options;
 
         _context = new AppDbContext(options);
+        _context.Database.EnsureCreated();
+        _context.Database.ExecuteSqlRaw("PRAGMA foreign_keys = OFF;");
+
         _itemRepository = new ItemRepository(_context);
         _ingredientRepository = new MenuItemIngredientRepository(_context);
         _menuItemRepository = new MenuItemRepository(_context);
@@ -46,8 +54,8 @@ public class ItemServiceTest
     [TearDown]
     public void TearDown()
     {
-        _context.Database.EnsureDeleted();
         _context.Dispose();
+        _connection.Dispose();
     }
 
     [Test]
@@ -139,6 +147,7 @@ public class ItemServiceTest
         await _itemService.UpdateStockByMenuItemIdAsync(1, 3, false);
 
         var updatedItem = await _context.Items.FindAsync(1);
+        await _context.Entry(updatedItem!).ReloadAsync();
         Assert.That(updatedItem!.StockQuantity, Is.EqualTo(4m));
     }
 
@@ -168,5 +177,48 @@ public class ItemServiceTest
 
         // Act: try to deduct 2 * 2 = 4 kg (we only have 3 kg)
         Assert.ThrowsAsync<BusinessRuleException>(async () => await _itemService.UpdateStockByMenuItemIdAsync(1, 2, false));
+    }
+
+    [Test]
+    public async Task RestockItemAsync_PassTest_IncreasesStock()
+    {
+        // Arrange
+        var item = new Item
+        {
+            Id = 10,
+            Name = "Milk",
+            Unit = ItemUnit.Liters,
+            StockQuantity = 5m,
+            StockThreshold = 1m,
+            IsActive = true
+        };
+        _context.Items.Add(item);
+        await _context.SaveChangesAsync();
+
+        var restockDto = new ItemRestockDto { Quantity = 15.5m };
+
+        // Act
+        var result = await _itemService.RestockItemAsync(10, restockDto);
+
+        // Assert
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.StockQuantity, Is.EqualTo(20.5m));
+        var updatedItem = await _context.Items.FindAsync(10);
+        await _context.Entry(updatedItem!).ReloadAsync();
+        Assert.That(updatedItem!.StockQuantity, Is.EqualTo(20.5m));
+    }
+
+    [Test]
+    public void RestockItemAsync_FailTest_InvalidQuantity_ThrowsArgumentException()
+    {
+        var restockDto = new ItemRestockDto { Quantity = -5m }; // Invalid
+        Assert.ThrowsAsync<ArgumentException>(async () => await _itemService.RestockItemAsync(1, restockDto));
+    }
+
+    [Test]
+    public void RestockItemAsync_FailTest_ItemNotFound_ThrowsNotFoundException()
+    {
+        var restockDto = new ItemRestockDto { Quantity = 5m };
+        Assert.ThrowsAsync<NotFoundException>(async () => await _itemService.RestockItemAsync(999, restockDto));
     }
 }

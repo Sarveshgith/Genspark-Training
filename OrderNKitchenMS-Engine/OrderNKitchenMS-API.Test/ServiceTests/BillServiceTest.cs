@@ -56,7 +56,11 @@ public class BillServiceTest
         {
             Id = 1,
             Status = (int)OrderStatus.Ready,
-            TotalAmount = 100m
+            TotalAmount = 100m,
+            OrderItems = new []
+            {
+                new OrderItemDto { MenuItemId = 1, Quantity = 1, UnitPrice = 100m }
+            }
         };
         _orderServiceMock.Setup(s => s.GetOrderByIdAsync(1)).ReturnsAsync(orderDto);
 
@@ -85,7 +89,11 @@ public class BillServiceTest
         {
             Id = 1,
             Status = (int)OrderStatus.Pending, // Not Ready
-            TotalAmount = 100m
+            TotalAmount = 100m,
+            OrderItems = new []
+            {
+                new OrderItemDto { MenuItemId = 1, Quantity = 1, UnitPrice = 100m }
+            }
         };
         _orderServiceMock.Setup(s => s.GetOrderByIdAsync(1)).ReturnsAsync(orderDto);
 
