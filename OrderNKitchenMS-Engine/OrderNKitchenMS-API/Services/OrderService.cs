@@ -23,6 +23,15 @@ public class OrderService : IOrderService
     private readonly IOrderItemRepository _orderItemRepository;
     private readonly IItemService _itemService;
     private readonly ILogger<OrderService> _logger;
+    private static readonly Dictionary<OrderStatus, List<OrderStatus>> AllowedTransitions = new()
+    {
+        { OrderStatus.Pending, new List<OrderStatus> { OrderStatus.InPrep, OrderStatus.Cancelled } },
+        { OrderStatus.InPrep, new List<OrderStatus> { OrderStatus.Ready, OrderStatus.Cancelled } },
+        { OrderStatus.Ready, new List<OrderStatus> { OrderStatus.Served, OrderStatus.Completed, OrderStatus.Cancelled } },
+        { OrderStatus.Served, new List<OrderStatus> { OrderStatus.Completed, OrderStatus.Cancelled } },
+        { OrderStatus.Completed, new List<OrderStatus>() },
+        { OrderStatus.Cancelled, new List<OrderStatus>() }
+    };
 
     public OrderService(
         AppDbContext context, 
@@ -369,7 +378,17 @@ public class OrderService : IOrderService
         var newStatus = (OrderStatus)status;
         var oldStatus = order.Status;
 
-        if (newStatus == OrderStatus.Cancelled && (oldStatus == OrderStatus.Pending || oldStatus == OrderStatus.InPrep))
+        if (newStatus == oldStatus)
+        {
+            return true;
+        }
+
+        if (!AllowedTransitions.TryGetValue(oldStatus, out var allowed) || !allowed.Contains(newStatus))
+        {
+            throw new BusinessRuleException($"Cannot transition order status from '{oldStatus}' to '{newStatus}'.");
+        }
+
+        if (newStatus == OrderStatus.Cancelled)
         {
             var orderItems = await _orderItemRepository.GetByOrderIdAsync(orderId);
             foreach (var orderItem in orderItems)
@@ -401,8 +420,19 @@ public class OrderService : IOrderService
             throw new NotFoundException($"Order with id {orderId} was not found.");
         }
 
+        var oldStatus = order.Status;
+        var newStatus = OrderStatus.InPrep;
+
+        if (oldStatus != newStatus)
+        {
+            if (!AllowedTransitions.TryGetValue(oldStatus, out var allowed) || !allowed.Contains(newStatus))
+            {
+                throw new BusinessRuleException($"Cannot transition order status from '{oldStatus}' to '{newStatus}'.");
+            }
+            order.Status = newStatus;
+        }
+
         order.AssignedChefId = chefId;
-        order.Status = OrderStatus.InPrep;
         await _context.SaveChangesAsync();
         _logger.LogInformation("AssignChefToOrderAsync succeeded. OrderId: {OrderId} assigned to ChefId: {ChefId}", orderId, chefId);
         return true;

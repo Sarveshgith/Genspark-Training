@@ -11,6 +11,7 @@ public interface IItemService
     Task<IEnumerable<ItemDto>> GetLowStockItemsAsync();
     Task<ItemDto> CreateItemAsync(ItemCreateDto dto);
     Task<ItemDto> UpdateItemAsync(int id, ItemUpdateDto dto);
+    Task<ItemDto> RestockItemAsync(int id, ItemRestockDto dto);
     Task ChangeItemStatusAsync(int id, bool isActive);
 
     Task<IEnumerable<MenuItemIngredientDto>> GetIngredientsByMenuItemIdAsync(int menuItemId);

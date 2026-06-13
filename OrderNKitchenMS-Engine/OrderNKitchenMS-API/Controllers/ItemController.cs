@@ -57,6 +57,14 @@ public class ItemController : ControllerBase
         return Ok(updated);
     }
 
+    [HttpPatch("items/{id:int}/restock")]
+    public async Task<ActionResult<ItemDto>> RestockItem(int id, [FromBody] ItemRestockDto dto)
+    {
+        Validation.RequireNotNull(dto, nameof(dto), "Item restock payload is required.");
+        var updated = await _itemService.RestockItemAsync(id, dto);
+        return Ok(updated);
+    }
+
     [HttpDelete("items/{id:int}")]
     public async Task<ActionResult> DeleteItem(int id)
     {

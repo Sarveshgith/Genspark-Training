@@ -36,6 +36,11 @@ public class ItemUpdateDto
     public bool IsActive { get; set; }
 }
 
+public class ItemRestockDto
+{
+    public decimal Quantity { get; set; }
+}
+
 public class MenuItemIngredientDto
 {
     public int Id { get; set; }

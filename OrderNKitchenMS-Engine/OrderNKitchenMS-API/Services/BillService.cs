@@ -44,16 +44,18 @@ public class BillService : IBillService
             throw new BusinessRuleException($"A bill already exists for Order ID {billCreateDto.OrderId}. Cannot create duplicate bills for the same order.");
         }
 
+        var subTotal = order.OrderItems.Sum(oi => oi.UnitPrice * oi.Quantity);
+
          if(billCreateDto.TaxRate < 0 || billCreateDto.TaxRate > 100)
         {
             _logger.LogWarning("CreateBillAsync failed: Invalid tax rate {TaxRate}", billCreateDto.TaxRate);
             throw new BusinessRuleException($"Invalid tax rate: {billCreateDto.TaxRate}. Tax rate must be between 0 and 100.");
         }
 
-        if(billCreateDto.DiscountAmount < 0 || billCreateDto.DiscountAmount > order.TotalAmount)
+        if(billCreateDto.DiscountAmount < 0 || billCreateDto.DiscountAmount > subTotal)
         {
             _logger.LogWarning("CreateBillAsync failed: Invalid discount amount {DiscountAmount}", billCreateDto.DiscountAmount);
-            throw new BusinessRuleException($"Invalid discount amount: {billCreateDto.DiscountAmount}. It must be between 0 and the order total amount ({order.TotalAmount}).");
+            throw new BusinessRuleException($"Invalid discount amount: {billCreateDto.DiscountAmount}. It must be between 0 and the order total amount ({subTotal}).");
         }
 
         if(order.Status != (int)OrderStatus.Ready)
@@ -62,7 +64,7 @@ public class BillService : IBillService
             throw new BusinessRuleException($"Cannot create bill for Order ID {billCreateDto.OrderId} because its status is not 'Ready'.");
         }
 
-        var bill = MapBillCreateDtoToEntity(order, billCreateDto);
+        var bill = MapBillCreateDtoToEntity(order, billCreateDto, subTotal);
         await _billRepository.CreateBillAsync(bill);
         _logger.LogInformation("CreateBillAsync succeeded. Generated Bill ID: {BillId} for Order ID: {OrderId}", bill.Id, bill.OrderId);
         return MapBillToDto(bill);
@@ -101,7 +103,9 @@ public class BillService : IBillService
             throw new NotFoundException($"Order with ID {billCreateDto.OrderId} not found.");
         }
 
-        var updatedBill = MapBillCreateDtoToEntity(order, billCreateDto);
+        var subTotal = order.OrderItems.Sum(oi => oi.UnitPrice * oi.Quantity);
+
+        var updatedBill = MapBillCreateDtoToEntity(order, billCreateDto, subTotal);
         var bill = await _billRepository.UpdateBillAsync(id, updatedBill);
         if (bill == null)
         {
@@ -181,15 +185,15 @@ public class BillService : IBillService
         };
     }
 
-    private static Bill MapBillCreateDtoToEntity(OrderDto orderDto, BillCreateDto billCreateDto)
+    private static Bill MapBillCreateDtoToEntity(OrderDto orderDto, BillCreateDto billCreateDto, decimal subTotal)
     {
         return new Bill
         {
             OrderId = billCreateDto.OrderId,
-            SubTotal = orderDto.TotalAmount,
+            SubTotal = subTotal,
             TaxRate = billCreateDto.TaxRate,
             DiscountAmount = billCreateDto.DiscountAmount,
-            TotalAmount = orderDto.TotalAmount + (orderDto.TotalAmount * billCreateDto.TaxRate / 100m) - billCreateDto.DiscountAmount,
+            TotalAmount = subTotal + (subTotal * billCreateDto.TaxRate / 100m) - billCreateDto.DiscountAmount,
             Status = Models.Enums.BillStatus.Pending,
             CreatedAt = DateTime.UtcNow
         };

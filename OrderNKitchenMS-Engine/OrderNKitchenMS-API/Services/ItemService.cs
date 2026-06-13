@@ -134,6 +134,33 @@ public class ItemService : IItemService
         return MapToDto(item);
     }
 
+    public async Task<ItemDto> RestockItemAsync(int id, ItemRestockDto dto)
+    {
+        _logger.LogInformation("RestockItemAsync started for Item ID: {Id}, Quantity: {Quantity}", id, dto.Quantity);
+        Validation.RequireNotNull(dto, nameof(dto), "Restock data is required.");
+        Validation.Require(dto.Quantity > 0, "Restock quantity must be greater than 0.", nameof(dto.Quantity));
+
+        var item = await _itemRepository.GetByIdAsync(id);
+        if (item == null)
+        {
+            throw new NotFoundException($"Item with ID {id} was not found.");
+        }
+
+        item.StockQuantity += dto.Quantity;
+        await _itemRepository.UpdateAsync(item);
+        await _itemRepository.SaveChangesAsync();
+
+        // Re-evaluate affected menu items
+        var ingredientMappings = await _ingredientRepository.GetByItemIdAsync(id);
+        foreach (var mapping in ingredientMappings)
+        {
+            await ReevaluateMenuItemAvailabilityAsync(mapping.MenuItemId);
+        }
+
+        _logger.LogInformation("RestockItemAsync succeeded for Item ID: {Id}. New StockQuantity: {StockQuantity}", id, item.StockQuantity);
+        return MapToDto(item);
+    }
+
     public async Task ChangeItemStatusAsync(int id, bool isActive)
     {
         _logger.LogInformation("ChangeItemStatusAsync started for Item ID: {Id}, IsActive: {IsActive}", id, isActive);
@@ -363,19 +390,23 @@ public class ItemService : IItemService
             var requiredQuantity = ingredient.QuantityRequired * quantity;
             if (isAdd)
             {
-                ingredient.Item.StockQuantity += requiredQuantity;
+                var affected = await _context.Database.ExecuteSqlInterpolatedAsync(
+                    $"UPDATE \"Items\" SET \"StockQuantity\" = \"StockQuantity\" + {requiredQuantity}, \"UpdatedAt\" = {DateTime.UtcNow} WHERE \"Id\" = {ingredient.ItemId}");
+                if (affected == 0)
+                {
+                    throw new BusinessRuleException($"Item not found: {ingredient.Item.Name}");
+                }
             }
             else
             {
-                if (ingredient.Item.StockQuantity < requiredQuantity)
+                var affected = await _context.Database.ExecuteSqlInterpolatedAsync(
+                    $"UPDATE \"Items\" SET \"StockQuantity\" = \"StockQuantity\" - {requiredQuantity}, \"UpdatedAt\" = {DateTime.UtcNow} WHERE \"Id\" = {ingredient.ItemId} AND CAST(\"StockQuantity\" AS NUMERIC) >= {requiredQuantity}");
+                if (affected == 0)
                 {
                     throw new BusinessRuleException($"Insufficient stock for item: {ingredient.Item.Name}");
                 }
-                ingredient.Item.StockQuantity -= requiredQuantity;
             }
-            await _itemRepository.UpdateAsync(ingredient.Item);
         }
-        await _itemRepository.SaveChangesAsync();
 
         // Re-evaluate affected menu items. Since we updated the stock of these ingredients,
         // we must re-evaluate all menu items that depend on any of these ingredient items.
@@ -398,7 +429,7 @@ public class ItemService : IItemService
 
     public async Task ReevaluateMenuItemAvailabilityAsync(int menuItemId)
     {
-        if (_context.Database.ProviderName != "Microsoft.EntityFrameworkCore.InMemory")
+        if (_context.Database.ProviderName == "Npgsql.EntityFrameworkCore.PostgreSQL")
         {
             return;
         }

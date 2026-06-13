@@ -122,6 +122,7 @@ Raw stock elements and recipe mapping (ingredients).
 | `GET` | `/api/inventory/items/low-stock` | `AdminOrChef` | Retrieve list of items that are below their threshold limit. |
 | `POST` | `/api/inventory/items` | `AdminOrChef` | Create a new raw stock item. |
 | `PUT` | `/api/inventory/items/{id}`| `AdminOrChef` | Update raw item properties (threshold, stock quantities, cost, units). |
+| `PATCH`| `/api/inventory/items/{id}/restock` | `AdminOrChef` | Targeted restock operation to increase stock quantity. |
 | `DELETE`| `/api/inventory/items/{id}`| `AdminOrChef` | Soft-deletes/deactivates an item (sets `IsActive = false`). |
 | `GET` | `/api/inventory/menu-items/{menuItemId}/ingredients` | `AdminOrChef` | Retrieve recipe mappings (ingredients needed) for a menu item. |
 | `POST` | `/api/inventory/menu-items/{menuItemId}/ingredients` | `AdminOrChef` | Add new ingredients mapping to a menu item. |
@@ -129,4 +130,5 @@ Raw stock elements and recipe mapping (ingredients).
 | `DELETE`| `/api/inventory/menu-items/{menuItemId}/ingredients/{ingredientId}` | `AdminOrChef` | Delete a single mapped ingredient from a menu item. |
 
 * **ItemCreateDto**: `{ name, unit, stockQuantity, stockThreshold, costPerUnit? }`
+* **ItemRestockDto**: `{ quantity }`
 * **MenuItemIngredientCreateDto**: `[ { itemId, quantityRequired } ]`
