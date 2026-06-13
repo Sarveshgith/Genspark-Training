@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OrderNKitchenMS_API.Models.DTOs;
 using OrderNKitchenMS_API.Services.Interfaces;
+using Microsoft.Extensions.Configuration;
 using OrderNKitchenMS_API.Utils;
 
 namespace OrderNKitchenMS_API.Controllers;
@@ -12,10 +13,26 @@ namespace OrderNKitchenMS_API.Controllers;
 public class TableController : ControllerBase
 {
     private readonly ITableService _tableService;
+    private readonly IConfiguration _configuration;
 
-    public TableController(ITableService tableService)
+    public TableController(ITableService tableService, IConfiguration configuration)
     {
         _tableService = tableService;
+        _configuration = configuration;
+    }
+
+    [AllowAnonymous]
+    [HttpGet("qrcode")]
+    public async Task<ActionResult> GetTableQRCode([FromQuery] int tableId)
+    {
+        await _tableService.GetByIdAsync(tableId);
+
+        var baseUrl = _configuration["QrSettings:BaseUrl"] ?? "http://localhost:4200";
+        baseUrl = baseUrl.TrimEnd('/');
+        var qrUrl = $"{baseUrl}?tableId={tableId}";
+        
+        byte[] qrBytes = QRCodeHelper.GenerateQRCodeBytes(qrUrl);
+        return File(qrBytes, "image/png");
     }
 
     [HttpGet]
