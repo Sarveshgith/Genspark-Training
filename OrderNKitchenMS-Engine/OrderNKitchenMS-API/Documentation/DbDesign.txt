@@ -37,6 +37,7 @@ Bills Table
 
 Notes
 
+=> eta = (now) + (activeOrdersAhead.Count * averagePrepTimePerOrder) + (currentOrderPrepTime)
 => TotalAmount = SubTotal * (1 + TaxRate/100) - DiscountAmount
 => QR Code is used for table reservation, table booking, and guest session tracking in real time.
 => Waiter capability is assigned to users with Admin privilege or simulated roles. Guests log in with TableId and can only place/add items to their table's order.

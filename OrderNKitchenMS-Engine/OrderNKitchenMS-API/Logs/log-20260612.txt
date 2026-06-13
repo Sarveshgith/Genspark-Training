@@ -858,3 +858,49 @@ LIMIT 1
 2026-06-12 15:03:47.014 +05:30 [INF] Executed endpoint 'OrderNKitchenMS_API.Controllers.BillController.GenerateBillPdf (OrderNKitchenMS-API)'
 2026-06-12 15:03:47.014 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:5182/api/bills/order/1/pdf - 200 47268 application/pdf 296.0437ms
 2026-06-12 15:04:32.419 +05:30 [INF] Application is shutting down...
+2026-06-12 19:03:34.040 +05:30 [INF] User profile is available. Using '/Users/sarveswaranb/.aspnet/DataProtection-Keys' as key repository; keys will not be encrypted at rest.
+2026-06-12 19:03:34.105 +05:30 [INF] Now listening on: http://localhost:5182
+2026-06-12 19:03:34.106 +05:30 [INF] Application started. Press Ctrl+C to shut down.
+2026-06-12 19:03:34.106 +05:30 [INF] Hosting environment: Development
+2026-06-12 19:03:34.106 +05:30 [INF] Content root path: /Users/sarveswaranb/Proggies/Presidio/Genspark-Training/OrderNKitchenMS-Engine/OrderNKitchenMS-API
+2026-06-12 19:03:48.747 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5182/api/inventory/items - application/json 82
+2026-06-12 19:03:48.805 +05:30 [INF] Failed to validate the token.
+Microsoft.IdentityModel.Tokens.SecurityTokenExpiredException: IDX10223: Lifetime validation failed. The token is expired. ValidTo (UTC): '6/12/2026 9:46:40 AM', Current time (UTC): '6/12/2026 1:33:48 PM'.
+   at Microsoft.IdentityModel.Tokens.ValidatorUtilities.ValidateLifetime(Nullable`1 notBefore, Nullable`1 expires, SecurityToken securityToken, TokenValidationParameters validationParameters)
+   at Microsoft.IdentityModel.Tokens.Validators.ValidateLifetime(Nullable`1 notBefore, Nullable`1 expires, SecurityToken securityToken, TokenValidationParameters validationParameters)
+   at Microsoft.IdentityModel.JsonWebTokens.JsonWebTokenHandler.ValidateTokenPayloadAsync(JsonWebToken jsonWebToken, TokenValidationParameters validationParameters, BaseConfiguration configuration)
+   at Microsoft.IdentityModel.JsonWebTokens.JsonWebTokenHandler.ValidateJWSAsync(JsonWebToken jsonWebToken, TokenValidationParameters validationParameters, BaseConfiguration configuration)
+2026-06-12 19:03:48.809 +05:30 [INF] Bearer was not authenticated. Failure message: IDX10223: Lifetime validation failed. The token is expired. ValidTo (UTC): '6/12/2026 9:46:40 AM', Current time (UTC): '6/12/2026 1:33:48 PM'.
+2026-06-12 19:03:48.811 +05:30 [INF] Authorization failed. These requirements were not met:
+RolesAuthorizationRequirement:User.IsInRole must be true for one of the following roles: (Admin|Chef)
+2026-06-12 19:03:48.813 +05:30 [INF] AuthenticationScheme: Bearer was challenged.
+2026-06-12 19:03:48.816 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:5182/api/inventory/items - 401 0 null 69.89ms
+2026-06-12 19:03:59.597 +05:30 [INF] Request starting HTTP/1.1 POST http://localhost:5182/api/auth/login - application/json 65
+2026-06-12 19:03:59.602 +05:30 [WRN] Failed to determine the https port for redirect.
+2026-06-12 19:03:59.603 +05:30 [INF] Executing endpoint 'OrderNKitchenMS_API.Controllers.AuthController.Login (OrderNKitchenMS-API)'
+2026-06-12 19:03:59.622 +05:30 [INF] Route matched with {action = "Login", controller = "Auth"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[OrderNKitchenMS_API.Models.DTOs.UserLoginResponseDto]] Login(OrderNKitchenMS_API.Models.DTOs.UserLoginDto) on controller OrderNKitchenMS_API.Controllers.AuthController (OrderNKitchenMS-API).
+2026-06-12 19:04:00.073 +05:30 [INF] Login requested for Email: sarvesh@gmail.com
+2026-06-12 19:04:00.074 +05:30 [INF] Logging in user with Email: sarvesh@gmail.com
+2026-06-12 19:04:00.494 +05:30 [INF] Executed DbCommand (38ms) [Parameters=[@ToLower='?'], CommandType='"Text"', CommandTimeout='30']
+SELECT u."Id", u."Address", u."CreatedAt", u."Email", u."IsDeleted", u."Name", u."PasswordHash", u."PhoneNumber", u."RoleId", u."UpdatedAt", r."Id", r."CreatedAt", r."Name", r."UpdatedAt"
+FROM "Users" AS u
+INNER JOIN "Roles" AS r ON u."RoleId" = r."Id"
+WHERE lower(u."Email") = @ToLower AND NOT (u."IsDeleted")
+LIMIT 1
+2026-06-12 19:04:00.613 +05:30 [INF] Login successful. Generated JWT and Refresh Token for User ID: 1
+2026-06-12 19:04:00.613 +05:30 [INF] Login succeeded for User: sarvesh@gmail.com (ID: 1)
+2026-06-12 19:04:00.616 +05:30 [INF] Executing OkObjectResult, writing value of type 'OrderNKitchenMS_API.Models.DTOs.UserLoginResponseDto'.
+2026-06-12 19:04:00.622 +05:30 [INF] Executed action OrderNKitchenMS_API.Controllers.AuthController.Login (OrderNKitchenMS-API) in 998.1551ms
+2026-06-12 19:04:00.622 +05:30 [INF] Executed endpoint 'OrderNKitchenMS_API.Controllers.AuthController.Login (OrderNKitchenMS-API)'
+2026-06-12 19:04:00.626 +05:30 [INF] Request finished HTTP/1.1 POST http://localhost:5182/api/auth/login - 200 null application/json; charset=utf-8 1029.8695ms
+2026-06-12 19:04:13.565 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5182/api/inventory/items - application/json 82
+2026-06-12 19:04:13.577 +05:30 [INF] Executing endpoint 'OrderNKitchenMS_API.Controllers.ItemController.GetItems (OrderNKitchenMS-API)'
+2026-06-12 19:04:13.581 +05:30 [INF] Route matched with {action = "GetItems", controller = "Item"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[System.Collections.Generic.IEnumerable`1[OrderNKitchenMS_API.Models.DTOs.ItemDto]]] GetItems() on controller OrderNKitchenMS_API.Controllers.ItemController (OrderNKitchenMS-API).
+2026-06-12 19:04:13.616 +05:30 [INF] GetAllItemsAsync called.
+2026-06-12 19:04:13.627 +05:30 [INF] Executed DbCommand (2ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT i."Id", i."CostPerUnit", i."CreatedAt", i."IsActive", i."Name", i."StockQuantity", i."StockThreshold", i."Unit", i."UpdatedAt"
+FROM "Items" AS i
+2026-06-12 19:04:13.641 +05:30 [INF] Executing OkObjectResult, writing value of type 'System.Linq.Enumerable+ListSelectIterator`2[[OrderNKitchenMS_API.Models.Entities.Item, OrderNKitchenMS-API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null],[OrderNKitchenMS_API.Models.DTOs.ItemDto, OrderNKitchenMS-API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-12 19:04:13.658 +05:30 [INF] Executed action OrderNKitchenMS_API.Controllers.ItemController.GetItems (OrderNKitchenMS-API) in 77.4505ms
+2026-06-12 19:04:13.658 +05:30 [INF] Executed endpoint 'OrderNKitchenMS_API.Controllers.ItemController.GetItems (OrderNKitchenMS-API)'
+2026-06-12 19:04:13.659 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:5182/api/inventory/items - 200 null application/json; charset=utf-8 93.4769ms

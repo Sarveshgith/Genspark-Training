@@ -71,15 +71,16 @@ public class OrderController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<OrderDto>> CreateOrder([FromBody] OrderCreateDto orderCreateDto)
     {
-        var tableId = User.GetTableId();
-        _logger.LogInformation("CreateOrder requested for TableId from Claims: {TableId}", tableId);
-        if (!tableId.HasValue)
+        var waiterId = User.GetUserId();
+        var tableId = orderCreateDto.TableId;
+        _logger.LogInformation("CreateOrder requested for TableId: {TableId} by WaiterId: {WaiterId}", tableId, waiterId);
+        if (tableId <= 0)
         {
-            _logger.LogWarning("CreateOrder failed: TableId claim is missing.");
+            _logger.LogWarning("CreateOrder failed: TableId is missing or invalid.");
             throw new BusinessRuleException("Table ID is required to create an order.");
         }
-        var createdOrder = await _orderService.CreateOrderAsync(tableId.Value, orderCreateDto);
-        _logger.LogInformation("CreateOrder completed. Created Order ID: {OrderId} for TableId: {TableId}", createdOrder.Id, tableId.Value);
+        var createdOrder = await _orderService.CreateOrderAsync(tableId, waiterId, orderCreateDto);
+        _logger.LogInformation("CreateOrder completed. Created Order ID: {OrderId} for TableId: {TableId}", createdOrder.Id, tableId);
         return Ok(createdOrder);
     }
 
@@ -117,12 +118,40 @@ public class OrderController : ControllerBase
     }
 
     [Authorize(Policy = "AdminOrChef")]
-    [HttpPatch("{orderId}/assign")]
-    public async Task<ActionResult> AssignOrder(int orderId, [FromBody] int userId)
+    [HttpPatch("{orderId}/assign-chef")]
+    public async Task<ActionResult> AssignChef(int orderId)
     {
-        _logger.LogInformation("AssignOrder requested for OrderId: {OrderId}, assigning to UserId: {UserId}", orderId, userId);
-        await _orderService.AssignOrderToUserAsync(orderId, userId);
-        _logger.LogInformation("AssignOrder completed for OrderId: {OrderId}", orderId);
+        var chefId = User.GetUserId();
+        _logger.LogInformation("AssignChef requested for OrderId: {OrderId} by ChefId: {ChefId}", orderId, chefId);
+        await _orderService.AssignChefToOrderAsync(orderId, chefId);
+        _logger.LogInformation("AssignChef completed for OrderId: {OrderId}", orderId);
         return NoContent();
+    }
+
+    [Authorize(Policy = "CanPlaceOrder")]
+    [HttpPatch("{orderId}/assign-waiter")]
+    public async Task<ActionResult> AssignWaiter(int orderId)
+    {
+        var waiterId = User.GetUserId();
+        _logger.LogInformation("AssignWaiter requested for OrderId: {OrderId} by WaiterId: {WaiterId}", orderId, waiterId);
+        await _orderService.AssignWaiterToOrderAsync(orderId, waiterId);
+        _logger.LogInformation("AssignWaiter completed for OrderId: {OrderId}", orderId);
+        return NoContent();
+    }
+
+    [Authorize(Policy = "GuestSession")]
+    [HttpGet("track")]
+    public async Task<ActionResult<GuestOrderTrackingDto>> TrackMyOrder()
+    {
+        var tableId = User.GetTableId();
+        _logger.LogInformation("TrackMyOrder requested for TableId from Claims: {TableId}", tableId);
+        if (!tableId.HasValue)
+        {
+            _logger.LogWarning("TrackMyOrder failed: TableId claim is missing.");
+            throw new BusinessRuleException("Table ID is required to track order.");
+        }
+        var trackingInfo = await _orderService.GetGuestOrderTrackingAsync(tableId.Value);
+        _logger.LogInformation("TrackMyOrder completed for TableId: {TableId}. Order ID: {OrderId}", tableId.Value, trackingInfo.OrderId);
+        return Ok(trackingInfo);
     }
 }

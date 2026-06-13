@@ -102,39 +102,68 @@ flowchart TD
 
 ---
 
-## 3. Guest Flow
+## 3. Guest & Waiter Interaction Flow (Updated)
 
-This flow allows restaurant customers to scan a table QR code and interact with the ordering system anonymously.
+In this revised model, **Guest Sessions** are read-only and restricted to live food tracking and requesting assistance, while the **Waiter** handles order placement and modifications. Real-time updates are pushed dynamically to the Guest UI using SignalR.
 
 ```mermaid
 sequenceDiagram
+    autonumber
     actor Guest as Customer (Guest)
-    participant QR as Table QR Code / URL
-    participant UI as Angular Frontend
-    participant API as Auth / Orders Controller
+    actor Waiter as Waiter (Staff)
+    actor Chef as Chef (Kitchen)
+    participant UI as Guest Mobile App / UI
+    participant API as Order & Kitchen API
+    participant SigR as SignalR Hub
+    actor Admin as Admin (Office)
 
-    Guest->>QR: Scan QR Code (e.g., Table 5)
-    QR->>UI: Redirect to Table ordering page (?tableId=5)
-    UI->>API: Guest Login Request (POST api/auth/guest-login?tableId=5)
-    API-->>UI: Return Guest JWT Session Token (TableId=5 claim)
-    Note over UI: Store Guest Token in Local Storage
+    Guest->>UI: Scan Table QR (e.g., Table 5)
+    UI->>API: Guest Login (POST api/auth/guest-login?tableId=5)
+    API-->>UI: Return Guest JWT (TableId=5 claim)
+    UI->>SigR: Connect to SignalR Hub (Table 5 Room)
 
-    UI->>API: Fetch Menu (GET api/menu?isAvailable=true)
-    API-->>UI: Return list of available dishes
-    Guest->>UI: Browse & add dishes to cart
-    Guest->>UI: Confirm and Place Order
-    UI->>API: Create Order (POST api/orders)
-    Note over API: Extracts TableId=5 from Token claims
-    API-->>UI: 200 OK (Order Created)
+    Guest->>Waiter: Call Waiter & Verbally Order Dishes
+    Waiter->>API: Create Order (POST api/orders) with TableId=5 (WaiterId in JWT)
+    API->>API: Save Order (Status = Pending, Compute EstimatedReadyAt)
+    API-->>Waiter: 200 OK (OrderDto)
+    API->>SigR: Broadcast order_updated Event
+    SigR-->>UI: Real-Time Order Info (Estimated time, queue pos, items)
 
-    loop Track Status
-        UI->>API: Get my table's active order (GET api/orders/me)
-        API-->>UI: Return Order status (Pending, InPrep, Ready, Served)
-    end
+    Note over Guest, Chef: Order is in Chef's pending queue
 
-    Guest->>UI: Request Bill
-    UI->>API: Download Bill PDF (GET api/bills/order/{orderId}/pdf)
-    API-->>Guest: PDF download
+    Chef->>API: Start Cooking (PATCH api/orders/{id}/assign-chef) (ChefId in JWT)
+    API->>API: Save Order (Status = InPrep)
+    API->>SigR: Broadcast order_updated Event
+    SigR-->>UI: Status changes to InPrep (Cooking)
+
+    Chef->>API: Finish Cooking (PATCH api/orders/{id}/status) [Status = Ready]
+    API->>API: Save Order (Status = Ready)
+    API->>SigR: Broadcast order_updated Event
+    SigR-->>UI: Status changes to Ready
+
+    Waiter->>API: Deliver Food to Table (PATCH api/orders/{id}/status) [Status = Served]
+    API->>API: Save Order (Status = Served)
+    API->>SigR: Broadcast order_updated Event
+    SigR-->>UI: Status changes to Served
+
+    Note over Guest: Customer Eats Food
+
+    Guest->>UI: Click "Request Assistance" (e.g., call waiter or ask for bill)
+    UI->>SigR: Send request_assistance Message
+    SigR-->>Waiter: Notify Waiter (Real-time alert on Waiter's device)
+
+    Waiter->>API: Generate Bill (POST api/bills/order/{orderId})
+    API->>API: Create Bill Entity (Status = Pending)
+    API-->>Waiter: Bill generated
+    API->>SigR: Broadcast bill_generated Event
+    SigR-->>UI: UI transitions to Bill Paying Page (UPI QR / Card)
+
+    Guest->>UI: Scan UPI QR & Complete Payment
+    Admin->>API: Update Bill Status -> Paid (PATCH api/bills/{id}/status) [Paid]
+    API->>API: Update Order Status -> Completed, release table -> Available
+    API-->>Admin: 200 OK
+    API->>SigR: Broadcast bill_paid Event
+    SigR-->>UI: UI shows Payment Successful page, logs out Guest
 ```
 
 ---

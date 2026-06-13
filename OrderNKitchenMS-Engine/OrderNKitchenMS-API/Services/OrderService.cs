@@ -38,10 +38,29 @@ public class OrderService : IOrderService
         _logger = logger;
     }
 
-    // Creates a new order for a table with the specified items.
-    public async Task<OrderDto> CreateOrderAsync(int tableId, OrderCreateDto orderCreateDto)
+    private async Task<DateTime> CalculateEstimatedReadyAtAsync(DateTime createdAt, List<int> menuItemIds, int excludeOrderId = 0)
     {
-        _logger.LogInformation("CreateOrderAsync started for TableId: {TableId}", tableId);
+        var currentOrderPrepTime = 0;
+        if (menuItemIds.Any())
+        {
+            currentOrderPrepTime = await _context.MenuItems
+                .Where(mi => menuItemIds.Contains(mi.Id) && !mi.IsDeleted)
+                .Select(mi => (int?)mi.PreparationTime)
+                .MaxAsync() ?? 0;
+        }
+
+        var activeOrdersAheadCount = await _context.Orders
+            .CountAsync(o => (o.Status == OrderStatus.Pending || o.Status == OrderStatus.InPrep) && o.Id != excludeOrderId && o.CreatedAt < createdAt);
+
+        const int averagePrepTimePerOrder = 10;
+
+        return DateTime.UtcNow.AddMinutes((activeOrdersAheadCount * averagePrepTimePerOrder) + currentOrderPrepTime);
+    }
+
+    // Creates a new order for a table with the specified items.
+    public async Task<OrderDto> CreateOrderAsync(int tableId, int waiterId, OrderCreateDto orderCreateDto)
+    {
+        _logger.LogInformation("CreateOrderAsync started for TableId: {TableId}, WaiterId: {WaiterId}", tableId, waiterId);
         ValidateCreateDto(orderCreateDto);
 
         var table = await _context.Tables.FirstOrDefaultAsync(table => table.Id == tableId && !table.IsDeleted);
@@ -68,11 +87,15 @@ public class OrderService : IOrderService
         {
             table.Status = TableStatus.Occupied;
 
+            var createdAt = DateTime.UtcNow;
+
             var orderEntity = new Order
             {
                 TableId = tableId,
                 Status = OrderStatus.Pending,
-                TotalAmount = 0m
+                TotalAmount = 0m,
+                AssignedWaiterId = waiterId,
+                CreatedAt = createdAt
             };
 
             var totalAmount = 0m;
@@ -113,7 +136,10 @@ public class OrderService : IOrderService
             await transaction.CommitAsync();
 
             _logger.LogInformation("CreateOrderAsync succeeded. Created Order ID: {OrderId} with Total Amount: {TotalAmount}", orderEntity.Id, orderEntity.TotalAmount);
-            return MapOrderToDto(orderEntity, table, orderItemEntities, menuItems);
+            
+            orderEntity.AssignedWaiter = await _context.Users.FindAsync(waiterId);
+
+            return await MapOrderToDtoAsync(orderEntity, table, orderItemEntities, menuItems);
         }
         catch (Exception ex)
         {
@@ -146,7 +172,7 @@ public class OrderService : IOrderService
         var orderItems = await _orderItemRepository.GetByOrderIdAsync(order.Id);
         var menuItems = orderItems.Select(oi => oi.MenuItem).ToList();
 
-        return MapOrderToDto(order, table, orderItems, menuItems);
+        return await MapOrderToDtoAsync(order, table, orderItems, menuItems);
     }
 
     // Retrieves all orders filtered by query parameters.
@@ -189,7 +215,7 @@ public class OrderService : IOrderService
         {
             var orderItems = await _orderItemRepository.GetByOrderIdAsync(order.Id);
             var menuItems = orderItems.Select(oi => oi.MenuItem).ToList();
-            result.Add(MapOrderToDto(order, order.Table, orderItems, menuItems));
+            result.Add(await MapOrderToDtoAsync(order, order.Table, orderItems, menuItems));
         }
 
         return result;
@@ -210,7 +236,7 @@ public class OrderService : IOrderService
         {
             var orderItems = await _orderItemRepository.GetByOrderIdAsync(order.Id);
             var menuItems = orderItems.Select(oi => oi.MenuItem).ToList();
-            result.Add(MapOrderToDto(order, order.Table, orderItems, menuItems));
+            result.Add(await MapOrderToDtoAsync(order, order.Table, orderItems, menuItems));
         }
 
         return result;
@@ -324,7 +350,7 @@ public class OrderService : IOrderService
         var orderItems = await _orderItemRepository.GetByOrderIdAsync(order.Id);
         var orderMenuItems = orderItems.Select(oi => oi.MenuItem).ToList();
 
-        return MapOrderToDto(order, table, orderItems, orderMenuItems);
+        return await MapOrderToDtoAsync(order, table, orderItems, orderMenuItems);
     }
 
     // Updates the status of an existing order.
@@ -357,28 +383,52 @@ public class OrderService : IOrderService
         return true;
     }
 
-    // Assigns an order to a specific user (staff member).
-    public async Task<bool> AssignOrderToUserAsync(int orderId, int userId)
+    // Assigns an order to a specific chef and sets status to InPrep.
+    public async Task<bool> AssignChefToOrderAsync(int orderId, int chefId)
     {
-        _logger.LogInformation("AssignOrderToUserAsync started. OrderId: {OrderId}, UserId: {UserId}", orderId, userId);
-        var user = await _context.Users.FirstOrDefaultAsync(user => user.Id == userId && !user.IsDeleted);
-        if (user == null)
+        _logger.LogInformation("AssignChefToOrderAsync started. OrderId: {OrderId}, ChefId: {ChefId}", orderId, chefId);
+        var user = await _context.Users.FirstOrDefaultAsync(user => user.Id == chefId && !user.IsDeleted);
+        if (user == null || user.RoleId != 3) // Chef role is 3
         {
-            _logger.LogWarning("AssignOrderToUserAsync failed: User with ID {UserId} was not found.", userId);
-            throw new NotFoundException($"User with id {userId} was not found.");
+            _logger.LogWarning("AssignChefToOrderAsync failed: Chef with ID {ChefId} was not found or invalid role.", chefId);
+            throw new NotFoundException($"Chef with id {chefId} was not found.");
         }
 
         var order = await _orderRepository.GetByIdAsync(orderId);
         if (order == null)
         {
-            _logger.LogWarning("AssignOrderToUserAsync failed: Order with ID {OrderId} was not found.", orderId);
+            _logger.LogWarning("AssignChefToOrderAsync failed: Order with ID {OrderId} was not found.", orderId);
             throw new NotFoundException($"Order with id {orderId} was not found.");
         }
 
-        order.AssignedUserId = userId;
+        order.AssignedChefId = chefId;
         order.Status = OrderStatus.InPrep;
         await _context.SaveChangesAsync();
-        _logger.LogInformation("AssignOrderToUserAsync succeeded. OrderId: {OrderId} assigned to UserId: {UserId}", orderId, userId);
+        _logger.LogInformation("AssignChefToOrderAsync succeeded. OrderId: {OrderId} assigned to ChefId: {ChefId}", orderId, chefId);
+        return true;
+    }
+
+    // Assigns a waiter to an order.
+    public async Task<bool> AssignWaiterToOrderAsync(int orderId, int waiterId)
+    {
+        _logger.LogInformation("AssignWaiterToOrderAsync started. OrderId: {OrderId}, WaiterId: {WaiterId}", orderId, waiterId);
+        var user = await _context.Users.FirstOrDefaultAsync(user => user.Id == waiterId && !user.IsDeleted);
+        if (user == null)
+        {
+            _logger.LogWarning("AssignWaiterToOrderAsync failed: Waiter with ID {WaiterId} was not found.", waiterId);
+            throw new NotFoundException($"Waiter with id {waiterId} was not found.");
+        }
+
+        var order = await _orderRepository.GetByIdAsync(orderId);
+        if (order == null)
+        {
+            _logger.LogWarning("AssignWaiterToOrderAsync failed: Order with ID {OrderId} was not found.", orderId);
+            throw new NotFoundException($"Order with id {orderId} was not found.");
+        }
+
+        order.AssignedWaiterId = waiterId;
+        await _context.SaveChangesAsync();
+        _logger.LogInformation("AssignWaiterToOrderAsync succeeded. OrderId: {OrderId} assigned to WaiterId: {WaiterId}", orderId, waiterId);
         return true;
     }
 
@@ -402,7 +452,62 @@ public class OrderService : IOrderService
         var menuItems = orderItems.Select(oi => oi.MenuItem).ToList();
 
         _logger.LogInformation("GetActiveOrderByTableIdAsync succeeded. Active Order ID: {OrderId} found for TableId: {TableId}", activeOrder.Id, tableId);
-        return MapOrderToDto(activeOrder, activeOrder.Table, orderItems, menuItems);
+        return await MapOrderToDtoAsync(activeOrder, activeOrder.Table, orderItems, menuItems);
+    }
+
+    // Retrieves live food tracking details for the guest session.
+    public async Task<GuestOrderTrackingDto> GetGuestOrderTrackingAsync(int tableId)
+    {
+        _logger.LogInformation("GetGuestOrderTrackingAsync called for TableId: {TableId}", tableId);
+        var orders = await _orderRepository.GetAllAsync();
+        var activeOrder = orders
+            .Where(o => o.TableId == tableId && o.Status != OrderStatus.Completed && o.Status != OrderStatus.Cancelled)
+            .OrderByDescending(o => o.CreatedAt)
+            .FirstOrDefault();
+
+        if (activeOrder == null)
+        {
+            _logger.LogWarning("GetGuestOrderTrackingAsync failed: No active order found for TableId: {TableId}", tableId);
+            throw new NotFoundException($"No active order found for table with ID {tableId}.");
+        }
+
+        var orderItems = await _orderItemRepository.GetByOrderIdAsync(activeOrder.Id);
+        var menuItems = orderItems.Select(oi => oi.MenuItem).ToList();
+
+        var queuePosition = 0;
+        var estimatedTimeMinutes = 0;
+        DateTime? estimatedReadyAt = null;
+
+        if (activeOrder.Status == OrderStatus.Pending || activeOrder.Status == OrderStatus.InPrep)
+        {
+            var activeOrders = orders
+                .Where(o => o.Status == OrderStatus.Pending || o.Status == OrderStatus.InPrep)
+                .OrderBy(o => o.CreatedAt)
+                .ToList();
+
+            var index = activeOrders.FindIndex(o => o.Id == activeOrder.Id);
+            queuePosition = index >= 0 ? index + 1 : 0;
+
+            var menuItemIds = orderItems.Select(oi => oi.MenuItemId).ToList();
+            estimatedReadyAt = await CalculateEstimatedReadyAtAsync(activeOrder.CreatedAt, menuItemIds, activeOrder.Id);
+            estimatedTimeMinutes = Math.Max(0, (int)Math.Ceiling((estimatedReadyAt.Value - DateTime.UtcNow).TotalMinutes));
+        }
+
+        return new GuestOrderTrackingDto
+        {
+            OrderId = activeOrder.Id,
+            TableId = activeOrder.TableId,
+            Status = activeOrder.Status.ToString(),
+            QueuePosition = queuePosition,
+            EstimatedReadyAt = estimatedReadyAt,
+            EstimatedTimeMinutes = estimatedTimeMinutes,
+            OrderItems = orderItems.Select(oi => new OrderItemTrackingDto
+            {
+                MenuItemName = menuItems.First(mi => mi.Id == oi.MenuItemId).Name,
+                Quantity = oi.Quantity,
+                Notes = oi.Notes
+            }).ToArray()
+        };
     }
 
     private static void ValidateCreateDto(OrderCreateDto orderCreateDto)
@@ -417,12 +522,15 @@ public class OrderService : IOrderService
         Validation.RequireValidEnum<OrderStatus>(status, nameof(status), "Invalid order status.");
     }
 
-    private static OrderDto MapOrderToDto(
+    private async Task<OrderDto> MapOrderToDtoAsync(
         Order order,
         Table table,
         IEnumerable<OrderItem> orderItems,
         IReadOnlyList<MenuItem> menuItems)
     {
+        var menuItemIds = orderItems.Select(oi => oi.MenuItemId).ToList();
+        var estimatedReadyAt = await CalculateEstimatedReadyAtAsync(order.CreatedAt, menuItemIds, order.Id);
+
         return new OrderDto
         {
             Id = order.Id,
@@ -433,6 +541,11 @@ public class OrderService : IOrderService
             TotalAmount = order.TotalAmount,
             CompletedAt = order.CompletedAt,
             CreatedAt = order.CreatedAt,
+            AssignedChefId = order.AssignedChefId,
+            AssignedChefName = order.AssignedChef?.Name,
+            AssignedWaiterId = order.AssignedWaiterId,
+            AssignedWaiterName = order.AssignedWaiter?.Name,
+            EstimatedReadyAt = estimatedReadyAt,
             OrderItems = orderItems.Select(orderItem => MapOrderItemToDto(orderItem, menuItems.First(mi => mi.Id == orderItem.MenuItemId).Name)).ToArray()
         };
     }

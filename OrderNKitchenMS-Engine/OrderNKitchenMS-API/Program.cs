@@ -56,8 +56,8 @@ builder.Services.AddAuthorization(options =>
 
     options.AddPolicy("CanPlaceOrder",
         policy => policy.RequireAssertion(ctx =>
-            ctx.User.HasClaim("SessionType", "Guest") ||
-            ctx.User.IsInRole("Admin")              ||
+            ctx.User.IsInRole("Admin")  ||
+            ctx.User.IsInRole("Waiter") ||
             ctx.User.IsInRole("Customer")      
         ));
 });
@@ -90,6 +90,9 @@ builder.Services.AddScoped<IOrderService, OrderService>();
 
 builder.Services.AddScoped<IBillRepository, BillRepository>();
 builder.Services.AddScoped<IBillService, BillService>();
+
+builder.Services.AddScoped<IReportRepository, ReportRepository>();
+builder.Services.AddScoped<IReportService, ReportService>();
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();

@@ -7,7 +7,7 @@ namespace OrderNKitchenMS_API.Services.Interfaces;
 
 public interface IOrderService
 {
-    public Task<OrderDto> CreateOrderAsync(int tableId, OrderCreateDto orderCreateDto);
+    public Task<OrderDto> CreateOrderAsync(int tableId, int waiterId, OrderCreateDto orderCreateDto);
 
     public Task<OrderDto> AddOrderItemsAsync(int orderId, List<OrderItemCreateDto> orderItemCreateDtos);
 
@@ -15,7 +15,9 @@ public interface IOrderService
 
     public Task<bool> UpdateOrderStatusAsync(int orderId, int newStatus);
 
-    public Task<bool> AssignOrderToUserAsync(int orderId, int userId);
+    public Task<bool> AssignChefToOrderAsync(int orderId, int chefId);
+    
+    public Task<bool> AssignWaiterToOrderAsync(int orderId, int waiterId);
 
     public Task<IEnumerable<OrderDto>> GetAllOrdersAsync(QueryOrderDto query);
 
@@ -24,4 +26,6 @@ public interface IOrderService
     public Task<bool> RemoveOrderItemAsync(int orderId, int orderItemId);
 
     public Task<OrderDto> GetActiveOrderByTableIdAsync(int tableId);
+
+    public Task<GuestOrderTrackingDto> GetGuestOrderTrackingAsync(int tableId);
 }

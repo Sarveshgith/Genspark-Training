@@ -23,7 +23,8 @@ public class OrderRepository : IOrderRepository
 	{
 		return await _orders
 			.Include(order => order.Table)
-			.Include(order => order.AssignedUser)
+			.Include(order => order.AssignedChef)
+			.Include(order => order.AssignedWaiter)
 			.ToListAsync();
 	}
 
@@ -31,7 +32,8 @@ public class OrderRepository : IOrderRepository
 	{
 		return await _orders
 			.Include(order => order.Table)
-			.Include(order => order.AssignedUser)
+			.Include(order => order.AssignedChef)
+			.Include(order => order.AssignedWaiter)
 			.FirstOrDefaultAsync(order => order.Id == id);
 	}
 
@@ -50,7 +52,8 @@ public class OrderRepository : IOrderRepository
 		}
 
 		existingOrder.TableId = order.TableId;
-		existingOrder.AssignedUserId = order.AssignedUserId;
+		existingOrder.AssignedChefId = order.AssignedChefId;
+		existingOrder.AssignedWaiterId = order.AssignedWaiterId;
 		existingOrder.Status = order.Status;
 		existingOrder.TotalAmount = order.TotalAmount;
 		existingOrder.CompletedAt = order.CompletedAt;

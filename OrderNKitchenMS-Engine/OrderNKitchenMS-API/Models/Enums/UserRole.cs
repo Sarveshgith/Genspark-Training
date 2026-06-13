@@ -8,4 +8,5 @@ public enum UserRole
     Customer,
     Chef,
     Deliveryman,
+    Waiter
 }

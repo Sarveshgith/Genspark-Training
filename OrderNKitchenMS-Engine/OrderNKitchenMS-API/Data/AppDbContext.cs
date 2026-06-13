@@ -39,7 +39,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 new Role { Id = 1, Name = UserRole.Admin, CreatedAt = new DateTime(2026, 5, 28, 11, 4, 45, 313, DateTimeKind.Utc).AddTicks(3490) },
                 new Role { Id = 2, Name = UserRole.Customer, CreatedAt = new DateTime(2026, 5, 28, 11, 4, 45, 313, DateTimeKind.Utc).AddTicks(3780) },
                 new Role { Id = 3, Name = UserRole.Chef, CreatedAt = new DateTime(2026, 5, 28, 11, 4, 45, 313, DateTimeKind.Utc).AddTicks(3780) },
-                new Role { Id = 4, Name = UserRole.Deliveryman, CreatedAt = new DateTime(2026, 5, 28, 11, 4, 45, 313, DateTimeKind.Utc).AddTicks(3780) }
+                new Role { Id = 4, Name = UserRole.Deliveryman, CreatedAt = new DateTime(2026, 5, 28, 11, 4, 45, 313, DateTimeKind.Utc).AddTicks(3780) },
+                new Role { Id = 5, Name = UserRole.Waiter, CreatedAt = new DateTime(2026, 5, 28, 11, 4, 45, 313, DateTimeKind.Utc).AddTicks(3780) }
             );
 
         modelBuilder.Entity<User>()
@@ -77,32 +78,15 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<Order>()
-            .HasOne(o => o.AssignedUser)
+            .HasOne(o => o.AssignedChef)
             .WithMany()
-            .HasForeignKey(o => o.AssignedUserId)
+            .HasForeignKey(o => o.AssignedChefId)
             .OnDelete(DeleteBehavior.Restrict);
-    }
 
-    public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
-    {
-        if (Database.ProviderName == "Microsoft.EntityFrameworkCore.InMemory")
-        {
-            var entries = ChangeTracker.Entries<BaseEntity>();
-
-            foreach (var entry in entries)
-            {
-                if (entry.State == EntityState.Added)
-                {
-                    entry.Entity.CreatedAt = DateTime.UtcNow;
-                    entry.Entity.UpdatedAt = DateTime.UtcNow;
-                }
-                else if (entry.State == EntityState.Modified)
-                {
-                    entry.Entity.UpdatedAt = DateTime.UtcNow;
-                }
-            }
-        }
-
-        return await base.SaveChangesAsync(cancellationToken);
+        modelBuilder.Entity<Order>()
+            .HasOne(o => o.AssignedWaiter)
+            .WithMany()
+            .HasForeignKey(o => o.AssignedWaiterId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }
