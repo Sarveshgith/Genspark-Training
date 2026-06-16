@@ -1,0 +1,9 @@
+{
+  "GROQ_API_KEY": "YOUR_GROQ_API_KEY",
+  "GROQ_MODEL": "llama-3.3-70b-versatile",
+  "SMTP_SERVER": "smtp.gmail.com",
+  "SMTP_PORT": 587,
+  "SENDER_EMAIL": "your_email@gmail.com",
+  "SENDER_PASSWORD": "your_gmail_app_password",
+  "RECIPIENT_EMAIL": "recipient_email@gmail.com"
+}

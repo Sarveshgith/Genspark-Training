@@ -1,0 +1,20 @@
+Subject: Feature Request: Real-time Driver Tracking & Notifications for Logistics Platform
+
+Dear Development Team,
+
+We need to add a new driver tracking and notification system to our current logistics application. 
+
+Currently, our customers have to manually refresh the page to see where their delivery driver is, or call support. We want to update this to show the driver's location on a map in real-time, updating every 10 seconds.
+
+Additionally, we need automatic notifications:
+1. When the driver starts the trip (SMS and Email).
+2. When the driver is within 2 kilometers of the delivery address (Push notification to the customer's mobile app, saying "Your delivery is arriving soon!").
+3. When the delivery is completed or if there's a delay.
+
+The tracking data needs to be highly secure. Drivers should only be tracked when they are active on a shift. We also need to make sure this doesn't drain the driver's phone battery, as our drivers use standard Android devices.
+
+We want to roll this out next month. Let us know if you need any clarification.
+
+Best regards,
+Sarah Jenkins
+Operations Director, FastRoute Logistics
