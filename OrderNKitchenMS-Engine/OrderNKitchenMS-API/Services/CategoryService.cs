@@ -49,6 +49,8 @@ public class CategoryService : ICategoryService
         Validation.RequireNotNull(categoryCreateDto, nameof(categoryCreateDto), "Category data is required.");
         ValidateName(categoryCreateDto.Name);
 
+        await EnsureUniqueNameAsync(categoryCreateDto.Name, categoryCreateDto.IsNonVeg);
+
         var createdCategory = await _categoryRepository.CreateAsync(new Category
         {
             Name = categoryCreateDto.Name.Trim(),
@@ -66,6 +68,8 @@ public class CategoryService : ICategoryService
         Validation.RequireNotNull(categoryUpdateDto, nameof(categoryUpdateDto), "Category data is required.");
         ValidateName(categoryUpdateDto.Name);
 
+        await EnsureUniqueNameAsync(categoryUpdateDto.Name, categoryUpdateDto.IsNonVeg, id);
+
         var updatedCategory = await _categoryRepository.UpdateAsync(id, new Category
         {
             Name = categoryUpdateDto.Name.Trim(),
@@ -80,6 +84,19 @@ public class CategoryService : ICategoryService
 
         _logger.LogInformation("UpdateAsync succeeded for Category ID: {Id}", id);
         return MapCategoryToDto(updatedCategory);
+    }
+
+    private async Task EnsureUniqueNameAsync(string name, bool isNonVeg, int? excludeId = null)
+    {
+        var categories = await _categoryRepository.GetAllAsync();
+        var exists = categories.Any(c => c.Name.Equals(name.Trim(), StringComparison.OrdinalIgnoreCase) 
+                                         && c.IsNonVeg == isNonVeg 
+                                         && (!excludeId.HasValue || c.Id != excludeId.Value));
+        if (exists)
+        {
+            var typeStr = isNonVeg ? "Non-Veg" : "Veg";
+            throw new ConflictException($"Category with name '{name.Trim()}' and type '{typeStr}' already exists.");
+        }
     }
 
     // Marks a category as deleted.

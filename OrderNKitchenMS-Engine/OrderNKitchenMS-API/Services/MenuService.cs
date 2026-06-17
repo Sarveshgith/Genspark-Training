@@ -97,6 +97,7 @@ public class MenuService : IMenuService
         _logger.LogInformation("CreateAsync started for Menu Item Name: '{Name}'", menuItemCreateDto.Name);
         ValidateCreateDto(menuItemCreateDto);
         await EnsureCategoryExists(menuItemCreateDto.CategoryId);
+        await EnsureUniqueNameAsync(menuItemCreateDto.Name);
 
         var menuItemEntity = MapCreateDtoToEntity(menuItemCreateDto);
         menuItemEntity.IsAvailable = false;
@@ -113,6 +114,7 @@ public class MenuService : IMenuService
         _logger.LogInformation("UpdateAsync started for Menu Item ID: {Id}", id);
         ValidateUpdateDto(menuItemUpdateDto);
         await EnsureCategoryExists(menuItemUpdateDto.CategoryId);
+        await EnsureUniqueNameAsync(menuItemUpdateDto.Name, id);
 
         var menuItemEntity = MapUpdateDtoToEntity(menuItemUpdateDto);
         var updatedMenuItem = await _menuItemRepository.UpdateAsync(id, menuItemEntity);
@@ -124,6 +126,16 @@ public class MenuService : IMenuService
 
         _logger.LogInformation("UpdateAsync succeeded for Menu Item ID: {Id}", id);
         return MapMenuItemToDto(updatedMenuItem);
+    }
+
+    private async Task EnsureUniqueNameAsync(string name, int? excludeId = null)
+    {
+        var menuItems = await _menuItemRepository.GetAllAsync();
+        var exists = await menuItems.AnyAsync(m => m.Name == name && (!excludeId.HasValue || m.Id != excludeId.Value));
+        if (exists)
+        {
+            throw new ConflictException($"Menu item with name '{name}' already exists.");
+        }
     }
 
     // Toggles the availability status of a menu item.

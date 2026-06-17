@@ -58,10 +58,10 @@ public class BillService : IBillService
             throw new BusinessRuleException($"Invalid discount amount: {billCreateDto.DiscountAmount}. It must be between 0 and the order total amount ({subTotal}).");
         }
 
-        if(order.Status != (int)OrderStatus.Ready)
+        if(order.Status != (int)OrderStatus.Served)
         {
-            _logger.LogWarning("CreateBillAsync failed: Order status is {Status} instead of 'Ready'", order.Status);
-            throw new BusinessRuleException($"Cannot create bill for Order ID {billCreateDto.OrderId} because its status is not 'Ready'.");
+            _logger.LogWarning("CreateBillAsync failed: Order status is {Status} instead of 'Served'", order.Status);
+            throw new BusinessRuleException($"Cannot create bill for Order ID {billCreateDto.OrderId} because its status is not 'Served'.");
         }
 
         var bill = MapBillCreateDtoToEntity(order, billCreateDto, subTotal);

@@ -146,4 +146,49 @@ public class MenuServiceTest
         // Act & Assert
         Assert.ThrowsAsync<BusinessRuleException>(async () => await _menuService.ToggleAvailabilityAsync(2, true));
     }
+
+    [Test]
+    public async Task CreateAsync_DuplicateName_ThrowsConflictException()
+    {
+        // Arrange
+        _context.Categories.Add(new Category { Id = 1, Name = "Appetizers" });
+        _context.MenuItems.Add(new MenuItem { Id = 10, Name = "Spring Rolls", Price = 6.5m, CategoryId = 1, PreparationTime = 15 });
+        await _context.SaveChangesAsync();
+
+        var dto = new MenuItemCreateDto
+        {
+            Name = "Spring Rolls", // Exact duplicate
+            Description = "Another crispy rolls",
+            Price = 7m,
+            CategoryId = 1,
+            ImageUrl = "http://springrolls2.jpg",
+            PreparationTime = 15
+        };
+
+        // Act & Assert
+        Assert.ThrowsAsync<ConflictException>(async () => await _menuService.CreateAsync(dto));
+    }
+
+    [Test]
+    public async Task UpdateAsync_DuplicateName_ThrowsConflictException()
+    {
+        // Arrange
+        _context.Categories.Add(new Category { Id = 1, Name = "Appetizers" });
+        _context.MenuItems.Add(new MenuItem { Id = 10, Name = "Spring Rolls", Price = 6.5m, CategoryId = 1, PreparationTime = 15 });
+        _context.MenuItems.Add(new MenuItem { Id = 11, Name = "Samosa", Price = 5m, CategoryId = 1, PreparationTime = 10 });
+        await _context.SaveChangesAsync();
+
+        var dto = new MenuItemUpdateDto
+        {
+            Name = "Spring Rolls", // Duplicate of ID 10
+            Description = "Tasty triangle",
+            Price = 5.5m,
+            CategoryId = 1,
+            ImageUrl = "http://samosa.jpg",
+            PreparationTime = 10
+        };
+
+        // Act & Assert
+        Assert.ThrowsAsync<ConflictException>(async () => await _menuService.UpdateAsync(11, dto));
+    }
 }

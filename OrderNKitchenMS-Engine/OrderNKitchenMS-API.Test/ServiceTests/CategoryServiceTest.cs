@@ -159,4 +159,101 @@ public class CategoryServiceTest
     {
         Assert.ThrowsAsync<NotFoundException>(async () => await _categoryService.DeleteAsync(999));
     }
+
+    [Test]
+    public async Task CreateAsync_DuplicateNameSameType_ThrowsConflictException()
+    {
+        var category = new Category
+        {
+            Id = 10,
+            Name = "Desserts",
+            IsNonVeg = false
+        };
+        _context.Categories.Add(category);
+        await _context.SaveChangesAsync();
+
+        var dto = new CategoryCreateDto
+        {
+            Name = "Desserts",
+            IsNonVeg = false
+        };
+
+        Assert.ThrowsAsync<ConflictException>(async () => await _categoryService.CreateAsync(dto));
+    }
+
+    [Test]
+    public async Task CreateAsync_DuplicateNameDifferentType_Passes()
+    {
+        var category = new Category
+        {
+            Id = 11,
+            Name = "Desserts",
+            IsNonVeg = false
+        };
+        _context.Categories.Add(category);
+        await _context.SaveChangesAsync();
+
+        var dto = new CategoryCreateDto
+        {
+            Name = "Desserts",
+            IsNonVeg = true
+        };
+
+        var result = await _categoryService.CreateAsync(dto);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Name, Is.EqualTo("Desserts"));
+        Assert.That(result.IsNonVeg, Is.True);
+    }
+
+    [Test]
+    public async Task CreateAsync_DuplicateNameWithDeletedCategory_Passes()
+    {
+        var category = new Category
+        {
+            Id = 12,
+            Name = "Beverages",
+            IsNonVeg = false,
+            IsDeleted = true
+        };
+        _context.Categories.Add(category);
+        await _context.SaveChangesAsync();
+
+        var dto = new CategoryCreateDto
+        {
+            Name = "Beverages",
+            IsNonVeg = false
+        };
+
+        var result = await _categoryService.CreateAsync(dto);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Name, Is.EqualTo("Beverages"));
+        Assert.That(result.IsNonVeg, Is.False);
+    }
+
+    [Test]
+    public async Task UpdateAsync_DuplicateNameSameType_ThrowsConflictException()
+    {
+        var category1 = new Category
+        {
+            Id = 13,
+            Name = "Appetizers",
+            IsNonVeg = false
+        };
+        var category2 = new Category
+        {
+            Id = 14,
+            Name = "Sides",
+            IsNonVeg = false
+        };
+        _context.Categories.AddRange(category1, category2);
+        await _context.SaveChangesAsync();
+
+        var updateDto = new CategoryUpdateDto
+        {
+            Name = "Appetizers",
+            IsNonVeg = false
+        };
+
+        Assert.ThrowsAsync<ConflictException>(async () => await _categoryService.UpdateAsync(14, updateDto));
+    }
 }

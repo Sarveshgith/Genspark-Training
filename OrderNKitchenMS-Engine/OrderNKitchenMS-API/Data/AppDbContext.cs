@@ -49,8 +49,55 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             .HasForeignKey(u => u.RoleId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        modelBuilder.Entity<Table>()
-            .HasIndex(table => table.Number)
+        var isPostgres = Database.ProviderName == "Npgsql.EntityFrameworkCore.PostgreSQL";
+
+        if (isPostgres)
+        {
+            modelBuilder.Entity<Table>()
+                .HasIndex(table => table.Number)
+                .HasFilter("\"IsDeleted\" = FALSE")
+                .IsUnique();
+
+            modelBuilder.Entity<MenuItem>()
+                .HasIndex(mi => mi.Name)
+                .HasFilter("\"IsDeleted\" = FALSE")
+                .IsUnique();
+
+            modelBuilder.Entity<Item>()
+                .HasIndex(i => i.Name)
+                .HasFilter("\"IsActive\" = TRUE")
+                .IsUnique();
+
+            modelBuilder.Entity<Category>()
+                .HasIndex(c => new { c.Name, c.IsNonVeg })
+                .HasFilter("\"IsDeleted\" = FALSE")
+                .IsUnique();
+        }
+        else
+        {
+            modelBuilder.Entity<Table>()
+                .HasIndex(table => table.Number)
+                .HasFilter("IsDeleted = 0")
+                .IsUnique();
+
+            modelBuilder.Entity<MenuItem>()
+                .HasIndex(mi => mi.Name)
+                .HasFilter("IsDeleted = 0")
+                .IsUnique();
+
+            modelBuilder.Entity<Item>()
+                .HasIndex(i => i.Name)
+                .HasFilter("IsActive = 1")
+                .IsUnique();
+
+            modelBuilder.Entity<Category>()
+                .HasIndex(c => new { c.Name, c.IsNonVeg })
+                .HasFilter("IsDeleted = 0")
+                .IsUnique();
+        }
+
+        modelBuilder.Entity<MenuItemIngredient>()
+            .HasIndex(mii => new { mii.MenuItemId, mii.ItemId })
             .IsUnique();
 
         modelBuilder.Entity<MenuItem>()
@@ -88,5 +135,31 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             .WithMany()
             .HasForeignKey(o => o.AssignedWaiterId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        if (Database.ProviderName == "Npgsql.EntityFrameworkCore.PostgreSQL")
+        {
+            var dateTimeConverter = new Microsoft.EntityFrameworkCore.Storage.ValueConversion.ValueConverter<DateTime, DateTime>(
+                v => v.Kind == DateTimeKind.Utc ? v : DateTime.SpecifyKind(v, DateTimeKind.Utc),
+                v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+
+            var nullableDateTimeConverter = new Microsoft.EntityFrameworkCore.Storage.ValueConversion.ValueConverter<DateTime?, DateTime?>(
+                v => !v.HasValue ? v : (v.Value.Kind == DateTimeKind.Utc ? v : DateTime.SpecifyKind(v.Value, DateTimeKind.Utc)),
+                v => !v.HasValue ? v : DateTime.SpecifyKind(v.Value, DateTimeKind.Utc));
+
+            foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+            {
+                foreach (var property in entityType.GetProperties())
+                {
+                    if (property.ClrType == typeof(DateTime))
+                    {
+                        property.SetValueConverter(dateTimeConverter);
+                    }
+                    else if (property.ClrType == typeof(DateTime?))
+                    {
+                        property.SetValueConverter(nullableDateTimeConverter);
+                    }
+                }
+            }
+        }
     }
 }

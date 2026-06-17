@@ -107,7 +107,7 @@ public class OrderController : ControllerBase
         return NoContent();
     }
 
-    [Authorize(Policy = "AdminOrChef")]
+    [Authorize(Policy = "AllStaff")]
     [HttpPatch("{orderId}/status")]
     public async Task<ActionResult> UpdateOrderStatus(int orderId, [FromBody] int status)
     {

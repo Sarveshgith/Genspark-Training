@@ -300,6 +300,17 @@ public class OrderService : IOrderService
     public async Task<OrderDto> AddOrderItemsAsync(int orderId, List<OrderItemCreateDto> orderItemCreateDtos)
     {
         _logger.LogInformation("AddOrderItemsAsync started. OrderId: {OrderId}, adding {Count} items.", orderId, orderItemCreateDtos?.Count);
+        
+        Validation.RequireNotNull(orderItemCreateDtos, nameof(orderItemCreateDtos), "Order items are required.");
+        Validation.Require(orderItemCreateDtos.Count > 0, "At least one order item is required.", nameof(orderItemCreateDtos));
+        Validation.Require(!orderItemCreateDtos.Any(oi => oi == null), "Order items cannot contain null entries.", nameof(orderItemCreateDtos));
+
+        var payloadMenuItemIds = orderItemCreateDtos.Select(oi => oi.MenuItemId).ToList();
+        if (payloadMenuItemIds.Count != payloadMenuItemIds.Distinct().Count())
+        {
+            throw new ArgumentException("Duplicate menu items are not allowed in the payload. Please consolidate quantities.");
+        }
+
         var order = await _orderRepository.GetByIdAsync(orderId);
         if (order == null)
         {
@@ -322,6 +333,9 @@ public class OrderService : IOrderService
 
         try
         {
+            var existingOrderItems = await _orderItemRepository.GetByOrderIdAsync(orderId);
+            var existingItemsMap = existingOrderItems.ToDictionary(oi => oi.MenuItemId);
+
             foreach (var orderItemCreateDto in orderItemCreateDtos)
             {
                 var menuItem = menuItems.First(mi => mi.Id == orderItemCreateDto.MenuItemId);
@@ -331,16 +345,34 @@ public class OrderService : IOrderService
                 // Deduct stock
                 await _itemService.UpdateStockByMenuItemIdAsync(orderItemCreateDto.MenuItemId, orderItemCreateDto.Quantity, false);
 
-                var orderItemEntity = new OrderItem
+                if (existingItemsMap.TryGetValue(orderItemCreateDto.MenuItemId, out var existingItem))
                 {
-                    OrderId = orderId,
-                    MenuItemId = orderItemCreateDto.MenuItemId,
-                    Quantity = orderItemCreateDto.Quantity,
-                    UnitPrice = unitPrice,
-                    Notes = orderItemCreateDto.Notes?.Trim() ?? string.Empty
-                };
+                    existingItem.Quantity += orderItemCreateDto.Quantity;
+                    existingItem.UnitPrice = unitPrice;
 
-                await _orderRepository.AddMenuItemAsync(orderId, orderItemEntity);
+                    var newNotes = orderItemCreateDto.Notes?.Trim() ?? string.Empty;
+                    if (!string.IsNullOrEmpty(newNotes))
+                    {
+                        existingItem.Notes = string.IsNullOrEmpty(existingItem.Notes)
+                            ? newNotes
+                            : $"{existingItem.Notes}; {newNotes}";
+                    }
+
+                    await _orderItemRepository.UpdateAsync(existingItem.Id, existingItem);
+                }
+                else
+                {
+                    var orderItemEntity = new OrderItem
+                    {
+                        OrderId = orderId,
+                        MenuItemId = orderItemCreateDto.MenuItemId,
+                        Quantity = orderItemCreateDto.Quantity,
+                        UnitPrice = unitPrice,
+                        Notes = orderItemCreateDto.Notes?.Trim() ?? string.Empty
+                    };
+
+                    await _orderItemRepository.AddAsync(orderItemEntity);
+                }
 
                 order.TotalAmount += totalPrice;
             }
@@ -545,6 +577,12 @@ public class OrderService : IOrderService
         Validation.RequireNotNull(orderCreateDto, nameof(orderCreateDto), "Order data is required.");
         Validation.Require(orderCreateDto.OrderItems != null && orderCreateDto.OrderItems.Count > 0, "At least one order item is required.", nameof(orderCreateDto.OrderItems));
         Validation.Require(!orderCreateDto.OrderItems!.Any(orderItem => orderItem == null), "Order items cannot contain null entries.", nameof(orderCreateDto.OrderItems));
+
+        var menuItemIds = orderCreateDto.OrderItems.Select(oi => oi.MenuItemId).ToList();
+        if (menuItemIds.Count != menuItemIds.Distinct().Count())
+        {
+            throw new ArgumentException("Duplicate menu items are not allowed in the order. Please consolidate quantities.");
+        }
     }
 
     private static void EnsureValidStatus(int status)

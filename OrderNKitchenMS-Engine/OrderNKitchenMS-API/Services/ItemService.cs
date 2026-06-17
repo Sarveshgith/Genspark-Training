@@ -73,9 +73,12 @@ public class ItemService : IItemService
             Validation.Require(dto.CostPerUnit.Value >= 0, "Cost per unit must be greater than or equal to 0.", nameof(dto.CostPerUnit));
         }
 
+        var trimmedName = dto.Name.Trim();
+        await EnsureUniqueNameAsync(trimmedName);
+
         var item = new Item
         {
-            Name = dto.Name.Trim(),
+            Name = trimmedName,
             Unit = dto.Unit,
             StockQuantity = dto.StockQuantity,
             StockThreshold = dto.StockThreshold,
@@ -110,7 +113,10 @@ public class ItemService : IItemService
             throw new NotFoundException($"Item with ID {id} was not found.");
         }
 
-        item.Name = dto.Name.Trim();
+        var trimmedName = dto.Name.Trim();
+        await EnsureUniqueNameAsync(trimmedName, id);
+
+        item.Name = trimmedName;
         item.Unit = dto.Unit;
         item.StockQuantity = dto.StockQuantity;
         if (dto.StockThreshold.HasValue)
@@ -132,6 +138,16 @@ public class ItemService : IItemService
 
         _logger.LogInformation("UpdateItemAsync succeeded for Item ID: {Id}", id);
         return MapToDto(item);
+    }
+
+    private async Task EnsureUniqueNameAsync(string name, int? excludeId = null)
+    {
+        var items = await _itemRepository.GetAllAsync();
+        var exists = items.Any(i => i.IsActive && i.Name == name && (!excludeId.HasValue || i.Id != excludeId.Value));
+        if (exists)
+        {
+            throw new ConflictException($"Inventory item with name '{name}' already exists.");
+        }
     }
 
     public async Task<ItemDto> RestockItemAsync(int id, ItemRestockDto dto)

@@ -55,7 +55,7 @@ public class BillServiceTest
         var orderDto = new OrderDto
         {
             Id = 1,
-            Status = (int)OrderStatus.Ready,
+            Status = (int)OrderStatus.Served,
             TotalAmount = 100m,
             OrderItems = new []
             {

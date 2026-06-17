@@ -22,8 +22,10 @@ public class GlobalExceptionHandler : IExceptionHandler
         Exception exception,
         CancellationToken cancellationToken)
     {
+        var isUniqueViolation = IsUniqueConstraintViolation(exception);
         var (statusCode, title) = exception switch
         {
+            _ when isUniqueViolation => (StatusCodes.Status409Conflict, "Conflict"),
             NotFoundException => (StatusCodes.Status404NotFound, "Not Found"),
             ConflictException => (StatusCodes.Status409Conflict, "Conflict"),
             BusinessRuleException => (StatusCodes.Status400BadRequest, "Bad Request"),
@@ -57,6 +59,28 @@ public class GlobalExceptionHandler : IExceptionHandler
         await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
 
         return true;
+    }
+
+    private static bool IsUniqueConstraintViolation(Exception? ex)
+    {
+        while (ex != null)
+        {
+            if (ex is Npgsql.PostgresException postgresEx && postgresEx.SqlState == "23505")
+            {
+                return true;
+            }
+            if (ex is Microsoft.Data.Sqlite.SqliteException sqliteEx && sqliteEx.SqliteErrorCode == 19)
+            {
+                return true;
+            }
+            if (ex.Message.Contains("unique constraint", StringComparison.OrdinalIgnoreCase) ||
+                ex.Message.Contains("duplicate key", StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+            ex = ex.InnerException;
+        }
+        return false;
     }
 }
 

@@ -221,4 +221,44 @@ public class ItemServiceTest
         var restockDto = new ItemRestockDto { Quantity = 5m };
         Assert.ThrowsAsync<NotFoundException>(async () => await _itemService.RestockItemAsync(999, restockDto));
     }
+
+    [Test]
+    public async Task CreateItemAsync_DuplicateName_ThrowsConflictException()
+    {
+        // Arrange
+        _context.Items.Add(new Item { Id = 10, Name = "Onion", Unit = ItemUnit.Kilograms, StockQuantity = 10m, StockThreshold = 1m, IsActive = true });
+        await _context.SaveChangesAsync();
+
+        var dto = new ItemCreateDto
+        {
+            Name = "Onion", // Exact duplicate
+            Unit = ItemUnit.Kilograms,
+            StockQuantity = 5m,
+            StockThreshold = 1m
+        };
+
+        // Act & Assert
+        Assert.ThrowsAsync<ConflictException>(async () => await _itemService.CreateItemAsync(dto));
+    }
+
+    [Test]
+    public async Task UpdateItemAsync_DuplicateName_ThrowsConflictException()
+    {
+        // Arrange
+        _context.Items.Add(new Item { Id = 10, Name = "Onion", Unit = ItemUnit.Kilograms, StockQuantity = 10m, StockThreshold = 1m, IsActive = true });
+        _context.Items.Add(new Item { Id = 11, Name = "Garlic", Unit = ItemUnit.Pieces, StockQuantity = 5m, StockThreshold = 1m, IsActive = true });
+        await _context.SaveChangesAsync();
+
+        var dto = new ItemUpdateDto
+        {
+            Name = "Onion", // Duplicate of ID 10
+            Unit = ItemUnit.Pieces,
+            StockQuantity = 5m,
+            StockThreshold = 1m,
+            IsActive = true
+        };
+
+        // Act & Assert
+        Assert.ThrowsAsync<ConflictException>(async () => await _itemService.UpdateItemAsync(11, dto));
+    }
 }

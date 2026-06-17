@@ -3,7 +3,7 @@ Users Table
 
 Roles Table
     Id (PK), Name, CreatedAt, UpdatedAt
-    [ENUM: Admin = 1, Customer = 2, Chef = 3, Deliveryman = 4]
+    [ENUM: Admin = 1, Customer = 2, Chef = 3, Deliveryman = 4, Waiter = 5]
 
 Tables Table
     Id (PK), Number (Unique), Status, Capacity, IsDeleted, CreatedAt, UpdatedAt

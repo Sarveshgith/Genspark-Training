@@ -16,7 +16,7 @@ public class BillController : ControllerBase
         _billService = billService;
     }
 
-    [Authorize(Policy = "AdminOnly")]
+    [Authorize(Policy = "AdminOrWaiter")]
     [HttpPost]
     public async Task<ActionResult<BillDto>> CreateBill([FromBody] BillCreateDto billCreateDto)
     {
@@ -32,7 +32,7 @@ public class BillController : ControllerBase
         return Ok(bills);
     }
 
-    [Authorize(Policy = "CanPlaceOrder")]
+    [Authorize(Policy = "All")]
     [HttpGet("order/{orderId:int}")]
     public async Task<ActionResult<BillDto>> GetBillByOrderId(int orderId)
     {
@@ -48,7 +48,7 @@ public class BillController : ControllerBase
         return Ok(updatedBill);
     }
 
-    [Authorize(Policy = "AdminOnly")]
+    [Authorize(Policy = "All")]
     [HttpPatch("{id:int}/status")]
     public async Task<IActionResult> UpdateBillStatus(int id, [FromBody] string status)
     {
@@ -56,7 +56,7 @@ public class BillController : ControllerBase
         return NoContent();
     }
 
-    [Authorize(Policy = "CanPlaceOrder")]
+    [Authorize(Policy = "All")]
     [HttpGet("order/{orderid:int}/pdf")]
     public async Task<IActionResult> GenerateBillPdf(int orderid)
     {

@@ -1,0 +1,7 @@
+2026-06-17 10:51:50.274 +05:30 [INF] Application is shutting down...
+2026-06-17 14:12:48.860 +05:30 [INF] User profile is available. Using '/Users/sarveswaranb/.aspnet/DataProtection-Keys' as key repository; keys will not be encrypted at rest.
+2026-06-17 14:12:48.921 +05:30 [INF] Now listening on: http://localhost:5182
+2026-06-17 14:12:48.922 +05:30 [INF] Application started. Press Ctrl+C to shut down.
+2026-06-17 14:12:48.922 +05:30 [INF] Hosting environment: Development
+2026-06-17 14:12:48.922 +05:30 [INF] Content root path: /Users/sarveswaranb/Proggies/Presidio/Genspark-Training/OrderNKitchenMS-Engine/OrderNKitchenMS-API
+2026-06-17 14:31:39.794 +05:30 [INF] Application is shutting down...

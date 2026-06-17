@@ -36,6 +36,7 @@ public class TableRepository : ITableRepository
     {
         return await _tables.FirstOrDefaultAsync(table =>
             table.Number == number &&
+            !table.IsDeleted &&
             (!excludeId.HasValue || table.Id != excludeId.Value));
     }
 

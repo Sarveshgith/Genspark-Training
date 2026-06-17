@@ -14,10 +14,24 @@ using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
+//AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
 builder.Logging.ClearProviders();
 builder.Host.UseSerilog((context, services, configuration) => configuration
     .ReadFrom.Configuration(context.Configuration)
     .ReadFrom.Services(services));
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAngularApp", policy =>
+    {
+        policy.WithOrigins("http://localhost:4200") 
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
+
 
 QuestPDF.Settings.License = LicenseType.Community;
 
@@ -47,9 +61,11 @@ builder.Services.AddAuthorization(options =>
 
     options.AddPolicy("AdminOrChef", policy => policy.RequireRole("Admin", "Chef"));
 
-    options.AddPolicy("CustomerOnly", policy => policy.RequireRole("Customer"));
+    options.AddPolicy("AdminOrWaiter", policy => policy.RequireRole("Admin", "Waiter"));
 
-    options.AddPolicy("DeliverymanOnly", policy => policy.RequireRole("Deliveryman"));
+    options.AddPolicy("AllStaff", policy => policy.RequireRole("Admin", "Chef", "Waiter"));
+
+    options.AddPolicy("WaiterOnly", policy => policy.RequireRole("Waiter"));
 
     options.AddPolicy("GuestSession",
         policy => policy.RequireClaim("SessionType", "Guest"));
@@ -57,8 +73,15 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("CanPlaceOrder",
         policy => policy.RequireAssertion(ctx =>
             ctx.User.IsInRole("Admin")  ||
+            ctx.User.IsInRole("Waiter")    
+        ));
+
+    options.AddPolicy("All",
+        policy => policy.RequireAssertion(ctx =>
+            ctx.User.IsInRole("Admin")  ||
+            ctx.User.IsInRole("Chef")   ||
             ctx.User.IsInRole("Waiter") ||
-            ctx.User.IsInRole("Customer")      
+            ctx.User.HasClaim(c => c.Type == "SessionType" && c.Value == "Guest")
         ));
 });
 
@@ -108,6 +131,13 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseRouting();
+
+app.UseCors("AllowAngularApp");
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllers();
 

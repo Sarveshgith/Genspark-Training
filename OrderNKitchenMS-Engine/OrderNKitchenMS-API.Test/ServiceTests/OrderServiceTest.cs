@@ -359,4 +359,70 @@ public class OrderServiceTest
         await _context.Entry(updatedItem!).ReloadAsync();
         Assert.That(updatedItem!.StockQuantity, Is.EqualTo(600m)); // 500 + 50 * 2 = 600
     }
+
+    [Test]
+    public void CreateOrderAsync_DuplicateItemsInPayload_ThrowsArgumentException()
+    {
+        // Arrange
+        var request = new OrderCreateDto
+        {
+            OrderItems = new List<OrderItemCreateDto>
+            {
+                new OrderItemCreateDto { MenuItemId = 1, Quantity = 2 },
+                new OrderItemCreateDto { MenuItemId = 1, Quantity = 1 } // Duplicate MenuItemId
+            }
+        };
+
+        // Act & Assert
+        Assert.ThrowsAsync<ArgumentException>(async () => await _orderService.CreateOrderAsync(1, 2, request));
+    }
+
+    [Test]
+    public async Task AddOrderItemsAsync_DuplicateItemsInPayload_ThrowsArgumentException()
+    {
+        // Arrange
+        _context.Tables.Add(new Table { Id = 1, Number = 1, Capacity = 4, Status = TableStatus.Occupied });
+        _context.Orders.Add(new Order { Id = 10, TableId = 1, Status = OrderStatus.Pending, TotalAmount = 10m });
+        await _context.SaveChangesAsync();
+
+        var request = new List<OrderItemCreateDto>
+        {
+            new OrderItemCreateDto { MenuItemId = 1, Quantity = 1 },
+            new OrderItemCreateDto { MenuItemId = 1, Quantity = 2 } // Duplicate
+        };
+
+        // Act & Assert
+        Assert.ThrowsAsync<ArgumentException>(async () => await _orderService.AddOrderItemsAsync(10, request));
+    }
+
+    [Test]
+    public async Task AddOrderItemsAsync_ExistingItemInOrder_ConsolidatesQuantityAndNotes()
+    {
+        // Arrange
+        _context.Tables.Add(new Table { Id = 1, Number = 1, Capacity = 4, Status = TableStatus.Occupied });
+        _context.Orders.Add(new Order { Id = 10, TableId = 1, Status = OrderStatus.Pending, TotalAmount = 10m });
+        _context.Categories.Add(new Category { Id = 1, Name = "Drinks" });
+        _context.MenuItems.Add(new MenuItem { Id = 2, Name = "Soda", Price = 3m, IsAvailable = true, CategoryId = 1, PreparationTime = 2 });
+        _context.Items.Add(new Item { Id = 2, Name = "SodaCan", Unit = ItemUnit.Pieces, StockQuantity = 10m, StockThreshold = 1m, IsActive = true });
+        _context.MenuItemIngredients.Add(new MenuItemIngredient { Id = 2, MenuItemId = 2, ItemId = 2, QuantityRequired = 1m });
+        
+        // Add existing order item
+        _context.OrderItems.Add(new OrderItem { Id = 15, OrderId = 10, MenuItemId = 2, Quantity = 1, UnitPrice = 3m, Notes = "No Ice" });
+        await _context.SaveChangesAsync();
+
+        var request = new List<OrderItemCreateDto>
+        {
+            new OrderItemCreateDto { MenuItemId = 2, Quantity = 2, Notes = "Extra Cold" }
+        };
+
+        // Act: add items
+        var result = await _orderService.AddOrderItemsAsync(10, request);
+
+        // Assert
+        Assert.That(result, Is.Not.Null);
+        var orderItems = await _context.OrderItems.Where(oi => oi.OrderId == 10).ToListAsync();
+        Assert.That(orderItems.Count, Is.EqualTo(1)); // Consolidated to 1 row
+        Assert.That(orderItems[0].Quantity, Is.EqualTo(3)); // 1 + 2 = 3
+        Assert.That(orderItems[0].Notes, Is.EqualTo("No Ice; Extra Cold"));
+    }
 }

@@ -1,0 +1,793 @@
+2026-06-14 13:12:36.480 +05:30 [INF] User profile is available. Using '/Users/sarveswaranb/.aspnet/DataProtection-Keys' as key repository; keys will not be encrypted at rest.
+2026-06-14 13:12:36.541 +05:30 [INF] Now listening on: http://localhost:5182
+2026-06-14 13:12:36.542 +05:30 [INF] Application started. Press Ctrl+C to shut down.
+2026-06-14 13:12:36.543 +05:30 [INF] Hosting environment: Development
+2026-06-14 13:12:36.543 +05:30 [INF] Content root path: /Users/sarveswaranb/Proggies/Presidio/Genspark-Training/OrderNKitchenMS-Engine/OrderNKitchenMS-API
+2026-06-14 13:12:55.875 +05:30 [INF] Request starting HTTP/1.1 POST http://localhost:5182/api/auth/login - application/json 65
+2026-06-14 13:12:55.906 +05:30 [WRN] Failed to determine the https port for redirect.
+2026-06-14 13:12:55.907 +05:30 [INF] Executing endpoint 'OrderNKitchenMS_API.Controllers.AuthController.Login (OrderNKitchenMS-API)'
+2026-06-14 13:12:55.923 +05:30 [INF] Route matched with {action = "Login", controller = "Auth"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[OrderNKitchenMS_API.Models.DTOs.UserLoginResponseDto]] Login(OrderNKitchenMS_API.Models.DTOs.UserLoginDto) on controller OrderNKitchenMS_API.Controllers.AuthController (OrderNKitchenMS-API).
+2026-06-14 13:12:56.437 +05:30 [INF] Login requested for Email: sarvesh@gmail.com
+2026-06-14 13:12:56.438 +05:30 [INF] Logging in user with Email: sarvesh@gmail.com
+2026-06-14 13:12:56.936 +05:30 [INF] Executed DbCommand (35ms) [Parameters=[@ToLower='?'], CommandType='"Text"', CommandTimeout='30']
+SELECT u."Id", u."Address", u."CreatedAt", u."Email", u."IsDeleted", u."Name", u."PasswordHash", u."PhoneNumber", u."RoleId", u."UpdatedAt", r."Id", r."CreatedAt", r."Name", r."UpdatedAt"
+FROM "Users" AS u
+INNER JOIN "Roles" AS r ON u."RoleId" = r."Id"
+WHERE lower(u."Email") = @ToLower AND NOT (u."IsDeleted")
+LIMIT 1
+2026-06-14 13:12:57.056 +05:30 [INF] Login successful. Generated JWT and Refresh Token for User ID: 1
+2026-06-14 13:12:57.057 +05:30 [INF] Login succeeded for User: sarvesh@gmail.com (ID: 1)
+2026-06-14 13:12:57.060 +05:30 [INF] Executing OkObjectResult, writing value of type 'OrderNKitchenMS_API.Models.DTOs.UserLoginResponseDto'.
+2026-06-14 13:12:57.066 +05:30 [INF] Executed action OrderNKitchenMS_API.Controllers.AuthController.Login (OrderNKitchenMS-API) in 1141.3335ms
+2026-06-14 13:12:57.067 +05:30 [INF] Executed endpoint 'OrderNKitchenMS_API.Controllers.AuthController.Login (OrderNKitchenMS-API)'
+2026-06-14 13:12:57.071 +05:30 [INF] Request finished HTTP/1.1 POST http://localhost:5182/api/auth/login - 200 null application/json; charset=utf-8 1197.6726ms
+2026-06-14 13:19:37.850 +05:30 [INF] Request starting HTTP/1.1 POST http://localhost:5182/api/auth/login - application/json 66
+2026-06-14 13:19:37.860 +05:30 [INF] Executing endpoint 'OrderNKitchenMS_API.Controllers.AuthController.Login (OrderNKitchenMS-API)'
+2026-06-14 13:19:37.863 +05:30 [INF] Route matched with {action = "Login", controller = "Auth"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[OrderNKitchenMS_API.Models.DTOs.UserLoginResponseDto]] Login(OrderNKitchenMS_API.Models.DTOs.UserLoginDto) on controller OrderNKitchenMS_API.Controllers.AuthController (OrderNKitchenMS-API).
+2026-06-14 13:19:37.917 +05:30 [INF] Login requested for Email: sarvesh2@gmail.com
+2026-06-14 13:19:37.917 +05:30 [INF] Logging in user with Email: sarvesh2@gmail.com
+2026-06-14 13:19:37.959 +05:30 [INF] Executed DbCommand (18ms) [Parameters=[@ToLower='?'], CommandType='"Text"', CommandTimeout='30']
+SELECT u."Id", u."Address", u."CreatedAt", u."Email", u."IsDeleted", u."Name", u."PasswordHash", u."PhoneNumber", u."RoleId", u."UpdatedAt", r."Id", r."CreatedAt", r."Name", r."UpdatedAt"
+FROM "Users" AS u
+INNER JOIN "Roles" AS r ON u."RoleId" = r."Id"
+WHERE lower(u."Email") = @ToLower AND NOT (u."IsDeleted")
+LIMIT 1
+2026-06-14 13:19:38.014 +05:30 [INF] Login successful. Generated JWT and Refresh Token for User ID: 2
+2026-06-14 13:19:38.014 +05:30 [INF] Login succeeded for User: sarvesh2@gmail.com (ID: 2)
+2026-06-14 13:19:38.015 +05:30 [INF] Executing OkObjectResult, writing value of type 'OrderNKitchenMS_API.Models.DTOs.UserLoginResponseDto'.
+2026-06-14 13:19:38.015 +05:30 [INF] Executed action OrderNKitchenMS_API.Controllers.AuthController.Login (OrderNKitchenMS-API) in 152.0594ms
+2026-06-14 13:19:38.015 +05:30 [INF] Executed endpoint 'OrderNKitchenMS_API.Controllers.AuthController.Login (OrderNKitchenMS-API)'
+2026-06-14 13:19:38.016 +05:30 [INF] Request finished HTTP/1.1 POST http://localhost:5182/api/auth/login - 200 null application/json; charset=utf-8 166.6424ms
+2026-06-14 13:19:57.861 +05:30 [INF] Request starting HTTP/1.1 POST http://localhost:5182/api/auth/login - application/json 66
+2026-06-14 13:19:57.865 +05:30 [INF] Executing endpoint 'OrderNKitchenMS_API.Controllers.AuthController.Login (OrderNKitchenMS-API)'
+2026-06-14 13:19:57.865 +05:30 [INF] Route matched with {action = "Login", controller = "Auth"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[OrderNKitchenMS_API.Models.DTOs.UserLoginResponseDto]] Login(OrderNKitchenMS_API.Models.DTOs.UserLoginDto) on controller OrderNKitchenMS_API.Controllers.AuthController (OrderNKitchenMS-API).
+2026-06-14 13:19:57.878 +05:30 [INF] Login requested for Email: sarvesh3@gmail.com
+2026-06-14 13:19:57.878 +05:30 [INF] Logging in user with Email: sarvesh3@gmail.com
+2026-06-14 13:19:57.881 +05:30 [INF] Executed DbCommand (2ms) [Parameters=[@ToLower='?'], CommandType='"Text"', CommandTimeout='30']
+SELECT u."Id", u."Address", u."CreatedAt", u."Email", u."IsDeleted", u."Name", u."PasswordHash", u."PhoneNumber", u."RoleId", u."UpdatedAt", r."Id", r."CreatedAt", r."Name", r."UpdatedAt"
+FROM "Users" AS u
+INNER JOIN "Roles" AS r ON u."RoleId" = r."Id"
+WHERE lower(u."Email") = @ToLower AND NOT (u."IsDeleted")
+LIMIT 1
+2026-06-14 13:19:57.934 +05:30 [INF] Login successful. Generated JWT and Refresh Token for User ID: 3
+2026-06-14 13:19:57.935 +05:30 [INF] Login succeeded for User: sarvesh3@gmail.com (ID: 3)
+2026-06-14 13:19:57.935 +05:30 [INF] Executing OkObjectResult, writing value of type 'OrderNKitchenMS_API.Models.DTOs.UserLoginResponseDto'.
+2026-06-14 13:19:57.935 +05:30 [INF] Executed action OrderNKitchenMS_API.Controllers.AuthController.Login (OrderNKitchenMS-API) in 70.1695ms
+2026-06-14 13:19:57.935 +05:30 [INF] Executed endpoint 'OrderNKitchenMS_API.Controllers.AuthController.Login (OrderNKitchenMS-API)'
+2026-06-14 13:19:57.935 +05:30 [INF] Request finished HTTP/1.1 POST http://localhost:5182/api/auth/login - 200 null application/json; charset=utf-8 74.594ms
+2026-06-14 13:23:41.155 +05:30 [INF] Request starting HTTP/1.1 POST http://localhost:5182/api/inventory/items - application/json 106
+2026-06-14 13:23:41.198 +05:30 [INF] Executing endpoint 'OrderNKitchenMS_API.Controllers.ItemController.CreateItem (OrderNKitchenMS-API)'
+2026-06-14 13:23:41.206 +05:30 [INF] Route matched with {action = "CreateItem", controller = "Item"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[OrderNKitchenMS_API.Models.DTOs.ItemDto]] CreateItem(OrderNKitchenMS_API.Models.DTOs.ItemCreateDto) on controller OrderNKitchenMS_API.Controllers.ItemController (OrderNKitchenMS-API).
+2026-06-14 13:23:41.228 +05:30 [INF] CreateItemAsync started for Name: 'Lemon'
+2026-06-14 13:23:41.340 +05:30 [INF] Executed DbCommand (29ms) [Parameters=[@p0='?' (DbType = Decimal), @p1='?' (DbType = DateTime), @p2='?' (DbType = Boolean), @p3='?', @p4='?' (DbType = Decimal), @p5='?' (DbType = Decimal), @p6='?' (DbType = Int32), @p7='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+INSERT INTO "Items" ("CostPerUnit", "CreatedAt", "IsActive", "Name", "StockQuantity", "StockThreshold", "Unit", "UpdatedAt")
+VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7)
+RETURNING "Id";
+2026-06-14 13:23:41.353 +05:30 [INF] CreateItemAsync succeeded. Created Item ID: 5
+2026-06-14 13:23:41.355 +05:30 [INF] Executing CreatedAtActionResult, writing value of type 'OrderNKitchenMS_API.Models.DTOs.ItemDto'.
+2026-06-14 13:23:41.374 +05:30 [INF] Executed action OrderNKitchenMS_API.Controllers.ItemController.CreateItem (OrderNKitchenMS-API) in 167.85ms
+2026-06-14 13:23:41.374 +05:30 [INF] Executed endpoint 'OrderNKitchenMS_API.Controllers.ItemController.CreateItem (OrderNKitchenMS-API)'
+2026-06-14 13:23:41.374 +05:30 [INF] Request finished HTTP/1.1 POST http://localhost:5182/api/inventory/items - 201 null application/json; charset=utf-8 219.3351ms
+2026-06-14 13:26:10.528 +05:30 [INF] Request starting HTTP/1.1 POST http://localhost:5182/api/menu - application/json 183
+2026-06-14 13:26:10.534 +05:30 [INF] Executing endpoint 'OrderNKitchenMS_API.Controllers.MenuController.CreateMenuItem (OrderNKitchenMS-API)'
+2026-06-14 13:26:10.539 +05:30 [INF] Route matched with {action = "CreateMenuItem", controller = "Menu"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[OrderNKitchenMS_API.Models.DTOs.MenuItemDto]] CreateMenuItem(OrderNKitchenMS_API.Models.DTOs.MenuItemCreateDto) on controller OrderNKitchenMS_API.Controllers.MenuController (OrderNKitchenMS-API).
+2026-06-14 13:26:10.543 +05:30 [INF] CreateAsync started for Menu Item Name: 'White Cheese Pasta'
+2026-06-14 13:26:10.563 +05:30 [INF] Executed DbCommand (2ms) [Parameters=[@id='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT c."Id", c."CreatedAt", c."IsDeleted", c."IsNonVeg", c."Name", c."UpdatedAt"
+FROM "Categories" AS c
+WHERE c."Id" = @id AND NOT (c."IsDeleted")
+LIMIT 1
+2026-06-14 13:26:10.608 +05:30 [INF] Executed DbCommand (19ms) [Parameters=[@p0='?' (DbType = Int32), @p1='?' (DbType = DateTime), @p2='?', @p3='?', @p4='?' (DbType = Boolean), @p5='?' (DbType = Boolean), @p6='?' (DbType = Boolean), @p7='?', @p8='?' (DbType = Int32), @p9='?' (DbType = Decimal), @p10='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+INSERT INTO "MenuItems" ("CategoryId", "CreatedAt", "Description", "ImageUrl", "IsAvailable", "IsDeleted", "IsManuallyDisabled", "Name", "PreparationTime", "Price", "UpdatedAt")
+VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7, @p8, @p9, @p10)
+RETURNING "Id";
+2026-06-14 13:26:10.610 +05:30 [INF] CreateAsync succeeded. Created Menu Item ID: 3
+2026-06-14 13:26:10.611 +05:30 [INF] Executing CreatedAtActionResult, writing value of type 'OrderNKitchenMS_API.Models.DTOs.MenuItemDto'.
+2026-06-14 13:26:10.613 +05:30 [INF] Executed action OrderNKitchenMS_API.Controllers.MenuController.CreateMenuItem (OrderNKitchenMS-API) in 74.0282ms
+2026-06-14 13:26:10.613 +05:30 [INF] Executed endpoint 'OrderNKitchenMS_API.Controllers.MenuController.CreateMenuItem (OrderNKitchenMS-API)'
+2026-06-14 13:26:10.613 +05:30 [INF] Request finished HTTP/1.1 POST http://localhost:5182/api/menu - 201 null application/json; charset=utf-8 85.1508ms
+2026-06-14 13:34:17.742 +05:30 [INF] Request starting HTTP/1.1 POST http://localhost:5182/api/inventory/menu-items/3/ingredients - application/json 114
+2026-06-14 13:34:17.750 +05:30 [INF] Authorization failed. These requirements were not met:
+RolesAuthorizationRequirement:User.IsInRole must be true for one of the following roles: (Admin|Chef)
+2026-06-14 13:34:17.754 +05:30 [INF] AuthenticationScheme: Bearer was challenged.
+2026-06-14 13:34:17.754 +05:30 [INF] Request finished HTTP/1.1 POST http://localhost:5182/api/inventory/menu-items/3/ingredients - 401 0 null 11.8636ms
+2026-06-14 13:39:42.877 +05:30 [INF] Request starting HTTP/1.1 POST http://localhost:5182/api/auth/login - application/json 66
+2026-06-14 13:39:42.878 +05:30 [INF] Executing endpoint 'OrderNKitchenMS_API.Controllers.AuthController.Login (OrderNKitchenMS-API)'
+2026-06-14 13:39:42.879 +05:30 [INF] Route matched with {action = "Login", controller = "Auth"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[OrderNKitchenMS_API.Models.DTOs.UserLoginResponseDto]] Login(OrderNKitchenMS_API.Models.DTOs.UserLoginDto) on controller OrderNKitchenMS_API.Controllers.AuthController (OrderNKitchenMS-API).
+2026-06-14 13:39:42.882 +05:30 [INF] Login requested for Email: sarvesh2@gmail.com
+2026-06-14 13:39:42.882 +05:30 [INF] Logging in user with Email: sarvesh2@gmail.com
+2026-06-14 13:39:42.901 +05:30 [INF] Executed DbCommand (6ms) [Parameters=[@ToLower='?'], CommandType='"Text"', CommandTimeout='30']
+SELECT u."Id", u."Address", u."CreatedAt", u."Email", u."IsDeleted", u."Name", u."PasswordHash", u."PhoneNumber", u."RoleId", u."UpdatedAt", r."Id", r."CreatedAt", r."Name", r."UpdatedAt"
+FROM "Users" AS u
+INNER JOIN "Roles" AS r ON u."RoleId" = r."Id"
+WHERE lower(u."Email") = @ToLower AND NOT (u."IsDeleted")
+LIMIT 1
+2026-06-14 13:39:42.954 +05:30 [INF] Login successful. Generated JWT and Refresh Token for User ID: 2
+2026-06-14 13:39:42.954 +05:30 [INF] Login succeeded for User: sarvesh2@gmail.com (ID: 2)
+2026-06-14 13:39:42.954 +05:30 [INF] Executing OkObjectResult, writing value of type 'OrderNKitchenMS_API.Models.DTOs.UserLoginResponseDto'.
+2026-06-14 13:39:42.954 +05:30 [INF] Executed action OrderNKitchenMS_API.Controllers.AuthController.Login (OrderNKitchenMS-API) in 75.5778ms
+2026-06-14 13:39:42.955 +05:30 [INF] Executed endpoint 'OrderNKitchenMS_API.Controllers.AuthController.Login (OrderNKitchenMS-API)'
+2026-06-14 13:39:42.955 +05:30 [INF] Request finished HTTP/1.1 POST http://localhost:5182/api/auth/login - 200 null application/json; charset=utf-8 77.9912ms
+2026-06-14 13:40:27.904 +05:30 [INF] Request starting HTTP/1.1 POST http://localhost:5182/api/auth/login - application/json 65
+2026-06-14 13:40:27.904 +05:30 [INF] Executing endpoint 'OrderNKitchenMS_API.Controllers.AuthController.Login (OrderNKitchenMS-API)'
+2026-06-14 13:40:27.904 +05:30 [INF] Route matched with {action = "Login", controller = "Auth"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[OrderNKitchenMS_API.Models.DTOs.UserLoginResponseDto]] Login(OrderNKitchenMS_API.Models.DTOs.UserLoginDto) on controller OrderNKitchenMS_API.Controllers.AuthController (OrderNKitchenMS-API).
+2026-06-14 13:40:27.906 +05:30 [INF] Login requested for Email: sarvesh@gmail.com
+2026-06-14 13:40:27.906 +05:30 [INF] Logging in user with Email: sarvesh@gmail.com
+2026-06-14 13:40:27.908 +05:30 [INF] Executed DbCommand (2ms) [Parameters=[@ToLower='?'], CommandType='"Text"', CommandTimeout='30']
+SELECT u."Id", u."Address", u."CreatedAt", u."Email", u."IsDeleted", u."Name", u."PasswordHash", u."PhoneNumber", u."RoleId", u."UpdatedAt", r."Id", r."CreatedAt", r."Name", r."UpdatedAt"
+FROM "Users" AS u
+INNER JOIN "Roles" AS r ON u."RoleId" = r."Id"
+WHERE lower(u."Email") = @ToLower AND NOT (u."IsDeleted")
+LIMIT 1
+2026-06-14 13:40:27.961 +05:30 [INF] Login successful. Generated JWT and Refresh Token for User ID: 1
+2026-06-14 13:40:27.962 +05:30 [INF] Login succeeded for User: sarvesh@gmail.com (ID: 1)
+2026-06-14 13:40:27.962 +05:30 [INF] Executing OkObjectResult, writing value of type 'OrderNKitchenMS_API.Models.DTOs.UserLoginResponseDto'.
+2026-06-14 13:40:27.962 +05:30 [INF] Executed action OrderNKitchenMS_API.Controllers.AuthController.Login (OrderNKitchenMS-API) in 57.5599ms
+2026-06-14 13:40:27.962 +05:30 [INF] Executed endpoint 'OrderNKitchenMS_API.Controllers.AuthController.Login (OrderNKitchenMS-API)'
+2026-06-14 13:40:27.962 +05:30 [INF] Request finished HTTP/1.1 POST http://localhost:5182/api/auth/login - 200 null application/json; charset=utf-8 58.2372ms
+2026-06-14 13:41:04.420 +05:30 [INF] Request starting HTTP/1.1 POST http://localhost:5182/api/auth/login - application/json 66
+2026-06-14 13:41:04.421 +05:30 [INF] Executing endpoint 'OrderNKitchenMS_API.Controllers.AuthController.Login (OrderNKitchenMS-API)'
+2026-06-14 13:41:04.421 +05:30 [INF] Route matched with {action = "Login", controller = "Auth"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[OrderNKitchenMS_API.Models.DTOs.UserLoginResponseDto]] Login(OrderNKitchenMS_API.Models.DTOs.UserLoginDto) on controller OrderNKitchenMS_API.Controllers.AuthController (OrderNKitchenMS-API).
+2026-06-14 13:41:04.422 +05:30 [INF] Login requested for Email: sarvesh3@gmail.com
+2026-06-14 13:41:04.422 +05:30 [INF] Logging in user with Email: sarvesh3@gmail.com
+2026-06-14 13:41:04.425 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[@ToLower='?'], CommandType='"Text"', CommandTimeout='30']
+SELECT u."Id", u."Address", u."CreatedAt", u."Email", u."IsDeleted", u."Name", u."PasswordHash", u."PhoneNumber", u."RoleId", u."UpdatedAt", r."Id", r."CreatedAt", r."Name", r."UpdatedAt"
+FROM "Users" AS u
+INNER JOIN "Roles" AS r ON u."RoleId" = r."Id"
+WHERE lower(u."Email") = @ToLower AND NOT (u."IsDeleted")
+LIMIT 1
+2026-06-14 13:41:04.480 +05:30 [INF] Login successful. Generated JWT and Refresh Token for User ID: 3
+2026-06-14 13:41:04.480 +05:30 [INF] Login succeeded for User: sarvesh3@gmail.com (ID: 3)
+2026-06-14 13:41:04.480 +05:30 [INF] Executing OkObjectResult, writing value of type 'OrderNKitchenMS_API.Models.DTOs.UserLoginResponseDto'.
+2026-06-14 13:41:04.480 +05:30 [INF] Executed action OrderNKitchenMS_API.Controllers.AuthController.Login (OrderNKitchenMS-API) in 59.6249ms
+2026-06-14 13:41:04.480 +05:30 [INF] Executed endpoint 'OrderNKitchenMS_API.Controllers.AuthController.Login (OrderNKitchenMS-API)'
+2026-06-14 13:41:04.481 +05:30 [INF] Request finished HTTP/1.1 POST http://localhost:5182/api/auth/login - 200 null application/json; charset=utf-8 60.2064ms
+2026-06-14 13:41:34.619 +05:30 [INF] Request starting HTTP/1.1 POST http://localhost:5182/api/inventory/menu-items/3/ingredients - application/json 114
+2026-06-14 13:41:34.622 +05:30 [INF] Executing endpoint 'OrderNKitchenMS_API.Controllers.ItemController.AddMenuItemIngredients (OrderNKitchenMS-API)'
+2026-06-14 13:41:34.632 +05:30 [INF] Route matched with {action = "AddMenuItemIngredients", controller = "Item"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[System.Collections.Generic.IEnumerable`1[OrderNKitchenMS_API.Models.DTOs.MenuItemIngredientDto]]] AddMenuItemIngredients(Int32, System.Collections.Generic.List`1[OrderNKitchenMS_API.Models.DTOs.MenuItemIngredientCreateDto]) on controller OrderNKitchenMS_API.Controllers.ItemController (OrderNKitchenMS-API).
+2026-06-14 13:41:34.641 +05:30 [INF] AddMenuItemIngredientsAsync started for MenuItem ID 3, mapping 2 items.
+2026-06-14 13:41:34.656 +05:30 [INF] Executed DbCommand (3ms) [Parameters=[@id='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT m."Id", m."CategoryId", m."CreatedAt", m."Description", m."ImageUrl", m."IsAvailable", m."IsDeleted", m."IsManuallyDisabled", m."Name", m."PreparationTime", m."Price", m."UpdatedAt", c."Id", c."CreatedAt", c."IsDeleted", c."IsNonVeg", c."Name", c."UpdatedAt"
+FROM "MenuItems" AS m
+INNER JOIN "Categories" AS c ON m."CategoryId" = c."Id"
+WHERE m."Id" = @id AND NOT (m."IsDeleted")
+LIMIT 1
+2026-06-14 13:41:34.671 +05:30 [INF] Executed DbCommand (3ms) [Parameters=[@menuItemId='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT m."Id", m."CreatedAt", m."ItemId", m."MenuItemId", m."QuantityRequired", m."UpdatedAt", i."Id", i."CostPerUnit", i."CreatedAt", i."IsActive", i."Name", i."StockQuantity", i."StockThreshold", i."Unit", i."UpdatedAt"
+FROM "MenuItemIngredients" AS m
+INNER JOIN "Items" AS i ON m."ItemId" = i."Id"
+WHERE m."MenuItemId" = @menuItemId
+2026-06-14 13:41:34.676 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[@id='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT i."Id", i."CostPerUnit", i."CreatedAt", i."IsActive", i."Name", i."StockQuantity", i."StockThreshold", i."Unit", i."UpdatedAt"
+FROM "Items" AS i
+WHERE i."Id" = @id
+LIMIT 1
+2026-06-14 13:41:34.679 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[@id='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT i."Id", i."CostPerUnit", i."CreatedAt", i."IsActive", i."Name", i."StockQuantity", i."StockThreshold", i."Unit", i."UpdatedAt"
+FROM "Items" AS i
+WHERE i."Id" = @id
+LIMIT 1
+2026-06-14 13:41:34.720 +05:30 [INF] Executed DbCommand (19ms) [Parameters=[@p0='?' (DbType = DateTime), @p1='?' (DbType = Int32), @p2='?' (DbType = Int32), @p3='?' (DbType = Decimal), @p4='?' (DbType = DateTime), @p5='?' (DbType = DateTime), @p6='?' (DbType = Int32), @p7='?' (DbType = Int32), @p8='?' (DbType = Decimal), @p9='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+INSERT INTO "MenuItemIngredients" ("CreatedAt", "ItemId", "MenuItemId", "QuantityRequired", "UpdatedAt")
+VALUES (@p0, @p1, @p2, @p3, @p4)
+RETURNING "Id";
+INSERT INTO "MenuItemIngredients" ("CreatedAt", "ItemId", "MenuItemId", "QuantityRequired", "UpdatedAt")
+VALUES (@p5, @p6, @p7, @p8, @p9)
+RETURNING "Id";
+2026-06-14 13:41:34.730 +05:30 [INF] AddMenuItemIngredientsAsync succeeded.
+2026-06-14 13:41:34.731 +05:30 [INF] Executing CreatedResult, writing value of type 'System.Linq.Enumerable+ListSelectIterator`2[[OrderNKitchenMS_API.Models.Entities.MenuItemIngredient, OrderNKitchenMS-API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null],[OrderNKitchenMS_API.Models.DTOs.MenuItemIngredientDto, OrderNKitchenMS-API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-14 13:41:34.732 +05:30 [INF] Executed action OrderNKitchenMS_API.Controllers.ItemController.AddMenuItemIngredients (OrderNKitchenMS-API) in 99.3247ms
+2026-06-14 13:41:34.732 +05:30 [INF] Executed endpoint 'OrderNKitchenMS_API.Controllers.ItemController.AddMenuItemIngredients (OrderNKitchenMS-API)'
+2026-06-14 13:41:34.732 +05:30 [INF] Request finished HTTP/1.1 POST http://localhost:5182/api/inventory/menu-items/3/ingredients - 201 null application/json; charset=utf-8 113.1185ms
+2026-06-14 14:31:49.354 +05:30 [INF] Request starting HTTP/1.1 POST http://localhost:5182/api/orders - application/json 205
+2026-06-14 14:31:49.358 +05:30 [INF] Authorization failed. These requirements were not met:
+Handler assertion should evaluate to true.
+2026-06-14 14:31:49.359 +05:30 [INF] AuthenticationScheme: Bearer was challenged.
+2026-06-14 14:31:49.359 +05:30 [INF] Request finished HTTP/1.1 POST http://localhost:5182/api/orders - 401 0 null 5.4476ms
+2026-06-14 14:32:05.675 +05:30 [INF] Request starting HTTP/1.1 POST http://localhost:5182/api/orders - application/json 205
+2026-06-14 14:32:05.679 +05:30 [INF] Executing endpoint 'OrderNKitchenMS_API.Controllers.OrderController.CreateOrder (OrderNKitchenMS-API)'
+2026-06-14 14:32:05.686 +05:30 [INF] Route matched with {action = "CreateOrder", controller = "Order"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[OrderNKitchenMS_API.Models.DTOs.OrderDto]] CreateOrder(OrderNKitchenMS_API.Models.DTOs.OrderCreateDto) on controller OrderNKitchenMS_API.Controllers.OrderController (OrderNKitchenMS-API).
+2026-06-14 14:32:05.695 +05:30 [INF] CreateOrder requested for TableId: 1 by WaiterId: 3
+2026-06-14 14:32:05.698 +05:30 [INF] CreateOrderAsync started for TableId: 1, WaiterId: 3
+2026-06-14 14:32:05.716 +05:30 [INF] Executed DbCommand (2ms) [Parameters=[@tableId='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT t."Id", t."Capacity", t."CreatedAt", t."IsDeleted", t."Number", t."Status", t."UpdatedAt"
+FROM "Tables" AS t
+WHERE t."Id" = @tableId AND NOT (t."IsDeleted")
+LIMIT 1
+2026-06-14 14:32:05.726 +05:30 [INF] Executed action OrderNKitchenMS_API.Controllers.OrderController.CreateOrder (OrderNKitchenMS-API) in 40.1038ms
+2026-06-14 14:32:05.727 +05:30 [INF] Executed endpoint 'OrderNKitchenMS_API.Controllers.OrderController.CreateOrder (OrderNKitchenMS-API)'
+2026-06-14 14:32:05.732 +05:30 [WRN] Business/Validation error occurred (Status 400): Table with id 1 is not available.
+2026-06-14 14:32:05.739 +05:30 [INF] Request finished HTTP/1.1 POST http://localhost:5182/api/orders - 400 null application/json; charset=utf-8 64.0551ms
+2026-06-14 14:32:37.783 +05:30 [INF] Request starting HTTP/1.1 POST http://localhost:5182/api/orders - application/json 205
+2026-06-14 14:32:37.783 +05:30 [INF] Executing endpoint 'OrderNKitchenMS_API.Controllers.OrderController.CreateOrder (OrderNKitchenMS-API)'
+2026-06-14 14:32:37.783 +05:30 [INF] Route matched with {action = "CreateOrder", controller = "Order"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[OrderNKitchenMS_API.Models.DTOs.OrderDto]] CreateOrder(OrderNKitchenMS_API.Models.DTOs.OrderCreateDto) on controller OrderNKitchenMS_API.Controllers.OrderController (OrderNKitchenMS-API).
+2026-06-14 14:32:37.785 +05:30 [INF] CreateOrder requested for TableId: 2 by WaiterId: 3
+2026-06-14 14:32:37.786 +05:30 [INF] CreateOrderAsync started for TableId: 2, WaiterId: 3
+2026-06-14 14:32:37.788 +05:30 [INF] Executed DbCommand (2ms) [Parameters=[@tableId='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT t."Id", t."Capacity", t."CreatedAt", t."IsDeleted", t."Number", t."Status", t."UpdatedAt"
+FROM "Tables" AS t
+WHERE t."Id" = @tableId AND NOT (t."IsDeleted")
+LIMIT 1
+2026-06-14 14:32:37.849 +05:30 [INF] Executed DbCommand (38ms) [Parameters=[@requestedMenuItemIds='?' (DbType = Object)], CommandType='"Text"', CommandTimeout='30']
+SELECT m."Id", m."CategoryId", m."CreatedAt", m."Description", m."ImageUrl", m."IsAvailable", m."IsDeleted", m."IsManuallyDisabled", m."Name", m."PreparationTime", m."Price", m."UpdatedAt"
+FROM "MenuItems" AS m
+WHERE m."Id" = ANY (@requestedMenuItemIds) AND NOT (m."IsDeleted")
+2026-06-14 14:32:37.853 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[@requestedMenuItemIds='?' (DbType = Object)], CommandType='"Text"', CommandTimeout='30']
+SELECT m."Id", m."CategoryId", m."CreatedAt", m."Description", m."ImageUrl", m."IsAvailable", m."IsDeleted", m."IsManuallyDisabled", m."Name", m."PreparationTime", m."Price", m."UpdatedAt"
+FROM "MenuItems" AS m
+WHERE m."Id" = ANY (@requestedMenuItemIds) AND NOT (m."IsDeleted")
+2026-06-14 14:32:37.859 +05:30 [INF] Executed DbCommand (2ms) [Parameters=[@requestedMenuItemIds='?' (DbType = Object)], CommandType='"Text"', CommandTimeout='30']
+SELECT m."Id", m."CreatedAt", m."ItemId", m."MenuItemId", m."QuantityRequired", m."UpdatedAt", i."Id", i."CostPerUnit", i."CreatedAt", i."IsActive", i."Name", i."StockQuantity", i."StockThreshold", i."Unit", i."UpdatedAt"
+FROM "MenuItemIngredients" AS m
+INNER JOIN "Items" AS i ON m."ItemId" = i."Id"
+WHERE m."MenuItemId" = ANY (@requestedMenuItemIds)
+2026-06-14 14:32:37.866 +05:30 [INF] Executed DbCommand (0ms) [Parameters=[@itemIds='?' (DbType = Object)], CommandType='"Text"', CommandTimeout='30']
+SELECT i."Id", i."CostPerUnit", i."CreatedAt", i."IsActive", i."Name", i."StockQuantity", i."StockThreshold", i."Unit", i."UpdatedAt"
+FROM "Items" AS i
+WHERE i."Id" = ANY (@itemIds)
+2026-06-14 14:32:37.909 +05:30 [INF] Executed DbCommand (10ms) [Parameters=[@p0='?' (DbType = Int32), @p1='?' (DbType = Int32), @p2='?' (DbType = DateTime), @p3='?' (DbType = DateTime), @p4='?' (DbType = Int32), @p5='?' (DbType = Int32), @p6='?' (DbType = Decimal), @p7='?' (DbType = DateTime), @p9='?' (DbType = Int32), @p8='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+INSERT INTO "Orders" ("AssignedChefId", "AssignedWaiterId", "CompletedAt", "CreatedAt", "Status", "TableId", "TotalAmount", "UpdatedAt")
+VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7)
+RETURNING "Id";
+UPDATE "Tables" SET "Status" = @p8
+WHERE "Id" = @p9;
+2026-06-14 14:32:37.916 +05:30 [INF] UpdateStockByMenuItemIdAsync started. MenuItemId: 2, Quantity: 2, IsAdd: false
+2026-06-14 14:32:37.917 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[@menuItemId='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT m."Id", m."CreatedAt", m."ItemId", m."MenuItemId", m."QuantityRequired", m."UpdatedAt", i."Id", i."CostPerUnit", i."CreatedAt", i."IsActive", i."Name", i."StockQuantity", i."StockThreshold", i."Unit", i."UpdatedAt"
+FROM "MenuItemIngredients" AS m
+INNER JOIN "Items" AS i ON m."ItemId" = i."Id"
+WHERE m."MenuItemId" = @menuItemId
+2026-06-14 14:32:37.924 +05:30 [INF] Executed DbCommand (5ms) [Parameters=[@p0='?' (DbType = Decimal), @p1='?' (DbType = DateTime), @p2='?' (DbType = Int32), @p3='?' (DbType = Decimal)], CommandType='"Text"', CommandTimeout='30']
+UPDATE "Items" SET "StockQuantity" = "StockQuantity" - @p0, "UpdatedAt" = @p1 WHERE "Id" = @p2 AND CAST("StockQuantity" AS NUMERIC) >= @p3
+2026-06-14 14:32:37.926 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[@p0='?' (DbType = Decimal), @p1='?' (DbType = DateTime), @p2='?' (DbType = Int32), @p3='?' (DbType = Decimal)], CommandType='"Text"', CommandTimeout='30']
+UPDATE "Items" SET "StockQuantity" = "StockQuantity" - @p0, "UpdatedAt" = @p1 WHERE "Id" = @p2 AND CAST("StockQuantity" AS NUMERIC) >= @p3
+2026-06-14 14:32:37.932 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[@itemId='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT m."Id", m."CreatedAt", m."ItemId", m."MenuItemId", m."QuantityRequired", m."UpdatedAt", m0."Id", m0."CategoryId", m0."CreatedAt", m0."Description", m0."ImageUrl", m0."IsAvailable", m0."IsDeleted", m0."IsManuallyDisabled", m0."Name", m0."PreparationTime", m0."Price", m0."UpdatedAt"
+FROM "MenuItemIngredients" AS m
+INNER JOIN "MenuItems" AS m0 ON m."MenuItemId" = m0."Id"
+WHERE m."ItemId" = @itemId
+2026-06-14 14:32:37.933 +05:30 [INF] Executed DbCommand (0ms) [Parameters=[@itemId='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT m."Id", m."CreatedAt", m."ItemId", m."MenuItemId", m."QuantityRequired", m."UpdatedAt", m0."Id", m0."CategoryId", m0."CreatedAt", m0."Description", m0."ImageUrl", m0."IsAvailable", m0."IsDeleted", m0."IsManuallyDisabled", m0."Name", m0."PreparationTime", m0."Price", m0."UpdatedAt"
+FROM "MenuItemIngredients" AS m
+INNER JOIN "MenuItems" AS m0 ON m."MenuItemId" = m0."Id"
+WHERE m."ItemId" = @itemId
+2026-06-14 14:32:37.933 +05:30 [INF] UpdateStockByMenuItemIdAsync completed for MenuItemId: 2
+2026-06-14 14:32:37.940 +05:30 [INF] UpdateStockByMenuItemIdAsync started. MenuItemId: 3, Quantity: 1, IsAdd: false
+2026-06-14 14:32:37.941 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[@menuItemId='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT m."Id", m."CreatedAt", m."ItemId", m."MenuItemId", m."QuantityRequired", m."UpdatedAt", i."Id", i."CostPerUnit", i."CreatedAt", i."IsActive", i."Name", i."StockQuantity", i."StockThreshold", i."Unit", i."UpdatedAt"
+FROM "MenuItemIngredients" AS m
+INNER JOIN "Items" AS i ON m."ItemId" = i."Id"
+WHERE m."MenuItemId" = @menuItemId
+2026-06-14 14:32:37.942 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[@p0='?' (DbType = Decimal), @p1='?' (DbType = DateTime), @p2='?' (DbType = Int32), @p3='?' (DbType = Decimal)], CommandType='"Text"', CommandTimeout='30']
+UPDATE "Items" SET "StockQuantity" = "StockQuantity" - @p0, "UpdatedAt" = @p1 WHERE "Id" = @p2 AND CAST("StockQuantity" AS NUMERIC) >= @p3
+2026-06-14 14:32:37.942 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[@p0='?' (DbType = Decimal), @p1='?' (DbType = DateTime), @p2='?' (DbType = Int32), @p3='?' (DbType = Decimal)], CommandType='"Text"', CommandTimeout='30']
+UPDATE "Items" SET "StockQuantity" = "StockQuantity" - @p0, "UpdatedAt" = @p1 WHERE "Id" = @p2 AND CAST("StockQuantity" AS NUMERIC) >= @p3
+2026-06-14 14:32:37.943 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[@itemId='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT m."Id", m."CreatedAt", m."ItemId", m."MenuItemId", m."QuantityRequired", m."UpdatedAt", m0."Id", m0."CategoryId", m0."CreatedAt", m0."Description", m0."ImageUrl", m0."IsAvailable", m0."IsDeleted", m0."IsManuallyDisabled", m0."Name", m0."PreparationTime", m0."Price", m0."UpdatedAt"
+FROM "MenuItemIngredients" AS m
+INNER JOIN "MenuItems" AS m0 ON m."MenuItemId" = m0."Id"
+WHERE m."ItemId" = @itemId
+2026-06-14 14:32:37.944 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[@itemId='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT m."Id", m."CreatedAt", m."ItemId", m."MenuItemId", m."QuantityRequired", m."UpdatedAt", m0."Id", m0."CategoryId", m0."CreatedAt", m0."Description", m0."ImageUrl", m0."IsAvailable", m0."IsDeleted", m0."IsManuallyDisabled", m0."Name", m0."PreparationTime", m0."Price", m0."UpdatedAt"
+FROM "MenuItemIngredients" AS m
+INNER JOIN "MenuItems" AS m0 ON m."MenuItemId" = m0."Id"
+WHERE m."ItemId" = @itemId
+2026-06-14 14:32:37.944 +05:30 [INF] UpdateStockByMenuItemIdAsync completed for MenuItemId: 3
+2026-06-14 14:32:37.949 +05:30 [INF] Executed DbCommand (2ms) [Parameters=[@p0='?' (DbType = DateTime), @p1='?' (DbType = Int32), @p2='?', @p3='?' (DbType = Int32), @p4='?' (DbType = Int32), @p5='?' (DbType = Decimal), @p6='?' (DbType = DateTime), @p7='?' (DbType = DateTime), @p8='?' (DbType = Int32), @p9='?', @p10='?' (DbType = Int32), @p11='?' (DbType = Int32), @p12='?' (DbType = Decimal), @p13='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+INSERT INTO "OrderItems" ("CreatedAt", "MenuItemId", "Notes", "OrderId", "Quantity", "UnitPrice", "UpdatedAt")
+VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6)
+RETURNING "Id";
+INSERT INTO "OrderItems" ("CreatedAt", "MenuItemId", "Notes", "OrderId", "Quantity", "UnitPrice", "UpdatedAt")
+VALUES (@p7, @p8, @p9, @p10, @p11, @p12, @p13)
+RETURNING "Id";
+2026-06-14 14:32:37.951 +05:30 [INF] CreateOrderAsync succeeded. Created Order ID: 3 with Total Amount: 440
+2026-06-14 14:32:37.960 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[@p='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT u."Id", u."Address", u."CreatedAt", u."Email", u."IsDeleted", u."Name", u."PasswordHash", u."PhoneNumber", u."RoleId", u."UpdatedAt"
+FROM "Users" AS u
+WHERE u."Id" = @p
+LIMIT 1
+2026-06-14 14:32:37.973 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[@menuItemIds='?' (DbType = Object)], CommandType='"Text"', CommandTimeout='30']
+SELECT max(m."PreparationTime")
+FROM "MenuItems" AS m
+WHERE m."Id" = ANY (@menuItemIds) AND NOT (m."IsDeleted")
+2026-06-14 14:32:37.986 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[@excludeOrderId='?' (DbType = Int32), @createdAt='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT count(*)::int
+FROM "Orders" AS o
+WHERE o."Status" IN (1, 2) AND o."Id" <> @excludeOrderId AND o."CreatedAt" < @createdAt
+2026-06-14 14:32:37.988 +05:30 [INF] CreateOrder completed. Created Order ID: 3 for TableId: 2
+2026-06-14 14:32:37.988 +05:30 [INF] Executing OkObjectResult, writing value of type 'OrderNKitchenMS_API.Models.DTOs.OrderDto'.
+2026-06-14 14:32:37.991 +05:30 [INF] Executed action OrderNKitchenMS_API.Controllers.OrderController.CreateOrder (OrderNKitchenMS-API) in 207.87ms
+2026-06-14 14:32:37.991 +05:30 [INF] Executed endpoint 'OrderNKitchenMS_API.Controllers.OrderController.CreateOrder (OrderNKitchenMS-API)'
+2026-06-14 14:32:37.991 +05:30 [INF] Request finished HTTP/1.1 POST http://localhost:5182/api/orders - 200 null application/json; charset=utf-8 208.7745ms
+2026-06-14 14:33:52.492 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5182/api/inventory/items - null null
+2026-06-14 14:33:52.494 +05:30 [INF] Authorization failed. These requirements were not met:
+RolesAuthorizationRequirement:User.IsInRole must be true for one of the following roles: (Admin|Chef)
+2026-06-14 14:33:52.496 +05:30 [INF] AuthenticationScheme: Bearer was forbidden.
+2026-06-14 14:33:52.496 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:5182/api/inventory/items - 403 0 null 4.4611ms
+2026-06-14 14:34:00.539 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5182/api/inventory/items - null null
+2026-06-14 14:34:00.540 +05:30 [INF] Executing endpoint 'OrderNKitchenMS_API.Controllers.ItemController.GetItems (OrderNKitchenMS-API)'
+2026-06-14 14:34:00.545 +05:30 [INF] Route matched with {action = "GetItems", controller = "Item"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[System.Collections.Generic.IEnumerable`1[OrderNKitchenMS_API.Models.DTOs.ItemDto]]] GetItems() on controller OrderNKitchenMS_API.Controllers.ItemController (OrderNKitchenMS-API).
+2026-06-14 14:34:00.548 +05:30 [INF] GetAllItemsAsync called.
+2026-06-14 14:34:00.552 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT i."Id", i."CostPerUnit", i."CreatedAt", i."IsActive", i."Name", i."StockQuantity", i."StockThreshold", i."Unit", i."UpdatedAt"
+FROM "Items" AS i
+2026-06-14 14:34:00.552 +05:30 [INF] Executing OkObjectResult, writing value of type 'System.Linq.Enumerable+ListSelectIterator`2[[OrderNKitchenMS_API.Models.Entities.Item, OrderNKitchenMS-API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null],[OrderNKitchenMS_API.Models.DTOs.ItemDto, OrderNKitchenMS-API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-14 14:34:00.553 +05:30 [INF] Executed action OrderNKitchenMS_API.Controllers.ItemController.GetItems (OrderNKitchenMS-API) in 7.7015ms
+2026-06-14 14:34:00.553 +05:30 [INF] Executed endpoint 'OrderNKitchenMS_API.Controllers.ItemController.GetItems (OrderNKitchenMS-API)'
+2026-06-14 14:34:00.553 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:5182/api/inventory/items - 200 null application/json; charset=utf-8 14.2436ms
+2026-06-14 14:35:33.442 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5182/api/orders/active - null null
+2026-06-14 14:35:33.443 +05:30 [INF] Executing endpoint 'OrderNKitchenMS_API.Controllers.OrderController.GetActiveOrders (OrderNKitchenMS-API)'
+2026-06-14 14:35:33.448 +05:30 [INF] Route matched with {action = "GetActiveOrders", controller = "Order"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[System.Collections.Generic.IEnumerable`1[OrderNKitchenMS_API.Models.DTOs.OrderDto]]] GetActiveOrders() on controller OrderNKitchenMS_API.Controllers.OrderController (OrderNKitchenMS-API).
+2026-06-14 14:35:33.450 +05:30 [INF] GetActiveOrders requested
+2026-06-14 14:35:33.451 +05:30 [INF] GetActiveOrdersAsync called
+2026-06-14 14:35:33.467 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT o."Id", o."AssignedChefId", o."AssignedWaiterId", o."CompletedAt", o."CreatedAt", o."Status", o."TableId", o."TotalAmount", o."UpdatedAt", t."Id", t."Capacity", t."CreatedAt", t."IsDeleted", t."Number", t."Status", t."UpdatedAt", u."Id", u."Address", u."CreatedAt", u."Email", u."IsDeleted", u."Name", u."PasswordHash", u."PhoneNumber", u."RoleId", u."UpdatedAt", u0."Id", u0."Address", u0."CreatedAt", u0."Email", u0."IsDeleted", u0."Name", u0."PasswordHash", u0."PhoneNumber", u0."RoleId", u0."UpdatedAt"
+FROM "Orders" AS o
+INNER JOIN "Tables" AS t ON o."TableId" = t."Id"
+LEFT JOIN "Users" AS u ON o."AssignedChefId" = u."Id"
+LEFT JOIN "Users" AS u0 ON o."AssignedWaiterId" = u0."Id"
+2026-06-14 14:35:33.477 +05:30 [INF] Executed DbCommand (2ms) [Parameters=[@orderId='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT o."Id", o."CreatedAt", o."MenuItemId", o."Notes", o."OrderId", o."Quantity", o."UnitPrice", o."UpdatedAt", m."Id", m."CategoryId", m."CreatedAt", m."Description", m."ImageUrl", m."IsAvailable", m."IsDeleted", m."IsManuallyDisabled", m."Name", m."PreparationTime", m."Price", m."UpdatedAt"
+FROM "OrderItems" AS o
+INNER JOIN "MenuItems" AS m ON o."MenuItemId" = m."Id"
+WHERE o."OrderId" = @orderId
+2026-06-14 14:35:33.479 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[@menuItemIds='?' (DbType = Object)], CommandType='"Text"', CommandTimeout='30']
+SELECT max(m."PreparationTime")
+FROM "MenuItems" AS m
+WHERE m."Id" = ANY (@menuItemIds) AND NOT (m."IsDeleted")
+2026-06-14 14:35:33.481 +05:30 [INF] Executed DbCommand (2ms) [Parameters=[@excludeOrderId='?' (DbType = Int32), @createdAt='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT count(*)::int
+FROM "Orders" AS o
+WHERE o."Status" IN (1, 2) AND o."Id" <> @excludeOrderId AND o."CreatedAt" < @createdAt
+2026-06-14 14:35:33.483 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[@orderId='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT o."Id", o."CreatedAt", o."MenuItemId", o."Notes", o."OrderId", o."Quantity", o."UnitPrice", o."UpdatedAt", m."Id", m."CategoryId", m."CreatedAt", m."Description", m."ImageUrl", m."IsAvailable", m."IsDeleted", m."IsManuallyDisabled", m."Name", m."PreparationTime", m."Price", m."UpdatedAt"
+FROM "OrderItems" AS o
+INNER JOIN "MenuItems" AS m ON o."MenuItemId" = m."Id"
+WHERE o."OrderId" = @orderId
+2026-06-14 14:35:33.483 +05:30 [INF] Executed DbCommand (0ms) [Parameters=[@menuItemIds='?' (DbType = Object)], CommandType='"Text"', CommandTimeout='30']
+SELECT max(m."PreparationTime")
+FROM "MenuItems" AS m
+WHERE m."Id" = ANY (@menuItemIds) AND NOT (m."IsDeleted")
+2026-06-14 14:35:33.484 +05:30 [INF] Executed DbCommand (0ms) [Parameters=[@excludeOrderId='?' (DbType = Int32), @createdAt='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT count(*)::int
+FROM "Orders" AS o
+WHERE o."Status" IN (1, 2) AND o."Id" <> @excludeOrderId AND o."CreatedAt" < @createdAt
+2026-06-14 14:35:33.484 +05:30 [INF] GetActiveOrders completed. Returned 2 active orders.
+2026-06-14 14:35:33.484 +05:30 [INF] Executing OkObjectResult, writing value of type 'System.Collections.Generic.List`1[[OrderNKitchenMS_API.Models.DTOs.OrderDto, OrderNKitchenMS-API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-14 14:35:33.484 +05:30 [INF] Executed action OrderNKitchenMS_API.Controllers.OrderController.GetActiveOrders (OrderNKitchenMS-API) in 36.6826ms
+2026-06-14 14:35:33.484 +05:30 [INF] Executed endpoint 'OrderNKitchenMS_API.Controllers.OrderController.GetActiveOrders (OrderNKitchenMS-API)'
+2026-06-14 14:35:33.485 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:5182/api/orders/active - 200 null application/json; charset=utf-8 42.9804ms
+2026-06-14 14:39:26.516 +05:30 [INF] Request starting HTTP/1.1 PATCH http://localhost:5182/api/orders/3/assign-chef - null 0
+2026-06-14 14:39:26.520 +05:30 [INF] Executing endpoint 'OrderNKitchenMS_API.Controllers.OrderController.AssignChef (OrderNKitchenMS-API)'
+2026-06-14 14:39:26.524 +05:30 [INF] Route matched with {action = "AssignChef", controller = "Order"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult] AssignChef(Int32) on controller OrderNKitchenMS_API.Controllers.OrderController (OrderNKitchenMS-API).
+2026-06-14 14:39:26.526 +05:30 [INF] AssignChef requested for OrderId: 3 by ChefId: 2
+2026-06-14 14:39:26.527 +05:30 [INF] AssignChefToOrderAsync started. OrderId: 3, ChefId: 2
+2026-06-14 14:39:26.541 +05:30 [INF] Executed DbCommand (2ms) [Parameters=[@chefId='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT u."Id", u."Address", u."CreatedAt", u."Email", u."IsDeleted", u."Name", u."PasswordHash", u."PhoneNumber", u."RoleId", u."UpdatedAt"
+FROM "Users" AS u
+WHERE u."Id" = @chefId AND NOT (u."IsDeleted")
+LIMIT 1
+2026-06-14 14:39:26.555 +05:30 [INF] Executed DbCommand (3ms) [Parameters=[@id='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT o."Id", o."AssignedChefId", o."AssignedWaiterId", o."CompletedAt", o."CreatedAt", o."Status", o."TableId", o."TotalAmount", o."UpdatedAt", t."Id", t."Capacity", t."CreatedAt", t."IsDeleted", t."Number", t."Status", t."UpdatedAt", u."Id", u."Address", u."CreatedAt", u."Email", u."IsDeleted", u."Name", u."PasswordHash", u."PhoneNumber", u."RoleId", u."UpdatedAt", u0."Id", u0."Address", u0."CreatedAt", u0."Email", u0."IsDeleted", u0."Name", u0."PasswordHash", u0."PhoneNumber", u0."RoleId", u0."UpdatedAt"
+FROM "Orders" AS o
+INNER JOIN "Tables" AS t ON o."TableId" = t."Id"
+LEFT JOIN "Users" AS u ON o."AssignedChefId" = u."Id"
+LEFT JOIN "Users" AS u0 ON o."AssignedWaiterId" = u0."Id"
+WHERE o."Id" = @id
+LIMIT 1
+2026-06-14 14:39:26.569 +05:30 [INF] Executed DbCommand (8ms) [Parameters=[@p2='?' (DbType = Int32), @p0='?' (DbType = Int32), @p1='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+UPDATE "Orders" SET "AssignedChefId" = @p0, "Status" = @p1
+WHERE "Id" = @p2;
+2026-06-14 14:39:26.569 +05:30 [INF] AssignChefToOrderAsync succeeded. OrderId: 3 assigned to ChefId: 2
+2026-06-14 14:39:26.569 +05:30 [INF] AssignChef completed for OrderId: 3
+2026-06-14 14:39:26.571 +05:30 [INF] Executing StatusCodeResult, setting HTTP status code 204
+2026-06-14 14:39:26.571 +05:30 [INF] Executed action OrderNKitchenMS_API.Controllers.OrderController.AssignChef (OrderNKitchenMS-API) in 46.7419ms
+2026-06-14 14:39:26.571 +05:30 [INF] Executed endpoint 'OrderNKitchenMS_API.Controllers.OrderController.AssignChef (OrderNKitchenMS-API)'
+2026-06-14 14:39:26.571 +05:30 [INF] Request finished HTTP/1.1 PATCH http://localhost:5182/api/orders/3/assign-chef - 204 null null 55.0594ms
+2026-06-14 14:39:31.898 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5182/api/orders/active - null null
+2026-06-14 14:39:31.898 +05:30 [INF] Executing endpoint 'OrderNKitchenMS_API.Controllers.OrderController.GetActiveOrders (OrderNKitchenMS-API)'
+2026-06-14 14:39:31.899 +05:30 [INF] Route matched with {action = "GetActiveOrders", controller = "Order"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[System.Collections.Generic.IEnumerable`1[OrderNKitchenMS_API.Models.DTOs.OrderDto]]] GetActiveOrders() on controller OrderNKitchenMS_API.Controllers.OrderController (OrderNKitchenMS-API).
+2026-06-14 14:39:31.900 +05:30 [INF] GetActiveOrders requested
+2026-06-14 14:39:31.900 +05:30 [INF] GetActiveOrdersAsync called
+2026-06-14 14:39:31.902 +05:30 [INF] Executed DbCommand (2ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT o."Id", o."AssignedChefId", o."AssignedWaiterId", o."CompletedAt", o."CreatedAt", o."Status", o."TableId", o."TotalAmount", o."UpdatedAt", t."Id", t."Capacity", t."CreatedAt", t."IsDeleted", t."Number", t."Status", t."UpdatedAt", u."Id", u."Address", u."CreatedAt", u."Email", u."IsDeleted", u."Name", u."PasswordHash", u."PhoneNumber", u."RoleId", u."UpdatedAt", u0."Id", u0."Address", u0."CreatedAt", u0."Email", u0."IsDeleted", u0."Name", u0."PasswordHash", u0."PhoneNumber", u0."RoleId", u0."UpdatedAt"
+FROM "Orders" AS o
+INNER JOIN "Tables" AS t ON o."TableId" = t."Id"
+LEFT JOIN "Users" AS u ON o."AssignedChefId" = u."Id"
+LEFT JOIN "Users" AS u0 ON o."AssignedWaiterId" = u0."Id"
+2026-06-14 14:39:31.905 +05:30 [INF] Executed DbCommand (2ms) [Parameters=[@orderId='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT o."Id", o."CreatedAt", o."MenuItemId", o."Notes", o."OrderId", o."Quantity", o."UnitPrice", o."UpdatedAt", m."Id", m."CategoryId", m."CreatedAt", m."Description", m."ImageUrl", m."IsAvailable", m."IsDeleted", m."IsManuallyDisabled", m."Name", m."PreparationTime", m."Price", m."UpdatedAt"
+FROM "OrderItems" AS o
+INNER JOIN "MenuItems" AS m ON o."MenuItemId" = m."Id"
+WHERE o."OrderId" = @orderId
+2026-06-14 14:39:31.906 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[@menuItemIds='?' (DbType = Object)], CommandType='"Text"', CommandTimeout='30']
+SELECT max(m."PreparationTime")
+FROM "MenuItems" AS m
+WHERE m."Id" = ANY (@menuItemIds) AND NOT (m."IsDeleted")
+2026-06-14 14:39:31.907 +05:30 [INF] Executed DbCommand (0ms) [Parameters=[@excludeOrderId='?' (DbType = Int32), @createdAt='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT count(*)::int
+FROM "Orders" AS o
+WHERE o."Status" IN (1, 2) AND o."Id" <> @excludeOrderId AND o."CreatedAt" < @createdAt
+2026-06-14 14:39:31.907 +05:30 [INF] Executed DbCommand (0ms) [Parameters=[@orderId='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT o."Id", o."CreatedAt", o."MenuItemId", o."Notes", o."OrderId", o."Quantity", o."UnitPrice", o."UpdatedAt", m."Id", m."CategoryId", m."CreatedAt", m."Description", m."ImageUrl", m."IsAvailable", m."IsDeleted", m."IsManuallyDisabled", m."Name", m."PreparationTime", m."Price", m."UpdatedAt"
+FROM "OrderItems" AS o
+INNER JOIN "MenuItems" AS m ON o."MenuItemId" = m."Id"
+WHERE o."OrderId" = @orderId
+2026-06-14 14:39:31.908 +05:30 [INF] Executed DbCommand (0ms) [Parameters=[@menuItemIds='?' (DbType = Object)], CommandType='"Text"', CommandTimeout='30']
+SELECT max(m."PreparationTime")
+FROM "MenuItems" AS m
+WHERE m."Id" = ANY (@menuItemIds) AND NOT (m."IsDeleted")
+2026-06-14 14:39:31.908 +05:30 [INF] Executed DbCommand (0ms) [Parameters=[@excludeOrderId='?' (DbType = Int32), @createdAt='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT count(*)::int
+FROM "Orders" AS o
+WHERE o."Status" IN (1, 2) AND o."Id" <> @excludeOrderId AND o."CreatedAt" < @createdAt
+2026-06-14 14:39:31.908 +05:30 [INF] GetActiveOrders completed. Returned 2 active orders.
+2026-06-14 14:39:31.908 +05:30 [INF] Executing OkObjectResult, writing value of type 'System.Collections.Generic.List`1[[OrderNKitchenMS_API.Models.DTOs.OrderDto, OrderNKitchenMS-API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-14 14:39:31.908 +05:30 [INF] Executed action OrderNKitchenMS_API.Controllers.OrderController.GetActiveOrders (OrderNKitchenMS-API) in 9.6959ms
+2026-06-14 14:39:31.908 +05:30 [INF] Executed endpoint 'OrderNKitchenMS_API.Controllers.OrderController.GetActiveOrders (OrderNKitchenMS-API)'
+2026-06-14 14:39:31.908 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:5182/api/orders/active - 200 null application/json; charset=utf-8 10.7959ms
+2026-06-14 14:41:32.363 +05:30 [INF] Request starting HTTP/1.1 POST http://localhost:5182/api/auth/guest-login?tableId=2 - null 0
+2026-06-14 14:41:32.364 +05:30 [INF] Executing endpoint 'OrderNKitchenMS_API.Controllers.AuthController.GuestLogin (OrderNKitchenMS-API)'
+2026-06-14 14:41:32.370 +05:30 [INF] Route matched with {action = "GuestLogin", controller = "Auth"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[OrderNKitchenMS_API.Models.DTOs.GuestLoginResponseDto]] GuestLogin(Int32) on controller OrderNKitchenMS_API.Controllers.AuthController (OrderNKitchenMS-API).
+2026-06-14 14:41:32.374 +05:30 [INF] GuestLogin requested for TableId: 2
+2026-06-14 14:41:32.374 +05:30 [INF] Logging in as Guest for TableId: 2
+2026-06-14 14:41:32.375 +05:30 [INF] Guest login successful for TableId: 2. Generated guest token.
+2026-06-14 14:41:32.375 +05:30 [INF] GuestLogin succeeded for TableId: 2
+2026-06-14 14:41:32.375 +05:30 [INF] Executing OkObjectResult, writing value of type 'OrderNKitchenMS_API.Models.DTOs.GuestLoginResponseDto'.
+2026-06-14 14:41:32.376 +05:30 [INF] Executed action OrderNKitchenMS_API.Controllers.AuthController.GuestLogin (OrderNKitchenMS-API) in 6.3135ms
+2026-06-14 14:41:32.376 +05:30 [INF] Executed endpoint 'OrderNKitchenMS_API.Controllers.AuthController.GuestLogin (OrderNKitchenMS-API)'
+2026-06-14 14:41:32.376 +05:30 [INF] Request finished HTTP/1.1 POST http://localhost:5182/api/auth/guest-login?tableId=2 - 200 null application/json; charset=utf-8 13.0377ms
+2026-06-14 14:42:48.826 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5182/api/orders/track - null null
+2026-06-14 14:42:48.840 +05:30 [INF] Failed to validate the token.
+Microsoft.IdentityModel.Tokens.SecurityTokenSignatureKeyNotFoundException: IDX10517: Signature validation failed. The token's kid is missing. Keys tried: 'Microsoft.IdentityModel.Tokens.SymmetricSecurityKey, KeyId: '', InternalId: '5esTEoMkeoABDD04oPDqQ-jPxE_cmnUHHINr5VpHSo4'. , KeyId: \n'.
+Number of keys in TokenValidationParameters: '1'. 
+Number of keys in Configuration: '0'.
+Exceptions caught:
+ '[PII of type 'System.Text.StringBuilder' is hidden. For more details, see https://aka.ms/IdentityModel/PII.]'.
+token: '[PII of type 'Microsoft.IdentityModel.JsonWebTokens.JsonWebToken' is hidden. For more details, see https://aka.ms/IdentityModel/PII.]'. See https://aka.ms/IDX10503 for details.
+   at Microsoft.IdentityModel.JsonWebTokens.JsonWebTokenHandler.ValidateSignature(JsonWebToken jwtToken, TokenValidationParameters validationParameters, BaseConfiguration configuration)
+   at Microsoft.IdentityModel.JsonWebTokens.JsonWebTokenHandler.ValidateSignatureAndIssuerSecurityKey(JsonWebToken jsonWebToken, TokenValidationParameters validationParameters, BaseConfiguration configuration)
+   at Microsoft.IdentityModel.JsonWebTokens.JsonWebTokenHandler.ValidateJWSAsync(JsonWebToken jsonWebToken, TokenValidationParameters validationParameters, BaseConfiguration configuration)
+2026-06-14 14:42:48.841 +05:30 [INF] Bearer was not authenticated. Failure message: IDX10517: Signature validation failed. The token's kid is missing. Keys tried: 'Microsoft.IdentityModel.Tokens.SymmetricSecurityKey, KeyId: '', InternalId: '5esTEoMkeoABDD04oPDqQ-jPxE_cmnUHHINr5VpHSo4'. , KeyId: \n'.
+Number of keys in TokenValidationParameters: '1'. 
+Number of keys in Configuration: '0'.
+Exceptions caught:
+ '[PII of type 'System.Text.StringBuilder' is hidden. For more details, see https://aka.ms/IdentityModel/PII.]'.
+token: '[PII of type 'Microsoft.IdentityModel.JsonWebTokens.JsonWebToken' is hidden. For more details, see https://aka.ms/IdentityModel/PII.]'. See https://aka.ms/IDX10503 for details.
+2026-06-14 14:42:48.841 +05:30 [INF] Authorization failed. These requirements were not met:
+ClaimsAuthorizationRequirement:Claim.Type=SessionType and Claim.Value is one of the following values: (Guest)
+2026-06-14 14:42:48.842 +05:30 [INF] AuthenticationScheme: Bearer was challenged.
+2026-06-14 14:42:48.842 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:5182/api/orders/track - 401 0 null 15.886ms
+2026-06-14 14:42:54.256 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5182/api/orders/track - null null
+2026-06-14 14:42:54.257 +05:30 [INF] Executing endpoint 'OrderNKitchenMS_API.Controllers.OrderController.TrackMyOrder (OrderNKitchenMS-API)'
+2026-06-14 14:42:54.263 +05:30 [INF] Route matched with {action = "TrackMyOrder", controller = "Order"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[OrderNKitchenMS_API.Models.DTOs.GuestOrderTrackingDto]] TrackMyOrder() on controller OrderNKitchenMS_API.Controllers.OrderController (OrderNKitchenMS-API).
+2026-06-14 14:42:54.265 +05:30 [INF] TrackMyOrder requested for TableId from Claims: 2
+2026-06-14 14:42:54.266 +05:30 [INF] GetGuestOrderTrackingAsync called for TableId: 2
+2026-06-14 14:42:54.267 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT o."Id", o."AssignedChefId", o."AssignedWaiterId", o."CompletedAt", o."CreatedAt", o."Status", o."TableId", o."TotalAmount", o."UpdatedAt", t."Id", t."Capacity", t."CreatedAt", t."IsDeleted", t."Number", t."Status", t."UpdatedAt", u."Id", u."Address", u."CreatedAt", u."Email", u."IsDeleted", u."Name", u."PasswordHash", u."PhoneNumber", u."RoleId", u."UpdatedAt", u0."Id", u0."Address", u0."CreatedAt", u0."Email", u0."IsDeleted", u0."Name", u0."PasswordHash", u0."PhoneNumber", u0."RoleId", u0."UpdatedAt"
+FROM "Orders" AS o
+INNER JOIN "Tables" AS t ON o."TableId" = t."Id"
+LEFT JOIN "Users" AS u ON o."AssignedChefId" = u."Id"
+LEFT JOIN "Users" AS u0 ON o."AssignedWaiterId" = u0."Id"
+2026-06-14 14:42:54.269 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[@orderId='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT o."Id", o."CreatedAt", o."MenuItemId", o."Notes", o."OrderId", o."Quantity", o."UnitPrice", o."UpdatedAt", m."Id", m."CategoryId", m."CreatedAt", m."Description", m."ImageUrl", m."IsAvailable", m."IsDeleted", m."IsManuallyDisabled", m."Name", m."PreparationTime", m."Price", m."UpdatedAt"
+FROM "OrderItems" AS o
+INNER JOIN "MenuItems" AS m ON o."MenuItemId" = m."Id"
+WHERE o."OrderId" = @orderId
+2026-06-14 14:42:54.270 +05:30 [INF] Executed DbCommand (0ms) [Parameters=[@menuItemIds='?' (DbType = Object)], CommandType='"Text"', CommandTimeout='30']
+SELECT max(m."PreparationTime")
+FROM "MenuItems" AS m
+WHERE m."Id" = ANY (@menuItemIds) AND NOT (m."IsDeleted")
+2026-06-14 14:42:54.271 +05:30 [INF] Executed DbCommand (0ms) [Parameters=[@excludeOrderId='?' (DbType = Int32), @createdAt='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT count(*)::int
+FROM "Orders" AS o
+WHERE o."Status" IN (1, 2) AND o."Id" <> @excludeOrderId AND o."CreatedAt" < @createdAt
+2026-06-14 14:42:54.271 +05:30 [INF] TrackMyOrder completed for TableId: 2. Order ID: 3
+2026-06-14 14:42:54.272 +05:30 [INF] Executing OkObjectResult, writing value of type 'OrderNKitchenMS_API.Models.DTOs.GuestOrderTrackingDto'.
+2026-06-14 14:42:54.273 +05:30 [INF] Executed action OrderNKitchenMS_API.Controllers.OrderController.TrackMyOrder (OrderNKitchenMS-API) in 9.3895ms
+2026-06-14 14:42:54.273 +05:30 [INF] Executed endpoint 'OrderNKitchenMS_API.Controllers.OrderController.TrackMyOrder (OrderNKitchenMS-API)'
+2026-06-14 14:42:54.273 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:5182/api/orders/track - 200 null application/json; charset=utf-8 16.863ms
+2026-06-14 14:44:29.428 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5182/api/orders/me - null null
+2026-06-14 14:44:29.431 +05:30 [INF] Authorization failed. These requirements were not met:
+Handler assertion should evaluate to true.
+2026-06-14 14:44:29.431 +05:30 [INF] AuthenticationScheme: Bearer was forbidden.
+2026-06-14 14:44:29.431 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:5182/api/orders/me - 403 0 null 3.4283ms
+2026-06-14 14:44:35.630 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5182/api/orders/track - null null
+2026-06-14 14:44:35.631 +05:30 [INF] Executing endpoint 'OrderNKitchenMS_API.Controllers.OrderController.TrackMyOrder (OrderNKitchenMS-API)'
+2026-06-14 14:44:35.632 +05:30 [INF] Route matched with {action = "TrackMyOrder", controller = "Order"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[OrderNKitchenMS_API.Models.DTOs.GuestOrderTrackingDto]] TrackMyOrder() on controller OrderNKitchenMS_API.Controllers.OrderController (OrderNKitchenMS-API).
+2026-06-14 14:44:35.632 +05:30 [INF] TrackMyOrder requested for TableId from Claims: 2
+2026-06-14 14:44:35.632 +05:30 [INF] GetGuestOrderTrackingAsync called for TableId: 2
+2026-06-14 14:44:35.645 +05:30 [INF] Executed DbCommand (5ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT o."Id", o."AssignedChefId", o."AssignedWaiterId", o."CompletedAt", o."CreatedAt", o."Status", o."TableId", o."TotalAmount", o."UpdatedAt", t."Id", t."Capacity", t."CreatedAt", t."IsDeleted", t."Number", t."Status", t."UpdatedAt", u."Id", u."Address", u."CreatedAt", u."Email", u."IsDeleted", u."Name", u."PasswordHash", u."PhoneNumber", u."RoleId", u."UpdatedAt", u0."Id", u0."Address", u0."CreatedAt", u0."Email", u0."IsDeleted", u0."Name", u0."PasswordHash", u0."PhoneNumber", u0."RoleId", u0."UpdatedAt"
+FROM "Orders" AS o
+INNER JOIN "Tables" AS t ON o."TableId" = t."Id"
+LEFT JOIN "Users" AS u ON o."AssignedChefId" = u."Id"
+LEFT JOIN "Users" AS u0 ON o."AssignedWaiterId" = u0."Id"
+2026-06-14 14:44:35.650 +05:30 [INF] Executed DbCommand (5ms) [Parameters=[@orderId='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT o."Id", o."CreatedAt", o."MenuItemId", o."Notes", o."OrderId", o."Quantity", o."UnitPrice", o."UpdatedAt", m."Id", m."CategoryId", m."CreatedAt", m."Description", m."ImageUrl", m."IsAvailable", m."IsDeleted", m."IsManuallyDisabled", m."Name", m."PreparationTime", m."Price", m."UpdatedAt"
+FROM "OrderItems" AS o
+INNER JOIN "MenuItems" AS m ON o."MenuItemId" = m."Id"
+WHERE o."OrderId" = @orderId
+2026-06-14 14:44:35.652 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[@menuItemIds='?' (DbType = Object)], CommandType='"Text"', CommandTimeout='30']
+SELECT max(m."PreparationTime")
+FROM "MenuItems" AS m
+WHERE m."Id" = ANY (@menuItemIds) AND NOT (m."IsDeleted")
+2026-06-14 14:44:35.652 +05:30 [INF] Executed DbCommand (0ms) [Parameters=[@excludeOrderId='?' (DbType = Int32), @createdAt='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT count(*)::int
+FROM "Orders" AS o
+WHERE o."Status" IN (1, 2) AND o."Id" <> @excludeOrderId AND o."CreatedAt" < @createdAt
+2026-06-14 14:44:35.652 +05:30 [INF] TrackMyOrder completed for TableId: 2. Order ID: 3
+2026-06-14 14:44:35.652 +05:30 [INF] Executing OkObjectResult, writing value of type 'OrderNKitchenMS_API.Models.DTOs.GuestOrderTrackingDto'.
+2026-06-14 14:44:35.652 +05:30 [INF] Executed action OrderNKitchenMS_API.Controllers.OrderController.TrackMyOrder (OrderNKitchenMS-API) in 20.8729ms
+2026-06-14 14:44:35.652 +05:30 [INF] Executed endpoint 'OrderNKitchenMS_API.Controllers.OrderController.TrackMyOrder (OrderNKitchenMS-API)'
+2026-06-14 14:44:35.653 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:5182/api/orders/track - 200 null application/json; charset=utf-8 22.1037ms
+2026-06-14 14:50:12.430 +05:30 [INF] Request starting HTTP/1.1 PATCH http://localhost:5182/api/orders/3/status - application/json 1
+2026-06-14 14:50:12.433 +05:30 [INF] Failed to validate the token.
+Microsoft.IdentityModel.Tokens.SecurityTokenExpiredException: IDX10223: Lifetime validation failed. The token is expired. ValidTo (UTC): '6/14/2026 9:09:42 AM', Current time (UTC): '6/14/2026 9:20:12 AM'.
+   at Microsoft.IdentityModel.Tokens.ValidatorUtilities.ValidateLifetime(Nullable`1 notBefore, Nullable`1 expires, SecurityToken securityToken, TokenValidationParameters validationParameters)
+   at Microsoft.IdentityModel.Tokens.Validators.ValidateLifetime(Nullable`1 notBefore, Nullable`1 expires, SecurityToken securityToken, TokenValidationParameters validationParameters)
+   at Microsoft.IdentityModel.JsonWebTokens.JsonWebTokenHandler.ValidateTokenPayloadAsync(JsonWebToken jsonWebToken, TokenValidationParameters validationParameters, BaseConfiguration configuration)
+   at Microsoft.IdentityModel.JsonWebTokens.JsonWebTokenHandler.ValidateJWSAsync(JsonWebToken jsonWebToken, TokenValidationParameters validationParameters, BaseConfiguration configuration)
+2026-06-14 14:50:12.435 +05:30 [INF] Bearer was not authenticated. Failure message: IDX10223: Lifetime validation failed. The token is expired. ValidTo (UTC): '6/14/2026 9:09:42 AM', Current time (UTC): '6/14/2026 9:20:12 AM'.
+2026-06-14 14:50:12.435 +05:30 [INF] Authorization failed. These requirements were not met:
+RolesAuthorizationRequirement:User.IsInRole must be true for one of the following roles: (Admin|Chef)
+2026-06-14 14:50:12.435 +05:30 [INF] AuthenticationScheme: Bearer was challenged.
+2026-06-14 14:50:12.435 +05:30 [INF] Request finished HTTP/1.1 PATCH http://localhost:5182/api/orders/3/status - 401 0 null 5.0136ms
+2026-06-14 14:51:24.411 +05:30 [INF] Request starting HTTP/1.1 POST http://localhost:5182/api/auth/login - application/json 66
+2026-06-14 14:51:24.411 +05:30 [INF] Executing endpoint 'OrderNKitchenMS_API.Controllers.AuthController.Login (OrderNKitchenMS-API)'
+2026-06-14 14:51:24.411 +05:30 [INF] Route matched with {action = "Login", controller = "Auth"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[OrderNKitchenMS_API.Models.DTOs.UserLoginResponseDto]] Login(OrderNKitchenMS_API.Models.DTOs.UserLoginDto) on controller OrderNKitchenMS_API.Controllers.AuthController (OrderNKitchenMS-API).
+2026-06-14 14:51:24.412 +05:30 [INF] Login requested for Email: sarvesh2@gmail.com
+2026-06-14 14:51:24.412 +05:30 [INF] Logging in user with Email: sarvesh2@gmail.com
+2026-06-14 14:51:24.424 +05:30 [INF] Executed DbCommand (4ms) [Parameters=[@ToLower='?'], CommandType='"Text"', CommandTimeout='30']
+SELECT u."Id", u."Address", u."CreatedAt", u."Email", u."IsDeleted", u."Name", u."PasswordHash", u."PhoneNumber", u."RoleId", u."UpdatedAt", r."Id", r."CreatedAt", r."Name", r."UpdatedAt"
+FROM "Users" AS u
+INNER JOIN "Roles" AS r ON u."RoleId" = r."Id"
+WHERE lower(u."Email") = @ToLower AND NOT (u."IsDeleted")
+LIMIT 1
+2026-06-14 14:51:24.478 +05:30 [INF] Login successful. Generated JWT and Refresh Token for User ID: 2
+2026-06-14 14:51:24.478 +05:30 [INF] Login succeeded for User: sarvesh2@gmail.com (ID: 2)
+2026-06-14 14:51:24.478 +05:30 [INF] Executing OkObjectResult, writing value of type 'OrderNKitchenMS_API.Models.DTOs.UserLoginResponseDto'.
+2026-06-14 14:51:24.478 +05:30 [INF] Executed action OrderNKitchenMS_API.Controllers.AuthController.Login (OrderNKitchenMS-API) in 66.6889ms
+2026-06-14 14:51:24.478 +05:30 [INF] Executed endpoint 'OrderNKitchenMS_API.Controllers.AuthController.Login (OrderNKitchenMS-API)'
+2026-06-14 14:51:24.478 +05:30 [INF] Request finished HTTP/1.1 POST http://localhost:5182/api/auth/login - 200 null application/json; charset=utf-8 67.3174ms
+2026-06-14 14:51:47.151 +05:30 [INF] Request starting HTTP/1.1 POST http://localhost:5182/api/auth/login - application/json 66
+2026-06-14 14:51:47.152 +05:30 [INF] Executing endpoint 'OrderNKitchenMS_API.Controllers.AuthController.Login (OrderNKitchenMS-API)'
+2026-06-14 14:51:47.152 +05:30 [INF] Route matched with {action = "Login", controller = "Auth"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[OrderNKitchenMS_API.Models.DTOs.UserLoginResponseDto]] Login(OrderNKitchenMS_API.Models.DTOs.UserLoginDto) on controller OrderNKitchenMS_API.Controllers.AuthController (OrderNKitchenMS-API).
+2026-06-14 14:51:47.153 +05:30 [INF] Login requested for Email: sarvesh3@gmail.com
+2026-06-14 14:51:47.153 +05:30 [INF] Logging in user with Email: sarvesh3@gmail.com
+2026-06-14 14:51:47.155 +05:30 [INF] Executed DbCommand (2ms) [Parameters=[@ToLower='?'], CommandType='"Text"', CommandTimeout='30']
+SELECT u."Id", u."Address", u."CreatedAt", u."Email", u."IsDeleted", u."Name", u."PasswordHash", u."PhoneNumber", u."RoleId", u."UpdatedAt", r."Id", r."CreatedAt", r."Name", r."UpdatedAt"
+FROM "Users" AS u
+INNER JOIN "Roles" AS r ON u."RoleId" = r."Id"
+WHERE lower(u."Email") = @ToLower AND NOT (u."IsDeleted")
+LIMIT 1
+2026-06-14 14:51:47.209 +05:30 [INF] Login successful. Generated JWT and Refresh Token for User ID: 3
+2026-06-14 14:51:47.209 +05:30 [INF] Login succeeded for User: sarvesh3@gmail.com (ID: 3)
+2026-06-14 14:51:47.209 +05:30 [INF] Executing OkObjectResult, writing value of type 'OrderNKitchenMS_API.Models.DTOs.UserLoginResponseDto'.
+2026-06-14 14:51:47.209 +05:30 [INF] Executed action OrderNKitchenMS_API.Controllers.AuthController.Login (OrderNKitchenMS-API) in 56.8576ms
+2026-06-14 14:51:47.209 +05:30 [INF] Executed endpoint 'OrderNKitchenMS_API.Controllers.AuthController.Login (OrderNKitchenMS-API)'
+2026-06-14 14:51:47.209 +05:30 [INF] Request finished HTTP/1.1 POST http://localhost:5182/api/auth/login - 200 null application/json; charset=utf-8 57.8421ms
+2026-06-14 14:52:01.635 +05:30 [INF] Request starting HTTP/1.1 POST http://localhost:5182/api/auth/login - application/json 65
+2026-06-14 14:52:01.636 +05:30 [INF] Executing endpoint 'OrderNKitchenMS_API.Controllers.AuthController.Login (OrderNKitchenMS-API)'
+2026-06-14 14:52:01.636 +05:30 [INF] Route matched with {action = "Login", controller = "Auth"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[OrderNKitchenMS_API.Models.DTOs.UserLoginResponseDto]] Login(OrderNKitchenMS_API.Models.DTOs.UserLoginDto) on controller OrderNKitchenMS_API.Controllers.AuthController (OrderNKitchenMS-API).
+2026-06-14 14:52:01.637 +05:30 [INF] Login requested for Email: sarvesh@gmail.com
+2026-06-14 14:52:01.637 +05:30 [INF] Logging in user with Email: sarvesh@gmail.com
+2026-06-14 14:52:01.640 +05:30 [INF] Executed DbCommand (3ms) [Parameters=[@ToLower='?'], CommandType='"Text"', CommandTimeout='30']
+SELECT u."Id", u."Address", u."CreatedAt", u."Email", u."IsDeleted", u."Name", u."PasswordHash", u."PhoneNumber", u."RoleId", u."UpdatedAt", r."Id", r."CreatedAt", r."Name", r."UpdatedAt"
+FROM "Users" AS u
+INNER JOIN "Roles" AS r ON u."RoleId" = r."Id"
+WHERE lower(u."Email") = @ToLower AND NOT (u."IsDeleted")
+LIMIT 1
+2026-06-14 14:52:01.691 +05:30 [INF] Login successful. Generated JWT and Refresh Token for User ID: 1
+2026-06-14 14:52:01.691 +05:30 [INF] Login succeeded for User: sarvesh@gmail.com (ID: 1)
+2026-06-14 14:52:01.692 +05:30 [INF] Executing OkObjectResult, writing value of type 'OrderNKitchenMS_API.Models.DTOs.UserLoginResponseDto'.
+2026-06-14 14:52:01.692 +05:30 [INF] Executed action OrderNKitchenMS_API.Controllers.AuthController.Login (OrderNKitchenMS-API) in 55.6335ms
+2026-06-14 14:52:01.692 +05:30 [INF] Executed endpoint 'OrderNKitchenMS_API.Controllers.AuthController.Login (OrderNKitchenMS-API)'
+2026-06-14 14:52:01.692 +05:30 [INF] Request finished HTTP/1.1 POST http://localhost:5182/api/auth/login - 200 null application/json; charset=utf-8 56.5185ms
+2026-06-14 14:52:19.387 +05:30 [INF] Request starting HTTP/1.1 PATCH http://localhost:5182/api/orders/3/status - application/json 1
+2026-06-14 14:52:19.388 +05:30 [INF] Executing endpoint 'OrderNKitchenMS_API.Controllers.OrderController.UpdateOrderStatus (OrderNKitchenMS-API)'
+2026-06-14 14:52:19.394 +05:30 [INF] Route matched with {action = "UpdateOrderStatus", controller = "Order"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult] UpdateOrderStatus(Int32, Int32) on controller OrderNKitchenMS_API.Controllers.OrderController (OrderNKitchenMS-API).
+2026-06-14 14:52:19.396 +05:30 [INF] UpdateOrderStatus requested for OrderId: 3, new status: 3
+2026-06-14 14:52:19.396 +05:30 [INF] UpdateOrderStatusAsync started. OrderId: 3, new status: 3
+2026-06-14 14:52:19.401 +05:30 [INF] Executed DbCommand (4ms) [Parameters=[@id='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT o."Id", o."AssignedChefId", o."AssignedWaiterId", o."CompletedAt", o."CreatedAt", o."Status", o."TableId", o."TotalAmount", o."UpdatedAt", t."Id", t."Capacity", t."CreatedAt", t."IsDeleted", t."Number", t."Status", t."UpdatedAt", u."Id", u."Address", u."CreatedAt", u."Email", u."IsDeleted", u."Name", u."PasswordHash", u."PhoneNumber", u."RoleId", u."UpdatedAt", u0."Id", u0."Address", u0."CreatedAt", u0."Email", u0."IsDeleted", u0."Name", u0."PasswordHash", u0."PhoneNumber", u0."RoleId", u0."UpdatedAt"
+FROM "Orders" AS o
+INNER JOIN "Tables" AS t ON o."TableId" = t."Id"
+LEFT JOIN "Users" AS u ON o."AssignedChefId" = u."Id"
+LEFT JOIN "Users" AS u0 ON o."AssignedWaiterId" = u0."Id"
+WHERE o."Id" = @id
+LIMIT 1
+2026-06-14 14:52:19.403 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[@id='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT o."Id", o."AssignedChefId", o."AssignedWaiterId", o."CompletedAt", o."CreatedAt", o."Status", o."TableId", o."TotalAmount", o."UpdatedAt", t."Id", t."Capacity", t."CreatedAt", t."IsDeleted", t."Number", t."Status", t."UpdatedAt", u."Id", u."Address", u."CreatedAt", u."Email", u."IsDeleted", u."Name", u."PasswordHash", u."PhoneNumber", u."RoleId", u."UpdatedAt", u0."Id", u0."Address", u0."CreatedAt", u0."Email", u0."IsDeleted", u0."Name", u0."PasswordHash", u0."PhoneNumber", u0."RoleId", u0."UpdatedAt"
+FROM "Orders" AS o
+INNER JOIN "Tables" AS t ON o."TableId" = t."Id"
+LEFT JOIN "Users" AS u ON o."AssignedChefId" = u."Id"
+LEFT JOIN "Users" AS u0 ON o."AssignedWaiterId" = u0."Id"
+WHERE o."Id" = @id
+LIMIT 1
+2026-06-14 14:52:19.412 +05:30 [INF] Executed DbCommand (7ms) [Parameters=[@p1='?' (DbType = Int32), @p0='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+UPDATE "Orders" SET "Status" = @p0
+WHERE "Id" = @p1;
+2026-06-14 14:52:19.412 +05:30 [INF] UpdateOrderStatusAsync succeeded. OrderId: 3 status changed to: "Ready"
+2026-06-14 14:52:19.412 +05:30 [INF] UpdateOrderStatus completed for OrderId: 3
+2026-06-14 14:52:19.412 +05:30 [INF] Executing StatusCodeResult, setting HTTP status code 204
+2026-06-14 14:52:19.412 +05:30 [INF] Executed action OrderNKitchenMS_API.Controllers.OrderController.UpdateOrderStatus (OrderNKitchenMS-API) in 18.0744ms
+2026-06-14 14:52:19.412 +05:30 [INF] Executed endpoint 'OrderNKitchenMS_API.Controllers.OrderController.UpdateOrderStatus (OrderNKitchenMS-API)'
+2026-06-14 14:52:19.412 +05:30 [INF] Request finished HTTP/1.1 PATCH http://localhost:5182/api/orders/3/status - 204 null null 25.6823ms
+2026-06-14 14:54:38.856 +05:30 [INF] Application is shutting down...
+2026-06-14 14:54:45.960 +05:30 [INF] User profile is available. Using '/Users/sarveswaranb/.aspnet/DataProtection-Keys' as key repository; keys will not be encrypted at rest.
+2026-06-14 14:54:46.025 +05:30 [INF] Now listening on: http://localhost:5182
+2026-06-14 14:54:46.027 +05:30 [INF] Application started. Press Ctrl+C to shut down.
+2026-06-14 14:54:46.027 +05:30 [INF] Hosting environment: Development
+2026-06-14 14:54:46.027 +05:30 [INF] Content root path: /Users/sarveswaranb/Proggies/Presidio/Genspark-Training/OrderNKitchenMS-Engine/OrderNKitchenMS-API
+2026-06-14 14:55:08.458 +05:30 [INF] Request starting HTTP/1.1 PATCH http://localhost:5182/api/orders/3/status - application/json 1
+2026-06-14 14:55:08.523 +05:30 [ERR] An unhandled exception has occurred while executing the request.
+System.InvalidOperationException: The AuthorizationPolicy named: 'AdminOrChef, WaiterOnly' was not found.
+   at Microsoft.AspNetCore.Authorization.AuthorizationPolicy.CombineAsync(IAuthorizationPolicyProvider policyProvider, IEnumerable`1 authorizeData, IEnumerable`1 policies)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Diagnostics.DeveloperExceptionPageMiddlewareImpl.Invoke(HttpContext context)
+2026-06-14 14:55:08.556 +05:30 [INF] Request finished HTTP/1.1 PATCH http://localhost:5182/api/orders/3/status - 500 null application/problem+json; charset=utf-8 99.1249ms
+2026-06-14 14:58:35.621 +05:30 [INF] Application is shutting down...
+2026-06-14 14:58:45.326 +05:30 [INF] User profile is available. Using '/Users/sarveswaranb/.aspnet/DataProtection-Keys' as key repository; keys will not be encrypted at rest.
+2026-06-14 14:58:45.387 +05:30 [INF] Now listening on: http://localhost:5182
+2026-06-14 14:58:45.388 +05:30 [INF] Application started. Press Ctrl+C to shut down.
+2026-06-14 14:58:45.388 +05:30 [INF] Hosting environment: Development
+2026-06-14 14:58:45.388 +05:30 [INF] Content root path: /Users/sarveswaranb/Proggies/Presidio/Genspark-Training/OrderNKitchenMS-Engine/OrderNKitchenMS-API
+2026-06-14 14:58:50.202 +05:30 [INF] Request starting HTTP/1.1 PATCH http://localhost:5182/api/orders/3/status - application/json 1
+2026-06-14 14:58:50.266 +05:30 [INF] Authorization failed. These requirements were not met:
+RolesAuthorizationRequirement:User.IsInRole must be true for one of the following roles: (Admin|Chef)
+2026-06-14 14:58:50.267 +05:30 [INF] AuthenticationScheme: Bearer was forbidden.
+2026-06-14 14:58:50.269 +05:30 [INF] Request finished HTTP/1.1 PATCH http://localhost:5182/api/orders/3/status - 403 0 null 68.0782ms
+2026-06-14 15:00:26.582 +05:30 [INF] Application is shutting down...
+2026-06-14 15:01:40.745 +05:30 [INF] User profile is available. Using '/Users/sarveswaranb/.aspnet/DataProtection-Keys' as key repository; keys will not be encrypted at rest.
+2026-06-14 15:01:40.807 +05:30 [INF] Now listening on: http://localhost:5182
+2026-06-14 15:01:40.808 +05:30 [INF] Application started. Press Ctrl+C to shut down.
+2026-06-14 15:01:40.808 +05:30 [INF] Hosting environment: Development
+2026-06-14 15:01:40.808 +05:30 [INF] Content root path: /Users/sarveswaranb/Proggies/Presidio/Genspark-Training/OrderNKitchenMS-Engine/OrderNKitchenMS-API
+2026-06-14 15:01:44.106 +05:30 [INF] Request starting HTTP/1.1 PATCH http://localhost:5182/api/orders/3/status - application/json 1
+2026-06-14 15:01:44.172 +05:30 [WRN] Failed to determine the https port for redirect.
+2026-06-14 15:01:44.173 +05:30 [INF] Executing endpoint 'OrderNKitchenMS_API.Controllers.OrderController.UpdateOrderStatus (OrderNKitchenMS-API)'
+2026-06-14 15:01:44.190 +05:30 [INF] Route matched with {action = "UpdateOrderStatus", controller = "Order"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult] UpdateOrderStatus(Int32, Int32) on controller OrderNKitchenMS_API.Controllers.OrderController (OrderNKitchenMS-API).
+2026-06-14 15:01:44.636 +05:30 [INF] UpdateOrderStatus requested for OrderId: 3, new status: 4
+2026-06-14 15:01:44.638 +05:30 [INF] UpdateOrderStatusAsync started. OrderId: 3, new status: 4
+2026-06-14 15:01:45.018 +05:30 [INF] Executed DbCommand (34ms) [Parameters=[@id='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT o."Id", o."AssignedChefId", o."AssignedWaiterId", o."CompletedAt", o."CreatedAt", o."Status", o."TableId", o."TotalAmount", o."UpdatedAt", t."Id", t."Capacity", t."CreatedAt", t."IsDeleted", t."Number", t."Status", t."UpdatedAt", u."Id", u."Address", u."CreatedAt", u."Email", u."IsDeleted", u."Name", u."PasswordHash", u."PhoneNumber", u."RoleId", u."UpdatedAt", u0."Id", u0."Address", u0."CreatedAt", u0."Email", u0."IsDeleted", u0."Name", u0."PasswordHash", u0."PhoneNumber", u0."RoleId", u0."UpdatedAt"
+FROM "Orders" AS o
+INNER JOIN "Tables" AS t ON o."TableId" = t."Id"
+LEFT JOIN "Users" AS u ON o."AssignedChefId" = u."Id"
+LEFT JOIN "Users" AS u0 ON o."AssignedWaiterId" = u0."Id"
+WHERE o."Id" = @id
+LIMIT 1
+2026-06-14 15:01:45.097 +05:30 [INF] Executed DbCommand (2ms) [Parameters=[@id='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT o."Id", o."AssignedChefId", o."AssignedWaiterId", o."CompletedAt", o."CreatedAt", o."Status", o."TableId", o."TotalAmount", o."UpdatedAt", t."Id", t."Capacity", t."CreatedAt", t."IsDeleted", t."Number", t."Status", t."UpdatedAt", u."Id", u."Address", u."CreatedAt", u."Email", u."IsDeleted", u."Name", u."PasswordHash", u."PhoneNumber", u."RoleId", u."UpdatedAt", u0."Id", u0."Address", u0."CreatedAt", u0."Email", u0."IsDeleted", u0."Name", u0."PasswordHash", u0."PhoneNumber", u0."RoleId", u0."UpdatedAt"
+FROM "Orders" AS o
+INNER JOIN "Tables" AS t ON o."TableId" = t."Id"
+LEFT JOIN "Users" AS u ON o."AssignedChefId" = u."Id"
+LEFT JOIN "Users" AS u0 ON o."AssignedWaiterId" = u0."Id"
+WHERE o."Id" = @id
+LIMIT 1
+2026-06-14 15:01:45.155 +05:30 [INF] Executed DbCommand (6ms) [Parameters=[@p1='?' (DbType = Int32), @p0='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+UPDATE "Orders" SET "Status" = @p0
+WHERE "Id" = @p1;
+2026-06-14 15:01:45.160 +05:30 [INF] UpdateOrderStatusAsync succeeded. OrderId: 3 status changed to: "Served"
+2026-06-14 15:01:45.160 +05:30 [INF] UpdateOrderStatus completed for OrderId: 3
+2026-06-14 15:01:45.162 +05:30 [INF] Executing StatusCodeResult, setting HTTP status code 204
+2026-06-14 15:01:45.164 +05:30 [INF] Executed action OrderNKitchenMS_API.Controllers.OrderController.UpdateOrderStatus (OrderNKitchenMS-API) in 972.0427ms
+2026-06-14 15:01:45.164 +05:30 [INF] Executed endpoint 'OrderNKitchenMS_API.Controllers.OrderController.UpdateOrderStatus (OrderNKitchenMS-API)'
+2026-06-14 15:01:45.169 +05:30 [INF] Request finished HTTP/1.1 PATCH http://localhost:5182/api/orders/3/status - 204 null null 1064.8526ms
+2026-06-14 15:01:56.705 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5182/api/orders/track - null null
+2026-06-14 15:01:56.710 +05:30 [INF] Executing endpoint 'OrderNKitchenMS_API.Controllers.OrderController.TrackMyOrder (OrderNKitchenMS-API)'
+2026-06-14 15:01:56.716 +05:30 [INF] Route matched with {action = "TrackMyOrder", controller = "Order"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[OrderNKitchenMS_API.Models.DTOs.GuestOrderTrackingDto]] TrackMyOrder() on controller OrderNKitchenMS_API.Controllers.OrderController (OrderNKitchenMS-API).
+2026-06-14 15:01:56.755 +05:30 [INF] TrackMyOrder requested for TableId from Claims: 2
+2026-06-14 15:01:56.756 +05:30 [INF] GetGuestOrderTrackingAsync called for TableId: 2
+2026-06-14 15:01:56.771 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT o."Id", o."AssignedChefId", o."AssignedWaiterId", o."CompletedAt", o."CreatedAt", o."Status", o."TableId", o."TotalAmount", o."UpdatedAt", t."Id", t."Capacity", t."CreatedAt", t."IsDeleted", t."Number", t."Status", t."UpdatedAt", u."Id", u."Address", u."CreatedAt", u."Email", u."IsDeleted", u."Name", u."PasswordHash", u."PhoneNumber", u."RoleId", u."UpdatedAt", u0."Id", u0."Address", u0."CreatedAt", u0."Email", u0."IsDeleted", u0."Name", u0."PasswordHash", u0."PhoneNumber", u0."RoleId", u0."UpdatedAt"
+FROM "Orders" AS o
+INNER JOIN "Tables" AS t ON o."TableId" = t."Id"
+LEFT JOIN "Users" AS u ON o."AssignedChefId" = u."Id"
+LEFT JOIN "Users" AS u0 ON o."AssignedWaiterId" = u0."Id"
+2026-06-14 15:01:56.785 +05:30 [INF] Executed DbCommand (4ms) [Parameters=[@orderId='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT o."Id", o."CreatedAt", o."MenuItemId", o."Notes", o."OrderId", o."Quantity", o."UnitPrice", o."UpdatedAt", m."Id", m."CategoryId", m."CreatedAt", m."Description", m."ImageUrl", m."IsAvailable", m."IsDeleted", m."IsManuallyDisabled", m."Name", m."PreparationTime", m."Price", m."UpdatedAt"
+FROM "OrderItems" AS o
+INNER JOIN "MenuItems" AS m ON o."MenuItemId" = m."Id"
+WHERE o."OrderId" = @orderId
+2026-06-14 15:01:56.802 +05:30 [INF] TrackMyOrder completed for TableId: 2. Order ID: 3
+2026-06-14 15:01:56.804 +05:30 [INF] Executing OkObjectResult, writing value of type 'OrderNKitchenMS_API.Models.DTOs.GuestOrderTrackingDto'.
+2026-06-14 15:01:56.815 +05:30 [INF] Executed action OrderNKitchenMS_API.Controllers.OrderController.TrackMyOrder (OrderNKitchenMS-API) in 98.441ms
+2026-06-14 15:01:56.815 +05:30 [INF] Executed endpoint 'OrderNKitchenMS_API.Controllers.OrderController.TrackMyOrder (OrderNKitchenMS-API)'
+2026-06-14 15:01:56.815 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:5182/api/orders/track - 200 null application/json; charset=utf-8 110.1252ms
+2026-06-14 15:06:12.980 +05:30 [INF] Application is shutting down...
+2026-06-14 15:06:20.812 +05:30 [INF] User profile is available. Using '/Users/sarveswaranb/.aspnet/DataProtection-Keys' as key repository; keys will not be encrypted at rest.
+2026-06-14 15:06:20.881 +05:30 [INF] Now listening on: http://localhost:5182
+2026-06-14 15:06:20.882 +05:30 [INF] Application started. Press Ctrl+C to shut down.
+2026-06-14 15:06:20.882 +05:30 [INF] Hosting environment: Development
+2026-06-14 15:06:20.882 +05:30 [INF] Content root path: /Users/sarveswaranb/Proggies/Presidio/Genspark-Training/OrderNKitchenMS-Engine/OrderNKitchenMS-API
+2026-06-14 15:06:33.368 +05:30 [INF] Request starting HTTP/1.1 POST http://localhost:5182/api/bills - application/json 65
+2026-06-14 15:06:33.433 +05:30 [WRN] Failed to determine the https port for redirect.
+2026-06-14 15:06:33.434 +05:30 [INF] Executing endpoint 'OrderNKitchenMS_API.Controllers.BillController.CreateBill (OrderNKitchenMS-API)'
+2026-06-14 15:06:33.450 +05:30 [INF] Route matched with {action = "CreateBill", controller = "Bill"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[OrderNKitchenMS_API.Models.DTOs.BillDto]] CreateBill(OrderNKitchenMS_API.Models.DTOs.BillCreateDto) on controller OrderNKitchenMS_API.Controllers.BillController (OrderNKitchenMS-API).
+2026-06-14 15:06:33.888 +05:30 [INF] CreateBillAsync started for Order ID: 3
+2026-06-14 15:06:33.890 +05:30 [INF] GetOrderByIdAsync called for Order ID: 3
+2026-06-14 15:06:34.488 +05:30 [INF] Executed DbCommand (35ms) [Parameters=[@id='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT o."Id", o."AssignedChefId", o."AssignedWaiterId", o."CompletedAt", o."CreatedAt", o."Status", o."TableId", o."TotalAmount", o."UpdatedAt", t."Id", t."Capacity", t."CreatedAt", t."IsDeleted", t."Number", t."Status", t."UpdatedAt", u."Id", u."Address", u."CreatedAt", u."Email", u."IsDeleted", u."Name", u."PasswordHash", u."PhoneNumber", u."RoleId", u."UpdatedAt", u0."Id", u0."Address", u0."CreatedAt", u0."Email", u0."IsDeleted", u0."Name", u0."PasswordHash", u0."PhoneNumber", u0."RoleId", u0."UpdatedAt"
+FROM "Orders" AS o
+INNER JOIN "Tables" AS t ON o."TableId" = t."Id"
+LEFT JOIN "Users" AS u ON o."AssignedChefId" = u."Id"
+LEFT JOIN "Users" AS u0 ON o."AssignedWaiterId" = u0."Id"
+WHERE o."Id" = @id
+LIMIT 1
+2026-06-14 15:06:34.580 +05:30 [INF] Executed DbCommand (3ms) [Parameters=[@orderId='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT o."Id", o."CreatedAt", o."MenuItemId", o."Notes", o."OrderId", o."Quantity", o."UnitPrice", o."UpdatedAt", m."Id", m."CategoryId", m."CreatedAt", m."Description", m."ImageUrl", m."IsAvailable", m."IsDeleted", m."IsManuallyDisabled", m."Name", m."PreparationTime", m."Price", m."UpdatedAt"
+FROM "OrderItems" AS o
+INNER JOIN "MenuItems" AS m ON o."MenuItemId" = m."Id"
+WHERE o."OrderId" = @orderId
+2026-06-14 15:06:34.666 +05:30 [INF] Executed DbCommand (33ms) [Parameters=[@menuItemIds='?' (DbType = Object)], CommandType='"Text"', CommandTimeout='30']
+SELECT max(m."PreparationTime")
+FROM "MenuItems" AS m
+WHERE m."Id" = ANY (@menuItemIds) AND NOT (m."IsDeleted")
+2026-06-14 15:06:34.681 +05:30 [INF] Executed DbCommand (2ms) [Parameters=[@excludeOrderId='?' (DbType = Int32), @createdAt='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT count(*)::int
+FROM "Orders" AS o
+WHERE o."Status" IN (1, 2) AND o."Id" <> @excludeOrderId AND o."CreatedAt" < @createdAt
+2026-06-14 15:06:34.690 +05:30 [INF] Executed DbCommand (3ms) [Parameters=[@orderId='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."CreatedAt", b."DiscountAmount", b."OrderId", b."Status", b."SubTotal", b."TaxRate", b."TotalAmount", b."UpdatedAt"
+FROM "Bills" AS b
+WHERE b."OrderId" = @orderId
+LIMIT 1
+2026-06-14 15:06:34.691 +05:30 [WRN] CreateBillAsync failed: Order status is 4 instead of 'Ready'
+2026-06-14 15:06:34.695 +05:30 [INF] Executed action OrderNKitchenMS_API.Controllers.BillController.CreateBill (OrderNKitchenMS-API) in 1242.8221ms
+2026-06-14 15:06:34.695 +05:30 [INF] Executed endpoint 'OrderNKitchenMS_API.Controllers.BillController.CreateBill (OrderNKitchenMS-API)'
+2026-06-14 15:06:34.696 +05:30 [WRN] Business/Validation error occurred (Status 400): Cannot create bill for Order ID 3 because its status is not 'Ready'.
+2026-06-14 15:06:34.708 +05:30 [INF] Request finished HTTP/1.1 POST http://localhost:5182/api/bills - 400 null application/json; charset=utf-8 1341.2721ms
+2026-06-14 15:07:59.787 +05:30 [INF] Application is shutting down...
+2026-06-14 15:08:06.683 +05:30 [INF] User profile is available. Using '/Users/sarveswaranb/.aspnet/DataProtection-Keys' as key repository; keys will not be encrypted at rest.
+2026-06-14 15:08:06.747 +05:30 [INF] Now listening on: http://localhost:5182
+2026-06-14 15:08:06.749 +05:30 [INF] Application started. Press Ctrl+C to shut down.
+2026-06-14 15:08:06.749 +05:30 [INF] Hosting environment: Development
+2026-06-14 15:08:06.749 +05:30 [INF] Content root path: /Users/sarveswaranb/Proggies/Presidio/Genspark-Training/OrderNKitchenMS-Engine/OrderNKitchenMS-API
+2026-06-14 15:08:08.330 +05:30 [INF] Request starting HTTP/1.1 POST http://localhost:5182/api/bills - application/json 65
+2026-06-14 15:08:08.391 +05:30 [WRN] Failed to determine the https port for redirect.
+2026-06-14 15:08:08.392 +05:30 [INF] Executing endpoint 'OrderNKitchenMS_API.Controllers.BillController.CreateBill (OrderNKitchenMS-API)'
+2026-06-14 15:08:08.409 +05:30 [INF] Route matched with {action = "CreateBill", controller = "Bill"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[OrderNKitchenMS_API.Models.DTOs.BillDto]] CreateBill(OrderNKitchenMS_API.Models.DTOs.BillCreateDto) on controller OrderNKitchenMS_API.Controllers.BillController (OrderNKitchenMS-API).
+2026-06-14 15:08:08.838 +05:30 [INF] CreateBillAsync started for Order ID: 3
+2026-06-14 15:08:08.838 +05:30 [INF] GetOrderByIdAsync called for Order ID: 3
+2026-06-14 15:08:09.206 +05:30 [INF] Executed DbCommand (39ms) [Parameters=[@id='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT o."Id", o."AssignedChefId", o."AssignedWaiterId", o."CompletedAt", o."CreatedAt", o."Status", o."TableId", o."TotalAmount", o."UpdatedAt", t."Id", t."Capacity", t."CreatedAt", t."IsDeleted", t."Number", t."Status", t."UpdatedAt", u."Id", u."Address", u."CreatedAt", u."Email", u."IsDeleted", u."Name", u."PasswordHash", u."PhoneNumber", u."RoleId", u."UpdatedAt", u0."Id", u0."Address", u0."CreatedAt", u0."Email", u0."IsDeleted", u0."Name", u0."PasswordHash", u0."PhoneNumber", u0."RoleId", u0."UpdatedAt"
+FROM "Orders" AS o
+INNER JOIN "Tables" AS t ON o."TableId" = t."Id"
+LEFT JOIN "Users" AS u ON o."AssignedChefId" = u."Id"
+LEFT JOIN "Users" AS u0 ON o."AssignedWaiterId" = u0."Id"
+WHERE o."Id" = @id
+LIMIT 1
+2026-06-14 15:08:09.324 +05:30 [INF] Executed DbCommand (3ms) [Parameters=[@orderId='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT o."Id", o."CreatedAt", o."MenuItemId", o."Notes", o."OrderId", o."Quantity", o."UnitPrice", o."UpdatedAt", m."Id", m."CategoryId", m."CreatedAt", m."Description", m."ImageUrl", m."IsAvailable", m."IsDeleted", m."IsManuallyDisabled", m."Name", m."PreparationTime", m."Price", m."UpdatedAt"
+FROM "OrderItems" AS o
+INNER JOIN "MenuItems" AS m ON o."MenuItemId" = m."Id"
+WHERE o."OrderId" = @orderId
+2026-06-14 15:08:09.577 +05:30 [INF] Executed DbCommand (61ms) [Parameters=[@menuItemIds='?' (DbType = Object)], CommandType='"Text"', CommandTimeout='30']
+SELECT max(m."PreparationTime")
+FROM "MenuItems" AS m
+WHERE m."Id" = ANY (@menuItemIds) AND NOT (m."IsDeleted")
+2026-06-14 15:08:09.593 +05:30 [INF] Executed DbCommand (2ms) [Parameters=[@excludeOrderId='?' (DbType = Int32), @createdAt='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT count(*)::int
+FROM "Orders" AS o
+WHERE o."Status" IN (1, 2) AND o."Id" <> @excludeOrderId AND o."CreatedAt" < @createdAt
+2026-06-14 15:08:09.600 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[@orderId='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."CreatedAt", b."DiscountAmount", b."OrderId", b."Status", b."SubTotal", b."TaxRate", b."TotalAmount", b."UpdatedAt"
+FROM "Bills" AS b
+WHERE b."OrderId" = @orderId
+LIMIT 1
+2026-06-14 15:08:09.695 +05:30 [INF] Executed DbCommand (10ms) [Parameters=[@p0='?' (DbType = DateTime), @p1='?' (DbType = Decimal), @p2='?' (DbType = Int32), @p3='?' (DbType = Int32), @p4='?' (DbType = Decimal), @p5='?' (DbType = Decimal), @p6='?' (DbType = Decimal), @p7='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+INSERT INTO "Bills" ("CreatedAt", "DiscountAmount", "OrderId", "Status", "SubTotal", "TaxRate", "TotalAmount", "UpdatedAt")
+VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7)
+RETURNING "Id";
+2026-06-14 15:08:09.708 +05:30 [INF] CreateBillAsync succeeded. Generated Bill ID: 2 for Order ID: 3
+2026-06-14 15:08:09.711 +05:30 [INF] Executing OkObjectResult, writing value of type 'OrderNKitchenMS_API.Models.DTOs.BillDto'.
+2026-06-14 15:08:09.720 +05:30 [INF] Executed action OrderNKitchenMS_API.Controllers.BillController.CreateBill (OrderNKitchenMS-API) in 1309.6267ms
+2026-06-14 15:08:09.721 +05:30 [INF] Executed endpoint 'OrderNKitchenMS_API.Controllers.BillController.CreateBill (OrderNKitchenMS-API)'
+2026-06-14 15:08:09.725 +05:30 [INF] Request finished HTTP/1.1 POST http://localhost:5182/api/bills - 200 null application/json; charset=utf-8 1396.5365ms
+2026-06-14 20:28:43.332 +05:30 [INF] Request starting HTTP/1.1 PATCH http://localhost:5182/api/bills/" - null 0
+2026-06-14 20:28:43.338 +05:30 [INF] Executing endpoint '405 HTTP Method Not Supported'
+2026-06-14 20:28:43.338 +05:30 [INF] Executed endpoint '405 HTTP Method Not Supported'
+2026-06-14 20:28:43.338 +05:30 [INF] Request finished HTTP/1.1 PATCH http://localhost:5182/api/bills/" - 405 0 null 6.6556ms
