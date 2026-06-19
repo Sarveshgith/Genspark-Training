@@ -32,8 +32,10 @@
     <Folder Include="Controllers/" />
     <Folder Include="Data/" />
     <Folder Include="Exceptions/" />
+    <Folder Include="Hubs/" />
     <Folder Include="Models/Entities/" />
     <Folder Include="Models/Enums/" />
+    <Folder Include="Notification/" />
     <Folder Include="Repositories/" />
     <Folder Include="Repositories/Interfaces/" />
     <Folder Include="Services/" />

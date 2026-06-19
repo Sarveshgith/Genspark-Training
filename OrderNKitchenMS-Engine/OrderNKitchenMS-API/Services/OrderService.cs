@@ -23,6 +23,7 @@ public class OrderService : IOrderService
     private readonly IOrderItemRepository _orderItemRepository;
     private readonly IItemService _itemService;
     private readonly ILogger<OrderService> _logger;
+    private readonly ISignalService _signalService;
     private static readonly Dictionary<OrderStatus, List<OrderStatus>> AllowedTransitions = new()
     {
         { OrderStatus.Pending, new List<OrderStatus> { OrderStatus.InPrep, OrderStatus.Cancelled } },
@@ -38,6 +39,7 @@ public class OrderService : IOrderService
         IOrderRepository orderRepository, 
         IOrderItemRepository orderItemRepository, 
         IItemService itemService,
+        ISignalService signalService,
         ILogger<OrderService> logger)
     {
         _context = context;
@@ -45,6 +47,7 @@ public class OrderService : IOrderService
         _orderItemRepository = orderItemRepository;
         _itemService = itemService;
         _logger = logger;
+        _signalService = signalService;
     }
 
     private async Task<DateTime> CalculateEstimatedReadyAtAsync(DateTime createdAt, List<int> menuItemIds, int excludeOrderId = 0)
@@ -148,7 +151,11 @@ public class OrderService : IOrderService
             
             orderEntity.AssignedWaiter = await _context.Users.FindAsync(waiterId);
 
-            return await MapOrderToDtoAsync(orderEntity, table, orderItemEntities, menuItems);
+            OrderDto orderDto = await MapOrderToDtoAsync(orderEntity, table, orderItemEntities, menuItems);
+
+            await _signalService.NotifyNewOrderAsync(orderDto);
+            
+            return orderDto;
         }
         catch (Exception ex)
         {
