@@ -1,0 +1,49 @@
+.kds-columns {
+  display: flex;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.kds-column {
+  flex: 1;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #fcfcfc;
+  min-height: 400px;
+}
+
+.column-header {
+  padding: 10px 16px;
+  border-bottom: 1px solid #ddd;
+  border-radius: 8px 8px 0 0;
+}
+
+.column-header h3 {
+  margin: 0;
+}
+
+.column-header.pending {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.column-header.in-prep {
+  background-color: #cce5ff;
+  color: #004085;
+}
+
+.column-header.ready {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.column-content {
+  padding: 16px;
+}
+
+.empty-msg {
+  color: #777;
+  font-style: italic;
+  text-align: center;
+  margin-top: 20px;
+}

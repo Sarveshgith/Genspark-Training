@@ -1,0 +1,72 @@
+<div class="card-container" (click)="openModal($event)">
+  <div class="card-header">
+    <span class="order-id">#{{ order().id }}</span>
+    <span class="table-number">Table {{ order().tableNumber }}</span>
+  </div>
+
+  <div class="card-content">
+    <ul>
+      @for (item of order().orderItems; track item.id) {
+        <li>
+          {{ item.menuItemName }} <span class="qty">x{{ item.quantity }}</span>
+          @if (item.notes) {
+            <div class="item-notes">{{ item.notes }}</div>
+          }
+        </li>
+      }
+    </ul>
+  </div>
+
+  <div class="card-actions">
+    @if (order().status === 1) {
+      <button (click)="onStartCooking()">Start Cooking</button>
+    } @else if (order().status === 2) {
+      <button (click)="onMarkReady()">Mark Ready</button>
+    }
+  </div>
+</div>
+
+<!-- Simple Modal Overlay -->
+@if (isModalOpen()) {
+  <div class="modal-backdrop" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Order Detail #{{ order().id }}</h3>
+        <button class="close-btn" (click)="closeModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p><strong>Table:</strong> {{ order().tableNumber }}</p>
+        <p><strong>Status:</strong> {{ order().statusName }} (Code: {{ order().status }})</p>
+        <p><strong>Created At:</strong> {{ order().createdAt | date:'short' }}</p>
+        @if (order().assignedChefName) {
+          <p><strong>Assigned Chef:</strong> {{ order().assignedChefName }}</p>
+        }
+        @if (order().assignedWaiterName) {
+          <p><strong>Waiter:</strong> {{ order().assignedWaiterName }}</p>
+        }
+        
+        <h4>Items</h4>
+        <table>
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Qty</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of order().orderItems; track item.id) {
+              <tr>
+                <td>{{ item.menuItemName }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>{{ item.notes || '-' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+        
+        <p class="total"><strong>Total:</strong> {{ order().totalAmount | currency }}</p>
+      </div>
+    </div>
+  </div>
+}

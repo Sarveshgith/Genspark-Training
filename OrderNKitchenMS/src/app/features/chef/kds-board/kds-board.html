@@ -1,0 +1,55 @@
+<h2>KDS Board - Kitchen Display System</h2>
+
+@if (errorMessage()) {
+  <p style="color: red;">{{ errorMessage() }}</p>
+}
+
+<div class="kds-columns">
+  <!-- Pending Column -->
+  <div class="kds-column">
+    <div class="column-header pending">
+      <h3>Pending ({{ pendingOrders().length }})</h3>
+    </div>
+    <div class="column-content">
+      @if (pendingOrders().length === 0) {
+        <p class="empty-msg">No pending orders.</p>
+      } @else {
+        @for (order of pendingOrders(); track order.id) {
+          <app-order-card [order]="order" (startCooking)="handleStartCooking($event)"></app-order-card>
+        }
+      }
+    </div>
+  </div>
+
+  <!-- In Prep Column -->
+  <div class="kds-column">
+    <div class="column-header in-prep">
+      <h3>In Prep ({{ inPrepOrders().length }})</h3>
+    </div>
+    <div class="column-content">
+      @if (inPrepOrders().length === 0) {
+        <p class="empty-msg">No orders in preparation.</p>
+      } @else {
+        @for (order of inPrepOrders(); track order.id) {
+          <app-order-card [order]="order" (markReady)="handleMarkReady($event)"></app-order-card>
+        }
+      }
+    </div>
+  </div>
+
+  <!-- Ready Column -->
+  <div class="kds-column">
+    <div class="column-header ready">
+      <h3>Ready ({{ readyOrders().length }})</h3>
+    </div>
+    <div class="column-content">
+      @if (readyOrders().length === 0) {
+        <p class="empty-msg">No ready orders.</p>
+      } @else {
+        @for (order of readyOrders(); track order.id) {
+          <app-order-card [order]="order"></app-order-card>
+        }
+      }
+    </div>
+  </div>
+</div>
