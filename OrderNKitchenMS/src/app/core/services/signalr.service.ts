@@ -12,9 +12,13 @@ export class SignalRService {
     private hubConnection!: signalR.HubConnection;
 
     private newOrderSubject = new Subject<OrderModel>();
-   
     public get newOrder$(): Observable<OrderModel> {
         return this.newOrderSubject.asObservable();
+    }
+
+    private orderUpdateSubject = new Subject<any>();
+    public get orderUpdate$(): Observable<any> {
+        return this.orderUpdateSubject.asObservable();
     }
 
     public async connect(token: string): Promise<void> {
@@ -44,6 +48,10 @@ export class SignalRService {
             this.newOrderSubject.next(order);
         });
 
+        this.hubConnection.on("ReceiveOrderUpdate", (trackingInfo) => {
+            console.log("Order update received:", trackingInfo);
+            this.orderUpdateSubject.next(trackingInfo);
+        });
     }
 
     public async disconnect(): Promise<void> {

@@ -42,6 +42,7 @@ export interface GuestOrderTrackingModel {
     queuePosition: number;
     estimatedReadyAt: Date | string | null;
     estimatedTimeMinutes: number;
+    createdAt: Date | string;
     orderItems: OrderItemTrackingModel[];
 }
 

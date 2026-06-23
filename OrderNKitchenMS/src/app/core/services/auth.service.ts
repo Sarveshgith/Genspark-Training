@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { LoginModel, LoginResponseModel, UserModel, RegisterModel } from "../models/auth.model";
 import { baseUrl } from "../enviroment";
-import { HttpClient, HttpContext } from "@angular/common/http";
+import { HttpClient, HttpContext, HttpParams } from "@angular/common/http";
 import { BehaviorSubject, catchError, Observable, tap, throwError } from "rxjs";
 import { IS_PUBLIC_API } from "../interceptors/public-api.token";
 
@@ -35,6 +35,11 @@ export class AuthService {
             return sessionStorage.getItem('refreshToken');
         }
         return null;
+    }
+
+    public getRole(): string | null {
+        const user = this.userSubject.value;
+        return user ? user.roleName : null; 
     }
 
     public login(loginModel: LoginModel) {
@@ -94,6 +99,24 @@ export class AuthService {
                     return throwError(() => error);
                 })
             );
+    }
+
+    public guestLogin(query: any): any {
+        let url = classUrl + "guest-login";
+        let params = new HttpParams().set('tableId', query.tableId.toString());
+        return this.http.post(url, null, {
+            params,
+            context: new HttpContext().set(IS_PUBLIC_API, true)
+        }).pipe(tap((response: any) => {
+            if (typeof window !== 'undefined' && window.sessionStorage) {
+                sessionStorage.setItem('token', response.token);
+            }
+            }),
+            catchError(error => {
+                console.error('Guest login failed:', error);
+                return throwError(() => new Error('Guest login failed. Please try again.'));
+            })
+        );
     }
 
     public logout() {

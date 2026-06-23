@@ -1,3 +1,5 @@
+export type isNonVeg = boolean | undefined;
+
 export interface CategoryModel {
     id: number;
 	name: string;
