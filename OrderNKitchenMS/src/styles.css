@@ -1,3 +1,13 @@
-/* You can add global styles to this file, and also import other style files */
-
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Syne:wght@400..800&display=swap');
 @import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Outfit', sans-serif;
+  --font-serif: 'Syne', sans-serif;
+  
+  --color-primary: #F28500;
+  --color-secondary: #36454F;
+  --color-tertiary: #FDFCFB;
+  --color-neutral: #1A1A1A;
+}
+

@@ -2,11 +2,11 @@ import { Component, inject, signal } from '@angular/core';
 import { AuthService } from '../../../core/services/auth.service';
 import { LoginModel } from '../../../core/models/auth.model';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-login',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './login.html',
   styleUrl: './login.css',
 })
@@ -41,11 +41,17 @@ export class Login {
     };
 
     this.authService.login(loginData).subscribe({
-      next: (user) => {
-        console.log('Login successful:', user);
-        alert('Login successful!');
+      next: (response) => {
+        console.log('Login successful:', response);
         this.isLoading.set(false);
-        //this.router.navigate(['/']);
+        const role = response.user.roleName;
+        if (role === 'Waiter') {
+          this.router.navigate(['/waiter/menu']);
+        } else if (role === 'Chef') {
+          this.router.navigate(['/chef/kds-board']);
+        } else {
+          this.router.navigate(['/']);
+        }
       },
       error: (err) => {
         this.isLoading.set(false);

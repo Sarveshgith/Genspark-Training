@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { baseUrl } from "../enviroment";
-import { OrderModel, QueryOrderModel, GuestOrderTrackingModel } from "../models/order.model";
+import { OrderModel, QueryOrderModel, GuestOrderTrackingModel, TableModel } from "../models/order.model";
 import { Observable } from "rxjs";
 
 let classUrl = baseUrl + "orders/";
@@ -10,6 +10,14 @@ let classUrl = baseUrl + "orders/";
 export class OrderService {
 
     constructor(private http: HttpClient) {}
+
+    public getTables(): Observable<TableModel[]> {
+        return this.http.get<TableModel[]>(baseUrl + "tables");
+    }
+
+    public createOrder(orderCreateDto: { tableId: number; orderItems: { menuItemId: number; quantity: number; notes: string }[] }): Observable<OrderModel> {
+        return this.http.post<OrderModel>(classUrl, orderCreateDto);
+    }
 
     public getActiveOrders(): Observable<OrderModel[]> {
         let url = classUrl + "active";

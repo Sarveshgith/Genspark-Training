@@ -1,12 +1,18 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth.service';
 import { RegisterModel } from '../../../core/models/auth.model';
+import { Router, RouterLink } from '@angular/router';
 
+const passwordMatchValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
+  const password = control.get('password')?.value;
+  const confirmPassword = control.get('confirmPassword')?.value;
+  return password === confirmPassword ? null : { passwordMismatch: true };
+};
 
 @Component({
   selector: 'app-register',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './register.html',
   styleUrl: './register.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -14,15 +20,24 @@ import { RegisterModel } from '../../../core/models/auth.model';
 export class Register {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
+  private router = inject(Router);
 
   registerForm = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
     name: ['', Validators.required],
-    password: ['', [Validators.required, Validators.minLength(6)]],
-    roleId: [0, Validators.required],
-    phoneNumber: ['', Validators.required],
+    password: ['', [
+      Validators.required,
+      Validators.minLength(8),
+      Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).+$/)
+    ]],
+    confirmPassword: ['', Validators.required],
+    roleId: [null as number | null, Validators.required],
+    phoneNumber: ['', [
+      Validators.required,
+      Validators.pattern(/^(\+91[\s-]?)?[6-9]\d{9}$/)
+    ]],
     address: [''],
-  });
+  }, { validators: passwordMatchValidator });
 
   readonly controls = this.registerForm.controls;
 
@@ -55,11 +70,13 @@ export class Register {
           email: '',
           name: '',
           password: '',
-          roleId: 0,
+          confirmPassword: '',
+          roleId: null,
           phoneNumber: '',
           address: '',
         });
         this.isLoading.set(false);
+        this.router.navigate(['/login']);
       },
       error: (err) => {
         this.isLoading.set(false);

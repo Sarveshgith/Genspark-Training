@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { baseUrl } from "../enviroment";
-import { CategoryModel, isNonVeg, MenuItemModel, QueryMenuItemModel } from "../models/menu.model";
+import { CategoryModel, MenuItemModel, QueryMenuItemModel } from "../models/menu.model";
 import { Observable } from "rxjs";
 
 let categoryUrl = baseUrl + "categories/";
@@ -10,12 +10,15 @@ let menuUrl = baseUrl + "menu/";
 @Injectable({ providedIn: "root" })
 export class MenuService {
 
-    constructor(private http: HttpClient) {}
+    constructor(private http: HttpClient) { }
 
-    getMenuCategories(query?: any): Observable<CategoryModel[]> {
-        return this.http.get<CategoryModel[]>(categoryUrl, { params: { isNonVeg: query?.isNonVeg } });
+    getMenuCategories(query?: { isNonVeg?: boolean }): Observable<CategoryModel[]> {
+        let params = new HttpParams();
+        if (query?.isNonVeg !== undefined && query?.isNonVeg !== null) {
+            params = params.set("isNonVeg", query.isNonVeg.toString());
+        }
+        return this.http.get<CategoryModel[]>(categoryUrl, { params });
     }
-
 
     getMenuItems(query?: QueryMenuItemModel): Observable<MenuItemModel[]> {
         let url = menuUrl;
