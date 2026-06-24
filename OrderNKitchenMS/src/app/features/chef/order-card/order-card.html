@@ -1,72 +1,254 @@
-<div class="card-container" (click)="openModal($event)">
-  <div class="card-header">
-    <span class="order-id">#{{ order().id }}</span>
-    <span class="table-number">Table {{ order().tableNumber }}</span>
-  </div>
+<div 
+  [class]="'group bg-[#131B2E] rounded-2xl p-5 border-2 transition-all duration-300 cursor-pointer flex flex-col justify-between h-fit select-none ' +
+           (isOverdue() ? 'border-[#F28500] shadow-[0_0_15px_rgba(242,133,0,0.15)] ring-1 ring-[#F28500]/30' : 'border-slate-800 hover:border-slate-700')"
+  (click)="openModal($event)"
+>
+  <div>
+    <!-- Card Header: Order # & Table Badge -->
+    <div class="flex items-center justify-between">
+      <span class="text-lg font-bold text-white font-syne uppercase tracking-tight">
+        Order #{{ order().id }}
+      </span>
+      <span class="bg-slate-800 text-slate-300 text-xs font-semibold px-3 py-1 rounded-lg font-syne shadow-sm">
+        T-{{ order().tableNumber | number:'2.0-0' }}
+      </span>
+    </div>
 
-  <div class="card-content">
-    <ul>
-      @for (item of order().orderItems; track item.id) {
-        <li>
-          {{ item.menuItemName }} <span class="qty">x{{ item.quantity }}</span>
-          @if (item.notes) {
-            <div class="item-notes">{{ item.notes }}</div>
-          }
-        </li>
+    <!-- Diet Badges below header -->
+    <div class="flex flex-wrap gap-1.5 mt-2">
+      @for (badge of dietBadges(); track badge) {
+        <span [class]="'text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded font-syne ' + 
+                       (badge === 'Veg' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 
+                        badge === 'Non-Veg' ? 'bg-red-500/10 text-red-400 border border-red-500/20' : 
+                        'bg-[#F28500]/10 text-[#F28500] border border-[#F28500]/20')"
+        >
+          {{ badge }}
+        </span>
       }
-    </ul>
+    </div>
+
+    <!-- Divider Line -->
+    <div class="border-t border-slate-800/80 my-4"></div>
+
+    <!-- Order Items List -->
+    <div class="space-y-3.5">
+      @for (item of order().orderItems; track item.id; let last = $last) {
+        <div class="space-y-1">
+          <div class="flex justify-between items-start text-sm leading-snug">
+            <!-- Item Name in Space Grotesk 500 (medium) -->
+            <span class="font-space font-medium text-white flex-1 select-text">
+              {{ item.menuItemName }}
+            </span>
+            <!-- Quantity in a pill -->
+            <span class="bg-slate-900 border border-slate-800 text-slate-300 font-bold font-mono-dm text-xs px-2.5 py-0.5 rounded-full shrink-0">
+              {{ item.quantity }}x
+            </span>
+          </div>
+          @if (item.notes) {
+            <!-- Special Notes in Space Grotesk 400 Amber -->
+            <div class="text-[#F28500] font-normal font-space text-[11px] tracking-wide italic pl-1 select-text">
+              * {{ item.notes }}
+            </div>
+          }
+          @if (!last) {
+            <!-- Thin divider between each item row -->
+            <div class="border-t border-slate-800/40 my-2"></div>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- Prepped By Chef Badge -->
+    @if (order().assignedChefName) {
+      <div class="mt-4 flex items-center space-x-2 bg-slate-900/40 rounded-xl px-3 py-1.5 border border-slate-800/40 text-[11px] text-slate-400 select-none animate-fade-in font-space">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span>Prepped by: <strong class="text-slate-200 font-medium font-syne">{{ order().assignedChefName }}</strong></span>
+      </div>
+    }
   </div>
 
-  <div class="card-actions">
+  <div>
+    <!-- Divider Line before Footer -->
+    <div class="border-t border-slate-800/80 my-4 shrink-0"></div>
+
+    <!-- CARD FOOTER — PENDING -->
     @if (order().status === 1) {
-      <button (click)="onStartCooking()">Start Cooking</button>
-    } @else if (order().status === 2) {
-      <button (click)="onMarkReady()">Mark Ready</button>
+      <div class="space-y-4 shrink-0">
+        <div class="flex items-center justify-between">
+          <div class="flex flex-col">
+            <span class="text-[9px] font-extrabold text-slate-500 uppercase tracking-widest font-syne">Waiting Time</span>
+            <span class="mt-1">
+              <app-order-timer [elapsedSeconds]="elapsedSeconds()"></app-order-timer>
+            </span>
+          </div>
+          <div class="flex flex-col items-end">
+            <span class="text-[9px] font-extrabold text-slate-500 uppercase tracking-widest font-syne">Est. Prep</span>
+            <span class="text-sm font-bold text-slate-300 mt-1 font-space">{{ prepTimeMinutes() }} mins</span>
+          </div>
+        </div>
+        <button 
+          (click)="onAction($event)"
+          class="w-full py-2.5 rounded-xl bg-[#8C5815] hover:bg-[#A36B21] text-white font-bold font-syne text-[11px] tracking-widest uppercase transition-all duration-200 outline-none select-none active:scale-[0.98] border border-[#8C5815]/20 shadow-lg shadow-orange-950/20"
+        >
+          Start cooking
+        </button>
+      </div>
+    }
+
+    <!-- CARD FOOTER — INPREP -->
+    @if (order().status === 2) {
+      <div class="space-y-4 shrink-0">
+        <!-- Progress Bar -->
+        <div class="space-y-1.5">
+          <div class="flex justify-between items-baseline text-[9px] font-extrabold text-slate-500 uppercase tracking-widest font-syne">
+            <span>Cooking Progress</span>
+            <span class="font-mono-dm">{{ progressPercentage() | number:'1.0-0' }}%</span>
+          </div>
+          <div class="w-full h-2 bg-slate-900 border border-slate-800/80 rounded-full overflow-hidden">
+            <div 
+              [class]="'h-full transition-all duration-1000 ' + (progressPercentage() >= 100 ? 'bg-[#F28500]' : 'bg-[#8C5815]')"
+              [style.width.%]="progressPercentage()"
+            ></div>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between">
+          <div class="flex flex-col">
+            <span class="text-[9px] font-extrabold text-slate-500 uppercase tracking-widest font-syne">Cooking Time</span>
+            <span class="mt-1">
+              <app-order-timer [elapsedSeconds]="elapsedSeconds()"></app-order-timer>
+            </span>
+          </div>
+          <div class="flex flex-col items-end">
+            <span class="text-[9px] font-extrabold text-slate-500 uppercase tracking-widest font-syne">Est. Prep</span>
+            <span class="text-xs font-bold text-slate-400 mt-1 font-space">{{ prepTimeMinutes() }} mins</span>
+          </div>
+        </div>
+
+        <button 
+          (click)="onAction($event)"
+          class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold font-syne text-[11px] tracking-widest uppercase transition-all duration-200 outline-none select-none active:scale-[0.98] border border-emerald-500/20 shadow-md shadow-emerald-900/10"
+        >
+          Mark ready
+        </button>
+      </div>
+    }
+
+    <!-- CARD FOOTER — READY -->
+    @if (order().status === 3) {
+      <div class="space-y-4 shrink-0">
+        <div class="flex items-center justify-between">
+          <div class="flex flex-col">
+            <span class="text-[9px] font-extrabold text-slate-500 uppercase tracking-widest font-syne">Total Elapsed</span>
+            <span class="mt-1">
+              <app-order-timer [elapsedSeconds]="elapsedSeconds()"></app-order-timer>
+            </span>
+          </div>
+          <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/25 text-[10px] font-extrabold px-3 py-1.5 rounded-lg tracking-wider font-syne">
+            READY TO SERVE
+          </span>
+        </div>
+        <button 
+          (click)="onAction($event)"
+          class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold font-syne text-[11px] tracking-widest uppercase transition-all duration-200 outline-none select-none active:scale-[0.98] border border-emerald-500/20"
+        >
+          Dismiss
+        </button>
+      </div>
     }
   </div>
 </div>
 
-<!-- Simple Modal Overlay -->
+<!-- Details Modal Overlay -->
 @if (isModalOpen()) {
-  <div class="modal-backdrop" (click)="closeModal()">
-    <div class="modal-content" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h3>Order Detail #{{ order().id }}</h3>
-        <button class="close-btn" (click)="closeModal()">&times;</button>
-      </div>
-      <div class="modal-body">
-        <p><strong>Table:</strong> {{ order().tableNumber }}</p>
-        <p><strong>Status:</strong> {{ order().statusName }} (Code: {{ order().status }})</p>
-        <p><strong>Created At:</strong> {{ order().createdAt | date:'short' }}</p>
-        @if (order().assignedChefName) {
-          <p><strong>Assigned Chef:</strong> {{ order().assignedChefName }}</p>
-        }
-        @if (order().assignedWaiterName) {
-          <p><strong>Waiter:</strong> {{ order().assignedWaiterName }}</p>
-        }
+  <div 
+    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-fade-in modal-backdrop select-none"
+    (click)="closeModal()"
+  >
+    <div 
+      class="relative bg-[#0F172A] rounded-3xl shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] border border-slate-800 max-w-lg w-full overflow-hidden flex flex-col transform transition-all duration-300 scale-100 ease-out animate-scale-in"
+      (click)="$event.stopPropagation()"
+    >
+      
+      <!-- Close floating button top-right -->
+      <button
+        (click)="closeModal()"
+        class="absolute top-4 right-4 z-10 bg-slate-800 hover:bg-slate-700 text-slate-300 p-2 rounded-full shadow-md transition-all duration-200 hover:scale-105 outline-none"
+      >
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+        </svg>
+      </button>
+
+      <!-- Modal Content -->
+      <div class="p-6 sm:p-8 flex flex-col space-y-6">
         
-        <h4>Items</h4>
-        <table>
-          <thead>
-            <tr>
-              <th>Item</th>
-              <th>Qty</th>
-              <th>Notes</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (item of order().orderItems; track item.id) {
-              <tr>
-                <td>{{ item.menuItemName }}</td>
-                <td>{{ item.quantity }}</td>
-                <td>{{ item.notes || '-' }}</td>
-              </tr>
-            }
-          </tbody>
-        </table>
-        
-        <p class="total"><strong>Total:</strong> {{ order().totalAmount | currency }}</p>
+        <!-- Header: Order ID & Table -->
+        <div class="space-y-1">
+          <span class="text-[10px] font-medium font-syne text-[#F28500] uppercase tracking-widest">Order Details</span>
+          <div class="flex items-baseline justify-between">
+            <h3 class="text-xl sm:text-2xl font-medium font-syne text-white tracking-tight">Order #{{ order().id }}</h3>
+            <span class="text-base font-medium font-syne text-slate-300">Table T-{{ order().tableNumber }}</span>
+          </div>
+        </div>
+
+        <!-- Details Grid -->
+        <div class="grid grid-cols-2 gap-4 bg-slate-900/50 border border-slate-800 rounded-2xl p-4 text-xs font-space">
+          <div>
+            <span class="text-[9px] font-medium font-syne text-slate-500 uppercase block tracking-wider mb-0.5">Status</span>
+            <span class="font-normal text-white">{{ order().statusName }} ({{ order().status }})</span>
+          </div>
+          <div>
+            <span class="text-[9px] font-medium font-syne text-slate-500 uppercase block tracking-wider mb-0.5">Estimated Ready</span>
+            <span class="font-normal text-slate-300 font-mono-dm">
+              {{ order().estimatedReadyAt ? (order().estimatedReadyAt | date:'shortTime') : 'Not Set' }}
+            </span>
+          </div>
+          <div>
+            <span class="text-[9px] font-medium font-syne text-slate-500 uppercase block tracking-wider mb-0.5">Order Time</span>
+            <span class="font-normal text-slate-300 font-mono-dm">{{ order().createdAt | date:'medium' }}</span>
+          </div>
+          <div>
+            <span class="text-[9px] font-medium font-syne text-slate-500 uppercase block tracking-wider mb-0.5">Staff Assignment</span>
+            <span class="font-normal text-slate-300">
+              Waiter: {{ order().assignedWaiterName || 'N/A' }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Table list of items -->
+        <div class="space-y-2">
+          <h4 class="text-[10px] font-medium font-syne text-slate-500 tracking-wider uppercase">Order Items</h4>
+          <div class="border border-slate-800 rounded-2xl overflow-hidden font-space">
+            <table class="w-full text-xs text-left border-collapse">
+              <thead>
+                <tr class="bg-slate-900/80 border-b border-slate-800 text-slate-400 font-medium font-syne uppercase tracking-wider text-[10px]">
+                  <th class="py-3 px-4">Item Description</th>
+                  <th class="py-3 px-4 text-center w-16">Qty</th>
+                  <th class="py-3 px-4">Notes</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-800">
+                @for (item of order().orderItems; track item.id) {
+                  <tr class="hover:bg-slate-900/30 text-white">
+                    <td class="py-3 px-4 font-normal">{{ item.menuItemName }}</td>
+                    <td class="py-3 px-4 text-center font-medium font-mono-dm text-slate-400">{{ item.quantity }}</td>
+                    <td class="py-3 px-4 text-amber-500 font-normal italic">{{ item.notes || '-' }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Total Price -->
+        <div class="flex items-center justify-between border-t border-slate-800 pt-4">
+          <span class="text-xs font-medium font-syne text-slate-400 uppercase tracking-widest">Total Amount</span>
+          <span class="text-xl sm:text-2xl font-semibold font-mono-dm text-[#F28500]">{{ order().totalAmount | currency }}</span>
+        </div>
+
       </div>
+
     </div>
   </div>
 }

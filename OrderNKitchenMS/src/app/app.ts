@@ -17,7 +17,7 @@ export class App {
   public showSidebar(): boolean {
     const url = this.router.url;
     // Don't show sidebar on login, register, guest landing, or root route
-    if (url.includes('/login') || url.includes('/register') || url.includes('/guest/landing') || url === '/' || url === '') {
+    if (url.includes('/login') || url.includes('/register') || url.includes('/guest/landing') || url === '/' || url === '' || url.includes('/kitchen')) {
       return false;
     }
     // Show sidebar if token is present

@@ -1,55 +1,232 @@
-<h2>KDS Board - Kitchen Display System</h2>
-
-@if (errorMessage()) {
-  <p style="color: red;">{{ errorMessage() }}</p>
-}
-
-<div class="kds-columns">
-  <!-- Pending Column -->
-  <div class="kds-column">
-    <div class="column-header pending">
-      <h3>Pending ({{ pendingOrders().length }})</h3>
+<div class="min-h-screen bg-[#0B0F19] text-slate-100 p-4 sm:p-6 font-sans flex flex-col select-none relative">
+  
+  <!-- TOAST NOTIFICATION FOR CANCELLATION -->
+  @if (toastMessage()) {
+    <div class="fixed top-6 right-6 z-50 bg-[#DE350B] text-white font-syne text-xs font-bold px-5 py-3.5 rounded-2xl border border-red-500/20 shadow-[0_20px_50px_rgba(222,53,11,0.3)] flex items-center space-x-3 animate-fade-in">
+      <span class="relative flex h-2 w-2">
+        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+        <span class="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+      </span>
+      <span>{{ toastMessage() }}</span>
     </div>
-    <div class="column-content">
-      @if (pendingOrders().length === 0) {
-        <p class="empty-msg">No pending orders.</p>
-      } @else {
-        @for (order of pendingOrders(); track order.id) {
-          <app-order-card [order]="order" (startCooking)="handleStartCooking($event)"></app-order-card>
-        }
-      }
+  }
+
+  <!-- TOP KDS HEADER BAR -->
+  <header class="bg-[#111827] border border-slate-800/80 rounded-2xl px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 shadow-2xl shrink-0">
+    
+    <!-- Title & Brand -->
+    <div class="flex items-center space-x-3">
+      <span class="text-2xl font-serif text-[#F28500] font-medium tracking-wide italic">Ambrosia</span>
+      <span class="w-1.5 h-6 bg-slate-800 rounded-full"></span>
+      <h2 class="text-lg font-bold tracking-wider text-slate-300 font-syne uppercase">
+        Kitchen Display
+      </h2>
     </div>
+
+    <!-- Active Metrics & Live Dot -->
+    <div class="flex flex-wrap items-center gap-4 sm:gap-6">
+      
+      <!-- Total Active Badge -->
+      <div class="bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 flex items-center space-x-3 shadow-inner">
+        <span class="text-[10px] font-extrabold text-slate-500 font-syne uppercase tracking-wider">ACTIVE ORDERS</span>
+        <span class="bg-[#F28500]/15 text-[#F28500] border border-[#F28500]/25 font-bold font-mono-dm text-sm px-2.5 py-0.5 rounded-lg">
+          {{ totalActiveOrders() }}
+        </span>
+      </div>
+
+      <!-- Avg cooking time badge -->
+      <div class="bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 flex items-center space-x-3 shadow-inner">
+        <span class="text-[10px] font-extrabold text-slate-500 font-syne uppercase tracking-wider">AVG IN-PREP TIME</span>
+        <span class="text-white font-bold font-mono-dm text-sm tracking-widest">
+          {{ avgInPrepTime() }}
+        </span>
+      </div>
+
+      <!-- Live Connection Dot -->
+      <div class="bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 flex items-center space-x-2.5 shadow-inner">
+        <span [class]="'w-2 h-2 rounded-full ' + (signalRService.isConnected() ? 'bg-emerald-500 animate-pulse' : 'bg-red-500')" id="connection-dot"></span>
+        <span class="text-[9px] font-extrabold text-slate-400 font-syne uppercase tracking-wider">
+          {{ signalRService.isConnected() ? 'CONNECTED' : 'DISCONNECTED' }}
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Error feedback message -->
+  @if (errorMessage()) {
+    <div class="mb-6 p-4 bg-red-500/10 border border-red-500/20 text-[#DE350B] text-sm font-semibold rounded-2xl flex items-center space-x-2 animate-fade-in shrink-0">
+      <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3Z" />
+      </svg>
+      <span>{{ errorMessage() }}</span>
+    </div>
+  }
+
+  <!-- THREE COLUMN DISPLAY WORKSPACE -->
+  <div class="flex-1 flex gap-6 items-stretch overflow-hidden">
+    
+    <!-- columns list -->
+    <div class="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6 overflow-y-auto pr-1">
+      
+      <!-- PENDING COLUMN -->
+      <div class="flex flex-col bg-[#111827]/40 border border-slate-800 rounded-3xl p-4 overflow-hidden h-full">
+        <!-- Header -->
+        <div 
+          (mouseenter)="resetUnread()" 
+          (click)="resetUnread()" 
+          class="flex items-center justify-between pb-3 border-b-2 border-[#F28500] mb-4 shrink-0 select-none cursor-pointer group"
+          id="pending-header"
+        >
+          <div class="flex items-center space-x-2">
+            <h3 class="text-base font-extrabold tracking-wider uppercase font-syne text-white">
+              Pending
+            </h3>
+            <span class="bg-[#F28500]/15 text-[#F28500] border border-[#F28500]/25 font-bold font-mono-dm text-xs px-2.5 py-0.5 rounded-full">
+              {{ pendingOrders().length }}
+            </span>
+          </div>
+
+          <!-- Unread alerts -->
+          @if (unreadCount() > 0) {
+            <span class="bg-red-500 text-white font-syne font-extrabold text-[9px] px-2 py-0.5 rounded-full tracking-wider uppercase animate-bounce shadow-[0_0_10px_rgba(239,68,68,0.5)]">
+              +{{ unreadCount() }} NEW
+            </span>
+          }
+        </div>
+
+        <!-- Orders list -->
+        <div class="flex-1 overflow-y-auto space-y-4 pr-1">
+          @if (pendingOrders().length === 0) {
+            <div class="text-center py-20 text-slate-600 font-space text-sm italic">
+              No pending orders.
+            </div>
+          } @else {
+            @for (order of pendingOrders(); track order.id) {
+              <app-order-card 
+                [order]="order" 
+                (startCooking)="handleStartCooking($event)"
+              ></app-order-card>
+            }
+          }
+        </div>
+      </div>
+
+      <!-- IN PREP COLUMN -->
+      <div class="flex flex-col bg-[#111827]/40 border border-slate-800 rounded-3xl p-4 overflow-hidden h-full">
+        <!-- Header -->
+        <div class="flex items-center justify-between pb-3 border-b-2 border-[#8C5815] mb-4 shrink-0 select-none" id="in-prep-header">
+          <div class="flex items-center space-x-2">
+            <h3 class="text-base font-extrabold tracking-wider uppercase font-syne text-white">
+              In Prep
+            </h3>
+            <span class="bg-[#8C5815]/15 text-[#8C5815] border border-[#8C5815]/25 font-bold font-mono-dm text-xs px-2.5 py-0.5 rounded-full">
+              {{ inPrepOrders().length }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Orders list -->
+        <div class="flex-1 overflow-y-auto space-y-4 pr-1">
+          @if (inPrepOrders().length === 0) {
+            <div class="text-center py-20 text-slate-600 font-space text-sm italic">
+              No orders cooking.
+            </div>
+          } @else {
+            @for (order of inPrepOrders(); track order.id) {
+              <app-order-card 
+                [order]="order" 
+                [cookingStartTime]="timerMap()[order.id]"
+                (markReady)="handleMarkReady($event)"
+              ></app-order-card>
+            }
+          }
+        </div>
+      </div>
+
+      <!-- READY COLUMN -->
+      <div class="flex flex-col bg-[#111827]/40 border border-slate-800 rounded-3xl p-4 overflow-hidden h-full">
+        <!-- Header -->
+        <div class="flex items-center justify-between pb-3 border-b-2 border-[#639922] mb-4 shrink-0 select-none" id="ready-header">
+          <div class="flex items-center space-x-2">
+            <h3 class="text-base font-extrabold tracking-wider uppercase font-syne text-white">
+              Ready
+            </h3>
+            <span class="bg-[#639922]/15 text-[#639922] border border-[#639922]/25 font-bold font-mono-dm text-xs px-2.5 py-0.5 rounded-full">
+              {{ readyOrders().length }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Orders list -->
+        <div class="flex-1 overflow-y-auto space-y-4 pr-1">
+          @if (readyOrders().length === 0) {
+            <div class="text-center py-20 text-slate-600 font-space text-sm italic">
+              No orders ready.
+            </div>
+          } @else {
+            @for (order of readyOrders(); track order.id) {
+              <app-order-card 
+                [order]="order" 
+                (markReady)="handleDismiss($event)"
+              ></app-order-card>
+            }
+          }
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT DRAWER: Collapsible Batch Prep Summary -->
+    @if (isSummaryOpen()) {
+      <aside class="w-80 bg-[#111827] border border-slate-800 rounded-3xl p-6 shadow-2xl shrink-0 flex flex-col h-full animate-scale-in">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-800 shrink-0">
+          <h3 class="text-sm font-extrabold text-white tracking-wider uppercase font-syne">Prep Summary</h3>
+          <span class="text-[9px] font-extrabold text-slate-500 tracking-wider bg-slate-900 border border-slate-800 px-2 py-0.5 rounded uppercase">
+            BATCH COOKING
+          </span>
+        </div>
+
+        <!-- Summary Items List -->
+        <div class="flex-1 overflow-y-auto py-4 space-y-3.5 pr-1">
+          @if (activeItemSummary().length === 0) {
+            <p class="text-xs text-slate-500 italic py-6 text-center">No active items to prepare.</p>
+          } @else {
+            @for (item of activeItemSummary(); track item.name) {
+              <div class="flex items-start justify-between text-sm leading-snug">
+                <span class="text-slate-300 font-semibold font-space">{{ item.name }}</span>
+                <span class="bg-[#F28500]/15 text-[#F28500] border border-[#F28500]/25 font-bold text-xs px-2.5 py-0.5 rounded-full shrink-0">
+                  {{ item.qty }}x
+                </span>
+              </div>
+            }
+          }
+        </div>
+
+        <!-- Footer warnings -->
+        <div class="bg-slate-900/60 rounded-xl p-3 border border-slate-800 text-[10px] text-slate-400 font-medium leading-relaxed shrink-0">
+          Sums active receipt quantities (Pending & In Prep). Prepare these in batches to optimize prep times.
+        </div>
+      </aside>
+    }
+
   </div>
 
-  <!-- In Prep Column -->
-  <div class="kds-column">
-    <div class="column-header in-prep">
-      <h3>In Prep ({{ inPrepOrders().length }})</h3>
-    </div>
-    <div class="column-content">
-      @if (inPrepOrders().length === 0) {
-        <p class="empty-msg">No orders in preparation.</p>
-      } @else {
-        @for (order of inPrepOrders(); track order.id) {
-          <app-order-card [order]="order" (markReady)="handleMarkReady($event)"></app-order-card>
-        }
-      }
-    </div>
-  </div>
+  <!-- FLOATING PREP SUMMARY TOGGLE BUTTON -->
+  <button 
+    (click)="toggleSummary()"
+    title="Toggle Prep Summary Sidebar"
+    [class]="'fixed bottom-6 right-6 z-40 p-4 rounded-full shadow-2xl transition-all duration-300 transform active:scale-95 outline-none border ' + 
+             (isSummaryOpen() ? 'bg-slate-800 text-white border-slate-700' : 'bg-[#F28500] hover:bg-[#D47300] text-white border-[#D47300]/20 hover:scale-105')"
+  >
+    @if (isSummaryOpen()) {
+      <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+      </svg>
+    } @else {
+      <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a9.04 9.04 0 0 1-2.943 2.244A9.07 9.07 0 0 1 9 18.75m6-12v6a3 3 0 0 1-3 3H9a3 3 0 0 1-3-3v-6a3 3 0 0 1 3-3h3a3 3 0 0 1 3 3ZM9 10.5h.008v.008H9V10.5Zm3 0h.008v.008H12V10.5Z" />
+      </svg>
+    }
+  </button>
 
-  <!-- Ready Column -->
-  <div class="kds-column">
-    <div class="column-header ready">
-      <h3>Ready ({{ readyOrders().length }})</h3>
-    </div>
-    <div class="column-content">
-      @if (readyOrders().length === 0) {
-        <p class="empty-msg">No ready orders.</p>
-      } @else {
-        @for (order of readyOrders(); track order.id) {
-          <app-order-card [order]="order"></app-order-card>
-        }
-      }
-    </div>
-  </div>
 </div>

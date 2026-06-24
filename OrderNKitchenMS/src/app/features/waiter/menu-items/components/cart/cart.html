@@ -5,23 +5,23 @@
       <svg class="w-5 h-5 text-[#8C5815]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
         <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
       </svg>
-      <h3 class="text-lg font-bold text-gray-800 font-serif">Current Order</h3>
+      <h3 class="text-lg font-medium text-gray-800 font-syne">Current Order</h3>
     </div>
-    <span class="bg-[#FAF4EC] text-[#8C5815] text-xs font-semibold px-2 py-1 rounded-full border border-[#8C5815]/10">
+    <span class="bg-[#FAF4EC] text-[#8C5815] text-[10px] font-medium font-syne px-2.5 py-1 rounded-full border border-[#8C5815]/10 uppercase tracking-wider">
       {{ cartItems.length }} items
     </span>
   </div>
 
   <!-- Cart Body: Table number and Items lists -->
-  <div class="p-6 flex-1 overflow-y-auto space-y-6 max-h-[350px] md:max-h-none">
+  <div class="p-6 flex-1 overflow-y-auto space-y-6 max-h-[350px] md:max-h-none font-space">
     <!-- Table Selector -->
     <div>
-      <label class="block text-[11px] font-bold tracking-wider text-gray-400 uppercase mb-2">Dining Table</label>
+      <label class="block text-[10px] font-medium tracking-wider text-gray-400 uppercase mb-2 font-syne">Dining Table</label>
       <div class="relative">
         <select
           [ngModel]="selectedTableId"
           (ngModelChange)="onTableChange($event)"
-          class="w-full bg-[#FCFAF8] text-gray-800 text-sm font-medium py-2.5 px-3 rounded-lg border border-gray-100 focus:ring-1 focus:ring-[#8C5815]/30 focus:bg-white outline-none appearance-none transition-all duration-200 shadow-sm"
+          class="w-full bg-[#FCFAF8] text-gray-800 text-sm font-normal py-2.5 px-3 rounded-lg border border-[#EFECE9] focus:ring-1 focus:ring-[#8C5815]/30 focus:bg-white outline-none appearance-none transition-all duration-200 shadow-sm"
         >
           <option [value]="null" disabled selected>-- Choose Table --</option>
           @for (tbl of tables; track tbl.id) {
@@ -38,24 +38,24 @@
 
     <!-- Items Lists -->
     <div class="space-y-4">
-      <label class="block text-[11px] font-bold tracking-wider text-gray-400 uppercase">Selected Dishes</label>
+      <label class="block text-[10px] font-medium tracking-wider text-gray-400 uppercase font-syne">Selected Dishes</label>
       
       @if (cartItems.length === 0) {
-        <div class="flex flex-col items-center justify-center py-12 text-center border border-dashed border-gray-100 rounded-xl bg-[#FCFAF8] select-none">
-          <p class="text-sm text-gray-400">Cart is empty.</p>
-          <p class="text-[10px] text-gray-400 mt-0.5">Click on available menu dishes to add.</p>
+        <div class="flex flex-col items-center justify-center py-12 text-center border border-dashed border-gray-150 rounded-xl bg-[#FCFAF8] select-none font-space">
+          <p class="text-sm text-gray-400 font-normal">Cart is empty.</p>
+          <p class="text-[10px] text-gray-400 mt-0.5 font-normal">Click on available menu dishes to add.</p>
         </div>
       } @else {
         <div class="space-y-3">
           @for (cartItem of cartItems; track cartItem.menuItem.id) {
-            <div class="flex flex-col p-3.5 bg-[#FCFAF8] rounded-xl border border-gray-100 shadow-sm space-y-2.5 transition-all duration-200 font-sans">
+            <div class="flex flex-col p-3.5 bg-[#FCFAF8] rounded-xl border border-[#EFECE9] shadow-sm space-y-2.5 transition-all duration-200">
               <div class="flex items-start justify-between gap-3">
                 <div class="flex items-center space-x-3">
                   <!-- Mini Thumbnail -->
                   <img [src]="cartItem.menuItem.imageUrl || '/favicon.ico'" class="w-10 h-10 object-cover rounded-md bg-gray-50 shrink-0" />
                   <div>
-                    <h4 class="text-sm font-bold text-gray-800 leading-tight font-serif">{{ cartItem.menuItem.name }}</h4>
-                    <span class="text-xs font-semibold text-[#8C5815] font-serif">${{ cartItem.menuItem.price }}</span>
+                    <h4 class="text-sm font-medium text-gray-800 leading-tight font-space">{{ cartItem.menuItem.name }}</h4>
+                    <span class="text-xs font-medium text-[#8C5815] font-mono-dm">${{ cartItem.menuItem.price }}</span>
                   </div>
                 </div>
 
@@ -70,17 +70,17 @@
               <!-- Controls: Quantity adjusters & Note input -->
               <div class="flex items-center justify-between gap-4 pt-1">
                 <!-- Quantity adjustments -->
-                <div class="flex items-center border border-gray-200 bg-white rounded-md overflow-hidden">
+                <div class="flex items-center border border-gray-200 bg-white rounded-md overflow-hidden font-mono-dm">
                   <button
                     (click)="updateQuantity.emit({ itemId: cartItem.menuItem.id, newQty: cartItem.quantity - 1 })"
-                    class="px-2 py-0.5 text-gray-500 hover:bg-gray-50 font-bold transition-colors duration-150"
+                    class="px-2 py-0.5 text-gray-500 hover:bg-gray-50 font-medium transition-colors duration-150"
                   >
                     -
                   </button>
-                  <span class="px-2 text-xs font-bold text-gray-800 w-6 text-center select-none">{{ cartItem.quantity }}</span>
+                  <span class="px-2 text-xs font-medium text-gray-800 w-6 text-center select-none">{{ cartItem.quantity }}</span>
                   <button
                     (click)="updateQuantity.emit({ itemId: cartItem.menuItem.id, newQty: cartItem.quantity + 1 })"
-                    class="px-2 py-0.5 text-gray-500 hover:bg-gray-50 font-bold transition-colors duration-150"
+                    class="px-2 py-0.5 text-gray-500 hover:bg-gray-50 font-medium transition-colors duration-150"
                   >
                     +
                   </button>
@@ -93,7 +93,7 @@
                     [ngModel]="cartItem.notes"
                     (ngModelChange)="updateNotes.emit({ itemId: cartItem.menuItem.id, notes: $event })"
                     placeholder="Add special instructions..."
-                    class="w-full bg-white text-gray-700 placeholder-gray-400 px-2.5 py-1 rounded text-[11px] border border-gray-200 outline-none focus:border-[#8C5815]/30 focus:ring-1 focus:ring-[#8C5815]/10 transition-all duration-200"
+                    class="w-full bg-white text-gray-700 placeholder-gray-400 px-2.5 py-1 rounded text-[11px] border border-gray-200 outline-none focus:border-[#8C5815]/30 focus:ring-1 focus:ring-[#8C5815]/10 transition-all duration-200 font-space"
                   />
                 </div>
               </div>
@@ -106,28 +106,28 @@
 
   <!-- Cart Checkout Footer -->
   <div class="p-6 border-t border-gray-100 bg-[#FCFAF8]/50 space-y-4 select-none">
-    <div class="space-y-1.5">
-      <div class="flex justify-between text-xs text-gray-500 font-medium">
-        <span>Subtotal</span>
+    <div class="space-y-1.5 font-mono-dm">
+      <div class="flex justify-between text-xs text-slate-500 font-medium">
+        <span class="font-space">Subtotal</span>
         <span>${{ getCartTotal().toFixed(2) }}</span>
       </div>
-      <div class="flex justify-between text-xs text-gray-500 font-medium">
-        <span>Est. Tax (8%)</span>
+      <div class="flex justify-between text-xs text-slate-500 font-medium">
+        <span class="font-space">Est. Tax (8%)</span>
         <span>${{ (getCartTotal() * 0.08).toFixed(2) }}</span>
       </div>
-      <div class="flex justify-between text-sm font-bold text-gray-800 pt-1.5 border-t border-dashed border-gray-200">
-        <span>Total Amount</span>
-        <span class="font-serif text-base">${{ (getCartTotal() * 1.08).toFixed(2) }}</span>
+      <div class="flex justify-between text-sm font-bold text-gray-800 pt-1.5 border-t border-dashed border-gray-200 items-baseline">
+        <span class="font-syne font-medium">Total Amount</span>
+        <span class="font-syne text-lg font-bold">${{ (getCartTotal() * 1.08).toFixed(2) }}</span>
       </div>
     </div>
 
     @if (checkoutSuccess) {
-      <div class="p-3 bg-[#E8F8F0] border border-[#D1F2DE] text-[#1E7E34] text-xs font-semibold rounded-lg animate-fade-in">
+      <div class="p-3 bg-[#E8F8F0] border border-[#D1F2DE] text-[#1E7E34] text-xs font-semibold rounded-lg animate-fade-in font-space">
         {{ checkoutSuccess }}
       </div>
     }
     @if (checkoutError) {
-      <div class="p-3 bg-[#FDF2F2] border border-[#FDE8E8] text-[#DE350B] text-xs font-semibold rounded-lg animate-fade-in">
+      <div class="p-3 bg-[#FDF2F2] border border-[#FDE8E8] text-[#DE350B] text-xs font-semibold rounded-lg animate-fade-in font-space">
         {{ checkoutError }}
       </div>
     }
@@ -135,7 +135,7 @@
     <button
       (click)="submitOrder.emit()"
       [disabled]="isSubmitting || cartItems.length === 0 || !selectedTableId"
-      class="w-full bg-[#8C5815] hover:bg-[#72450F] disabled:bg-gray-300 text-white font-semibold py-3 rounded-xl text-sm transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center space-x-2"
+      class="w-full bg-[#8C5815] hover:bg-[#72450F] disabled:bg-gray-300 text-white font-medium font-syne py-3 rounded-xl text-xs sm:text-sm tracking-widest uppercase transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center space-x-2"
     >
       @if (isSubmitting) {
         <svg class="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">

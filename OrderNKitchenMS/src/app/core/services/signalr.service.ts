@@ -1,4 +1,4 @@
-import { Injectable } from "@angular/core";
+import { Injectable, signal } from "@angular/core";
 import * as signalR from "@microsoft/signalr";
 import { signalrUrl } from "../enviroment";
 import { Observable, Subject } from "rxjs";
@@ -10,6 +10,7 @@ import { OrderModel } from "../models/order.model";
 export class SignalRService {
 
     private hubConnection!: signalR.HubConnection;
+    public isConnected = signal<boolean>(false);
 
     private newOrderSubject = new Subject<OrderModel>();
     public get newOrder$(): Observable<OrderModel> {
@@ -35,9 +36,15 @@ export class SignalRService {
 
             await this.hubConnection.start();
             console.log("SignalR Connected.");
+            this.isConnected.set(true);
+
+            this.hubConnection.onclose(() => this.isConnected.set(false));
+            this.hubConnection.onreconnecting(() => this.isConnected.set(false));
+            this.hubConnection.onreconnected(() => this.isConnected.set(true));
 
         } catch (err) {
             console.error("Error connecting to SignalR:", err);
+            this.isConnected.set(false);
         }
     }
 
@@ -60,6 +67,7 @@ export class SignalRService {
                 await this.hubConnection.stop();
                 console.log("SignalR Disconnected.");
             }
+            this.isConnected.set(false);
         } catch (err) {
             console.error("Error disconnecting from SignalR:", err);
         }

@@ -1,9 +1,14 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Syne:wght@400..800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;1,500&family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;700&family=Syne:wght@500;700;800&display=swap');
 @import 'tailwindcss';
 
 @theme {
-  --font-sans: 'Outfit', sans-serif;
-  --font-serif: 'Syne', sans-serif;
+  --font-sans: 'Space Grotesk', sans-serif;
+  --font-serif: 'Cormorant Garamond', serif;
+  
+  --font-space: 'Space Grotesk', sans-serif;
+  --font-syne: 'Syne', sans-serif;
+  --font-mono-dm: 'DM Mono', monospace;
+  --font-cormorant: 'Cormorant Garamond', serif;
   
   --color-primary: #F28500;
   --color-secondary: #36454F;

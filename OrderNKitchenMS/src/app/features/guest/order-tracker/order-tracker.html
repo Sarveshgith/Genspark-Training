@@ -1,11 +1,11 @@
 <!-- Header Navbar -->
 <header class="max-w-7xl mx-auto w-full px-6 py-6 flex items-center justify-between border-b border-[#F5EFE6]">
-  <div class="text-2xl font-bold tracking-widest text-[#9C7A3C] uppercase font-serif">
+  <div class="text-2xl font-bold tracking-widest text-[#9C7A3C] uppercase font-syne">
     Ambrosia
   </div>
   <div class="flex items-center space-x-3 bg-[#FAF3E8] border border-[#EFE5D3] px-4 py-2 rounded-full shadow-sm">
-    <span class="text-xs font-semibold tracking-wider text-[#8C7A6B] uppercase">Your Location</span>
-    <span class="text-sm font-bold text-[#2C2117] font-serif">Table {{ tableNumber }}</span>
+    <span class="text-sm font-semibold tracking-wider text-[#8C7A6B] uppercase font-outfit">Your Location</span>
+    <span class="text-sm font-bold text-[#2C2117] font-syne">Table {{ tableNumber }}</span>
     <div class="w-8 h-8 rounded-full bg-[#E8A54B] flex items-center justify-center text-white">
       <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
@@ -25,8 +25,8 @@
       <div class="relative overflow-hidden bg-gradient-to-br from-[#FCEAD2] to-[#F5DBC1] border border-[#E9C7A5] rounded-3xl p-8 md:p-10 shadow-lg shadow-[#FCEAD2]/20">
         <div class="space-y-6">
           <div class="space-y-1">
-            <p class="text-xs uppercase tracking-widest text-[#8C663C] font-semibold">Live Order Status</p>
-            <h2 class="text-5xl font-extrabold tracking-tight text-[#8C5815] font-serif leading-tight">
+            <p class="text-sm uppercase tracking-widest text-[#8C663C] font-semibold font-outfit">Live Order Status</p>
+            <h2 class="text-4xl sm:text-5xl font-extrabold tracking-tight text-[#8C5815] font-syne leading-tight">
               {{ statusDisplay }}
             </h2>
           </div>
@@ -66,28 +66,28 @@
           <div *ngIf="order && order.status === 'InPrep'" class="grid grid-cols-2 md:grid-cols-4 gap-4 pt-6 border-t border-[#8C5815]/10 mt-6 transition-all duration-300">
             <!-- Queue Position -->
             <div class="bg-white/40 backdrop-blur-sm border border-[#E9C7A5]/30 rounded-2xl p-4 text-center space-y-1">
-              <span class="block text-[10px] uppercase tracking-widest text-[#8C663C] font-bold">Queue Position</span>
-              <span class="block text-xl font-bold font-serif text-[#8C5815]">#{{ order.queuePosition || 1 }}</span>
+              <span class="block text-[11px] uppercase tracking-widest text-[#8C663C] font-bold font-outfit">Queue Position</span>
+              <span class="block text-2xl font-bold font-syne text-[#8C5815]">#{{ order.queuePosition || 1 }}</span>
             </div>
 
             <!-- Wait Time -->
             <div class="bg-white/40 backdrop-blur-sm border border-[#E9C7A5]/30 rounded-2xl p-4 text-center space-y-1">
-              <span class="block text-[10px] uppercase tracking-widest text-[#8C663C] font-bold">Est. Wait</span>
-              <span class="block text-xl font-bold font-serif text-[#8C5815]">{{ order.estimatedTimeMinutes || 0 }} min</span>
+              <span class="block text-[11px] uppercase tracking-widest text-[#8C663C] font-bold font-outfit">Est. Wait</span>
+              <span class="block text-2xl font-bold font-syne text-[#8C5815]">{{ order.estimatedTimeMinutes || 0 }} min</span>
             </div>
 
             <!-- ETA -->
             <div class="bg-white/40 backdrop-blur-sm border border-[#E9C7A5]/30 rounded-2xl p-4 text-center space-y-1">
-              <span class="block text-[10px] uppercase tracking-widest text-[#8C663C] font-bold">Ready By</span>
-              <span class="block text-xl font-bold font-serif text-[#8C5815]">
+              <span class="block text-[11px] uppercase tracking-widest text-[#8C663C] font-bold font-outfit">Ready By</span>
+              <span class="block text-2xl font-extrabold font-syne text-[#8C5815]">
                 {{ order.estimatedReadyAt ? (order.estimatedReadyAt | date:'shortTime') : '--:--' }}
               </span>
             </div>
 
             <!-- Time Lapsed -->
             <div class="bg-white/40 backdrop-blur-sm border border-[#E9C7A5]/30 rounded-2xl p-4 text-center space-y-1">
-              <span class="block text-[10px] uppercase tracking-widest text-[#8C663C] font-bold">Time Lapsed</span>
-              <span class="block text-xl font-bold font-serif text-[#8C5815]">{{ timeElapsedDisplay }}</span>
+              <span class="block text-[11px] uppercase tracking-widest text-[#8C663C] font-bold font-outfit">Time Lapsed</span>
+              <span class="block text-3xl font-bold font-mono-dm text-[#8C5815]">{{ timeElapsedDisplay }}</span>
             </div>
           </div>
         </div>
@@ -119,12 +119,12 @@
         <div class="absolute -left-20 -bottom-20 w-48 h-48 bg-[#E8A54B]/5 rounded-full blur-3xl"></div>
         
         <div class="relative space-y-1">
-          <h4 class="text-[#E8A54B] text-xs font-bold uppercase tracking-widest flex items-center space-x-1.5">
+          <h4 class="text-[#E8A54B] text-xs font-bold uppercase tracking-widest flex items-center space-x-1.5 font-outfit">
             <span>✨</span>
             <span>Chef's Culinary Insights</span>
           </h4>
-          <h3 class="text-xl font-serif text-white">Your Menu's Flavor Palette</h3>
-          <p class="text-xs text-[#A39081] leading-relaxed">
+          <h3 class="text-xl font-syne text-white">Your Menu's Flavor Palette</h3>
+          <p class="text-sm text-[#A39081] leading-relaxed font-outfit font-normal">
             Here is the flavor profile balance crafted by our kitchen based on your ordered items:
           </p>
         </div>
@@ -175,7 +175,7 @@
           </div>
         </div>
 
-        <div class="relative pt-2 border-t border-[#3E2E22] flex items-start space-x-3 text-xxs text-[#A39081] leading-relaxed">
+        <div class="relative pt-2 border-t border-[#3E2E22] flex items-start space-x-3 text-sm text-[#A39081] leading-relaxed font-outfit font-normal">
           <span class="text-[#E8A54B] text-base leading-none">👨‍🍳</span>
           <p>
             <strong>Chef's Note:</strong> The pairing of savory items is complemented perfectly by subtle hints of zest. Sip your beverage slowly between bites to refresh your palate.
@@ -220,11 +220,11 @@
 
         <!-- Decorative Ticket Footer -->
         <div class="border-t-2 border-dashed border-[#E8DFD3] pt-6 text-center space-y-2">
-          <div class="flex justify-between text-xxs font-semibold uppercase tracking-wider text-[#8C7A6B]">
+          <div class="flex justify-between text-xs font-semibold uppercase tracking-wider text-[#8C7A6B] font-outfit">
             <span>Location: Table {{ tableNumber }}</span>
             <span>Status: {{ statusDisplay }}</span>
           </div>
-          <p class="text-[10px] text-[#A39081] italic">
+          <p class="text-sm font-outfit font-normal text-[#8C7A6B] italic">
             Chef de Cuisine • Ambrosia Dining Room
           </p>
         </div>

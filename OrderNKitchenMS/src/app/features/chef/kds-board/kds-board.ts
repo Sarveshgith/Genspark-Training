@@ -4,33 +4,80 @@ import { OrderModel } from '../../../core/models/order.model';
 import { OrderCard } from '../order-card/order-card';
 import { AuthService } from '../../../core/services/auth.service';
 import { SignalRService } from '../../../core/services/signalr.service';
+import { AudioService } from '../../../core/services/audio.service';
 import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-kds-board',
+  standalone: true,
   imports: [OrderCard],
   templateUrl: './kds-board.html',
   styleUrl: './kds-board.css',
 })
 export class KdsBoard implements OnInit, OnDestroy {
   private orderService = inject(OrderService);
-  public activeOrders = signal<OrderModel[]>([]);
-  public errorMessage = signal<string>('');
   private authService = inject(AuthService);
-  private signalRService = inject(SignalRService);
+  public signalRService = inject(SignalRService);
+  private audioService = inject(AudioService);
 
-  private signalRSubscription!: Subscription;
+  // Column signals
+  public pendingOrders = signal<OrderModel[]>([]);
+  public inPrepOrders = signal<OrderModel[]>([]);
+  public readyOrders = signal<OrderModel[]>([]);
 
-  public pendingOrders = computed(() => {
-    return this.activeOrders().filter(order => order.status === 1); // Pending = 1
+  // Maps orderId to cooking start time (epoch milliseconds)
+  public timerMap = signal<{ [orderId: number]: number }>({});
+
+  public unreadCount = signal<number>(0);
+  public toastMessage = signal<string | null>(null);
+  public errorMessage = signal<string>('');
+  
+  public currentTime = signal<Date>(new Date());
+  public isSummaryOpen = signal<boolean>(false);
+
+  private subscriptions = new Subscription();
+  private clockIntervalId: any;
+  private toastTimeoutId: any;
+
+  // Active count across all three columns
+  public totalActiveOrders = computed(() => {
+    return this.pendingOrders().length + this.inPrepOrders().length + this.readyOrders().length;
   });
 
-  public inPrepOrders = computed(() => {
-    return this.activeOrders().filter(order => order.status === 2); // InPrep = 2
+  // Ticking average cooking duration across all In Prep cards
+  public avgInPrepTime = computed(() => {
+    const prepOrders = this.inPrepOrders();
+    if (prepOrders.length === 0) return '00:00';
+
+    const now = this.currentTime().getTime();
+    let totalSeconds = 0;
+
+    prepOrders.forEach(o => {
+      const startTime = this.timerMap()[o.id] || new Date(o.createdAt).getTime();
+      const diff = Math.floor((now - startTime) / 1000);
+      totalSeconds += Math.max(0, diff);
+    });
+
+    const avgSeconds = Math.floor(totalSeconds / prepOrders.length);
+    const mins = Math.floor(avgSeconds / 60);
+    const secs = avgSeconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   });
 
-  public readyOrders = computed(() => {
-    return this.activeOrders().filter(order => order.status === 3); // Ready = 3
+  // Aggregated Prep Summary across all active orders (Pending and In Prep)
+  public activeItemSummary = computed(() => {
+    const summary: { [key: string]: number } = {};
+    const activeList = [...this.pendingOrders(), ...this.inPrepOrders()];
+    
+    activeList.forEach(order => {
+      order.orderItems.forEach(item => {
+        summary[item.menuItemName] = (summary[item.menuItemName] || 0) + item.quantity;
+      });
+    });
+
+    return Object.entries(summary)
+      .map(([name, qty]) => ({ name, qty }))
+      .sort((a, b) => b.qty - a.qty);
   });
 
   ngOnInit(): void {
@@ -39,17 +86,144 @@ export class KdsBoard implements OnInit, OnDestroy {
     const token = this.authService.getToken() ?? '';
     this.signalRService.connect(token);
 
-    this.signalRSubscription = this.signalRService.newOrder$.subscribe({
-      next: (newOrder) => {
-        this.activeOrders.update(orders => [newOrder, ...orders]);
-      }
-    });
+    // 1. Listen for new orders
+    this.subscriptions.add(
+      this.signalRService.newOrder$.subscribe({
+        next: (newOrder) => {
+          if (newOrder.status === 1) { // Pending
+            this.pendingOrders.update(orders => {
+              if (orders.some(o => o.id === newOrder.id)) return orders;
+              const updated = [...orders, newOrder];
+              return this.sortByAge(updated);
+            });
+            this.unreadCount.update(c => c + 1);
+            this.audioService.playNewOrderChime();
+          } else if (newOrder.status === 2) { // InPrep
+            this.inPrepOrders.update(orders => {
+              if (orders.some(o => o.id === newOrder.id)) return orders;
+              const updated = [...orders, newOrder];
+              return this.sortByAge(updated);
+            });
+            this.timerMap.update(map => ({ ...map, [newOrder.id]: Date.now() }));
+          }
+        }
+      })
+    );
+
+    // 2. Listen for order updates & cancellations
+    this.subscriptions.add(
+      this.signalRService.orderUpdate$.subscribe({
+        next: (trackingInfo) => {
+          const orderId = trackingInfo.orderId;
+          const statusStr = trackingInfo.status;
+
+          if (statusStr === 'Cancelled') {
+            // Remove from all signals
+            this.pendingOrders.update(orders => orders.filter(o => o.id !== orderId));
+            this.inPrepOrders.update(orders => orders.filter(o => o.id !== orderId));
+            this.readyOrders.update(orders => orders.filter(o => o.id !== orderId));
+
+            // Clear timer
+            this.timerMap.update(map => {
+              const newMap = { ...map };
+              delete newMap[orderId];
+              return newMap;
+            });
+
+            this.showToast(`Order #${orderId} cancelled`);
+          } 
+          else if (statusStr === 'InPrep') {
+            // Avoid redundant update if already processed locally
+            if (this.inPrepOrders().some(o => o.id === orderId)) {
+              return;
+            }
+
+            // Move from pending to inPrep
+            let foundOrder: OrderModel | undefined;
+            this.pendingOrders.update(orders => {
+              const idx = orders.findIndex(o => o.id === orderId);
+              if (idx > -1) {
+                foundOrder = { ...orders[idx], status: 2, statusName: 'InPrep' };
+                return orders.filter(o => o.id !== orderId);
+              }
+              return orders;
+            });
+
+            if (foundOrder) {
+              const order = foundOrder;
+              this.inPrepOrders.update(orders => {
+                if (orders.some(o => o.id === orderId)) return orders;
+                return this.sortByAge([...orders, order]);
+              });
+              // Start cooking timer
+              this.timerMap.update(map => ({ ...map, [orderId]: Date.now() }));
+            } else {
+              this.fetchActiveOrders();
+            }
+          } 
+          else if (statusStr === 'Ready') {
+            // Avoid redundant update if already processed locally
+            if (this.readyOrders().some(o => o.id === orderId)) {
+              return;
+            }
+
+            // Move from InPrep to Ready
+            let foundOrder: OrderModel | undefined;
+            this.inPrepOrders.update(orders => {
+              const idx = orders.findIndex(o => o.id === orderId);
+              if (idx > -1) {
+                foundOrder = { ...orders[idx], status: 3, statusName: 'Ready' };
+                return orders.filter(o => o.id !== orderId);
+              }
+              return orders;
+            });
+
+            if (foundOrder) {
+              const order = foundOrder;
+              this.readyOrders.update(orders => {
+                if (orders.some(o => o.id === orderId)) return orders;
+                return this.sortByAge([...orders, order]);
+              });
+              // Clear timer
+              this.timerMap.update(map => {
+                const newMap = { ...map };
+                delete newMap[orderId];
+                return newMap;
+              });
+            } else {
+              this.fetchActiveOrders();
+            }
+          } 
+          else if (statusStr === 'Served' || statusStr === 'Completed') {
+            // Clear from ready column
+            this.readyOrders.update(orders => orders.filter(o => o.id !== orderId));
+          }
+        }
+      })
+    );
+
+    // Start clock interval for ticking timers & average preparation computations
+    this.clockIntervalId = setInterval(() => {
+      this.currentTime.set(new Date());
+    }, 1000);
   }
 
   fetchActiveOrders(): void {
     this.orderService.getActiveOrders().subscribe({
       next: (orders) => {
-        this.activeOrders.set(orders);
+        const sorted = this.sortByAge(orders);
+        this.pendingOrders.set(sorted.filter(o => o.status === 1));
+        this.inPrepOrders.set(sorted.filter(o => o.status === 2));
+        this.readyOrders.set(sorted.filter(o => o.status === 3));
+
+        // Sync existing inPrep order timers
+        const currentTimers = { ...this.timerMap() };
+        sorted.filter(o => o.status === 2).forEach(o => {
+          if (!currentTimers[o.id]) {
+            currentTimers[o.id] = new Date(o.createdAt).getTime(); // Fallback to createdAt
+          }
+        });
+        this.timerMap.set(currentTimers);
       },
       error: (err) => {
         console.error('Failed to load active orders', err);
@@ -59,32 +233,117 @@ export class KdsBoard implements OnInit, OnDestroy {
   }
 
   handleStartCooking(orderId: number): void {
-    this.orderService.assignChef(orderId).subscribe({
+    // PATCH status=2
+    this.orderService.updateOrderStatus(orderId, 2).subscribe({
       next: () => {
-        this.fetchActiveOrders();
+        // Move from pending to inPrep immediately for instant local UI update!
+        let foundOrder: OrderModel | undefined;
+        this.pendingOrders.update(orders => {
+          const idx = orders.findIndex(o => o.id === orderId);
+          if (idx > -1) {
+            foundOrder = { ...orders[idx], status: 2, statusName: 'InPrep' };
+            return orders.filter(o => o.id !== orderId);
+          }
+          return orders;
+        });
+
+        if (foundOrder) {
+          const order = foundOrder;
+          this.inPrepOrders.update(orders => {
+            if (orders.some(o => o.id === orderId)) return orders;
+            return this.sortByAge([...orders, order]);
+          });
+          // Start cooking timer
+          this.timerMap.update(map => ({ ...map, [orderId]: Date.now() }));
+        }
       },
       error: (err) => {
-        console.error('Failed to assign chef and start cooking', err);
-        this.errorMessage.set('Failed to assign chef and start cooking. Please try again.');
+        console.error('Failed to start cooking', err);
+        this.errorMessage.set('Failed to transition order status. Please try again.');
       }
     });
   }
 
   handleMarkReady(orderId: number): void {
-    this.orderService.updateOrderStatus(orderId, 3).subscribe({ // Ready = 3
+    // PATCH status=3
+    this.orderService.updateOrderStatus(orderId, 3).subscribe({
       next: () => {
-        this.fetchActiveOrders();
+        // Move from InPrep to Ready immediately for instant local UI update!
+        let foundOrder: OrderModel | undefined;
+        this.inPrepOrders.update(orders => {
+          const idx = orders.findIndex(o => o.id === orderId);
+          if (idx > -1) {
+            foundOrder = { ...orders[idx], status: 3, statusName: 'Ready' };
+            return orders.filter(o => o.id !== orderId);
+          }
+          return orders;
+        });
+
+        if (foundOrder) {
+          const order = foundOrder;
+          this.readyOrders.update(orders => {
+            if (orders.some(o => o.id === orderId)) return orders;
+            return this.sortByAge([...orders, order]);
+          });
+          // Clear timer
+          this.timerMap.update(map => {
+            const newMap = { ...map };
+            delete newMap[orderId];
+            return newMap;
+          });
+        }
       },
       error: (err) => {
         console.error('Failed to mark order ready', err);
-        this.errorMessage.set('Failed to mark order ready. Please try again.');
+        this.errorMessage.set('Failed to transition order status. Please try again.');
       }
     });
   }
 
+  handleDismiss(orderId: number): void {
+    // PATCH status=4 (Served) to clear from ready column
+    this.orderService.updateOrderStatus(orderId, 4).subscribe({
+      next: () => {
+        // Clear from ready column immediately for instant local UI update!
+        this.readyOrders.update(orders => orders.filter(o => o.id !== orderId));
+      },
+      error: (err) => {
+        console.error('Failed to dismiss order', err);
+        this.errorMessage.set('Failed to transition order status. Please try again.');
+      }
+    });
+  }
+
+  resetUnread(): void {
+    this.unreadCount.set(0);
+  }
+
+  toggleSummary(): void {
+    this.isSummaryOpen.update(val => !val);
+  }
+
+  private sortByAge(orders: OrderModel[]): OrderModel[] {
+    return [...orders].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+  }
+
+
+  private showToast(message: string): void {
+    this.toastMessage.set(message);
+    if (this.toastTimeoutId) {
+      clearTimeout(this.toastTimeoutId);
+    }
+    this.toastTimeoutId = setTimeout(() => {
+      this.toastMessage.set(null);
+    }, 4000);
+  }
+
   ngOnDestroy(): void {
-    if (this.signalRSubscription) {
-      this.signalRSubscription.unsubscribe();
+    this.subscriptions.unsubscribe();
+    if (this.clockIntervalId) {
+      clearInterval(this.clockIntervalId);
+    }
+    if (this.toastTimeoutId) {
+      clearTimeout(this.toastTimeoutId);
     }
     this.signalRService.disconnect();
   }

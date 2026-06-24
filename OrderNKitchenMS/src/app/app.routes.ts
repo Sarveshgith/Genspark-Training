@@ -12,16 +12,12 @@ export const routes: Routes = [
 	{ path: 'login', component: Login },
 
 	{ path: 'register', component: Register },
-
+	
 	{
-		path: 'chef',
+		path: 'kitchen',
 		component: KdsBoard,
 		canActivate: [RoleGuard],
-		data: { roles: ['Chef'] },
-		children: [
-			{ path: '', redirectTo: 'kds', pathMatch: 'full' },
-			{ path: 'kds-board', component: KdsBoard }
-		]
+		data: { roles: ['Chef'] }
 	},
 
 	{
