@@ -1,11 +1,12 @@
 import { Component, inject, signal } from '@angular/core';
 import { RouterOutlet, Router } from '@angular/router';
-import { SidebarComponent } from './core/components/sidebar/sidebar';
+import { SidebarComponent } from './features/admin/sidebar/sidebar';
+import { WaiterNavbarComponent } from './features/waiter/waiter-navbar/waiter-navbar';
 import { AuthService } from './core/services/auth.service';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, SidebarComponent],
+  imports: [RouterOutlet, SidebarComponent, WaiterNavbarComponent],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
@@ -16,11 +17,20 @@ export class App {
 
   public showSidebar(): boolean {
     const url = this.router.url;
-    // Don't show sidebar on login, register, guest landing, or root route
     if (url.includes('/login') || url.includes('/register') || url.includes('/guest/landing') || url === '/' || url === '' || url.includes('/kitchen')) {
       return false;
     }
-    // Show sidebar if token is present
+    if (this.authService.getRole()?.toLowerCase() === 'waiter') {
+      return false;
+    }
     return !!this.authService.getToken();
+  }
+
+  public showWaiterNavbar(): boolean {
+    const url = this.router.url;
+    if (url.includes('/login') || url.includes('/register') || url.includes('/guest/landing') || url === '/' || url === '' || url.includes('/kitchen')) {
+      return false;
+    }
+    return this.authService.getRole()?.toLowerCase() === 'waiter' && !!this.authService.getToken();
   }
 }

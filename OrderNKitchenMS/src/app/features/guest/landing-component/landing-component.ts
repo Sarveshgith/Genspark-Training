@@ -28,6 +28,7 @@ export class LandingComponent implements OnInit, OnDestroy {
   public isLoading: boolean = true;
   public errorMessage: string | null = null;
   public orderDetails: any = null;
+  public taxPercent: string = 'X.X';
 
   private menuPriceMap: { [name: string]: number } = {};
   private rawOrderDetails: any = null;
@@ -119,6 +120,17 @@ export class LandingComponent implements OnInit, OnDestroy {
         this.zone.run(() => {
           try {
             console.log('Order tracking data retrieved successfully:', trackingInfo);
+            const trackingTableId = trackingInfo.tableId ?? (trackingInfo as any).TableId;
+            if (trackingTableId !== undefined && trackingTableId !== null && trackingTableId !== this.tableNumber) {
+              this.errorMessage = "Access Denied: The table ID in your session does not match this table.";
+              this.orderDetails = null;
+              this.isLoading = false;
+              this.cdr.detectChanges();
+              return;
+            }
+            if (trackingTableId) {
+              this.tableNumber = trackingTableId;
+            }
             this.rawOrderDetails = trackingInfo;
             this.enrichOrderDetails();
           } catch (e) {
@@ -167,7 +179,9 @@ export class LandingComponent implements OnInit, OnDestroy {
       });
 
       const subtotal = orderItems.reduce((acc: number, item: any) => acc + item.totalPrice, 0);
-      const tax = subtotal * 0.08;
+      const parsedRate = parseFloat(this.taxPercent);
+      const taxRate = isNaN(parsedRate) ? 0 : parsedRate / 100;
+      const tax = subtotal * taxRate;
       const total = subtotal + tax;
 
       this.orderDetails = {

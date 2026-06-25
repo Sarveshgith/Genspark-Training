@@ -13,7 +13,7 @@ export class OrderTracker implements OnInit, OnDestroy, OnChanges {
 
   public showWaiterModal: boolean = false;
   public showBillModal: boolean = false;
-  
+
   private timerId: any;
   public timeElapsedDisplay: string = '0 min';
 
@@ -43,7 +43,7 @@ export class OrderTracker implements OnInit, OnDestroy, OnChanges {
     const now = new Date().getTime();
     const diffMs = now - created;
     const diffMins = Math.max(0, Math.floor(diffMs / 60000));
-    
+
     if (diffMins < 1) {
       const diffSecs = Math.max(0, Math.floor(diffMs / 1000));
       this.timeElapsedDisplay = `${diffSecs}s`;
@@ -52,21 +52,19 @@ export class OrderTracker implements OnInit, OnDestroy, OnChanges {
     }
   }
 
-  // Helper to determine the numeric progress percentage based on order status string.
-  // OrderStatus: Pending, InPrep, Ready, Served, Completed, Cancelled
   public get progressPercent(): number {
     if (!this.order) return 0;
-    
+
     switch (this.order.status) {
       case 'Pending':
-        return 15; // Confirmed
+        return 15;
       case 'InPrep':
-        return 50; // In Kitchen
+        return 50;
       case 'Ready':
-        return 80; // Ready / Almost Served
+        return 80;
       case 'Served':
       case 'Completed':
-        return 100; // Served
+        return 100;
       case 'Cancelled':
         return 0;
       default:
@@ -74,28 +72,24 @@ export class OrderTracker implements OnInit, OnDestroy, OnChanges {
     }
   }
 
-  // Check if status is at least confirmed (Pending, InPrep, Ready, Served, Completed)
   public get isConfirmed(): boolean {
     if (!this.order) return false;
     return ['Pending', 'InPrep', 'Ready', 'Served', 'Completed'].includes(this.order.status);
   }
 
-  // Check if status is In Kitchen (InPrep, Ready, Served, Completed)
   public get isInKitchen(): boolean {
     if (!this.order) return false;
     return ['InPrep', 'Ready', 'Served', 'Completed'].includes(this.order.status);
   }
 
-  // Check if status is Served (Served, Completed)
   public get isServed(): boolean {
     if (!this.order) return false;
     return ['Served', 'Completed'].includes(this.order.status);
   }
 
-  // Map status string to guest-friendly text
   public get statusDisplay(): string {
     if (!this.order) return 'Pending';
-    
+
     switch (this.order.status) {
       case 'Pending':
         return 'Confirmed';
@@ -113,17 +107,44 @@ export class OrderTracker implements OnInit, OnDestroy, OnChanges {
     }
   }
 
+  private waiterTimeoutId: any;
+  private billTimeoutId: any;
+
   public callWaiter() {
+    if (this.waiterTimeoutId) {
+      clearTimeout(this.waiterTimeoutId);
+    }
     this.showWaiterModal = true;
-    setTimeout(() => {
+    this.waiterTimeoutId = setTimeout(() => {
       this.showWaiterModal = false;
+      this.waiterTimeoutId = null;
     }, 4000);
   }
 
+  public closeWaiterModal() {
+    this.showWaiterModal = false;
+    if (this.waiterTimeoutId) {
+      clearTimeout(this.waiterTimeoutId);
+      this.waiterTimeoutId = null;
+    }
+  }
+
   public requestBill() {
+    if (this.billTimeoutId) {
+      clearTimeout(this.billTimeoutId);
+    }
     this.showBillModal = true;
-    setTimeout(() => {
+    this.billTimeoutId = setTimeout(() => {
       this.showBillModal = false;
+      this.billTimeoutId = null;
     }, 4000);
+  }
+
+  public closeBillModal() {
+    this.showBillModal = false;
+    if (this.billTimeoutId) {
+      clearTimeout(this.billTimeoutId);
+      this.billTimeoutId = null;
+    }
   }
 }

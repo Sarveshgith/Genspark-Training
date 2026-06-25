@@ -44,7 +44,6 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
             }
 
             if (err.status === 404) {
-                router.navigate(['/not-found']);
                 return throwError(() => err);
             }
 

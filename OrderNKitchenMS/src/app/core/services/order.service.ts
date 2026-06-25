@@ -1,7 +1,8 @@
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { baseUrl } from "../enviroment";
-import { OrderModel, QueryOrderModel, GuestOrderTrackingModel, TableModel } from "../models/order.model";
+import { OrderModel, QueryOrderModel, GuestOrderTrackingModel } from "../models/order.model";
+import { TableModel } from "../models/table.model";
 import { Observable } from "rxjs";
 
 let classUrl = baseUrl + "orders/";
@@ -52,6 +53,11 @@ export class OrderService {
     public trackOrder(): Observable<GuestOrderTrackingModel> {
         let url = classUrl + "track";
         return this.http.get<GuestOrderTrackingModel>(url);
+    }
+
+    public getActiveOrderByTableId(tableId: number): Observable<OrderModel> {
+        let url = `${classUrl}table/${tableId}/active`;
+        return this.http.get<OrderModel>(url);
     }
 
     public updateOrderStatus(orderId: number, status: number): Observable<void> {

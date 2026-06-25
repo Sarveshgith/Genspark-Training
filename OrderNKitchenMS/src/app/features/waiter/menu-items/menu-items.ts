@@ -1,12 +1,13 @@
 import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { MenuService } from '../../../core/services/menu.service';
 import { MenuItemModel, CategoryModel } from '../../../core/models/menu.model';
 import { AuthService } from '../../../core/services/auth.service';
 import { OrderService } from '../../../core/services/order.service';
-import { TableModel } from '../../../core/models/order.model';
+import { TableModel } from '../../../core/models/table.model';
 import { CartSidebarComponent } from './components/cart/cart';
 import { FilterPanelComponent } from './components/filter-panel/filter-panel';
 
@@ -26,6 +27,7 @@ export class MenuItems implements OnInit {
   public menuService = inject(MenuService);
   public orderService = inject(OrderService);
   public authService = inject(AuthService);
+  private route = inject(ActivatedRoute);
 
   // Readonly computed signals as requested
   public readonly isWaiter = computed(() => this.authService.getRole()?.toLowerCase() === 'waiter');
@@ -64,25 +66,36 @@ export class MenuItems implements OnInit {
   public checkoutSuccess = signal<string | null>(null);
   public checkoutError = signal<string | null>(null);
   public isSubmitting = signal<boolean>(false);
+  public taxPercent: string = 'X.X';
 
   // Extract unique category names for tab display
   public uniqueCategoryNames = computed(() => {
-    const names = this.categories().map(c => c.name);
+    const names = this.categories().map(c => {
+      const name = c.name.trim().toUpperCase();
+      if (name === 'MAIN') return 'MAINS';
+      return name;
+    });
     return Array.from(new Set(names));
   });
 
   // Check if advanced filters are active (non-default values)
   public areFiltersActive = computed(() => {
     return this.filterMinPrice() !== null ||
-           this.filterMaxPrice() !== null ||
-           this.filterMaxPrepTime() !== null ||
-           this.filterAvailability() !== 'all';
+      this.filterMaxPrice() !== null ||
+      this.filterMaxPrepTime() !== null ||
+      this.filterAvailability() !== 'all';
   });
 
   ngOnInit(): void {
     this.fetchCategories();
     if (this.isWaiter()) {
       this.fetchTables();
+      this.route.queryParams.subscribe(params => {
+        const tableId = params['tableId'];
+        if (tableId) {
+          this.selectedTableId.set(Number(tableId));
+        }
+      });
     }
   }
 
@@ -118,8 +131,12 @@ export class MenuItems implements OnInit {
     }
 
     if (catName !== 'All') {
-      const matchingCats = this.categories().filter(c => c.name.toLowerCase() === catName.toLowerCase());
-      
+      const matchingCats = this.categories().filter(c => {
+        let name = c.name.trim().toUpperCase();
+        if (name === 'MAIN') name = 'MAINS';
+        return name === catName.toUpperCase();
+      });
+
       if (vegStatus === 'veg') {
         const vegCat = matchingCats.find(c => !c.isNonVeg);
         if (vegCat) {
@@ -213,11 +230,11 @@ export class MenuItems implements OnInit {
 
   fetchTables(): void {
     this.orderService.getTables().subscribe({
-      next: (tbls) => {
+      next: (tbls: TableModel[]) => {
         console.log('Tables fetched:', tbls);
-        this.tables.set(tbls.filter(t => !t.isDeleted));
+        this.tables.set(tbls.filter((t: TableModel) => !t.isDeleted));
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error('Failed to load tables', err);
       }
     });
@@ -258,10 +275,10 @@ export class MenuItems implements OnInit {
     console.log('Item clicked:', item);
     if (this.isWaiter()) {
       if (!item.isAvailable) return;
-      
+
       const currentCart = this.cartItems();
       const existingItem = currentCart.find(cartItem => cartItem.menuItem.id === item.id);
-      
+
       if (existingItem) {
         this.updateQuantity(item.id, existingItem.quantity + 1);
       } else {

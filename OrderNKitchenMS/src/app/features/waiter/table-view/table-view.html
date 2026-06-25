@@ -1,0 +1,75 @@
+<div class="min-h-screen bg-[#FDFBF7] text-[#2C2117] font-sans antialiased">
+
+  <!-- Main Container -->
+  <main class="max-w-7xl mx-auto px-6 py-10">
+    <div class="space-y-8">
+      
+      <!-- Subheader -->
+      <div class="space-y-1.5">
+        <h1 class="text-3xl font-extrabold font-syne text-[#2C2117]">Dining Room</h1>
+        <p class="text-sm text-[#8C7A6B] font-outfit leading-relaxed">
+          Monitor table occupancy states and elapsed order timers. Tap Available tables to place new orders.
+        </p>
+      </div>
+
+      <!-- Grid of Table Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+        <div *ngFor="let table of tables()" 
+             (click)="onTableClick(table)"
+             class="group relative h-60 bg-white border border-[#EFE5D3] rounded-3xl p-6 shadow-sm hover:shadow-md hover:border-[#C5A059] transition-all duration-300 flex flex-col justify-between cursor-pointer select-none">
+          
+          <!-- Top Row: Capacity & Elapsed Time (if occupied) -->
+          <div class="flex justify-between items-center select-none">
+            <!-- Capacity (Icon + Number) -->
+            <div class="flex items-center space-x-1 text-xs text-[#8C7A6B] font-semibold font-outfit bg-[#FAF6EE] px-2.5 py-1 rounded-full border border-[#EFE5D3]">
+              <span>👥</span>
+              <span>{{ table.capacity }}</span>
+            </div>
+
+            <!-- Elapsed Time (Occupied only) -->
+            <div *ngIf="table.status === 2 && table.activeOrderId" class="text-[10px] text-[#8C5815] bg-[#FFF9EB] px-2.5 py-1 rounded-full border border-[#FFE8B3] font-mono-dm flex items-center space-x-1">
+              <span>⏱️</span>
+              <span>{{ getElapsedTime(table.activeOrderCreatedAt) }}</span>
+            </div>
+          </div>
+
+          <!-- Middle Row: Table Number (Syne font, center of card) -->
+          <div class="flex flex-col items-center justify-center flex-grow py-2">
+            <span class="text-5xl font-extrabold font-syne text-[#2C2117] tracking-tight group-hover:scale-105 transition-transform duration-300">
+              {{ table.number }}
+            </span>
+          </div>
+
+          <!-- Bottom Row: Active Order Indicator & Status Badge -->
+          <div class="flex items-center justify-between mt-2 select-none">
+            <!-- Active Order Indicator (Occupied only) -->
+            <div *ngIf="table.status === 2 && table.activeOrderId" class="flex items-center space-x-1 text-[9px] uppercase tracking-wider text-[#9C7A3C] font-extrabold font-outfit">
+              <span class="w-1.5 h-1.5 rounded-full bg-[#E8A54B] animate-ping"></span>
+              <span>Order #{{ table.activeOrderId }}</span>
+            </div>
+            <div *ngIf="table.status !== 2 || !table.activeOrderId" class="w-1 h-1"></div>
+
+            <!-- Status Badge -->
+            <div class="flex items-center space-x-1.5 px-3 py-1 rounded-full text-[9px] uppercase tracking-wider font-extrabold font-outfit shadow-sm"
+                 [ngClass]="{
+                   'bg-[#EBFDF3] text-[#1E7E34] border border-[#D1F2DE]': table.status === 1,
+                   'bg-[#FFF9EB] text-[#B37822] border border-[#FFE8B3]': table.status === 2,
+                   'bg-[#F1F3F5] text-[#495057] border border-[#E9ECEF]': table.status === 3
+                 }">
+              <!-- Dot Indicator -->
+              <span class="w-1.5 h-1.5 rounded-full"
+                    [ngClass]="{
+                      'bg-[#1E7E34]': table.status === 1,
+                      'bg-[#E8A54B]': table.status === 2,
+                      'bg-[#495057]': table.status === 3
+                    }"></span>
+              <span>{{ table.statusName }}</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>

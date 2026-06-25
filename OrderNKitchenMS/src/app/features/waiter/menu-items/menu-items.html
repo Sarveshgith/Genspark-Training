@@ -170,20 +170,14 @@
                 <img
                   [src]="item.imageUrl || '/favicon.ico'"
                   [alt]="item.name"
-                  [class]="'w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ' + (!item.isAvailable ? 'grayscale blur-[1px]' : '')"
+                  [class]="'w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ' + (!item.isAvailable ? 'grayscale opacity-70' : '')"
                 />
 
-                <!-- Available Tag -->
-                @if (item.isAvailable) {
-                  <span class="absolute top-3 right-3 bg-[#FAF4EC]/95 text-[#8C5815] border border-[#8C5815]/20 px-2 py-0.5 rounded text-[10px] tracking-wider uppercase font-bold shadow-sm">
-                    AVAILABLE
+                <!-- Unavailable Tag -->
+                @if (!item.isAvailable) {
+                  <span class="absolute top-3 right-3 bg-gray-100/90 text-gray-500 border border-gray-250/80 px-2.5 py-0.5 rounded-full text-[10px] font-medium tracking-wide shadow-sm lowercase">
+                    unavailable
                   </span>
-                } @else {
-                  <div class="absolute inset-0 bg-black/40 flex items-center justify-center p-3 select-none">
-                    <span class="bg-black/60 text-white backdrop-blur-sm text-[10px] font-bold tracking-widest uppercase px-3 py-1.5 rounded-md border border-white/10 shadow-lg">
-                      OUT OF STOCK
-                    </span>
-                  </div>
                 }
               </div>
 
@@ -245,6 +239,7 @@
       [isSubmitting]="isSubmitting()"
       [checkoutSuccess]="checkoutSuccess()"
       [checkoutError]="checkoutError()"
+      [taxPercent]="taxPercent"
       (selectedTableIdChange)="selectedTableId.set($event)"
       (updateQuantity)="updateQuantity($event.itemId, $event.newQty)"
       (updateNotes)="updateNotes($event.itemId, $event.notes)"

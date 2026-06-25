@@ -5,6 +5,8 @@ import { KdsBoard } from './features/chef/kds-board/kds-board';
 import { RoleGuard } from './core/guards/role.guard';
 import { LandingComponent } from './features/guest/landing-component/landing-component';
 import { MenuItems } from './features/waiter/menu-items/menu-items';
+import { TableView } from './features/waiter/table-view/table-view';
+import { ActiveOrderComponent } from './features/waiter/active-order/active-order';
 
 export const routes: Routes = [
 	{ path: '', pathMatch: 'full', redirectTo: 'login' },
@@ -22,6 +24,20 @@ export const routes: Routes = [
 
 	{
 		path: 'waiter/menu', component: MenuItems
+	},
+
+	{
+		path: 'waiter/tables',
+		component: TableView,
+		canActivate: [RoleGuard],
+		data: { roles: ['Waiter'] }
+	},
+
+	{
+		path: 'waiter/active-order/:tableId',
+		component: ActiveOrderComponent,
+		canActivate: [RoleGuard],
+		data: { roles: ['Waiter'] }
 	},
 
 	{ path: 'guest/landing', component: LandingComponent },

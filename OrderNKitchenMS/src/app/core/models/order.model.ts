@@ -51,12 +51,3 @@ export interface OrderItemTrackingModel {
     quantity: number;
     notes: string;
 }
-
-export interface TableModel {
-    id: number;
-    number: number;
-    status: number;
-    statusName: string;
-    capacity: number;
-    isDeleted: boolean;
-}

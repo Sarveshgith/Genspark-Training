@@ -22,7 +22,16 @@ export class SignalRService {
         return this.orderUpdateSubject.asObservable();
     }
 
+    private tablesUpdatedSubject = new Subject<void>();
+    public get tablesUpdated$(): Observable<void> {
+        return this.tablesUpdatedSubject.asObservable();
+    }
+
     public async connect(token: string): Promise<void> {
+        if (this.hubConnection && this.isConnected()) {
+            console.log("SignalR connection already active. Skipping connect.");
+            return;
+        }
         try {
 
             this.hubConnection = new signalR.HubConnectionBuilder()
@@ -58,6 +67,11 @@ export class SignalRService {
         this.hubConnection.on("ReceiveOrderUpdate", (trackingInfo) => {
             console.log("Order update received:", trackingInfo);
             this.orderUpdateSubject.next(trackingInfo);
+        });
+
+        this.hubConnection.on("ReceiveTableStateUpdate", () => {
+            console.log("Table state update signal received");
+            this.tablesUpdatedSubject.next();
         });
     }
 

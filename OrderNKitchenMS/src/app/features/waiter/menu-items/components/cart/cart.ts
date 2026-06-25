@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { TableModel } from '../../../../../core/models/order.model';
+import { TableModel } from '../../../../../core/models/table.model';
 import { CartItem } from '../../menu-items';
 
 @Component({
@@ -16,6 +16,7 @@ export class CartSidebarComponent {
   @Input() isSubmitting: boolean = false;
   @Input() checkoutSuccess: string | null = null;
   @Input() checkoutError: string | null = null;
+  @Input() taxPercent: string = 'X.X';
 
   @Output() selectedTableIdChange = new EventEmitter<number | null>();
   @Output() updateQuantity = new EventEmitter<{ itemId: number, newQty: number }>();

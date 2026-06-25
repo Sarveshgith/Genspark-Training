@@ -106,20 +106,18 @@
 
   <!-- Cart Checkout Footer -->
   <div class="p-6 border-t border-gray-100 bg-[#FCFAF8]/50 space-y-4 select-none">
-    <div class="space-y-1.5 font-mono-dm">
-      <div class="flex justify-between text-xs text-slate-500 font-medium">
-        <span class="font-space">Subtotal</span>
-        <span>${{ getCartTotal().toFixed(2) }}</span>
+    @if (cartItems.length > 0) {
+      <div class="space-y-1.5 font-mono-dm mb-4">
+        <div class="flex justify-between text-xs text-slate-500 font-medium">
+          <span class="font-space">Subtotal</span>
+          <span>${{ getCartTotal().toFixed(2) }}</span>
+        </div>
+        <div class="flex justify-between text-sm font-bold text-gray-800 pt-1.5 border-t border-dashed border-gray-200 items-baseline">
+          <span class="font-syne font-medium">Total Amount</span>
+          <span class="font-syne text-lg font-bold">${{ getCartTotal().toFixed(2) }} + {{ taxPercent }}% tax</span>
+        </div>
       </div>
-      <div class="flex justify-between text-xs text-slate-500 font-medium">
-        <span class="font-space">Est. Tax (8%)</span>
-        <span>${{ (getCartTotal() * 0.08).toFixed(2) }}</span>
-      </div>
-      <div class="flex justify-between text-sm font-bold text-gray-800 pt-1.5 border-t border-dashed border-gray-200 items-baseline">
-        <span class="font-syne font-medium">Total Amount</span>
-        <span class="font-syne text-lg font-bold">${{ (getCartTotal() * 1.08).toFixed(2) }}</span>
-      </div>
-    </div>
+    }
 
     @if (checkoutSuccess) {
       <div class="p-3 bg-[#E8F8F0] border border-[#D1F2DE] text-[#1E7E34] text-xs font-semibold rounded-lg animate-fade-in font-space">
@@ -147,5 +145,15 @@
         <span>SEND ORDER TO KITCHEN</span>
       }
     </button>
+    
+    @if (cartItems.length === 0) {
+      <p class="text-[11px] text-center text-gray-400 font-medium tracking-wide font-space mt-1.5">
+        Add items to place order
+      </p>
+    } @else if (!selectedTableId) {
+      <p class="text-[11px] text-center text-amber-600 font-medium tracking-wide font-space mt-1.5">
+        Please select a table to place order
+      </p>
+    }
   </div>
 </aside>
