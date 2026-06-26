@@ -24,4 +24,22 @@ public class SignalService : ISignalService
         await _hubContext.Clients.Group("kitchen")
             .SendAsync("ReceiveNewOrder", orderDto);
     }
+
+    public async Task NotifyOrderUpdateAsync(int tableId, GuestOrderTrackingDto trackingDto)
+    {
+        _logger.LogInformation("Notifying table-{TableId} and kitchen about order update for Order: {OrderId}", tableId, trackingDto.OrderId);
+
+        await _hubContext.Clients.Group($"table-{tableId}")
+            .SendAsync("ReceiveOrderUpdate", trackingDto);
+
+        await _hubContext.Clients.Group("kitchen")
+            .SendAsync("ReceiveOrderUpdate", trackingDto);
+    }
+
+    public async Task NotifyTablesUpdatedAsync()
+    {
+        _logger.LogInformation("Broadcasting table state update to all clients");
+        await _hubContext.Clients.All.SendAsync("ReceiveTableStateUpdate");
+    }
+
 }

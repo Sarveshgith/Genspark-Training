@@ -31,7 +31,7 @@ public class OrderController : ControllerBase
         return Ok(orders);
     }
 
-    [Authorize(Policy = "AdminOrChef")]
+    [Authorize(Policy = "AllStaff")]
     [HttpGet("active")]
     public async Task<ActionResult<IEnumerable<OrderDto>>> GetActiveOrders()
     {
@@ -153,5 +153,15 @@ public class OrderController : ControllerBase
         var trackingInfo = await _orderService.GetGuestOrderTrackingAsync(tableId.Value);
         _logger.LogInformation("TrackMyOrder completed for TableId: {TableId}. Order ID: {OrderId}", tableId.Value, trackingInfo.OrderId);
         return Ok(trackingInfo);
+    }
+
+    [Authorize(Policy = "AllStaff")]
+    [HttpGet("table/{tableId:int}/active")]
+    public async Task<ActionResult<OrderDto>> GetActiveOrderByTableId(int tableId)
+    {
+        _logger.LogInformation("GetActiveOrderByTableId requested for TableId: {TableId}", tableId);
+        var order = await _orderService.GetActiveOrderByTableIdAsync(tableId);
+        _logger.LogInformation("GetActiveOrderByTableId completed for TableId: {TableId}. Order ID: {OrderId}", tableId, order.Id);
+        return Ok(order);
     }
 }

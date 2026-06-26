@@ -46,6 +46,7 @@ public class GuestOrderTrackingDto
 	public int QueuePosition { get; set; }
 	public DateTime? EstimatedReadyAt { get; set; }
 	public int EstimatedTimeMinutes { get; set; }
+	public DateTime CreatedAt { get; set; }
 	public IReadOnlyCollection<OrderItemTrackingDto> OrderItems { get; set; } = Array.Empty<OrderItemTrackingDto>();
 }
 

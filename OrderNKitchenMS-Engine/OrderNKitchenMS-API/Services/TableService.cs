@@ -6,17 +6,27 @@ using OrderNKitchenMS_API.Repositories.Interfaces;
 using OrderNKitchenMS_API.Services.Interfaces;
 using OrderNKitchenMS_API.Utils;
 using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore;
+using OrderNKitchenMS_API.Data;
 
 namespace OrderNKitchenMS_API.Services;
 
 public class TableService : ITableService
 {
     private readonly ITableRepository _tableRepository;
+    private readonly AppDbContext _context;
+    private readonly ISignalService _signalService;
     private readonly ILogger<TableService> _logger;
 
-    public TableService(ITableRepository tableRepository, ILogger<TableService> logger)
+    public TableService(
+        ITableRepository tableRepository, 
+        AppDbContext context,
+        ISignalService signalService,
+        ILogger<TableService> logger)
     {
         _tableRepository = tableRepository;
+        _context = context;
+        _signalService = signalService;
         _logger = logger;
     }
 
@@ -25,7 +35,22 @@ public class TableService : ITableService
     {
         _logger.LogInformation("GetAllAsync called for tables");
         var tables = await _tableRepository.GetAllAsync();
-        return tables.Select(MapTableToDto);
+
+        var activeOrders = await _context.Orders
+            .Where(o => o.Status != OrderStatus.Completed && o.Status != OrderStatus.Cancelled)
+            .ToListAsync();
+
+        var activeOrdersMap = activeOrders
+            .GroupBy(o => o.TableId)
+            .ToDictionary(g => g.Key, g => g.OrderByDescending(o => o.CreatedAt).First());
+
+        return tables.Select(table => {
+            activeOrdersMap.TryGetValue(table.Id, out var activeOrder);
+            var dto = MapTableToDto(table);
+            dto.ActiveOrderId = activeOrder?.Id;
+            dto.ActiveOrderCreatedAt = activeOrder?.CreatedAt;
+            return dto;
+        });
     }
 
     // Retrieves a specific table by its unique identifier.
@@ -39,7 +64,15 @@ public class TableService : ITableService
             throw new NotFoundException($"Table with id {id} was not found.");
         }
 
-        return MapTableToDto(table);
+        var activeOrder = await _context.Orders
+            .Where(o => o.TableId == table.Id && o.Status != OrderStatus.Completed && o.Status != OrderStatus.Cancelled)
+            .OrderByDescending(o => o.CreatedAt)
+            .FirstOrDefaultAsync();
+
+        var dto = MapTableToDto(table);
+        dto.ActiveOrderId = activeOrder?.Id;
+        dto.ActiveOrderCreatedAt = activeOrder?.CreatedAt;
+        return dto;
     }
 
     // Creates a new dining table.
@@ -83,6 +116,15 @@ public class TableService : ITableService
         {
             _logger.LogWarning("ChangeStatusAsync failed: Table with ID {Id} was not found.", id);
             throw new NotFoundException($"Table with id {id} was not found.");
+        }
+
+        try
+        {
+            await _signalService.NotifyTablesUpdatedAsync();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to broadcast table update signal.");
         }
 
         _logger.LogInformation("ChangeStatusAsync succeeded for Table ID: {Id}", id);

@@ -8,6 +8,8 @@ public class TableDto
 	public string StatusName { get; set; } = string.Empty;
 	public int Capacity { get; set; }
 	public bool IsDeleted { get; set; }
+	public int? ActiveOrderId { get; set; }
+	public DateTime? ActiveOrderCreatedAt { get; set; }
 }
 
 public class TableCreateDto

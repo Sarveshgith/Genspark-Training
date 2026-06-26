@@ -89,14 +89,11 @@ public class OrderRepository : IOrderRepository
 			order.CompletedAt = DateTime.UtcNow;
 		}
 
-		if (_context.Database.ProviderName == "Microsoft.EntityFrameworkCore.InMemory")
+		if (status == OrderStatus.Completed || status == OrderStatus.Cancelled)
 		{
-			if (status == OrderStatus.Completed || status == OrderStatus.Cancelled)
+			if (order.Table != null)
 			{
-				if (order.Table != null)
-				{
-					order.Table.Status = TableStatus.Available;
-				}
+				order.Table.Status = TableStatus.Available;
 			}
 		}
 
