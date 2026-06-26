@@ -1,9 +1,10 @@
-import { Component, inject, OnInit, OnDestroy, ChangeDetectorRef, NgZone } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, ChangeDetectorRef, NgZone, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { OrderService } from '../../../core/services/order.service';
 import { MenuService } from '../../../core/services/menu.service';
+import { BillService } from '../../../core/services/bill.service';
 import { SignalRService } from '../../../core/services/signalr.service';
 import { OrderTracker } from '../order-tracker/order-tracker';
 import { Subscription } from 'rxjs';
@@ -20,6 +21,7 @@ export class LandingComponent implements OnInit, OnDestroy {
   private authService = inject(AuthService);
   private orderService = inject(OrderService);
   private menuService = inject(MenuService);
+  private billService = inject(BillService);
   private signalRService = inject(SignalRService);
   private cdr = inject(ChangeDetectorRef);
   private zone = inject(NgZone);
@@ -28,7 +30,8 @@ export class LandingComponent implements OnInit, OnDestroy {
   public isLoading: boolean = true;
   public errorMessage: string | null = null;
   public orderDetails: any = null;
-  public taxPercent: string = 'X.X';
+  public billDetails = signal<any | null>(null);
+  public taxPercent: string = 'X';
 
   private menuPriceMap: { [name: string]: number } = {};
   private rawOrderDetails: any = null;
@@ -96,11 +99,24 @@ export class LandingComponent implements OnInit, OnDestroy {
                   console.log('Real-time order update received:', updatedTrackingInfo);
                   this.rawOrderDetails = updatedTrackingInfo;
                   this.enrichOrderDetails();
+                  if (this.rawOrderDetails && this.rawOrderDetails.orderId) {
+                    this.fetchBillDetails(this.rawOrderDetails.orderId);
+                  }
                   this.cdr.detectChanges();
                 });
               }
             });
             this.subscriptions.add(signalSub);
+
+            const tablesSub = this.signalRService.tablesUpdated$.subscribe({
+              next: () => {
+                this.zone.run(() => {
+                  console.log('Table state update signal received. Refreshing guest order status...');
+                  this.fetchOrderTracking();
+                });
+              }
+            });
+            this.subscriptions.add(tablesSub);
           });
         }
 
@@ -133,6 +149,9 @@ export class LandingComponent implements OnInit, OnDestroy {
             }
             this.rawOrderDetails = trackingInfo;
             this.enrichOrderDetails();
+            if (this.rawOrderDetails && this.rawOrderDetails.orderId) {
+              this.fetchBillDetails(this.rawOrderDetails.orderId);
+            }
           } catch (e) {
             console.error('Error in next/enrich callback of fetchOrderTracking:', e);
             this.errorMessage = "Error parsing order details: " + e;
@@ -212,5 +231,22 @@ export class LandingComponent implements OnInit, OnDestroy {
     }
     // Standard default fallback
     return '/favicon.ico';
+  }
+
+  public fetchBillDetails(orderId: number) {
+    this.billService.getBillByOrderId(orderId).subscribe({
+      next: (bill) => {
+        this.zone.run(() => {
+          this.billDetails.set(bill);
+          this.cdr.detectChanges();
+        });
+      },
+      error: () => {
+        this.zone.run(() => {
+          this.billDetails.set(null);
+          this.cdr.detectChanges();
+        });
+      }
+    });
   }
 }

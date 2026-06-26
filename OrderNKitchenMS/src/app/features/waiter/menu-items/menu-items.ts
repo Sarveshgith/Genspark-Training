@@ -66,7 +66,7 @@ export class MenuItems implements OnInit {
   public checkoutSuccess = signal<string | null>(null);
   public checkoutError = signal<string | null>(null);
   public isSubmitting = signal<boolean>(false);
-  public taxPercent: string = 'X.X';
+  public taxPercent: string = 'X';
 
   // Extract unique category names for tab display
   public uniqueCategoryNames = computed(() => {

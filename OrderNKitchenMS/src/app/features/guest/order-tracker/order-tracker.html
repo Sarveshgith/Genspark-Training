@@ -1,5 +1,6 @@
-<header class="max-w-7xl mx-auto w-full px-6 py-6 flex items-center justify-between border-b border-[#F5EFE6]">
-  <div class="text-2xl font-bold tracking-widest text-[#9C7A3C] uppercase font-syne">
+<header
+  class="max-w-7xl mx-auto w-full px-6 py-6 flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-[#F5EFE6]">
+  <div class="text-2xl font-bold tracking-widest text-[#9C7A3C] uppercase font-syne text-center sm:text-left">
     Ambrosia
   </div>
   <div class="flex items-center space-x-3 bg-[#FAF3E8] border border-[#EFE5D3] px-4 py-2 rounded-full shadow-sm">
@@ -20,16 +21,34 @@
     <div class="lg:col-span-8 space-y-8">
 
       <div
-        class="relative overflow-hidden bg-gradient-to-br from-[#FCEAD2] to-[#F5DBC1] border border-[#E9C7A5] rounded-3xl p-8 md:p-10 shadow-lg shadow-[#FCEAD2]/20">
+        class="relative overflow-hidden bg-gradient-to-br from-[#FCEAD2] to-[#F5DBC1] border border-[#E9C7A5] rounded-3xl p-6 md:p-10 shadow-lg shadow-[#FCEAD2]/20">
         <div class="space-y-6">
           <div class="space-y-1">
-            <p class="text-sm uppercase tracking-widest text-[#8C663C] font-semibold font-outfit">Live Order Status</p>
-            <h2 class="text-4xl sm:text-5xl font-extrabold tracking-tight text-[#8C5815] font-syne leading-tight">
-              {{ statusDisplay }}
+            <div class="flex items-center justify-between flex-wrap gap-2 mb-1">
+              <p class="text-sm uppercase tracking-widest text-[#8C663C] font-semibold font-outfit">Live Order Status
+              </p>
+              <div
+                class="flex items-center space-x-1.5 bg-[#E8F5E9] border border-[#C8E6C9] px-2.5 py-1 rounded-full shadow-sm text-xxs font-extrabold text-[#2E7D32] tracking-wider uppercase font-outfit animate-pulse-subtle">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span>
+                <span>Live Sync</span>
+              </div>
+            </div>
+            <h2
+              class="text-3xl sm:text-5xl font-extrabold tracking-tight text-[#8C5815] font-syne leading-tight flex items-center gap-3">
+              <span>{{ statusDisplay }}</span>
+              @if (order && order.status === 'InPrep') {
+              <span class="animate-flame hidden sm:inline-block text-2xl sm:text-4xl select-none"
+                aria-hidden="true">🔥</span>
+              }
             </h2>
+            @if (order && order.status === 'InPrep') {
+            <p class="text-xs text-[#8C663C] font-outfit mt-1.5 animate-fade-in">
+              Chef is actively preparing your selection
+            </p>
+            }
           </div>
 
-          <div class="space-y-4 pt-4">
+          <div class="space-y-4 pt-2">
             <div class="relative w-full h-2 bg-white/40 rounded-full overflow-hidden">
               <div
                 class="absolute left-0 top-0 h-full bg-gradient-to-r from-[#D49E53] to-[#B37822] rounded-full transition-all duration-1000 ease-out"
@@ -37,7 +56,8 @@
               </div>
             </div>
 
-            <div class="flex justify-between items-center text-xs font-semibold text-[#8C663C]">
+            <div
+              class="flex flex-col sm:flex-row justify-between sm:items-center gap-3 sm:gap-1.5 text-xs font-semibold text-[#8C663C]">
               <div class="flex items-center space-x-1.5 transition-opacity duration-300"
                 [ngClass]="isConfirmed ? 'opacity-100' : 'opacity-40'">
                 <span
@@ -59,36 +79,121 @@
                 <span>Served</span>
               </div>
             </div>
+
+            @if (isOverdue()) {
+            <p class="text-xs text-[#8C5815] italic text-center font-outfit mt-4 animate-fade-in">
+              Chef is finishing your dish. Taking a little longer than expected — giving it extra attention.
+            </p>
+            }
           </div>
 
-          <div *ngIf="order && order.status === 'InPrep'"
-            class="grid grid-cols-2 md:grid-cols-4 gap-4 pt-6 border-t border-[#8C5815]/10 mt-6 transition-all duration-300">
-            <div class="bg-white/40 backdrop-blur-sm border border-[#E9C7A5]/30 rounded-2xl p-4 text-center space-y-1">
-              <span class="block text-[11px] uppercase tracking-widest text-[#8C663C] font-bold font-outfit">Queue
+          @if (order && order.status === 'InPrep') {
+          <div [ngClass]="isOverdue() ? 'grid-cols-1 sm:grid-cols-3' : 'grid-cols-2 sm:grid-cols-4'"
+            class="grid gap-4 pt-6 border-t border-[#8C5815]/10 mt-6 transition-all duration-300">
+
+            @if (!isOverdue()) {
+            <!-- Queue Position Highlight Box -->
+            <div
+              class="col-span-1 bg-gradient-to-br from-[#FFF4E3] to-[#FCE4C3] border-2 border-[#E8A54B] rounded-2xl p-4 text-center space-y-1 shadow-md shadow-[#E8A54B]/10 relative overflow-hidden group">
+              <span
+                class="absolute -right-3 -top-3 text-3xl opacity-10 rotate-12 transition-transform group-hover:scale-110">🍳</span>
+              <span class="block text-[10px] uppercase tracking-widest text-[#8C5815] font-extrabold font-outfit">Queue
                 Position</span>
-              <span class="block text-2xl font-bold font-syne text-[#8C5815]">#{{ order.queuePosition || 1 }}</span>
+              <span class="block text-2xl font-black font-syne text-[#8C5815] tracking-tight">#{{ order.queuePosition ||
+                1 }}</span>
+              <span class="block text-[9px] text-[#A37B4C] font-semibold font-outfit">Ahead of you</span>
             </div>
+            }
 
-            <div class="bg-white/40 backdrop-blur-sm border border-[#E9C7A5]/30 rounded-2xl p-4 text-center space-y-1">
-              <span class="block text-[11px] uppercase tracking-widest text-[#8C663C] font-bold font-outfit">Est.
+            <div
+              class="col-span-1 bg-white/40 border border-[#E9C7A5]/30 rounded-2xl p-4 text-center space-y-1 flex flex-col justify-center">
+              <span class="block text-[10px] uppercase tracking-widest text-[#8C663C] font-bold font-outfit">Est.
                 Wait</span>
-              <span class="block text-2xl font-bold font-syne text-[#8C5815]">{{ order.estimatedTimeMinutes || 0 }}
-                min</span>
+              <span class="block text-xl sm:text-2xl font-bold font-syne text-[#8C5815]">
+                @if (isOverdue()) {
+                Shortly
+                } @else {
+                {{ order.estimatedTimeMinutes || 0 }} min
+                }
+              </span>
             </div>
 
-            <div class="bg-white/40 backdrop-blur-sm border border-[#E9C7A5]/30 rounded-2xl p-4 text-center space-y-1">
-              <span class="block text-[11px] uppercase tracking-widest text-[#8C663C] font-bold font-outfit">Ready
+            <div
+              class="col-span-1 bg-white/40 border border-[#E9C7A5]/30 rounded-2xl p-4 text-center space-y-1 flex flex-col justify-center">
+              <span class="block text-[10px] uppercase tracking-widest text-[#8C663C] font-bold font-outfit">Ready
                 By</span>
-              <span class="block text-2xl font-extrabold font-syne text-[#8C5815]">
+              <span class="block text-xs sm:text-sm font-extrabold font-syne text-[#8C5815]">
                 {{ order.estimatedReadyAt ? (order.estimatedReadyAt | date:'shortTime') : '--:--' }}
               </span>
             </div>
 
-            <div class="bg-white/40 backdrop-blur-sm border border-[#E9C7A5]/30 rounded-2xl p-4 text-center space-y-1">
-              <span class="block text-[11px] uppercase tracking-widest text-[#8C663C] font-bold font-outfit">Time
-                Lapsed</span>
-              <span class="block text-3xl font-bold font-mono-dm text-[#8C5815]">{{ timeElapsedDisplay }}</span>
+            <!-- Time Lapsed with soft amber color shift if overdue -->
+            <div
+              [ngClass]="isOverdue() ? 'bg-[#FFF3E0] border border-[#E8A54B]/30 text-[#E65100]' : 'bg-white/40 border border-[#E9C7A5]/30 text-[#8C5815]'"
+              class="col-span-1 rounded-2xl p-4 text-center space-y-1 flex flex-col justify-center transition-all duration-300">
+              <span class="block text-[10px] uppercase tracking-widest font-bold font-outfit"
+                [ngClass]="isOverdue() ? 'text-[#E65100]' : 'text-[#8C663C]'">
+                {{ isOverdue() ? 'Over Est.' : 'Time Lapsed' }}
+              </span>
+              <span class="block text-xl sm:text-2xl font-bold font-mono-dm"
+                [ngClass]="isOverdue() ? 'text-[#B05B00]' : 'text-[#8C5815]'">
+                {{ timeElapsedDisplay() }}
+              </span>
             </div>
+          </div>
+
+          <!-- Wait Progress Bar Linking Time Elapsed and Est. Wait -->
+          @if (order.estimatedTimeMinutes > 0) {
+          <div class="mt-5 space-y-2 font-outfit">
+            <div
+              class="flex justify-between items-center text-[10px] font-bold text-[#8C663C] uppercase tracking-wider">
+              <span>Elapsed: {{ timeElapsedDisplay() }}</span>
+              <span>Est. Wait: {{ order.estimatedTimeMinutes }} min ({{ waitTimeProgressPercent() }}%)</span>
+            </div>
+            <div [ngClass]="{'overdue-progress-glow border-[#FFA726]/40 bg-[#FFF3E0]/30': isOverdue()}"
+              class="w-full h-2 bg-white/45 rounded-full overflow-hidden border border-[#E9C7A5]/25 relative">
+              <div
+                class="h-full bg-gradient-to-r from-[#D49E53] to-[#B37822] rounded-full transition-all duration-700 ease-out"
+                [style.width.%]="waitTimeProgressPercentCapped()">
+              </div>
+              @if (isOverdue()) {
+              <span
+                class="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-[#FFA726] shadow-[0_0_8px_#FFA726] animate-pulse"></span>
+              }
+            </div>
+          </div>
+          }
+          }
+
+          <!-- Interactive Action Buttons Row -->
+          <div class="border-t border-[#8C5815]/10 pt-6 mt-6 flex flex-col sm:flex-row gap-4">
+            <button (click)="callWaiter()"
+              class="flex-1 flex items-center justify-center space-x-2 px-6 py-3.5 bg-white/50 hover:bg-white/70 border border-[#E9C7A5] text-[#8C5815] hover:text-[#704610] active:scale-98 rounded-2xl transition duration-200 font-bold tracking-wider text-xs uppercase shadow-xs cursor-pointer">
+              <span>🔔</span>
+              <span>Call Waiter</span>
+            </button>
+
+            @if (bill) {
+            @if (bill.statusName === 'Paid') {
+            <button (click)="goToPayment()"
+              class="flex-1 flex items-center justify-center space-x-2 px-6 py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white active:scale-98 rounded-2xl transition duration-200 font-bold tracking-wider text-xs uppercase shadow-sm cursor-pointer">
+              <span>✅</span>
+              <span>Paid (Receipt)</span>
+            </button>
+            } @else {
+            <button (click)="goToPayment()"
+              class="flex-1 flex items-center justify-center space-x-2 px-6 py-3.5 bg-[#8C5815] hover:bg-[#704610] text-white active:scale-98 rounded-2xl transition duration-200 font-bold tracking-wider text-xs uppercase shadow-sm cursor-pointer">
+              <span>💳</span>
+              <span>Pay Now</span>
+            </button>
+            }
+            } @else {
+            <button (click)="requestBill()"
+              class="flex-1 flex items-center justify-center space-x-2 px-6 py-3.5 bg-[#FAF3E8]/70 hover:bg-[#FAF3E8] border border-[#EFE5D3] text-[#8C663C] hover:text-[#704610] active:scale-98 rounded-2xl transition duration-200 font-bold tracking-wider text-xs uppercase shadow-xs cursor-pointer">
+              <span>📄</span>
+              <span>Bill Soon</span>
+            </button>
+            }
           </div>
         </div>
       </div>
@@ -106,8 +211,8 @@
         </div>
 
         <div class="space-y-4 max-h-[380px] overflow-y-auto pr-2 scrollbar-thin">
-          <div *ngFor="let item of order.orderItems"
-            class="flex items-center justify-between py-2 border-b border-[#F2ECE4]/60 last:border-b-0">
+          @for (item of order.orderItems; track item.menuItemName) {
+          <div class="flex items-center justify-between py-2 border-b border-[#F2ECE4]/60 last:border-b-0">
             <div class="flex items-center space-x-4">
               <div class="w-12 h-12 rounded-xl overflow-hidden border border-[#E8DFD3] bg-[#FDFBF7] flex-shrink-0">
                 <img [src]="item.imageUrl" [alt]="item.menuItemName" class="w-full h-full object-cover">
@@ -116,12 +221,15 @@
                 <h4 class="font-bold text-[#2C2117] text-sm">{{ item.menuItemName }}</h4>
                 <p class="text-xs text-[#8C7A6B]">
                   Quantity: <span class="font-semibold text-[#2C2117]">{{ item.quantity }}</span>
-                  <span *ngIf="item.notes" class="mx-1.5 text-gray-300">•</span>
+                  @if (item.notes) {
+                  <span class="mx-1.5 text-gray-300">•</span>
                   <span class="italic text-gray-500">{{ item.notes }}</span>
+                  }
                 </p>
               </div>
             </div>
           </div>
+          }
         </div>
 
         <div class="border-t-2 border-dashed border-[#E8DFD3] pt-6 text-center space-y-2">
@@ -137,21 +245,7 @@
 
     </div>
 
-    <div class="lg:col-span-4 space-y-8">
-      <div class="grid grid-cols-2 gap-4">
-        <button (click)="callWaiter()"
-          class="flex items-center justify-center space-x-2 px-6 py-4 bg-white border-2 border-[#C5A059] text-[#C5A059] hover:bg-[#FAF6EE] active:scale-98 rounded-2xl transition duration-200 font-bold tracking-wider text-sm uppercase shadow-sm cursor-pointer">
-          <span>🔔</span>
-          <span>Call Waiter</span>
-        </button>
-
-        <button (click)="requestBill()"
-          class="flex items-center justify-center space-x-2 px-6 py-4 bg-[#F2ECE4] border-2 border-transparent text-[#6E6153] hover:bg-[#EAE1D7] active:scale-98 rounded-2xl transition duration-200 font-bold tracking-wider text-sm uppercase shadow-sm cursor-pointer">
-          <span>📄</span>
-          <span>Bill Soon</span>
-        </button>
-      </div>
-
+    <div class="lg:col-span-4">
       <div
         class="relative bg-gradient-to-br from-[#1C1510] to-[#2D2118] text-[#F9F6F0] rounded-3xl p-6 md:p-8 shadow-lg border border-[#3E2E22] overflow-hidden space-y-6">
         <div class="absolute -right-20 -top-20 w-48 h-48 bg-[#C5A059]/10 rounded-full blur-3xl"></div>
@@ -226,7 +320,8 @@
   </div>
 </main>
 
-<div *ngIf="showWaiterModal" (click)="closeWaiterModal()"
+@if (showWaiterModal) {
+<div (click)="closeWaiterModal()"
   class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm transition-all duration-300">
   <div (click)="$event.stopPropagation()"
     class="bg-white border border-[#EFE5D3] rounded-3xl p-6 max-w-sm w-full text-center shadow-2xl animate-fade-in space-y-4">
@@ -242,8 +337,10 @@
     </div>
   </div>
 </div>
+}
 
-<div *ngIf="showBillModal" (click)="closeBillModal()"
+@if (showBillModal) {
+<div (click)="closeBillModal()"
   class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm transition-all duration-300">
   <div (click)="$event.stopPropagation()"
     class="bg-white border border-[#EFE5D3] rounded-3xl p-6 max-w-sm w-full text-center shadow-2xl animate-fade-in space-y-4">
@@ -259,3 +356,4 @@
     </div>
   </div>
 </div>
+}

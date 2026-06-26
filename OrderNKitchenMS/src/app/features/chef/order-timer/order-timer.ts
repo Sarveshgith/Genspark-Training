@@ -4,12 +4,24 @@ import { Component, input, computed } from '@angular/core';
   selector: 'app-order-timer',
   standalone: true,
   template: `
+    <style>
+      @keyframes red-pulse {
+        0%, 100% {
+          text-shadow: 0 0 4px rgba(222, 53, 11, 0.2);
+          opacity: 0.85;
+        }
+        50% {
+          text-shadow: 0 0 12px rgba(222, 53, 11, 0.8), 0 0 20px rgba(222, 53, 11, 0.5);
+          opacity: 1;
+        }
+      }
+      .animate-red-glow {
+        animation: red-pulse 1.5s infinite ease-in-out;
+      }
+    </style>
     <div class="flex flex-col items-end select-none">
       <span [class]="timerColorClass() + ' text-2xl font-bold font-mono-dm leading-none tracking-tight'">
         {{ formattedTime() }}
-      </span>
-      <span class="text-[8px] font-extrabold text-slate-500 tracking-widest uppercase mt-1">
-        ELAPSED
       </span>
     </div>
   `
@@ -34,7 +46,7 @@ export class OrderTimer {
   public timerColorClass = computed(() => {
     const secs = this.elapsedSeconds();
     if (secs >= 600) {
-      return 'text-[#DE350B] animate-pulse'; // overdue red
+      return 'text-[#DE350B] animate-red-glow'; // overdue red with glow and pulse
     }
     if (secs >= 300) {
       return 'text-[#F28500]'; // warning orange

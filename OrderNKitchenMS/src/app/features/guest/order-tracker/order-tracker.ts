@@ -1,5 +1,6 @@
-import { Component, Input, OnInit, OnDestroy, OnChanges } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy, OnChanges, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-order-tracker',
@@ -10,14 +11,49 @@ import { CommonModule } from '@angular/common';
 export class OrderTracker implements OnInit, OnDestroy, OnChanges {
   @Input() order: any;
   @Input() tableNumber!: number;
+  @Input() bill: any = null;
+
+  private router = inject(Router);
 
   public showWaiterModal: boolean = false;
   public showBillModal: boolean = false;
 
   private timerId: any;
-  public timeElapsedDisplay: string = '0 min';
+  public orderSignal = signal<any>(null);
+  public elapsedSeconds = signal<number>(0);
+
+  public estimatedSeconds = computed(() => {
+    const order = this.orderSignal();
+    return (order?.estimatedTimeMinutes || 0) * 60;
+  });
+
+  public isOverdue = computed(() => {
+    const est = this.estimatedSeconds();
+    return est > 0 && this.elapsedSeconds() > est;
+  });
+
+  public timeElapsedDisplay = computed(() => {
+    const elapsed = this.elapsedSeconds();
+    const diffMins = Math.floor(elapsed / 60);
+    if (diffMins < 1) {
+      return `${elapsed}s`;
+    } else {
+      return `${diffMins} min`;
+    }
+  });
+
+  public waitTimeProgressPercent = computed(() => {
+    const est = this.estimatedSeconds();
+    if (est <= 0) return 0;
+    return Math.round((this.elapsedSeconds() / est) * 100);
+  });
+
+  public waitTimeProgressPercentCapped = computed(() => {
+    return Math.min(100, this.waitTimeProgressPercent());
+  });
 
   public ngOnInit() {
+    this.orderSignal.set(this.order);
     this.updateTimeElapsed();
     this.timerId = setInterval(() => {
       this.updateTimeElapsed();
@@ -31,25 +67,20 @@ export class OrderTracker implements OnInit, OnDestroy, OnChanges {
   }
 
   public ngOnChanges() {
+    this.orderSignal.set(this.order);
     this.updateTimeElapsed();
   }
 
   private updateTimeElapsed() {
-    if (!this.order || !this.order.createdAt) {
-      this.timeElapsedDisplay = '0 min';
+    const order = this.orderSignal();
+    if (!order || !order.createdAt) {
+      this.elapsedSeconds.set(0);
       return;
     }
-    const created = new Date(this.order.createdAt).getTime();
+    const created = new Date(order.createdAt).getTime();
     const now = new Date().getTime();
     const diffMs = now - created;
-    const diffMins = Math.max(0, Math.floor(diffMs / 60000));
-
-    if (diffMins < 1) {
-      const diffSecs = Math.max(0, Math.floor(diffMs / 1000));
-      this.timeElapsedDisplay = `${diffSecs}s`;
-    } else {
-      this.timeElapsedDisplay = `${diffMins} min`;
-    }
+    this.elapsedSeconds.set(Math.max(0, Math.floor(diffMs / 1000)));
   }
 
   public get progressPercent(): number {
@@ -145,6 +176,12 @@ export class OrderTracker implements OnInit, OnDestroy, OnChanges {
     if (this.billTimeoutId) {
       clearTimeout(this.billTimeoutId);
       this.billTimeoutId = null;
+    }
+  }
+
+  public goToPayment() {
+    if (this.order && this.order.orderId) {
+      this.router.navigate(['/guest/payment', this.order.orderId], { queryParams: { tableId: this.tableNumber } });
     }
   }
 }

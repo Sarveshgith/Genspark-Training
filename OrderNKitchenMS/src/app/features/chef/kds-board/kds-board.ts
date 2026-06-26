@@ -34,6 +34,7 @@ export class KdsBoard implements OnInit, OnDestroy {
   
   public currentTime = signal<Date>(new Date());
   public isSummaryOpen = signal<boolean>(false);
+  public chefName = signal<string>('Chef');
 
   private subscriptions = new Subscription();
   private clockIntervalId: any;
@@ -85,6 +86,15 @@ export class KdsBoard implements OnInit, OnDestroy {
 
     const token = this.authService.getToken() ?? '';
     this.signalRService.connect(token);
+
+    // Fetch logged-in chef name
+    this.subscriptions.add(
+      this.authService.user$.subscribe(user => {
+        if (user) {
+          this.chefName.set(user.name);
+        }
+      })
+    );
 
     // 1. Listen for new orders
     this.subscriptions.add(

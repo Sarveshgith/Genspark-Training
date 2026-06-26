@@ -46,9 +46,9 @@ export class Login {
         this.isLoading.set(false);
         const role = response.user.roleName;
         if (role === 'Waiter') {
-          this.router.navigate(['/waiter/menu']);
+          this.router.navigate(['/waiter/tables']);
         } else if (role === 'Chef') {
-          this.router.navigate(['/chef/kds-board']);
+          this.router.navigate(['/kitchen']);
         } else {
           this.router.navigate(['/']);
         }

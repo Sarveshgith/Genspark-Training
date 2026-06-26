@@ -144,16 +144,11 @@
               <app-order-timer [elapsedSeconds]="elapsedSeconds()"></app-order-timer>
             </span>
           </div>
-          <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/25 text-[10px] font-extrabold px-3 py-1.5 rounded-lg tracking-wider font-syne">
-            READY TO SERVE
-          </span>
+          <div class="flex items-center space-x-1.5 text-xs font-bold text-emerald-400 uppercase tracking-wider font-syne select-none">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span>Ready</span>
+          </div>
         </div>
-        <button 
-          (click)="onAction($event)"
-          class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold font-syne text-[11px] tracking-widest uppercase transition-all duration-200 outline-none select-none active:scale-[0.98] border border-emerald-500/20"
-        >
-          Dismiss
-        </button>
       </div>
     }
   </div>

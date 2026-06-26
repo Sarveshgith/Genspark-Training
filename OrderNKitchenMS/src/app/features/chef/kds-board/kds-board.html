@@ -49,6 +49,13 @@
           {{ signalRService.isConnected() ? 'CONNECTED' : 'DISCONNECTED' }}
         </span>
       </div>
+
+      <!-- Chef Identity Badge -->
+      <div class="bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 flex items-center space-x-2 shadow-inner">
+        <span class="text-xs font-semibold font-syne tracking-wide text-[#F28500]">
+          👨‍🍳 {{ chefName().toLowerCase().startsWith('chef') ? chefName() : 'Chef ' + chefName() }}
+        </span>
+      </div>
     </div>
   </header>
 
@@ -69,7 +76,7 @@
     <div class="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6 overflow-y-auto pr-1">
       
       <!-- PENDING COLUMN -->
-      <div class="flex flex-col bg-[#111827]/40 border border-slate-800 rounded-3xl p-4 overflow-hidden h-full">
+      <div class="flex flex-col bg-[#111827]/40 border border-slate-800 rounded-3xl p-4 overflow-hidden h-fit lg:max-h-full min-h-[280px]">
         <!-- Header -->
         <div 
           (mouseenter)="resetUnread()" 
@@ -97,8 +104,12 @@
         <!-- Orders list -->
         <div class="flex-1 overflow-y-auto space-y-4 pr-1">
           @if (pendingOrders().length === 0) {
-            <div class="text-center py-20 text-slate-600 font-space text-sm italic">
-              No pending orders.
+            <div class="flex flex-col items-center justify-center py-16 text-slate-600 select-none">
+              <!-- Empty state icon: Order checklist/ticket with low opacity -->
+              <svg class="w-12 h-12 text-slate-700/35 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+              </svg>
+              <span class="font-space text-sm italic">No pending orders.</span>
             </div>
           } @else {
             @for (order of pendingOrders(); track order.id) {
@@ -112,7 +123,7 @@
       </div>
 
       <!-- IN PREP COLUMN -->
-      <div class="flex flex-col bg-[#111827]/40 border border-slate-800 rounded-3xl p-4 overflow-hidden h-full">
+      <div class="flex flex-col bg-[#111827]/40 border border-slate-800 rounded-3xl p-4 overflow-hidden h-fit lg:max-h-full min-h-[280px]">
         <!-- Header -->
         <div class="flex items-center justify-between pb-3 border-b-2 border-[#8C5815] mb-4 shrink-0 select-none" id="in-prep-header">
           <div class="flex items-center space-x-2">
@@ -128,8 +139,12 @@
         <!-- Orders list -->
         <div class="flex-1 overflow-y-auto space-y-4 pr-1">
           @if (inPrepOrders().length === 0) {
-            <div class="text-center py-20 text-slate-600 font-space text-sm italic">
-              No orders cooking.
+            <div class="flex flex-col items-center justify-center py-16 text-slate-600 select-none">
+              <!-- Empty state icon: Cooking flame with low opacity -->
+              <svg class="w-12 h-12 text-slate-700/35 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343c1.567 1.566 2.344 3.905 2.344 6.314a7.973 7.973 0 01-2.343 5Z" />
+              </svg>
+              <span class="font-space text-sm italic">No orders cooking.</span>
             </div>
           } @else {
             @for (order of inPrepOrders(); track order.id) {
@@ -144,7 +159,7 @@
       </div>
 
       <!-- READY COLUMN -->
-      <div class="flex flex-col bg-[#111827]/40 border border-slate-800 rounded-3xl p-4 overflow-hidden h-full">
+      <div class="flex flex-col bg-[#111827]/40 border border-slate-800 rounded-3xl p-4 overflow-hidden h-fit lg:max-h-full min-h-[280px]">
         <!-- Header -->
         <div class="flex items-center justify-between pb-3 border-b-2 border-[#639922] mb-4 shrink-0 select-none" id="ready-header">
           <div class="flex items-center space-x-2">
@@ -160,14 +175,17 @@
         <!-- Orders list -->
         <div class="flex-1 overflow-y-auto space-y-4 pr-1">
           @if (readyOrders().length === 0) {
-            <div class="text-center py-20 text-slate-600 font-space text-sm italic">
-              No orders ready.
+            <div class="flex flex-col items-center justify-center py-16 text-slate-600 select-none">
+              <!-- Empty state icon: Serving cloche with low opacity -->
+              <svg class="w-12 h-12 text-slate-700/35 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 19h18M12 6a1 1 0 110-2 1 1 0 010 2Zm0 0a8 8 0 00-8 8h16a8 8 0 00-8-8Z" />
+              </svg>
+              <span class="font-space text-sm italic">No orders ready.</span>
             </div>
           } @else {
             @for (order of readyOrders(); track order.id) {
               <app-order-card 
                 [order]="order" 
-                (markReady)="handleDismiss($event)"
               ></app-order-card>
             }
           }

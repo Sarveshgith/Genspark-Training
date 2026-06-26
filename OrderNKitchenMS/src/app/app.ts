@@ -16,21 +16,10 @@ export class App {
   private router = inject(Router);
 
   public showSidebar(): boolean {
-    const url = this.router.url;
-    if (url.includes('/login') || url.includes('/register') || url.includes('/guest/landing') || url === '/' || url === '' || url.includes('/kitchen')) {
-      return false;
-    }
-    if (this.authService.getRole()?.toLowerCase() === 'waiter') {
-      return false;
-    }
-    return !!this.authService.getToken();
+    return this.authService.getRole()?.toLowerCase() === 'admin' && !!this.authService.getToken();
   }
 
   public showWaiterNavbar(): boolean {
-    const url = this.router.url;
-    if (url.includes('/login') || url.includes('/register') || url.includes('/guest/landing') || url === '/' || url === '' || url.includes('/kitchen')) {
-      return false;
-    }
     return this.authService.getRole()?.toLowerCase() === 'waiter' && !!this.authService.getToken();
   }
 }

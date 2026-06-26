@@ -16,7 +16,7 @@ export class CartSidebarComponent {
   @Input() isSubmitting: boolean = false;
   @Input() checkoutSuccess: string | null = null;
   @Input() checkoutError: string | null = null;
-  @Input() taxPercent: string = 'X.X';
+  @Input() taxPercent: string = 'X';
 
   @Output() selectedTableIdChange = new EventEmitter<number | null>();
   @Output() updateQuantity = new EventEmitter<{ itemId: number, newQty: number }>();

@@ -1,81 +1,83 @@
 <div class="min-h-screen bg-[#FDFBF7] text-[#2C2117] font-sans antialiased">
 
-  <div *ngIf="isLoading" class="flex flex-col items-center justify-center min-h-screen space-y-4">
-    <div class="w-12 h-12 border-4 border-[#C5A059] border-t-transparent rounded-full animate-spin"></div>
-    <p class="text-sm font-medium tracking-widest uppercase text-[#8C7A6B]">Verifying Table Session...</p>
-  </div>
-
-  <div *ngIf="!isLoading && errorMessage"
-    class="flex flex-col items-center justify-center min-h-screen p-6 max-w-md mx-auto text-center space-y-6">
+  @if (isLoading) {
+    <div class="flex flex-col items-center justify-center min-h-screen space-y-4">
+      <div class="w-12 h-12 border-4 border-[#C5A059] border-t-transparent rounded-full animate-spin"></div>
+      <p class="text-sm font-medium tracking-widest uppercase text-[#8C7A6B]">Verifying Table Session...</p>
+    </div>
+  } @else if (errorMessage) {
     <div
-      class="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center border border-red-100 shadow-sm">
-      <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-      </svg>
+      class="flex flex-col items-center justify-center min-h-screen p-6 max-w-md mx-auto text-center space-y-6">
+      <div
+        class="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center border border-red-100 shadow-sm">
+        <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+      </div>
+      <h2 class="text-2xl font-semibold tracking-wide text-[#2C2117]">Session Issue</h2>
+      <p class="text-[#8C7A6B]">{{ errorMessage }}</p>
+      <button (click)="ngOnInit()"
+        class="px-6 py-2 border border-[#C5A059] text-[#C5A059] hover:bg-[#C5A059] hover:text-white rounded-md transition duration-300 font-medium tracking-wide cursor-pointer">
+        Retry Connection
+      </button>
     </div>
-    <h2 class="text-2xl font-semibold tracking-wide text-[#2C2117]">Session Issue</h2>
-    <p class="text-[#8C7A6B]">{{ errorMessage }}</p>
-    <button (click)="ngOnInit()"
-      class="px-6 py-2 border border-[#C5A059] text-[#C5A059] hover:bg-[#C5A059] hover:text-white rounded-md transition duration-300 font-medium tracking-wide">
-      Retry Connection
-    </button>
-  </div>
-
-  <div *ngIf="!isLoading && !errorMessage">
-    <div *ngIf="orderDetails">
-      <app-order-tracker [order]="orderDetails" [tableNumber]="tableNumber"></app-order-tracker>
-    </div>
-    <div *ngIf="!orderDetails" class="min-h-screen flex flex-col justify-between">
-      <header class="max-w-7xl mx-auto w-full px-6 py-8 flex items-center justify-between border-b border-[#F5EFE6]">
-        <div class="text-2xl font-bold tracking-widest text-[#9C7A3C] uppercase font-syne">
-          Ambrosia
-        </div>
-        <div class="flex items-center space-x-3 bg-[#FAF3E8] border border-[#EFE5D3] px-4 py-2 rounded-full shadow-sm font-outfit">
-          <span class="text-sm font-semibold tracking-wider text-[#8C7A6B] uppercase">Your Location</span>
-          <span class="text-sm font-bold text-[#2C2117] font-syne">Table {{ tableNumber }}</span>
-          <div class="w-8 h-8 rounded-full bg-[#E8A54B] flex items-center justify-center text-white">
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-            </svg>
+  } @else {
+    @if (orderDetails) {
+      <app-order-tracker [order]="orderDetails" [tableNumber]="tableNumber" [bill]="billDetails()"></app-order-tracker>
+    } @else {
+      <div class="min-h-screen flex flex-col justify-between">
+        <header class="max-w-7xl mx-auto w-full px-6 py-6 sm:py-8 flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-[#F5EFE6]">
+          <div class="text-2xl font-bold tracking-widest text-[#9C7A3C] uppercase font-syne text-center sm:text-left">
+            Ambrosia
           </div>
-        </div>
-      </header>
-
-      <main class="flex-grow flex items-center justify-center p-6">
-        <div
-          class="max-w-xl w-full bg-white border border-[#EFE5D3] rounded-3xl p-8 text-center shadow-xl shadow-[#FAF7F0] space-y-8">
-          <div class="text-6xl font-syne text-[#9C7A3C]">✦</div>
-          <div class="space-y-3">
-            <h1 class="text-4xl font-semibold font-syne tracking-tight text-[#2C2117]">Welcome to Ambrosia</h1>
-            <p class="text-base text-[#8C7A6B] max-w-md mx-auto leading-relaxed font-outfit font-normal">
-              Scan our tabletop QR code or ask your waiter to place an order. Once submitted, your real-time course
-              progression will appear right here.
-            </p>
-          </div>
-          <div class="border-t border-[#F5EFE6] pt-6 flex flex-col items-center justify-center space-y-4">
-            <div class="flex items-center space-x-2 text-sm text-[#9C7A3C] font-semibold tracking-wider uppercase font-outfit">
-              <span class="inline-block w-2.5 h-2.5 rounded-full bg-[#E8A54B] animate-pulse"></span>
-              <span>Waiting for your order</span>
+          <div class="flex items-center space-x-3 bg-[#FAF3E8] border border-[#EFE5D3] px-4 py-2 rounded-full shadow-sm font-outfit">
+            <span class="text-sm font-semibold tracking-wider text-[#8C7A6B] uppercase">Your Location</span>
+            <span class="text-sm font-bold text-[#2C2117] font-syne">Table {{ tableNumber }}</span>
+            <div class="w-8 h-8 rounded-full bg-[#E8A54B] flex items-center justify-center text-white">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+              </svg>
             </div>
-            <button (click)="fetchOrderTracking()"
-              class="px-8 py-3 bg-[#2C2117] text-white hover:bg-[#3d2f21] rounded-full transition duration-300 shadow-md shadow-[#2c21171c] font-medium font-outfit tracking-wide">
-              Refresh Status
-            </button>
           </div>
-        </div>
-      </main>
+        </header>
 
-      <div class="w-full relative h-48 sm:h-64 overflow-hidden mt-12 bg-black flex items-center justify-center">
-        <img src="/restaurant_ambient.png" alt="Ambrosia Restaurant Interior"
-          class="absolute inset-0 w-full h-full object-cover opacity-60">
-        <div class="absolute inset-0 bg-gradient-to-t from-[#2C2117] via-transparent to-transparent"></div>
-        <div class="relative text-center text-white px-4 space-y-1">
-          <p class="text-xs uppercase tracking-widest text-[#E8A54B] font-semibold font-outfit">Fine Dining Redefined</p>
-          <h3 class="text-xl font-syne text-white">Enjoy an exceptional culinary journey</h3>
+        <main class="flex-grow flex items-center justify-center p-6">
+          <div
+            class="max-w-xl w-full bg-white border border-[#EFE5D3] rounded-3xl p-8 text-center shadow-xl shadow-[#FAF7F0] space-y-8">
+            <div class="text-6xl font-syne text-[#9C7A3C]">✦</div>
+            <div class="space-y-3">
+              <h1 class="text-4xl font-semibold font-syne tracking-tight text-[#2C2117]">Welcome to Ambrosia</h1>
+              <p class="text-base text-[#8C7A6B] max-w-md mx-auto leading-relaxed font-outfit font-normal">
+                Scan our tabletop QR code or ask your waiter to place an order. Once submitted, your real-time course
+                progression will appear right here.
+              </p>
+            </div>
+            <div class="border-t border-[#F5EFE6] pt-6 flex flex-col items-center justify-center space-y-4">
+              <div class="flex items-center space-x-2 text-sm text-[#9C7A3C] font-semibold tracking-wider uppercase font-outfit">
+                <span class="inline-block w-2.5 h-2.5 rounded-full bg-[#E8A54B] animate-pulse"></span>
+                <span>Waiting for your order</span>
+              </div>
+              <button (click)="fetchOrderTracking()"
+                class="px-8 py-3 bg-[#2C2117] text-white hover:bg-[#3d2f21] rounded-full transition duration-300 shadow-md shadow-[#2c21171c] font-medium font-outfit tracking-wide cursor-pointer">
+                Refresh Status
+              </button>
+            </div>
+          </div>
+        </main>
+
+        <div class="w-full relative h-48 sm:h-64 overflow-hidden mt-12 bg-black flex items-center justify-center">
+          <img src="/restaurant_ambient.png" alt="Ambrosia Restaurant Interior"
+            class="absolute inset-0 w-full h-full object-cover opacity-60">
+          <div class="absolute inset-0 bg-gradient-to-t from-[#2C2117] via-transparent to-transparent"></div>
+          <div class="relative text-center text-white px-4 space-y-1">
+            <p class="text-xs uppercase tracking-widest text-[#E8A54B] font-semibold font-outfit">Fine Dining Redefined</p>
+            <h3 class="text-xl font-syne text-white">Enjoy an exceptional culinary journey</h3>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
+    }
+  }
+
 </div>

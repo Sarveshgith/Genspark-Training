@@ -4,6 +4,8 @@ import { TableService } from '../../../core/services/table.service';
 import { TableModel } from '../../../core/models/table.model';
 import { SignalRService } from '../../../core/services/signalr.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { OrderService } from '../../../core/services/order.service';
+import { OrderModel } from '../../../core/models/order.model';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 
@@ -17,12 +19,14 @@ import { Subscription } from 'rxjs';
 export class TableView implements OnInit, OnDestroy {
   private tableService = inject(TableService);
   private authService = inject(AuthService);
+  private orderService = inject(OrderService);
   public signalRService = inject(SignalRService);
   private router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
   private zone = inject(NgZone);
 
   public tables = signal<TableModel[]>([]);
+  public activeOrders = signal<OrderModel[]>([]);
   public timeTrigger = signal<number>(Date.now());
 
   private subscriptions: Subscription = new Subscription();
@@ -49,19 +53,39 @@ export class TableView implements OnInit, OnDestroy {
     const token = this.authService.getToken() ?? '';
     if (token) {
       this.signalRService.connect(token).then(() => {
-        const sub = this.signalRService.tablesUpdated$.subscribe({
+        const sub1 = this.signalRService.tablesUpdated$.subscribe({
           next: () => {
             this.zone.run(() => {
               this.fetchTables();
             });
           }
         });
-        this.subscriptions.add(sub);
+        const sub2 = this.signalRService.orderUpdate$.subscribe({
+          next: () => {
+            this.zone.run(() => {
+              this.fetchTables();
+            });
+          }
+        });
+        this.subscriptions.add(sub1);
+        this.subscriptions.add(sub2);
       });
     }
   }
 
   public fetchTables(): void {
+    this.orderService.getActiveOrders().subscribe({
+      next: (orders: OrderModel[]) => {
+        this.zone.run(() => {
+          this.activeOrders.set(orders);
+          this.cdr.detectChanges();
+        });
+      },
+      error: (err) => {
+        console.error('Failed to fetch active orders:', err);
+      }
+    });
+
     this.tableService.getTables().subscribe({
       next: (response: TableModel[]) => {
         this.zone.run(() => {
@@ -104,5 +128,21 @@ export class TableView implements OnInit, OnDestroy {
     } else if (table.status === 2) { // Occupied
       this.router.navigate(['/waiter/active-order', table.id]);
     }
+  }
+
+  public getReadyOrderForTable(tableId: number): OrderModel | undefined {
+    return this.activeOrders().find(o => o.tableId === tableId && o.status === 3);
+  }
+
+  public serveOrder(event: MouseEvent, orderId: number): void {
+    event.stopPropagation(); // prevent navigation on card click
+    this.orderService.updateOrderStatus(orderId, 4).subscribe({
+      next: () => {
+        this.fetchTables();
+      },
+      error: (err) => {
+        console.error('Failed to mark order served:', err);
+      }
+    });
   }
 }

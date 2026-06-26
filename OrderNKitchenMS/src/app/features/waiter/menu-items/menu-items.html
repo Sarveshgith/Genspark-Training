@@ -2,15 +2,16 @@
   <!-- MAIN WORKSPACE CONTENT -->
   <div class="flex-1 flex flex-col overflow-y-auto">
     <!-- TOP HEADER BAR -->
-    <header class="bg-[#FCFAF8] border-b border-[#EFECE9] sticky top-0 z-40 px-8 py-4 flex items-center justify-between font-syne">
+    <header
+      class="bg-[#FCFAF8] border-b border-[#EFECE9] sticky top-0 z-40 px-8 py-4 flex items-center justify-between font-syne">
       <!-- Title (Offset left padding on mobile to accommodate floating hamburger) -->
       <div class="flex items-baseline space-x-2 pl-12 md:pl-0 select-none">
         <h2 class="text-2xl font-medium text-gray-800">Menu Guide</h2>
         <span class="text-xs font-medium tracking-wider text-slate-400 uppercase">
           @if (isWaiter()) {
-            (Waiter View)
+          (Waiter View)
           } @else {
-            (Guest View)
+          (Guest View)
           }
         </span>
       </div>
@@ -21,33 +22,34 @@
         <div class="relative w-40 sm:w-60 md:w-80">
           <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
             <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.602 10.602Z" />
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.602 10.602Z" />
             </svg>
           </span>
-          <input
-            type="text"
-            [ngModel]="searchQuery()"
-            (ngModelChange)="searchQuery.set($event); fetchMenuItems()"
+          <input type="text" [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event); fetchMenuItems()"
             placeholder="Search..."
-            class="w-full bg-[#EFECE9]/60 text-gray-800 placeholder-gray-400 pl-9 pr-3 py-1.5 rounded-full text-xs sm:text-sm border-0 focus:ring-1 focus:ring-[#8C5815]/30 focus:bg-white outline-none transition-all duration-200 shadow-inner"
-          />
+            class="w-full bg-[#EFECE9]/60 text-gray-800 placeholder-gray-400 pl-9 pr-3 py-1.5 rounded-full text-xs sm:text-sm border-0 focus:ring-1 focus:ring-[#8C5815]/30 focus:bg-white outline-none transition-all duration-200 shadow-inner" />
         </div>
 
         <!-- Notification (hidden on extra small screens) -->
-        <button class="hidden sm:block relative p-2 text-gray-500 hover:text-gray-700 bg-white rounded-full border border-gray-100 shadow-sm transition-all duration-200 hover:scale-105">
+        <button
+          class="hidden sm:block relative p-2 text-gray-500 hover:text-gray-700 bg-white rounded-full border border-gray-100 shadow-sm transition-all duration-200 hover:scale-105">
           <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a9.04 9.04 0 0 1-2.943 2.244A9.07 9.07 0 0 1 9 18.75m6-12v6a3 3 0 0 1-3 3H9a3 3 0 0 1-3-3v-6a3 3 0 0 1 3-3h3a3 3 0 0 1 3 3ZM9 10.5h.008v.008H9V10.5Zm3 0h.008v.008H12V10.5Z" />
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M14.857 17.082a9.04 9.04 0 0 1-2.943 2.244A9.07 9.07 0 0 1 9 18.75m6-12v6a3 3 0 0 1-3 3H9a3 3 0 0 1-3-3v-6a3 3 0 0 1 3-3h3a3 3 0 0 1 3 3ZM9 10.5h.008v.008H9V10.5Zm3 0h.008v.008H12V10.5Z" />
           </svg>
           <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-[#8C5815] rounded-full"></span>
         </button>
 
         <!-- Profile Avatar -->
         <div class="flex items-center space-x-3 select-none">
-          <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full overflow-hidden border-2 border-[#8C5815]/20 bg-[#FAF4EC] flex items-center justify-center font-syne text-xs sm:text-sm font-medium text-[#8C5815]">
+          <div
+            class="w-8 h-8 sm:w-10 sm:h-10 rounded-full overflow-hidden border-2 border-[#8C5815]/20 bg-[#FAF4EC] flex items-center justify-center font-syne text-xs sm:text-sm font-medium text-[#8C5815]">
             @if (isWaiter()) {
-              <img src="https://images.unsplash.com/photo-1577219491135-ce391730fb2c?w=100&h=100&fit=crop&crop=face" alt="Waiter Profile" class="w-full h-full object-cover">
+            <img src="https://images.unsplash.com/photo-1577219491135-ce391730fb2c?w=100&h=100&fit=crop&crop=face"
+              alt="Waiter Profile" class="w-full h-full object-cover">
             } @else {
-              G
+            G
             }
           </div>
         </div>
@@ -57,24 +59,21 @@
     <!-- CONTENT BODY -->
     <div class="p-4 sm:p-8 flex-1">
       <!-- Dynamic Categories bar & Kitchen Status -->
-      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between border-b border-[#EFECE9] pb-4 mb-6 gap-4">
+      <div
+        class="flex flex-col lg:flex-row lg:items-center lg:justify-between border-b border-[#EFECE9] pb-4 mb-6 gap-4">
         <!-- Categories tabs -->
         <div class="flex items-center space-x-6 overflow-x-auto scrollbar-none pb-2 lg:pb-0">
-          <button
-            (click)="selectCategory('All')"
+          <button (click)="selectCategory('All')"
             [class]="'text-xs sm:text-sm font-medium font-syne tracking-wide uppercase transition-all duration-200 relative pb-4 -mb-4 ' +
-                     (selectedCategory() === 'All' ? 'text-[#8C5815] font-semibold border-b-2 border-[#8C5815]' : 'text-gray-400 hover:text-gray-600')"
-          >
+                     (selectedCategory() === 'All' ? 'text-[#8C5815] font-semibold border-b-2 border-[#8C5815]' : 'text-gray-400 hover:text-gray-600')">
             All
           </button>
           @for (catName of uniqueCategoryNames(); track catName) {
-            <button
-              (click)="selectCategory(catName)"
-              [class]="'text-xs sm:text-sm font-medium font-syne tracking-wide uppercase transition-all duration-200 relative pb-4 -mb-4 shrink-0 ' +
-                       (selectedCategory().toLowerCase() === catName.toLowerCase() ? 'text-[#8C5815] font-semibold border-b-2 border-[#8C5815]' : 'text-gray-400 hover:text-gray-600')"
-            >
-              {{ catName }}
-            </button>
+          <button (click)="selectCategory(catName)"
+            [class]="'text-xs sm:text-sm font-medium font-syne tracking-wide uppercase transition-all duration-200 relative pb-4 -mb-4 shrink-0 ' +
+                       (selectedCategory().toLowerCase() === catName.toLowerCase() ? 'text-[#8C5815] font-semibold border-b-2 border-[#8C5815]' : 'text-gray-400 hover:text-gray-600')">
+            {{ catName }}
+          </button>
           }
         </div>
 
@@ -82,49 +81,42 @@
         <div class="flex flex-wrap items-center gap-4 select-none font-syne">
           <!-- Veg / Non-Veg Toggle Group -->
           <div class="flex bg-[#EFECE9]/60 p-0.5 rounded-lg border border-[#EFECE9] text-[10px] sm:text-xs font-medium">
-            <button
-              (click)="setVegToggle('all')"
+            <button (click)="setVegToggle('all')"
               [class]="'px-3 py-1 rounded-md transition-all duration-200 ' + 
-                       (vegToggle() === 'all' ? 'bg-white text-gray-800 shadow-sm' : 'text-gray-400 hover:text-gray-600')"
-            >
+                       (vegToggle() === 'all' ? 'bg-white text-gray-800 shadow-sm' : 'text-gray-400 hover:text-gray-600')">
               All
             </button>
-            <button
-              (click)="setVegToggle('veg')"
+            <button (click)="setVegToggle('veg')"
               [class]="'px-3 py-1 rounded-md transition-all duration-200 flex items-center space-x-1 ' + 
-                       (vegToggle() === 'veg' ? 'bg-white text-green-700 shadow-sm' : 'text-gray-400 hover:text-gray-600')"
-            >
+                       (vegToggle() === 'veg' ? 'bg-white text-green-700 shadow-sm' : 'text-gray-400 hover:text-gray-600')">
               <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
               <span>Veg</span>
             </button>
-            <button
-              (click)="setVegToggle('non-veg')"
+            <button (click)="setVegToggle('non-veg')"
               [class]="'px-3 py-1 rounded-md transition-all duration-200 flex items-center space-x-1 ' + 
-                       (vegToggle() === 'non-veg' ? 'bg-white text-red-700 shadow-sm' : 'text-gray-400 hover:text-gray-600')"
-            >
+                       (vegToggle() === 'non-veg' ? 'bg-white text-red-700 shadow-sm' : 'text-gray-400 hover:text-gray-600')">
               <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>
               <span>Non-Veg</span>
             </button>
           </div>
 
           <!-- Advanced Filter Toggle Button -->
-          <button
-            (click)="toggleFilterPanel()"
-            [class]="'p-2 rounded-lg border flex items-center space-x-1.5 text-xs font-medium shadow-sm transition-all duration-200 ' +
+          <button (click)="toggleFilterPanel()" [class]="'p-2 rounded-lg border flex items-center space-x-1.5 text-xs font-medium shadow-sm transition-all duration-200 ' +
                      (isFilterPanelOpen() ? 'bg-[#FAF4EC] text-[#8C5815] border-[#8C5815]/30' : 'bg-white text-gray-500 border-gray-150 hover:bg-gray-50') +
-                     (areFiltersActive() ? ' border-[#8C5815]' : '')"
-          >
+                     (areFiltersActive() ? ' border-[#8C5815]' : '')">
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v3.059-2.086c0 .585-.233 1.146-.647 1.56L16.5 11v8.25c0 .414-.336.75-.75.75h-3.5a.75.75 0 0 1-.75-.75V11l-3.833-3.833A2.204 2.204 0 0 1 7 5.607V3.559c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z" />
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v3.059-2.086c0 .585-.233 1.146-.647 1.56L16.5 11v8.25c0 .414-.336.75-.75.75h-3.5a.75.75 0 0 1-.75-.75V11l-3.833-3.833A2.204 2.204 0 0 1 7 5.607V3.559c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z" />
             </svg>
             <span>Filters</span>
             @if (areFiltersActive()) {
-              <span class="w-1.5 h-1.5 rounded-full bg-[#8C5815]"></span>
+            <span class="w-1.5 h-1.5 rounded-full bg-[#8C5815]"></span>
             }
           </button>
 
           <!-- Global Status -->
-          <div class="flex items-center space-x-1.5 px-3 py-1 bg-[#E8F8F0] text-[#1E7E34] border border-[#D1F2DE] rounded-full text-xs font-medium">
+          <div
+            class="flex items-center space-x-1.5 px-3 py-1 bg-[#E8F8F0] text-[#1E7E34] border border-[#D1F2DE] rounded-full text-xs font-medium">
             <span class="w-1.5 h-1.5 bg-[#1E7E34] rounded-full animate-pulse"></span>
             <span>FLOWING</span>
           </div>
@@ -132,192 +124,183 @@
       </div>
 
       <!-- STANDALONE FILTER PANEL COMPONENT -->
-      <app-filter-panel
-        [isOpen]="isFilterPanelOpen()"
-        [minPrice]="filterMinPrice()"
-        [maxPrice]="filterMaxPrice()"
-        [maxPrepTime]="filterMaxPrepTime()"
-        [availability]="filterAvailability()"
-        (minPriceChange)="filterMinPrice.set($event)"
-        (maxPriceChange)="filterMaxPrice.set($event)"
-        (maxPrepTimeChange)="filterMaxPrepTime.set($event)"
-        (availabilityChange)="filterAvailability.set($event)"
-        (apply)="applyFilters()"
-        (clear)="clearFilters()"
-      ></app-filter-panel>
+      <app-filter-panel [isOpen]="isFilterPanelOpen()" [minPrice]="filterMinPrice()" [maxPrice]="filterMaxPrice()"
+        [maxPrepTime]="filterMaxPrepTime()" [availability]="filterAvailability()"
+        (minPriceChange)="filterMinPrice.set($event)" (maxPriceChange)="filterMaxPrice.set($event)"
+        (maxPrepTimeChange)="filterMaxPrepTime.set($event)" (availabilityChange)="filterAvailability.set($event)"
+        (apply)="applyFilters()" (clear)="clearFilters()"></app-filter-panel>
 
       <!-- MAIN CARDS GRID -->
       @if (menuItems().length === 0) {
-        <div class="flex flex-col items-center justify-center py-20 text-center">
-          <div class="w-16 h-16 text-gray-300 mb-4">
-            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3Z" />
-            </svg>
-          </div>
-          <h3 class="text-lg font-medium text-gray-600 font-serif">No dishes found</h3>
-          <p class="text-sm text-gray-400 mt-1">Try relaxing your search query or choosing another category tab.</p>
+      <div class="flex flex-col items-center justify-center py-20 text-center">
+        <div class="w-16 h-16 text-gray-300 mb-4">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3Z" />
+          </svg>
         </div>
+        <h3 class="text-lg font-medium text-gray-600 font-serif">No dishes found</h3>
+        <p class="text-sm text-gray-400 mt-1">Try relaxing your search query or choosing another category tab.</p>
+      </div>
       } @else {
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          @for (item of menuItems(); track item.id) {
-            <div
-              (click)="handleClick(item)"
-              [class]="'group relative bg-white rounded-xl shadow-sm hover:shadow-md border border-gray-100 overflow-hidden flex flex-col justify-between transition-all duration-300 ' + 
-                       (item.isAvailable ? 'cursor-pointer hover:-translate-y-0.5' : 'opacity-75 select-none')"
-            >
-              <!-- Card Image and Availability Overlay -->
-              <div class="relative h-48 sm:h-56 w-full overflow-hidden bg-gray-50">
-                <img
-                  [src]="item.imageUrl || '/favicon.ico'"
-                  [alt]="item.name"
-                  [class]="'w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ' + (!item.isAvailable ? 'grayscale opacity-70' : '')"
-                />
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        @for (item of menuItems(); track item.id) {
+        <div (click)="handleClick(item)" [class]="'group relative bg-white rounded-xl shadow-sm hover:shadow-md border border-gray-100 overflow-hidden flex flex-col justify-between transition-all duration-300 ' + 
+                       (item.isAvailable ? 'cursor-pointer hover:-translate-y-0.5' : 'opacity-75 select-none')">
+          <!-- Card Image and Availability Overlay -->
+          <div class="relative h-48 sm:h-56 w-full overflow-hidden bg-gray-50">
+            <img [src]="item.imageUrl || '/favicon.ico'" [alt]="item.name"
+              [class]="'w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ' + (!item.isAvailable ? 'grayscale opacity-70' : '')" />
 
-                <!-- Unavailable Tag -->
-                @if (!item.isAvailable) {
-                  <span class="absolute top-3 right-3 bg-gray-100/90 text-gray-500 border border-gray-250/80 px-2.5 py-0.5 rounded-full text-[10px] font-medium tracking-wide shadow-sm lowercase">
-                    unavailable
-                  </span>
-                }
+            <!-- Unavailable Tag -->
+            @if (!item.isAvailable) {
+            <span
+              class="absolute top-3 right-3 bg-gray-100/90 text-gray-500 border border-gray-250/80 px-2.5 py-0.5 rounded-full text-[10px] font-medium tracking-wide shadow-sm lowercase">
+              unavailable
+            </span>
+            }
+          </div>
+
+          <!-- Card Body Content -->
+          <div class="p-5 flex-1 flex flex-col justify-between">
+            <div>
+              <!-- Name & Price -->
+              <div class="flex items-start justify-between gap-3 mb-1">
+                <h3
+                  class="text-base sm:text-lg font-medium font-space text-gray-800 tracking-tight leading-tight group-hover:text-[#8C5815] transition-colors duration-200">
+                  {{ item.name }}
+                </h3>
+                <span class="text-base sm:text-lg font-medium font-mono-dm text-[#8C5815] shrink-0">
+                  ₹{{ item.price }}
+                </span>
               </div>
 
-              <!-- Card Body Content -->
-              <div class="p-5 flex-1 flex flex-col justify-between">
-                <div>
-                  <!-- Name & Price -->
-                  <div class="flex items-start justify-between gap-3 mb-1">
-                    <h3 class="text-base sm:text-lg font-medium font-space text-gray-800 tracking-tight leading-tight group-hover:text-[#8C5815] transition-colors duration-200">
-                      {{ item.name }}
-                    </h3>
-                    <span class="text-base sm:text-lg font-medium font-mono-dm text-[#8C5815] shrink-0">
-                      ${{ item.price }}
-                    </span>
-                  </div>
+              <!-- Preparation Time and Dietary Badges -->
+              <div class="flex items-center space-x-2.5 mb-3">
+                <div class="flex items-center space-x-1 text-gray-400">
+                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                  </svg>
+                  <span class="text-[11px] font-medium">{{ item.preparationTime }} MINS</span>
+                </div>
 
-                  <!-- Preparation Time and Dietary Badges -->
-                  <div class="flex items-center space-x-2.5 mb-3">
-                    <div class="flex items-center space-x-1 text-gray-400">
-                      <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                      </svg>
-                      <span class="text-[11px] font-medium">{{ item.preparationTime }} MINS</span>
-                    </div>
-
-                    <!-- Dynamic Dietary Badges -->
-                    <div class="flex items-center space-x-1">
-                      @if (item.name.toLowerCase().includes('truffle') || item.name.toLowerCase().includes('beet') || item.name.toLowerCase().includes('ribeye') || item.description.toLowerCase().includes('gluten-free') || item.description.toLowerCase().includes('gf')) {
-                        <span class="px-1.5 py-0.5 bg-gray-100 text-gray-500 rounded text-[9px] font-bold tracking-wider">GF</span>
-                      }
-                      @if (item.name.toLowerCase().includes('beet') || item.description.toLowerCase().includes('vegetarian')) {
-                        <span class="px-1.5 py-0.5 bg-gray-100 text-gray-500 rounded text-[9px] font-bold tracking-wider">V</span>
-                      }
-                      @if (item.name.toLowerCase().includes('ambrosia') || item.name.toLowerCase().includes('cocktail') || item.description.toLowerCase().includes('vegan')) {
-                        <span class="px-1.5 py-0.5 bg-gray-100 text-gray-500 rounded text-[9px] font-bold tracking-wider">VG</span>
-                      }
-                    </div>
-                  </div>
-
-                  <!-- Description -->
-                  <p class="text-xs text-gray-400 italic font-normal font-space line-clamp-2 leading-relaxed">
-                    {{ item.description }}
-                  </p>
+                <!-- Dynamic Dietary Badges -->
+                <div class="flex items-center space-x-1">
+                  @if (item.name.toLowerCase().includes('truffle') || item.name.toLowerCase().includes('beet') ||
+                  item.name.toLowerCase().includes('ribeye') || item.description.toLowerCase().includes('gluten-free')
+                  || item.description.toLowerCase().includes('gf')) {
+                  <span
+                    class="px-1.5 py-0.5 bg-gray-100 text-gray-500 rounded text-[9px] font-bold tracking-wider">GF</span>
+                  }
+                  @if (item.name.toLowerCase().includes('beet') ||
+                  item.description.toLowerCase().includes('vegetarian')) {
+                  <span
+                    class="px-1.5 py-0.5 bg-gray-100 text-gray-500 rounded text-[9px] font-bold tracking-wider">V</span>
+                  }
+                  @if (item.name.toLowerCase().includes('ambrosia') || item.name.toLowerCase().includes('cocktail') ||
+                  item.description.toLowerCase().includes('vegan')) {
+                  <span
+                    class="px-1.5 py-0.5 bg-gray-100 text-gray-500 rounded text-[9px] font-bold tracking-wider">VG</span>
+                  }
                 </div>
               </div>
+
+              <!-- Description -->
+              <p class="text-xs text-gray-400 italic font-normal font-space line-clamp-2 leading-relaxed">
+                {{ item.description }}
+              </p>
             </div>
-          }
+          </div>
         </div>
+        }
+      </div>
       }
     </div>
   </div>
 
   <!-- STANDALONE WAITER CART SIDEBAR COMPONENT -->
   @if (canViewCart()) {
-    <app-cart-sidebar
-      [cartItems]="cartItems()"
-      [tables]="tables()"
-      [selectedTableId]="selectedTableId()"
-      [isSubmitting]="isSubmitting()"
-      [checkoutSuccess]="checkoutSuccess()"
-      [checkoutError]="checkoutError()"
-      [taxPercent]="taxPercent"
-      (selectedTableIdChange)="selectedTableId.set($event)"
-      (updateQuantity)="updateQuantity($event.itemId, $event.newQty)"
-      (updateNotes)="updateNotes($event.itemId, $event.notes)"
-      (removeFromCart)="removeFromCart($event)"
-      (submitOrder)="submitWaiterOrder()"
-    ></app-cart-sidebar>
+  <app-cart-sidebar [cartItems]="cartItems()" [tables]="tables()" [selectedTableId]="selectedTableId()"
+    [isSubmitting]="isSubmitting()" [checkoutSuccess]="checkoutSuccess()" [checkoutError]="checkoutError()"
+    [taxPercent]="taxPercent" (selectedTableIdChange)="selectedTableId.set($event)"
+    (updateQuantity)="updateQuantity($event.itemId, $event.newQty)"
+    (updateNotes)="updateNotes($event.itemId, $event.notes)" (removeFromCart)="removeFromCart($event)"
+    (submitOrder)="submitWaiterOrder()"></app-cart-sidebar>
   }
 </div>
 
 <!-- REDESIGNED GUEST DETAIL MODAL (HIGH AESTHETICS & DB FIELDS ONLY) -->
 @if (isModalOpen() && selectedItem()) {
+<div (click)="closeModal($event)"
+  class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md modal-backdrop animate-fade-in">
   <div
-    (click)="closeModal($event)"
-    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md modal-backdrop animate-fade-in"
-  >
-    <div class="relative bg-[#FCFAF8] rounded-3xl shadow-[0_25px_50px_-12px_rgba(0,0,0,0.4)] max-w-lg w-full overflow-hidden flex flex-col border border-[#EFECE9] transform transition-all duration-300 scale-100 ease-out animate-scale-in">
-      
-      <!-- Close floating button top-right -->
-      <button
-        (click)="closeModal()"
-        class="absolute top-4 right-4 z-10 bg-white/90 hover:bg-white text-gray-800 p-2 rounded-full shadow-md backdrop-blur-sm transition-all duration-200 hover:scale-105 hover:rotate-90 outline-none border border-gray-100"
-      >
-        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
-        </svg>
-      </button>
+    class="relative bg-[#FCFAF8] rounded-3xl shadow-[0_25px_50px_-12px_rgba(0,0,0,0.4)] max-w-lg w-full overflow-hidden flex flex-col border border-[#EFECE9] transform transition-all duration-300 scale-100 ease-out animate-scale-in">
 
-      <!-- Food Image & Overlay -->
-      <div class="relative h-60 sm:h-64 w-full overflow-hidden shrink-0 select-none bg-gray-100">
-        <img
-          [src]="selectedItem()?.imageUrl || '/favicon.ico'"
-          [alt]="selectedItem()?.name"
-          class="w-full h-full object-cover"
-        />
-        <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-        
-        <!-- Available Tag overlay -->
-        <span [class]="'absolute bottom-4 left-4 border text-[9px] tracking-widest uppercase font-bold px-2.5 py-1 rounded shadow-md ' + 
+    <!-- Close floating button top-right -->
+    <button (click)="closeModal()"
+      class="absolute top-4 right-4 z-10 bg-white/90 hover:bg-white text-gray-800 p-2 rounded-full shadow-md backdrop-blur-sm transition-all duration-200 hover:scale-105 hover:rotate-90 outline-none border border-gray-100">
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+      </svg>
+    </button>
+
+    <!-- Food Image & Overlay -->
+    <div class="relative h-60 sm:h-64 w-full overflow-hidden shrink-0 select-none bg-gray-100">
+      <img [src]="selectedItem()?.imageUrl || '/favicon.ico'" [alt]="selectedItem()?.name"
+        class="w-full h-full object-cover" />
+      <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+
+      <!-- Available Tag overlay -->
+      <span
+        [class]="'absolute bottom-4 left-4 border text-[9px] tracking-widest uppercase font-bold px-2.5 py-1 rounded shadow-md ' + 
                      (selectedItem()?.isAvailable ? 'bg-[#FAF4EC]/95 text-[#8C5815] border-[#8C5815]/20' : 'bg-black/85 text-white border-white/10')">
-          {{ selectedItem()?.isAvailable ? 'AVAILABLE' : 'OUT OF STOCK' }}
-        </span>
+        {{ selectedItem()?.isAvailable ? 'AVAILABLE' : 'OUT OF STOCK' }}
+      </span>
+    </div>
+
+    <!-- Detail Content -->
+    <div class="p-6 sm:p-8 flex flex-col space-y-4">
+
+      <!-- Header: Category Name, Price, and Dish Title (Cormorant Garamond italic hero moment) -->
+      <div class="space-y-1">
+        <span class="text-[10px] font-medium font-syne text-[#8C5815] uppercase tracking-widest">{{
+          selectedItem()?.categoryName }}</span>
+        <div class="flex items-start justify-between gap-4">
+          <h3 class="text-2xl sm:text-3xl font-medium font-cormorant italic text-gray-800 tracking-tight leading-tight">
+            {{ selectedItem()?.name }}</h3>
+          <span class="text-xl sm:text-2xl font-medium font-mono-dm text-[#8C5815] shrink-0">₹{{ selectedItem()?.price
+            }}</span>
+        </div>
       </div>
 
-      <!-- Detail Content -->
-      <div class="p-6 sm:p-8 flex flex-col space-y-4">
-        
-        <!-- Header: Category Name, Price, and Dish Title (Cormorant Garamond italic hero moment) -->
-        <div class="space-y-1">
-          <span class="text-[10px] font-medium font-syne text-[#8C5815] uppercase tracking-widest">{{ selectedItem()?.categoryName }}</span>
-          <div class="flex items-start justify-between gap-4">
-            <h3 class="text-2xl sm:text-3xl font-medium font-cormorant italic text-gray-800 tracking-tight leading-tight">{{ selectedItem()?.name }}</h3>
-            <span class="text-xl sm:text-2xl font-medium font-mono-dm text-[#8C5815] shrink-0">${{ selectedItem()?.price }}</span>
-          </div>
-        </div>
+      <!-- Description -->
+      <div class="space-y-1 pt-2 border-t border-[#EFECE9] font-space">
+        <h4 class="text-[10px] font-medium font-syne text-gray-400 tracking-wider uppercase select-none">Description
+        </h4>
+        <p class="text-xs sm:text-sm text-gray-650 leading-relaxed font-normal">
+          {{ selectedItem()?.description }}
+        </p>
+      </div>
 
-        <!-- Description -->
-        <div class="space-y-1 pt-2 border-t border-[#EFECE9] font-space">
-          <h4 class="text-[10px] font-medium font-syne text-gray-400 tracking-wider uppercase select-none">Description</h4>
-          <p class="text-xs sm:text-sm text-gray-650 leading-relaxed font-normal">
-            {{ selectedItem()?.description }}
-          </p>
+      <!-- Prep Time info -->
+      <div class="flex items-center justify-between gap-4 pt-3 border-t border-[#EFECE9] select-none">
+        <div class="font-space">
+          <h4 class="text-[10px] font-medium font-syne text-gray-400 tracking-wider uppercase select-none mb-0.5">
+            Preparation Time</h4>
+          <span class="text-xs font-normal text-gray-850 flex items-center space-x-1">
+            <svg class="w-3.5 h-3.5 text-[#8C5815]" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+              stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+            </svg>
+            <span class="font-mono-dm text-slate-800">{{ selectedItem()?.preparationTime }} minutes</span>
+          </span>
         </div>
-
-        <!-- Prep Time info -->
-        <div class="flex items-center justify-between gap-4 pt-3 border-t border-[#EFECE9] select-none">
-          <div class="font-space">
-            <h4 class="text-[10px] font-medium font-syne text-gray-400 tracking-wider uppercase select-none mb-0.5">Preparation Time</h4>
-            <span class="text-xs font-normal text-gray-850 flex items-center space-x-1">
-              <svg class="w-3.5 h-3.5 text-[#8C5815]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-              </svg>
-              <span class="font-mono-dm text-slate-800">{{ selectedItem()?.preparationTime }} minutes</span>
-            </span>
-          </div>
-        </div>
-
       </div>
 
     </div>
+
   </div>
+</div>
 }
