@@ -50,4 +50,5 @@ export interface OrderItemTrackingModel {
     menuItemName: string;
     quantity: number;
     notes: string;
+    unitPrice?: number;
 }

@@ -27,6 +27,16 @@ export class SignalRService {
         return this.tablesUpdatedSubject.asObservable();
     }
 
+    private billGeneratedSubject = new Subject<any>();
+    public get billGenerated$(): Observable<any> {
+        return this.billGeneratedSubject.asObservable();
+    }
+
+    private billPaidSubject = new Subject<any>();
+    public get billPaid$(): Observable<any> {
+        return this.billPaidSubject.asObservable();
+    }
+
     public async connect(token: string): Promise<void> {
         if (this.hubConnection && this.isConnected()) {
             console.log("SignalR connection already active. Skipping connect.");
@@ -72,6 +82,16 @@ export class SignalRService {
         this.hubConnection.on("ReceiveTableStateUpdate", () => {
             console.log("Table state update signal received");
             this.tablesUpdatedSubject.next();
+        });
+
+        this.hubConnection.on("bill_generated", (bill) => {
+            console.log("Bill generated received:", bill);
+            this.billGeneratedSubject.next(bill);
+        });
+
+        this.hubConnection.on("bill_paid", (bill) => {
+            console.log("Bill paid received:", bill);
+            this.billPaidSubject.next(bill);
         });
     }
 

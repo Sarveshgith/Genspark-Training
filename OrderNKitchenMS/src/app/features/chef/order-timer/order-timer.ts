@@ -46,11 +46,11 @@ export class OrderTimer {
   public timerColorClass = computed(() => {
     const secs = this.elapsedSeconds();
     if (secs >= 600) {
-      return 'text-[#DE350B] animate-red-glow'; // overdue red with glow and pulse
+      return 'text-[#DE350B] animate-red-glow';
     }
     if (secs >= 300) {
-      return 'text-[#F28500]'; // warning orange
+      return 'text-[#F28500]';
     }
-    return 'text-slate-300'; // normal slate
+    return 'text-slate-300';
   });
 }

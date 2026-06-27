@@ -117,8 +117,11 @@
       <div
         class="flex justify-between text-sm font-bold text-gray-800 pt-1.5 border-t border-dashed border-gray-200 items-baseline">
         <span class="font-syne font-medium">Total Amount</span>
-        <span class="font-syne text-lg font-bold">₹{{ getCartTotal().toFixed(2) }} + {{ taxPercent }}% tax</span>
+        <span class="font-syne text-lg font-bold">₹{{ getCartTotal().toFixed(2) }}</span>
       </div>
+      <p class="text-[10px] text-gray-400 font-normal font-space mt-1 text-right select-none">
+        Tax and discounts applied at billing.
+      </p>
     </div>
     }
 

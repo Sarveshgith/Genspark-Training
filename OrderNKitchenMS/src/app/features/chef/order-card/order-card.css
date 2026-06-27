@@ -1,1 +1,3 @@
-/* Scoped styling removed for plain HTML phase */
+:host {
+  display: block;
+}

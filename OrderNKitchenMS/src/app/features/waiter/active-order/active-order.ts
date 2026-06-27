@@ -1,5 +1,6 @@
 import { Component, inject, OnInit, OnDestroy, signal, ChangeDetectorRef, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { OrderService } from '../../../core/services/order.service';
 import { SignalRService } from '../../../core/services/signalr.service';
@@ -13,7 +14,7 @@ import { Subscription } from 'rxjs';
 @Component({
   selector: 'app-active-order',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './active-order.html',
   styleUrl: './active-order.css',
 })
@@ -39,6 +40,11 @@ export class ActiveOrderComponent implements OnInit, OnDestroy {
   public isMarkingPaid: boolean = false;
   public billError: string | null = null;
   public billSuccess: string | null = null;
+
+  public showBillForm: boolean = false;
+  public taxRateInput: number = 8;
+  public discountAmountInput: number = 0;
+  public isPaymentComplete: boolean = false;
 
   public elapsedDisplay: string = '0s';
   private timerId: any;
@@ -75,7 +81,9 @@ export class ActiveOrderComponent implements OnInit, OnDestroy {
         const sub = this.signalRService.tablesUpdated$.subscribe({
           next: () => {
             this.zone.run(() => {
-              this.fetchActiveOrder();
+              if (!this.isPaymentComplete) {
+                this.fetchActiveOrder();
+              }
             });
           }
         });
@@ -85,6 +93,7 @@ export class ActiveOrderComponent implements OnInit, OnDestroy {
   }
 
   public fetchActiveOrder() {
+    if (this.isPaymentComplete) return;
     this.orderService.getActiveOrderByTableId(this.tableId).subscribe({
       next: (order) => {
         this.zone.run(() => {
@@ -117,6 +126,9 @@ export class ActiveOrderComponent implements OnInit, OnDestroy {
       next: (bill) => {
         this.zone.run(() => {
           this.bill = bill;
+          if (bill && bill.statusName === 'Paid') {
+            this.isPaymentComplete = true;
+          }
           this.cdr.detectChanges();
         });
       },
@@ -130,15 +142,30 @@ export class ActiveOrderComponent implements OnInit, OnDestroy {
   }
 
   public generateBill() {
+    this.showBillForm = true;
+    this.taxRateInput = parseFloat(this.taxPercent) || 8;
+    this.discountAmountInput = 0;
+  }
+
+  public submitGenerateBill() {
     if (!this.order) return;
+    if (this.taxRateInput < 0 || this.taxRateInput > 100) {
+      this.billError = "Tax rate must be between 0 and 100.";
+      return;
+    }
+    if (this.discountAmountInput < 0 || this.discountAmountInput > this.subtotal) {
+      this.billError = `Discount cannot exceed the subtotal amount (${this.subtotal}).`;
+      return;
+    }
+
     this.isGeneratingBill = true;
     this.billError = null;
     this.billSuccess = null;
 
     const payload = {
       orderId: this.order.id,
-      taxRate: 8,
-      discountAmount: 0
+      taxRate: this.taxRateInput,
+      discountAmount: this.discountAmountInput
     };
 
     this.billService.createBill(payload).subscribe({
@@ -146,6 +173,7 @@ export class ActiveOrderComponent implements OnInit, OnDestroy {
         this.zone.run(() => {
           this.bill = bill;
           this.isGeneratingBill = false;
+          this.showBillForm = false;
           this.billSuccess = "Bill generated successfully!";
           this.cdr.detectChanges();
         });
@@ -171,10 +199,7 @@ export class ActiveOrderComponent implements OnInit, OnDestroy {
         this.zone.run(() => {
           this.isMarkingPaid = false;
           this.billSuccess = "Bill marked as paid! Order completed.";
-          this.bill = null;
-          setTimeout(() => {
-            this.router.navigate(['/waiter/tables']);
-          }, 1500);
+          this.isPaymentComplete = true;
           this.cdr.detectChanges();
         });
       },

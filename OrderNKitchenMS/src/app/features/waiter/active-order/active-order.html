@@ -1,163 +1,262 @@
 <div class="min-h-screen bg-[#FDFBF7] text-[#2C2117] font-sans antialiased pb-12">
 
   <!-- Loading State -->
-  <div *ngIf="isLoading" class="flex flex-col items-center justify-center min-h-[50vh] space-y-4">
-    <div class="w-10 h-10 border-4 border-[#C5A059] border-t-transparent rounded-full animate-spin"></div>
-    <p class="text-xs font-semibold tracking-wider uppercase text-[#8C7A6B]">Fetching active order...</p>
-  </div>
-
-  <!-- Error State / No Order -->
-  <div *ngIf="!isLoading && errorMessage" class="max-w-md mx-auto mt-20 px-6 text-center space-y-6">
-    <div class="w-16 h-16 bg-[#FAF6EE] text-[#C5A059] rounded-full flex items-center justify-center border border-[#EFE5D3] mx-auto shadow-sm text-2xl">
-      🍽️
+  @if (isLoading) {
+    <div class="flex flex-col items-center justify-center min-h-[50vh] space-y-4">
+      <div class="w-10 h-10 border-4 border-[#C5A059] border-t-transparent rounded-full animate-spin"></div>
+      <p class="text-xs font-semibold tracking-wider uppercase text-[#8C7A6B]">Fetching active order...</p>
     </div>
-    <div class="space-y-2">
-      <h2 class="text-2xl font-bold font-syne text-[#2C2117]">No Active Order</h2>
-      <p class="text-sm text-[#8C7A6B] leading-relaxed">{{ errorMessage }}</p>
-    </div>
-    <button routerLink="/waiter/tables" class="px-6 py-2.5 bg-[#2C2117] text-white hover:bg-[#3d2f21] rounded-full transition duration-300 font-semibold text-sm cursor-pointer">
-      Return to Layout
-    </button>
-  </div>
-
-  <!-- Main Order Details View -->
-  <main *ngIf="!isLoading && !errorMessage && order" class="max-w-2xl mx-auto px-6 py-10 space-y-8 animate-fade-in">
-    
-    <!-- Back Button -->
-    <div class="flex items-center">
-      <button routerLink="/waiter/tables" class="flex items-center space-x-1.5 text-xs font-bold uppercase tracking-wider text-[#8C7A6B] hover:text-[#2C2117] transition duration-200 cursor-pointer">
-        <span>←</span>
-        <span>Back to tables</span>
+  } @else if (errorMessage && !isPaymentComplete) {
+    <!-- Error State / No Order -->
+    <div class="max-w-md mx-auto mt-20 px-6 text-center space-y-6">
+      <div class="w-16 h-16 bg-[#FAF6EE] text-[#C5A059] rounded-full flex items-center justify-center border border-[#EFE5D3] mx-auto shadow-sm text-2xl">
+        🍽️
+      </div>
+      <div class="space-y-2">
+        <h2 class="text-2xl font-bold font-syne text-[#2C2117]">No Active Order</h2>
+        <p class="text-sm text-[#8C7A6B] leading-relaxed">{{ errorMessage }}</p>
+      </div>
+      <button routerLink="/waiter/tables" class="px-6 py-2.5 bg-[#2C2117] text-white hover:bg-[#3d2f21] rounded-full transition duration-300 font-semibold text-sm cursor-pointer">
+        Return to Layout
       </button>
     </div>
-
-    <!-- Table Header Info Card -->
-    <div class="flex items-center justify-between bg-white border border-[#EFE5D3] rounded-3xl p-6 shadow-sm">
-      <div class="space-y-1">
-        <h1 class="text-3xl font-extrabold font-syne text-[#2C2117]">Table {{ order.tableNumber }}</h1>
+  } @else if (isPaymentComplete) {
+    <!-- Payment Complete Success State -->
+    <div class="max-w-md mx-auto mt-20 px-6 text-center space-y-6 animate-fade-in">
+      <div class="w-20 h-20 bg-[#EBFDF3] text-[#1E7E34] rounded-full flex items-center justify-center border border-[#D1F2DE] mx-auto shadow-md text-3xl animate-bounce-subtle">
+        ✓
       </div>
-      <div class="text-right space-y-1">
-        <span class="inline-block px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-sm"
-              [ngClass]="{
-                'bg-[#FFF9EB] text-[#B37822] border border-[#FFE8B3]': order.statusName === 'Pending' || order.statusName === 'InPrep',
-                'bg-[#EBFDF3] text-[#1E7E34] border border-[#D1F2DE]': order.statusName === 'Ready' || order.statusName === 'Served' || order.statusName === 'Completed'
-              }">
-          {{ order.statusName }}
-        </span>
-        <p class="text-[10px] font-mono-dm text-[#8C7A6B] mt-1">Placed {{ elapsedDisplay }} ago</p>
-      </div>
-    </div>
-
-    <!-- Order Items List -->
-    <div class="bg-white border border-[#EFE5D3] rounded-3xl p-6 md:p-8 shadow-sm space-y-6">
-      <div class="flex items-center justify-between border-b border-[#F5EFE6] pb-4">
-        <h3 class="text-sm font-extrabold uppercase tracking-widest text-[#2C2117] font-outfit">Selected Courses</h3>
-        <span class="text-xs font-mono-dm text-[#8C7A6B] font-semibold">#AMB-{{ order.id }}</span>
+      <div class="space-y-3">
+        <h2 class="text-3xl font-bold font-syne text-[#2C2117]">Table {{ tableId }}</h2>
+        <p class="text-lg font-semibold tracking-wide text-[#1E7E34]">Payment Complete</p>
+        <p class="text-xs text-[#8C7A6B] leading-relaxed">
+          The bill has been settled and the table has been set to Available.
+        </p>
       </div>
 
-      <div class="space-y-4">
-        <div *ngFor="let item of order.orderItems" class="flex items-start justify-between py-3 border-b border-[#F5EFE6]/60 last:border-b-0">
-          <div class="space-y-1">
-            <h4 class="font-bold text-[#2C2117] text-sm">{{ item.menuItemName }}</h4>
-            <p class="text-xs text-[#8C7A6B]">
-              Quantity: <span class="font-semibold text-[#2C2117]">{{ item.quantity }}</span>
-              <span *ngIf="item.notes" class="mx-1.5 text-gray-300">•</span>
-              <span class="italic text-gray-500">{{ item.notes }}</span>
-            </p>
+      <!-- Settle breakdown summary -->
+      @if (bill) {
+        <div class="bg-white border border-[#EFE5D3] rounded-2xl p-4 text-left text-xs space-y-2">
+          <div class="flex justify-between">
+            <span class="text-gray-500">Subtotal</span>
+            <span class="font-mono-dm font-semibold">{{ bill.subTotal | currency }}</span>
           </div>
-          <span class="text-sm font-bold font-mono-dm text-[#2C2117]">{{ item.unitPrice * item.quantity | currency }}</span>
+          <div class="flex justify-between">
+            <span class="text-gray-500">Taxes ({{ bill.taxRate }}%)</span>
+            <span class="font-mono-dm font-semibold">{{ (bill.subTotal * bill.taxRate / 100) | currency }}</span>
+          </div>
+          @if (bill.discountAmount > 0) {
+            <div class="flex justify-between text-[#1E7E34]">
+              <span>Discount</span>
+              <span class="font-mono-dm font-semibold">-{{ bill.discountAmount | currency }}</span>
+            </div>
+          }
+          <div class="flex justify-between text-sm font-bold pt-1.5 border-t border-gray-100">
+            <span>Amount Paid</span>
+            <span class="font-mono-dm text-[#9C7A3C]">{{ bill.totalAmount | currency }}</span>
+          </div>
         </div>
-      </div>
+      }
 
-      <!-- Financial Totals -->
-      <div class="border-t border-[#F5EFE6] pt-6 space-y-3 font-outfit text-sm">
-        <div class="flex justify-between text-[#8C7A6B]">
-          <span>Subtotal</span>
-          <span class="font-mono-dm">{{ subtotal | currency }}</span>
-        </div>
-        <div class="flex justify-between text-[#2C2117] font-bold text-base pt-2 border-t border-[#F5EFE6]/60">
-          <span>Total Balance</span>
-          <span class="font-mono-dm text-[#9C7A3C]">{{ subtotal | currency }} + {{ taxPercentDisplay }}% tax</span>
-        </div>
-      </div>
+      <button routerLink="/waiter/tables" class="px-8 py-3 bg-[#2C2117] text-white hover:bg-[#3d2f21] rounded-full transition duration-300 font-semibold text-sm cursor-pointer shadow-md">
+        Back to Tables View
+      </button>
     </div>
-
-    <!-- Bill / Next Steps Card -->
-    <div class="bg-white border border-[#EFE5D3] rounded-3xl p-6 md:p-8 shadow-sm space-y-6">
-      <div class="flex items-center justify-between border-b border-[#F5EFE6] pb-4">
-        <h3 class="text-sm font-extrabold uppercase tracking-widest text-[#2C2117] font-outfit">Billing & Settlement</h3>
-        <span class="text-xs font-mono-dm text-[#8C7A6B] font-semibold">STATUS: {{ order.statusName }}</span>
+  } @else if (order) {
+    <!-- Main Order Details View -->
+    <main class="max-w-2xl mx-auto px-6 py-10 space-y-8 animate-fade-in">
+      
+      <!-- Back Button -->
+      <div class="flex items-center">
+        <button routerLink="/waiter/tables" class="flex items-center space-x-1.5 text-xs font-bold uppercase tracking-wider text-[#8C7A6B] hover:text-[#2C2117] transition duration-200 cursor-pointer">
+          <span>←</span>
+          <span>Back to tables</span>
+        </button>
       </div>
 
-      <!-- Feedback notifications -->
-      <div *ngIf="billSuccess" class="p-3.5 bg-[#EBFDF3] border border-[#D1F2DE] text-[#1E7E34] text-xs font-semibold rounded-2xl">
-        {{ billSuccess }}
-      </div>
-      <div *ngIf="billError" class="p-3.5 bg-[#FDF2F2] border border-[#FDE8E8] text-[#DE350B] text-xs font-semibold rounded-2xl">
-        {{ billError }}
+      <!-- Table Header Info Card -->
+      <div class="flex items-center justify-between bg-white border border-[#EFE5D3] rounded-3xl p-6 shadow-sm">
+        <div class="space-y-1">
+          <h1 class="text-3xl font-extrabold font-syne text-[#2C2117]">Table {{ order.tableNumber }}</h1>
+        </div>
+        <div class="text-right space-y-1">
+          <span class="inline-block px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-sm"
+                [ngClass]="{
+                  'bg-[#FFF9EB] text-[#B37822] border border-[#FFE8B3]': order.statusName === 'Pending' || order.statusName === 'InPrep',
+                  'bg-[#EBFDF3] text-[#1E7E34] border border-[#D1F2DE]': order.statusName === 'Ready' || order.statusName === 'Served' || order.statusName === 'Completed'
+                }">
+            {{ order.statusName }}
+          </span>
+          <p class="text-[10px] font-mono-dm text-[#8C7A6B] mt-1">Placed {{ elapsedDisplay }} ago</p>
+        </div>
       </div>
 
-      <!-- Case 1: Status is Served (order complete, ready for bill) -->
-      <div *ngIf="order.statusName === 'Served'" class="space-y-4">
-        <!-- Sub-case A: No bill generated yet -->
-        <div *ngIf="!bill" class="space-y-3">
-          <p class="text-xs text-[#8C7A6B] leading-relaxed">
-            All courses have been served to Table {{ order.tableNumber }}. You can now generate the guest's bill summary.
+      <!-- Order Items List -->
+      <div class="bg-white border border-[#EFE5D3] rounded-3xl p-6 md:p-8 shadow-sm space-y-6">
+        <div class="flex items-center justify-between border-b border-[#F5EFE6] pb-4">
+          <h3 class="text-sm font-extrabold uppercase tracking-widest text-[#2C2117] font-outfit">Selected Courses</h3>
+          <span class="text-xs font-mono-dm text-[#8C7A6B] font-semibold">#AMB-{{ order.id }}</span>
+        </div>
+
+        <div class="space-y-4">
+          @for (item of order.orderItems; track item.menuItemName) {
+            <div class="flex items-start justify-between py-3 border-b border-[#F5EFE6]/60 last:border-b-0">
+              <div class="space-y-1">
+                <h4 class="font-bold text-[#2C2117] text-sm">{{ item.menuItemName }}</h4>
+                <p class="text-xs text-[#8C7A6B]">
+                  Quantity: <span class="font-semibold text-[#2C2117]">{{ item.quantity }}</span>
+                  @if (item.notes) {
+                    <span class="mx-1.5 text-gray-300">•</span>
+                    <span class="italic text-gray-500">{{ item.notes }}</span>
+                  }
+                </p>
+              </div>
+              <span class="text-sm font-bold font-mono-dm text-[#2C2117]">{{ (item.unitPrice * item.quantity) | currency }}</span>
+            </div>
+          }
+        </div>
+
+        <!-- Financial Totals -->
+        <div class="border-t border-[#F5EFE6] pt-6 space-y-3 font-outfit text-sm">
+          <div class="flex justify-between text-[#8C7A6B]">
+            <span>Subtotal</span>
+            <span class="font-mono-dm">{{ subtotal | currency }}</span>
+          </div>
+          <div class="flex justify-between text-[#2C2117] font-bold text-base pt-2 border-t border-[#F5EFE6]/60">
+            <span>Total Balance</span>
+            <span class="font-mono-dm text-[#9C7A3C]">{{ subtotal | currency }}</span>
+          </div>
+          <p class="text-[10px] text-[#8C7A6B] italic font-outfit mt-1 text-right select-none">
+            Tax and discounts applied at billing.
           </p>
-          <button
-            (click)="generateBill()"
-            [disabled]="isGeneratingBill"
-            class="w-full py-4 bg-[#8C5815] text-white hover:bg-[#72450F] rounded-2xl font-bold font-syne tracking-wider text-sm transition duration-200 cursor-pointer shadow-sm disabled:bg-gray-300"
-          >
-            {{ isGeneratingBill ? 'GENERATING RECEIPT...' : 'GENERATE BILL' }}
-          </button>
-        </div>
-
-        <!-- Sub-case B: Bill is generated, waiting for payment -->
-        <div *ngIf="bill" class="space-y-4">
-          <div class="p-4 bg-[#FAF7F2] rounded-2xl border border-[#EFE5D3] space-y-3 font-outfit text-xs text-gray-700">
-            <div class="flex justify-between">
-              <span>Receipt Ref</span>
-              <span class="font-mono-dm font-semibold">#REC-{{ bill.id }}</span>
-            </div>
-            <div class="flex justify-between">
-              <span>Subtotal</span>
-              <span class="font-mono-dm">{{ bill.subTotal | currency }}</span>
-            </div>
-            <div class="flex justify-between">
-              <span>Taxes ({{ bill.taxRate }}%)</span>
-              <span class="font-mono-dm">{{ (bill.subTotal * bill.taxRate / 100) | currency }}</span>
-            </div>
-            <div class="flex justify-between font-bold text-sm text-[#2C2117] pt-2 border-t border-[#EFE5D3]">
-              <span>Final Total</span>
-              <span class="font-mono-dm text-[#9C7A3C]">{{ bill.totalAmount | currency }}</span>
-            </div>
-          </div>
-
-          <div class="grid grid-cols-2 gap-4">
-            <button
-              (click)="markAsPaid()"
-              [disabled]="isMarkingPaid"
-              class="py-3.5 bg-[#1E7E34] text-white hover:bg-[#155A24] rounded-2xl font-bold font-syne tracking-wider text-xs transition duration-200 cursor-pointer shadow-sm"
-            >
-              {{ isMarkingPaid ? 'PROCESSING...' : 'SETTLE PAYMENT' }}
-            </button>
-            <button
-              (click)="downloadPdf()"
-              class="py-3.5 bg-white border border-[#EFE5D3] text-gray-700 hover:bg-gray-50 rounded-2xl font-bold font-syne tracking-wider text-xs transition duration-200 cursor-pointer shadow-sm"
-            >
-              DOWNLOAD PDF
-            </button>
-          </div>
         </div>
       </div>
 
-      <!-- Case 2: Status is pending or prepping (in kitchen) -->
-      <div *ngIf="order.statusName !== 'Served'" class="text-xs text-[#8C7A6B] leading-relaxed py-2 flex items-center space-x-2">
-        <span class="w-1.5 h-1.5 rounded-full bg-[#E8A54B] animate-pulse"></span>
-        <span>Bill settlement option will become active once all courses are marked as <strong>Served</strong>.</span>
-      </div>
-    </div>
+      <!-- Bill / Next Steps Card -->
+      <div class="bg-white border border-[#EFE5D3] rounded-3xl p-6 md:p-8 shadow-sm space-y-6">
+        <div class="flex items-center justify-between border-b border-[#F5EFE6] pb-4">
+          <h3 class="text-sm font-extrabold uppercase tracking-widest text-[#2C2117] font-outfit">Billing & Settlement</h3>
+          <span class="text-xs font-mono-dm text-[#8C7A6B] font-semibold">STATUS: {{ order.statusName }}</span>
+        </div>
 
-  </main>
+        <!-- Feedback notifications -->
+        @if (billSuccess) {
+          <div class="p-3.5 bg-[#EBFDF3] border border-[#D1F2DE] text-[#1E7E34] text-xs font-semibold rounded-2xl">
+            {{ billSuccess }}
+          </div>
+        }
+        @if (billError) {
+          <div class="p-3.5 bg-[#FDF2F2] border border-[#FDE8E8] text-[#DE350B] text-xs font-semibold rounded-2xl">
+            {{ billError }}
+          </div>
+        }
+
+        <!-- Case 1: Status is Served (order complete, ready for bill) -->
+        @if (order.statusName === 'Served') {
+          <div class="space-y-4">
+            <!-- Sub-case A: No bill generated yet -->
+            @if (!bill) {
+              <div class="space-y-3">
+                @if (showBillForm) {
+                  <!-- Inline Billing Form -->
+                  <div class="p-4 bg-[#FAF7F2] rounded-2xl border border-[#EFE5D3] space-y-4">
+                    <h4 class="text-xs font-extrabold uppercase tracking-wider text-[#2C2117]">Billing Details</h4>
+                    
+                    <div class="space-y-1.5">
+                      <label class="block text-xxs font-bold uppercase text-[#8C7A6B]">Tax Rate (%)</label>
+                      <input type="number" [(ngModel)]="taxRateInput" name="taxRateInput" min="0" max="100" step="0.5"
+                             class="w-full px-3 py-2 bg-white border border-[#EFE5D3] rounded-xl text-sm text-[#2C2117] focus:outline-none focus:border-[#C5A059]">
+                    </div>
+
+                    <div class="space-y-1.5">
+                      <label class="block text-xxs font-bold uppercase text-[#8C7A6B]">Discount Amount ($)</label>
+                      <input type="number" [(ngModel)]="discountAmountInput" name="discountAmountInput" min="0" [max]="subtotal" step="0.01"
+                             class="w-full px-3 py-2 bg-white border border-[#EFE5D3] rounded-xl text-sm text-[#2C2117] focus:outline-none focus:border-[#C5A059]">
+                    </div>
+
+                    <div class="flex space-x-3 pt-2">
+                      <button (click)="submitGenerateBill()" [disabled]="isGeneratingBill"
+                              class="flex-1 py-2.5 bg-[#8C5815] text-white hover:bg-[#72450F] rounded-xl text-xs font-bold font-syne tracking-wider uppercase transition cursor-pointer disabled:bg-gray-300">
+                        {{ isGeneratingBill ? 'Submitting...' : 'Submit' }}
+                      </button>
+                      <button (click)="showBillForm = false" [disabled]="isGeneratingBill"
+                              class="px-4 py-2.5 bg-white border border-[#EFE5D3] text-gray-700 hover:bg-gray-50 rounded-xl text-xs font-bold font-syne tracking-wider uppercase transition cursor-pointer">
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                } @else {
+                  <p class="text-xs text-[#8C7A6B] leading-relaxed">
+                    All courses have been served to Table {{ order.tableNumber }}. You can now generate the guest's bill summary.
+                  </p>
+                  <button
+                    (click)="generateBill()"
+                    [disabled]="isGeneratingBill"
+                    class="w-full py-4 bg-[#8C5815] text-white hover:bg-[#72450F] rounded-2xl font-bold font-syne tracking-wider text-sm transition duration-200 cursor-pointer shadow-sm disabled:bg-gray-300"
+                  >
+                    {{ isGeneratingBill ? 'GENERATING RECEIPT...' : 'GENERATE BILL' }}
+                  </button>
+                }
+              </div>
+            }
+
+            <!-- Sub-case B: Bill is generated, waiting for payment -->
+            @if (bill) {
+              <div class="space-y-4">
+                <div class="p-4 bg-[#FAF7F2] rounded-2xl border border-[#EFE5D3] space-y-3 font-outfit text-xs text-gray-700">
+                  <div class="flex justify-between">
+                    <span>Receipt Ref</span>
+                    <span class="font-mono-dm font-semibold">#REC-{{ bill.id }}</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Subtotal</span>
+                    <span class="font-mono-dm">{{ bill.subTotal | currency }}</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Taxes ({{ bill.taxRate }}%)</span>
+                    <span class="font-mono-dm">{{ (bill.subTotal * bill.taxRate / 100) | currency }}</span>
+                  </div>
+                  @if (bill.discountAmount > 0) {
+                    <div class="flex justify-between text-[#2E7D32]">
+                      <span>Discount</span>
+                      <span class="font-mono-dm font-semibold">-{{ bill.discountAmount | currency }}</span>
+                    </div>
+                  }
+                  <div class="flex justify-between font-bold text-sm text-[#2C2117] pt-2 border-t border-[#EFE5D3]">
+                    <span>Final Total</span>
+                    <span class="font-mono-dm text-[#9C7A3C]">{{ bill.totalAmount | currency }}</span>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                  <button
+                    (click)="markAsPaid()"
+                    [disabled]="isMarkingPaid"
+                    class="py-3.5 bg-[#1E7E34] text-white hover:bg-[#155A24] rounded-2xl font-bold font-syne tracking-wider text-xs transition duration-200 cursor-pointer shadow-sm disabled:bg-gray-300"
+                  >
+                    {{ isMarkingPaid ? 'PROCESSING...' : 'MARK PAID' }}
+                  </button>
+                  <button
+                    (click)="downloadPdf()"
+                    class="py-3.5 bg-white border border-[#EFE5D3] text-gray-700 hover:bg-gray-50 rounded-2xl font-bold font-syne tracking-wider text-xs transition duration-200 cursor-pointer shadow-sm"
+                  >
+                    DOWNLOAD PDF
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+        }
+
+        <!-- Case 2: Status is pending or prepping (in kitchen) -->
+        @if (order.statusName !== 'Served') {
+          <div class="text-xs text-[#8C7A6B] leading-relaxed py-2 flex items-center space-x-2">
+            <span class="w-1.5 h-1.5 rounded-full bg-[#E8A54B] animate-pulse"></span>
+            <span>Bill settlement option will become active once all courses are marked as <strong>Served</strong>.</span>
+          </div>
+        }
+      </div>
+
+    </main>
+  }
 </div>

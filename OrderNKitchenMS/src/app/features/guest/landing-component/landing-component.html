@@ -23,9 +23,7 @@
       </button>
     </div>
   } @else {
-    @if (orderDetails) {
-      <app-order-tracker [order]="orderDetails" [tableNumber]="tableNumber" [bill]="billDetails()"></app-order-tracker>
-    } @else {
+    @if (guestState() === 'waiting') {
       <div class="min-h-screen flex flex-col justify-between">
         <header class="max-w-7xl mx-auto w-full px-6 py-6 sm:py-8 flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-[#F5EFE6]">
           <div class="text-2xl font-bold tracking-widest text-[#9C7A3C] uppercase font-syne text-center sm:text-left">
@@ -75,6 +73,153 @@
             <p class="text-xs uppercase tracking-widest text-[#E8A54B] font-semibold font-outfit">Fine Dining Redefined</p>
             <h3 class="text-xl font-syne text-white">Enjoy an exceptional culinary journey</h3>
           </div>
+        </div>
+      </div>
+    }
+
+    @if (guestState() === 'tracking') {
+      @if (orderDetails) {
+        <app-order-tracker [order]="orderDetails" [tableNumber]="tableNumber" [bill]="billDetails()"></app-order-tracker>
+      }
+    }
+
+    @if (guestState() === 'bill') {
+      <div class="min-h-screen flex flex-col justify-between">
+        <header class="max-w-7xl mx-auto w-full px-6 py-6 sm:py-8 flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-[#F5EFE6]">
+          <div class="text-2xl font-bold tracking-widest text-[#9C7A3C] uppercase font-syne text-center sm:text-left">
+            Ambrosia
+          </div>
+          <div class="flex items-center space-x-3 bg-[#FAF3E8] border border-[#EFE5D3] px-4 py-2 rounded-full shadow-sm font-outfit">
+            <span class="text-sm font-semibold tracking-wider text-[#8C7A6B] uppercase">Your Location</span>
+            <span class="text-sm font-bold text-[#2C2117] font-syne">Table {{ tableNumber }}</span>
+            <div class="w-8 h-8 rounded-full bg-[#E8A54B] flex items-center justify-center text-white">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+          </div>
+        </header>
+
+        <main class="flex-grow max-w-2xl w-full mx-auto px-6 py-10 space-y-8">
+          <div class="bg-white border border-[#EFE5D3] rounded-3xl p-6 md:p-8 shadow-xl shadow-[#FAF7F0] space-y-8">
+            <div class="text-center space-y-2">
+              <span class="text-xs uppercase tracking-widest text-[#C5A059] font-bold font-outfit">Settle Bill</span>
+              <h1 class="text-3xl font-semibold font-syne tracking-tight text-[#2C2117]">Your Dining Bill</h1>
+              <p class="text-xs text-[#8C7A6B] font-outfit">Order Reference: #AMB-{{ orderDetails?.orderId }}</p>
+            </div>
+
+            <!-- Itemized List -->
+            <div class="space-y-4">
+              <h3 class="text-xs font-extrabold uppercase tracking-widest text-[#2C2117] border-b border-[#F5EFE6] pb-2 font-outfit">Itemised Order Summary</h3>
+              <div class="divide-y divide-[#F5EFE6]/60">
+                @for (item of orderDetails?.orderItems; track item.menuItemName) {
+                  <div class="flex justify-between py-3 text-sm">
+                    <div class="space-y-0.5">
+                      <span class="font-bold text-[#2C2117]">{{ item.menuItemName }}</span>
+                      <div class="text-xs text-[#8C7A6B]">
+                        Qty: <span class="font-semibold text-[#2C2117]">{{ item.quantity }}</span> 
+                        @if (item.unitPrice) {
+                          <span class="mx-1">•</span> Unit Price: <span class="font-semibold text-[#2C2117]">{{ item.unitPrice | currency }}</span>
+                        }
+                      </div>
+                    </div>
+                    <span class="font-bold font-mono-dm text-[#2C2117]">{{ (item.unitPrice * item.quantity) | currency }}</span>
+                  </div>
+                }
+              </div>
+            </div>
+
+            <!-- Financials Breakdown -->
+            <div class="border-t border-[#F5EFE6] pt-6 space-y-3 text-sm font-outfit">
+              @if (billDetails()) {
+                <div class="flex justify-between text-[#8C7A6B]">
+                  <span>Subtotal</span>
+                  <span class="font-mono-dm text-[#2C2117]">{{ billDetails()?.subTotal | currency }}</span>
+                </div>
+                <div class="flex justify-between text-[#8C7A6B]">
+                  <span>Tax ({{ billDetails()?.taxRate }}%)</span>
+                  <span class="font-mono-dm text-[#2C2117]">{{ ((billDetails()?.subTotal * billDetails()?.taxRate) / 100) | currency }}</span>
+                </div>
+                @if (billDetails()?.discountAmount > 0) {
+                  <div class="flex justify-between text-[#2E7D32]">
+                    <span>Discount</span>
+                    <span class="font-mono-dm font-bold">-{{ billDetails()?.discountAmount | currency }}</span>
+                  </div>
+                }
+                <div class="flex justify-between font-bold text-lg text-[#2C2117] pt-3 border-t border-[#F5EFE6]">
+                  <span>Grand Total</span>
+                  <span class="font-mono-dm text-[#9C7A3C] text-xl">{{ billDetails()?.totalAmount | currency }}</span>
+                </div>
+              }
+            </div>
+
+            <!-- UPI QR Code Visual -->
+            <div class="bg-[#FAF8F4] border border-[#EFE5D3] rounded-2xl p-6 text-center space-y-4">
+              <span class="text-xs font-bold uppercase tracking-wider text-[#8C7A6B] block">Scan to Pay via UPI</span>
+              @if (billDetails()) {
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=upi://pay?pa=ambrosia@upi%26pn=Ambrosia%26am={{billDetails()?.totalAmount}}%26cu=INR" 
+                     alt="UPI QR Code" 
+                     class="mx-auto border-4 border-white shadow-md rounded-2xl w-44 h-44">
+              }
+              <div class="text-xxs text-[#8C7A6B] italic">
+                Accepts all major UPI apps (GPay, PhonePe, Paytm, BHIM)
+              </div>
+            </div>
+
+            <!-- Note and download button -->
+            <div class="border-t border-[#F5EFE6] pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div class="flex items-center space-x-2 text-[#8C7A6B]">
+                <span class="text-lg">💁‍♂️</span>
+                <span class="text-xs font-medium">Your waiter will process the payment.</span>
+              </div>
+              <button (click)="downloadReceipt()" 
+                      class="w-full sm:w-auto px-6 py-3 bg-[#2C2117] hover:bg-[#3d2f21] text-white rounded-full transition duration-300 font-medium tracking-wide text-xs uppercase cursor-pointer flex items-center justify-center space-x-2">
+                <span>📄</span>
+                <span>Download Receipt</span>
+              </button>
+            </div>
+
+          </div>
+        </main>
+      </div>
+    }
+
+    @if (guestState() === 'paid') {
+      <div class="min-h-screen flex items-center justify-center p-6 bg-[#FDFBF7]">
+        <div class="max-w-md w-full bg-white border border-[#EFE5D3] rounded-3xl p-8 text-center shadow-2xl space-y-8 animate-fade-in">
+          
+          <!-- Green checkmark graphic -->
+          <div class="w-20 h-20 bg-[#E8F5E9] border border-[#C8E6C9] rounded-full flex items-center justify-center text-4xl mx-auto text-[#2E7D32] animate-bounce-subtle">
+            ✓
+          </div>
+
+          <div class="space-y-3">
+            <span class="text-xs uppercase tracking-widest text-[#2E7D32] font-extrabold font-outfit">Settle Complete</span>
+            <h1 class="text-3xl font-semibold font-syne text-[#2C2117]">Payment Complete</h1>
+            <p class="text-sm text-[#8C7A6B] leading-relaxed font-outfit">
+              We have successfully received your payment. Thank you for dining with us at Ambrosia!
+            </p>
+          </div>
+
+          <!-- Total paid box -->
+          <div class="bg-[#F4F9F4] border border-[#D0E7D2] rounded-2xl py-4 px-6 max-w-xs mx-auto flex items-center justify-between">
+            <span class="text-xs uppercase font-bold tracking-wider text-[#2E7D32]">Total Settle</span>
+            <span class="text-xl font-bold font-mono-dm text-[#2E7D32]">{{ billDetails()?.totalAmount | currency }}</span>
+          </div>
+
+          <!-- Countdown timer -->
+          <div class="border-t border-[#F5EFE6] pt-6 flex flex-col items-center justify-center space-y-2">
+            <div class="flex items-center space-x-2 text-xxs font-extrabold uppercase tracking-widest text-[#8C7A6B] font-outfit">
+              <span class="inline-block w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>
+              <span>Resetting table session in {{ countdownSeconds() }} seconds</span>
+            </div>
+            <div class="w-full h-1 bg-gray-100 rounded-full overflow-hidden max-w-[200px]">
+              <div class="h-full bg-gradient-to-r from-amber-500 to-[#E8A54B] transition-all duration-1000 ease-linear"
+                   [style.width.%]="(countdownSeconds() / 5) * 100"></div>
+            </div>
+          </div>
+
         </div>
       </div>
     }

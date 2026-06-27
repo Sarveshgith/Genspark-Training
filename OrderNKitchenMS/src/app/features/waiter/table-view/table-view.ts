@@ -36,7 +36,6 @@ export class TableView implements OnInit, OnDestroy {
     this.fetchTables();
     this.setupSignalR();
 
-    // Update the ticking timers every 10 seconds
     this.timeIntervalId = setInterval(() => {
       this.timeTrigger.set(Date.now());
     }, 10000);

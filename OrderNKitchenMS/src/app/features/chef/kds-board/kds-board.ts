@@ -20,12 +20,10 @@ export class KdsBoard implements OnInit, OnDestroy {
   public signalRService = inject(SignalRService);
   private audioService = inject(AudioService);
 
-  // Column signals
   public pendingOrders = signal<OrderModel[]>([]);
   public inPrepOrders = signal<OrderModel[]>([]);
   public readyOrders = signal<OrderModel[]>([]);
 
-  // Maps orderId to cooking start time (epoch milliseconds)
   public timerMap = signal<{ [orderId: number]: number }>({});
 
   public unreadCount = signal<number>(0);
@@ -40,12 +38,10 @@ export class KdsBoard implements OnInit, OnDestroy {
   private clockIntervalId: any;
   private toastTimeoutId: any;
 
-  // Active count across all three columns
   public totalActiveOrders = computed(() => {
     return this.pendingOrders().length + this.inPrepOrders().length + this.readyOrders().length;
   });
 
-  // Ticking average cooking duration across all In Prep cards
   public avgInPrepTime = computed(() => {
     const prepOrders = this.inPrepOrders();
     if (prepOrders.length === 0) return '00:00';
@@ -65,7 +61,6 @@ export class KdsBoard implements OnInit, OnDestroy {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   });
 
-  // Aggregated Prep Summary across all active orders (Pending and In Prep)
   public activeItemSummary = computed(() => {
     const summary: { [key: string]: number } = {};
     const activeList = [...this.pendingOrders(), ...this.inPrepOrders()];
@@ -87,7 +82,6 @@ export class KdsBoard implements OnInit, OnDestroy {
     const token = this.authService.getToken() ?? '';
     this.signalRService.connect(token);
 
-    // Fetch logged-in chef name
     this.subscriptions.add(
       this.authService.user$.subscribe(user => {
         if (user) {
@@ -96,11 +90,10 @@ export class KdsBoard implements OnInit, OnDestroy {
       })
     );
 
-    // 1. Listen for new orders
     this.subscriptions.add(
       this.signalRService.newOrder$.subscribe({
         next: (newOrder) => {
-          if (newOrder.status === 1) { // Pending
+          if (newOrder.status === 1) {
             this.pendingOrders.update(orders => {
               if (orders.some(o => o.id === newOrder.id)) return orders;
               const updated = [...orders, newOrder];
@@ -108,7 +101,7 @@ export class KdsBoard implements OnInit, OnDestroy {
             });
             this.unreadCount.update(c => c + 1);
             this.audioService.playNewOrderChime();
-          } else if (newOrder.status === 2) { // InPrep
+          } else if (newOrder.status === 2) {
             this.inPrepOrders.update(orders => {
               if (orders.some(o => o.id === newOrder.id)) return orders;
               const updated = [...orders, newOrder];
@@ -120,7 +113,6 @@ export class KdsBoard implements OnInit, OnDestroy {
       })
     );
 
-    // 2. Listen for order updates & cancellations
     this.subscriptions.add(
       this.signalRService.orderUpdate$.subscribe({
         next: (trackingInfo) => {
@@ -128,12 +120,9 @@ export class KdsBoard implements OnInit, OnDestroy {
           const statusStr = trackingInfo.status;
 
           if (statusStr === 'Cancelled') {
-            // Remove from all signals
             this.pendingOrders.update(orders => orders.filter(o => o.id !== orderId));
             this.inPrepOrders.update(orders => orders.filter(o => o.id !== orderId));
             this.readyOrders.update(orders => orders.filter(o => o.id !== orderId));
-
-            // Clear timer
             this.timerMap.update(map => {
               const newMap = { ...map };
               delete newMap[orderId];
@@ -143,12 +132,9 @@ export class KdsBoard implements OnInit, OnDestroy {
             this.showToast(`Order #${orderId} cancelled`);
           } 
           else if (statusStr === 'InPrep') {
-            // Avoid redundant update if already processed locally
             if (this.inPrepOrders().some(o => o.id === orderId)) {
               return;
             }
-
-            // Move from pending to inPrep
             let foundOrder: OrderModel | undefined;
             this.pendingOrders.update(orders => {
               const idx = orders.findIndex(o => o.id === orderId);
@@ -305,20 +291,6 @@ export class KdsBoard implements OnInit, OnDestroy {
       },
       error: (err) => {
         console.error('Failed to mark order ready', err);
-        this.errorMessage.set('Failed to transition order status. Please try again.');
-      }
-    });
-  }
-
-  handleDismiss(orderId: number): void {
-    // PATCH status=4 (Served) to clear from ready column
-    this.orderService.updateOrderStatus(orderId, 4).subscribe({
-      next: () => {
-        // Clear from ready column immediately for instant local UI update!
-        this.readyOrders.update(orders => orders.filter(o => o.id !== orderId));
-      },
-      error: (err) => {
-        console.error('Failed to dismiss order', err);
         this.errorMessage.set('Failed to transition order status. Please try again.');
       }
     });

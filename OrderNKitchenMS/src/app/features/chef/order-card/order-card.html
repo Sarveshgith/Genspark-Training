@@ -14,19 +14,6 @@
       </span>
     </div>
 
-    <!-- Diet Badges below header -->
-    <div class="flex flex-wrap gap-1.5 mt-2">
-      @for (badge of dietBadges(); track badge) {
-        <span [class]="'text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded font-syne ' + 
-                       (badge === 'Veg' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 
-                        badge === 'Non-Veg' ? 'bg-red-500/10 text-red-400 border border-red-500/20' : 
-                        'bg-[#F28500]/10 text-[#F28500] border border-[#F28500]/20')"
-        >
-          {{ badge }}
-        </span>
-      }
-    </div>
-
     <!-- Divider Line -->
     <div class="border-t border-slate-800/80 my-4"></div>
 

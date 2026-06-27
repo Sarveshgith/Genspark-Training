@@ -1,6 +1,7 @@
 import { Component, inject, OnInit, OnDestroy, ChangeDetectorRef, NgZone, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../../../core/services/auth.service';
 import { OrderService } from '../../../core/services/order.service';
 import { MenuService } from '../../../core/services/menu.service';
@@ -25,6 +26,7 @@ export class LandingComponent implements OnInit, OnDestroy {
   private signalRService = inject(SignalRService);
   private cdr = inject(ChangeDetectorRef);
   private zone = inject(NgZone);
+  private http = inject(HttpClient);
 
   public tableNumber: number = 0;
   public isLoading: boolean = true;
@@ -32,6 +34,10 @@ export class LandingComponent implements OnInit, OnDestroy {
   public orderDetails: any = null;
   public billDetails = signal<any | null>(null);
   public taxPercent: string = 'X';
+
+  public guestState = signal<'waiting' | 'tracking' | 'bill' | 'paid'>('waiting');
+  public countdownSeconds = signal<number>(5);
+  private countdownInterval: any;
 
   private menuPriceMap: { [name: string]: number } = {};
   private rawOrderDetails: any = null;
@@ -117,6 +123,31 @@ export class LandingComponent implements OnInit, OnDestroy {
               }
             });
             this.subscriptions.add(tablesSub);
+
+            const billGenSub = this.billService.billGenerated$.subscribe({
+              next: (bill) => {
+                this.zone.run(() => {
+                  console.log('Real-time bill generated event received:', bill);
+                  this.billDetails.set(bill);
+                  this.guestState.set('bill');
+                  this.cdr.detectChanges();
+                });
+              }
+            });
+            this.subscriptions.add(billGenSub);
+
+            const billPaidSub = this.billService.billPaid$.subscribe({
+              next: (bill) => {
+                this.zone.run(() => {
+                  console.log('Real-time bill paid event received:', bill);
+                  this.billDetails.set(bill);
+                  this.guestState.set('paid');
+                  this.startPaymentCountdown();
+                  this.cdr.detectChanges();
+                });
+              }
+            });
+            this.subscriptions.add(billPaidSub);
           });
         }
 
@@ -151,6 +182,8 @@ export class LandingComponent implements OnInit, OnDestroy {
             this.enrichOrderDetails();
             if (this.rawOrderDetails && this.rawOrderDetails.orderId) {
               this.fetchBillDetails(this.rawOrderDetails.orderId);
+            } else {
+              this.guestState.set('waiting');
             }
           } catch (e) {
             console.error('Error in next/enrich callback of fetchOrderTracking:', e);
@@ -166,6 +199,7 @@ export class LandingComponent implements OnInit, OnDestroy {
           console.error('Order tracking fetch error:', err);
           if (err.status === 404) {
             this.orderDetails = null;
+            this.guestState.set('waiting');
           } else {
             this.errorMessage = "Failed to retrieve order tracking information.";
           }
@@ -188,7 +222,7 @@ export class LandingComponent implements OnInit, OnDestroy {
       }
 
       const orderItems = this.rawOrderDetails.orderItems.map((item: any) => {
-        const unitPrice = this.menuPriceMap[item.menuItemName] ?? 0;
+        const unitPrice = item.unitPrice ?? this.menuPriceMap[item.menuItemName] ?? 0;
         return {
           ...item,
           unitPrice: unitPrice,
@@ -238,14 +272,61 @@ export class LandingComponent implements OnInit, OnDestroy {
       next: (bill) => {
         this.zone.run(() => {
           this.billDetails.set(bill);
+          if (bill) {
+            if (bill.statusName === 'Paid') {
+              this.guestState.set('paid');
+              this.startPaymentCountdown();
+            } else if (bill.statusName === 'Pending') {
+              this.guestState.set('bill');
+            } else {
+              this.guestState.set('tracking');
+            }
+          } else {
+            this.guestState.set('tracking');
+          }
           this.cdr.detectChanges();
         });
       },
       error: () => {
         this.zone.run(() => {
           this.billDetails.set(null);
+          this.guestState.set('tracking');
           this.cdr.detectChanges();
         });
+      }
+    });
+  }
+
+  public startPaymentCountdown() {
+    this.countdownSeconds.set(5);
+    if (this.countdownInterval) {
+      clearInterval(this.countdownInterval);
+    }
+    this.countdownInterval = setInterval(() => {
+      this.countdownSeconds.update(s => s - 1);
+      if (this.countdownSeconds() <= 0) {
+        clearInterval(this.countdownInterval);
+        this.authService.logout();
+        this.router.navigate(['/guest/landing'], { queryParams: { tableId: this.tableNumber } });
+      }
+      this.cdr.detectChanges();
+    }, 1000);
+  }
+
+  public downloadReceipt() {
+    if (!this.orderDetails) return;
+    const url = this.billService.getBillPdfUrl(this.orderDetails.orderId);
+    this.http.get(url, { responseType: 'blob' }).subscribe({
+      next: (blob) => {
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `receipt_order_${this.orderDetails.orderId}.pdf`;
+        link.click();
+        URL.revokeObjectURL(link.href);
+      },
+      error: (err) => {
+        console.error('Failed to download PDF:', err);
+        window.open(url, '_blank');
       }
     });
   }

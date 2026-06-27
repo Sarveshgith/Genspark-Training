@@ -1,19 +1,21 @@
 <div class="min-h-screen bg-[#0B0F19] text-slate-100 p-4 sm:p-6 font-sans flex flex-col select-none relative">
-  
+
   <!-- TOAST NOTIFICATION FOR CANCELLATION -->
   @if (toastMessage()) {
-    <div class="fixed top-6 right-6 z-50 bg-[#DE350B] text-white font-syne text-xs font-bold px-5 py-3.5 rounded-2xl border border-red-500/20 shadow-[0_20px_50px_rgba(222,53,11,0.3)] flex items-center space-x-3 animate-fade-in">
-      <span class="relative flex h-2 w-2">
-        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
-        <span class="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
-      </span>
-      <span>{{ toastMessage() }}</span>
-    </div>
+  <div
+    class="fixed top-6 right-6 z-50 bg-[#DE350B] text-white font-syne text-xs font-bold px-5 py-3.5 rounded-2xl border border-red-500/20 shadow-[0_20px_50px_rgba(222,53,11,0.3)] flex items-center space-x-3 animate-fade-in">
+    <span class="relative flex h-2 w-2">
+      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+      <span class="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+    </span>
+    <span>{{ toastMessage() }}</span>
+  </div>
   }
 
   <!-- TOP KDS HEADER BAR -->
-  <header class="bg-[#111827] border border-slate-800/80 rounded-2xl px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 shadow-2xl shrink-0">
-    
+  <header
+    class="bg-[#111827] border border-slate-800/80 rounded-2xl px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 shadow-2xl shrink-0">
+
     <!-- Title & Brand -->
     <div class="flex items-center space-x-3">
       <span class="text-2xl font-serif text-[#F28500] font-medium tracking-wide italic">Ambrosia</span>
@@ -25,18 +27,20 @@
 
     <!-- Active Metrics & Live Dot -->
     <div class="flex flex-wrap items-center gap-4 sm:gap-6">
-      
+
       <!-- Total Active Badge -->
       <div class="bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 flex items-center space-x-3 shadow-inner">
         <span class="text-[10px] font-extrabold text-slate-500 font-syne uppercase tracking-wider">ACTIVE ORDERS</span>
-        <span class="bg-[#F28500]/15 text-[#F28500] border border-[#F28500]/25 font-bold font-mono-dm text-sm px-2.5 py-0.5 rounded-lg">
+        <span
+          class="bg-[#F28500]/15 text-[#F28500] border border-[#F28500]/25 font-bold font-mono-dm text-sm px-2.5 py-0.5 rounded-lg">
           {{ totalActiveOrders() }}
         </span>
       </div>
 
       <!-- Avg cooking time badge -->
       <div class="bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 flex items-center space-x-3 shadow-inner">
-        <span class="text-[10px] font-extrabold text-slate-500 font-syne uppercase tracking-wider">AVG IN-PREP TIME</span>
+        <span class="text-[10px] font-extrabold text-slate-500 font-syne uppercase tracking-wider">AVG IN-PREP
+          TIME</span>
         <span class="text-white font-bold font-mono-dm text-sm tracking-widest">
           {{ avgInPrepTime() }}
         </span>
@@ -44,7 +48,9 @@
 
       <!-- Live Connection Dot -->
       <div class="bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 flex items-center space-x-2.5 shadow-inner">
-        <span [class]="'w-2 h-2 rounded-full ' + (signalRService.isConnected() ? 'bg-emerald-500 animate-pulse' : 'bg-red-500')" id="connection-dot"></span>
+        <span
+          [class]="'w-2 h-2 rounded-full ' + (signalRService.isConnected() ? 'bg-emerald-500 animate-pulse' : 'bg-red-500')"
+          id="connection-dot"></span>
         <span class="text-[9px] font-extrabold text-slate-400 font-syne uppercase tracking-wider">
           {{ signalRService.isConnected() ? 'CONNECTED' : 'DISCONNECTED' }}
         </span>
@@ -61,133 +67,137 @@
 
   <!-- Error feedback message -->
   @if (errorMessage()) {
-    <div class="mb-6 p-4 bg-red-500/10 border border-red-500/20 text-[#DE350B] text-sm font-semibold rounded-2xl flex items-center space-x-2 animate-fade-in shrink-0">
-      <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3Z" />
-      </svg>
-      <span>{{ errorMessage() }}</span>
-    </div>
+  <div
+    class="mb-6 p-4 bg-red-500/10 border border-red-500/20 text-[#DE350B] text-sm font-semibold rounded-2xl flex items-center space-x-2 animate-fade-in shrink-0">
+    <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round"
+        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3Z" />
+    </svg>
+    <span>{{ errorMessage() }}</span>
+  </div>
   }
 
   <!-- THREE COLUMN DISPLAY WORKSPACE -->
   <div class="flex-1 flex gap-6 items-stretch overflow-hidden">
-    
+
     <!-- columns list -->
     <div class="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6 overflow-y-auto pr-1">
-      
+
       <!-- PENDING COLUMN -->
-      <div class="flex flex-col bg-[#111827]/40 border border-slate-800 rounded-3xl p-4 overflow-hidden h-fit lg:max-h-full min-h-[280px]">
+      <div
+        class="flex flex-col bg-[#111827]/40 border border-slate-800 rounded-3xl p-4 overflow-hidden h-fit lg:max-h-full min-h-[280px]">
         <!-- Header -->
-        <div 
-          (mouseenter)="resetUnread()" 
-          (click)="resetUnread()" 
+        <div (mouseenter)="resetUnread()" (click)="resetUnread()"
           class="flex items-center justify-between pb-3 border-b-2 border-[#F28500] mb-4 shrink-0 select-none cursor-pointer group"
-          id="pending-header"
-        >
+          id="pending-header">
           <div class="flex items-center space-x-2">
             <h3 class="text-base font-extrabold tracking-wider uppercase font-syne text-white">
               Pending
             </h3>
-            <span class="bg-[#F28500]/15 text-[#F28500] border border-[#F28500]/25 font-bold font-mono-dm text-xs px-2.5 py-0.5 rounded-full">
+            <span
+              class="bg-[#F28500]/15 text-[#F28500] border border-[#F28500]/25 font-bold font-mono-dm text-xs px-2.5 py-0.5 rounded-full">
               {{ pendingOrders().length }}
             </span>
           </div>
 
           <!-- Unread alerts -->
           @if (unreadCount() > 0) {
-            <span class="bg-red-500 text-white font-syne font-extrabold text-[9px] px-2 py-0.5 rounded-full tracking-wider uppercase animate-bounce shadow-[0_0_10px_rgba(239,68,68,0.5)]">
-              +{{ unreadCount() }} NEW
-            </span>
+          <span
+            class="bg-red-500 text-white font-syne font-extrabold text-[9px] px-2 py-0.5 rounded-full tracking-wider uppercase animate-bounce shadow-[0_0_10px_rgba(239,68,68,0.5)]">
+            +{{ unreadCount() }} NEW
+          </span>
           }
         </div>
 
         <!-- Orders list -->
-        <div class="flex-1 overflow-y-auto space-y-4 pr-1">
+        <div class="flex-1 overflow-y-auto space-y-6 pr-1">
           @if (pendingOrders().length === 0) {
-            <div class="flex flex-col items-center justify-center py-16 text-slate-600 select-none">
-              <!-- Empty state icon: Order checklist/ticket with low opacity -->
-              <svg class="w-12 h-12 text-slate-700/35 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-              </svg>
-              <span class="font-space text-sm italic">No pending orders.</span>
-            </div>
+          <div class="flex flex-col items-center justify-center py-16 text-slate-600 select-none">
+            <!-- Empty state icon: Order checklist/ticket with low opacity -->
+            <svg class="w-12 h-12 text-slate-700/35 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+              stroke-width="1.2">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+            </svg>
+            <span class="font-space text-sm italic">No pending orders.</span>
+          </div>
           } @else {
-            @for (order of pendingOrders(); track order.id) {
-              <app-order-card 
-                [order]="order" 
-                (startCooking)="handleStartCooking($event)"
-              ></app-order-card>
-            }
+          @for (order of pendingOrders(); track order.id) {
+          <app-order-card class="block" [order]="order" (startCooking)="handleStartCooking($event)"></app-order-card>
+          }
           }
         </div>
       </div>
 
       <!-- IN PREP COLUMN -->
-      <div class="flex flex-col bg-[#111827]/40 border border-slate-800 rounded-3xl p-4 overflow-hidden h-fit lg:max-h-full min-h-[280px]">
+      <div
+        class="flex flex-col bg-[#111827]/40 border border-slate-800 rounded-3xl p-4 overflow-hidden h-fit lg:max-h-full min-h-[280px]">
         <!-- Header -->
-        <div class="flex items-center justify-between pb-3 border-b-2 border-[#8C5815] mb-4 shrink-0 select-none" id="in-prep-header">
+        <div class="flex items-center justify-between pb-3 border-b-2 border-[#8C5815] mb-4 shrink-0 select-none"
+          id="in-prep-header">
           <div class="flex items-center space-x-2">
             <h3 class="text-base font-extrabold tracking-wider uppercase font-syne text-white">
               In Prep
             </h3>
-            <span class="bg-[#8C5815]/15 text-[#8C5815] border border-[#8C5815]/25 font-bold font-mono-dm text-xs px-2.5 py-0.5 rounded-full">
+            <span
+              class="bg-[#8C5815]/15 text-[#8C5815] border border-[#8C5815]/25 font-bold font-mono-dm text-xs px-2.5 py-0.5 rounded-full">
               {{ inPrepOrders().length }}
             </span>
           </div>
         </div>
 
         <!-- Orders list -->
-        <div class="flex-1 overflow-y-auto space-y-4 pr-1">
+        <div class="flex-1 overflow-y-auto space-y-6 pr-1">
           @if (inPrepOrders().length === 0) {
-            <div class="flex flex-col items-center justify-center py-16 text-slate-600 select-none">
-              <!-- Empty state icon: Cooking flame with low opacity -->
-              <svg class="w-12 h-12 text-slate-700/35 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343c1.567 1.566 2.344 3.905 2.344 6.314a7.973 7.973 0 01-2.343 5Z" />
-              </svg>
-              <span class="font-space text-sm italic">No orders cooking.</span>
-            </div>
+          <div class="flex flex-col items-center justify-center py-16 text-slate-600 select-none">
+            <!-- Empty state icon: Cooking flame with low opacity -->
+            <svg class="w-12 h-12 text-slate-700/35 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+              stroke-width="1.2">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343c1.567 1.566 2.344 3.905 2.344 6.314a7.973 7.973 0 01-2.343 5Z" />
+            </svg>
+            <span class="font-space text-sm italic">No orders cooking.</span>
+          </div>
           } @else {
-            @for (order of inPrepOrders(); track order.id) {
-              <app-order-card 
-                [order]="order" 
-                [cookingStartTime]="timerMap()[order.id]"
-                (markReady)="handleMarkReady($event)"
-              ></app-order-card>
-            }
+          @for (order of inPrepOrders(); track order.id) {
+          <app-order-card class="block" [order]="order" [cookingStartTime]="timerMap()[order.id]"
+            (markReady)="handleMarkReady($event)"></app-order-card>
+          }
           }
         </div>
       </div>
 
       <!-- READY COLUMN -->
-      <div class="flex flex-col bg-[#111827]/40 border border-slate-800 rounded-3xl p-4 overflow-hidden h-fit lg:max-h-full min-h-[280px]">
+      <div
+        class="flex flex-col bg-[#111827]/40 border border-slate-800 rounded-3xl p-4 overflow-hidden h-fit lg:max-h-full min-h-[280px]">
         <!-- Header -->
-        <div class="flex items-center justify-between pb-3 border-b-2 border-[#639922] mb-4 shrink-0 select-none" id="ready-header">
+        <div class="flex items-center justify-between pb-3 border-b-2 border-[#639922] mb-4 shrink-0 select-none"
+          id="ready-header">
           <div class="flex items-center space-x-2">
             <h3 class="text-base font-extrabold tracking-wider uppercase font-syne text-white">
               Ready
             </h3>
-            <span class="bg-[#639922]/15 text-[#639922] border border-[#639922]/25 font-bold font-mono-dm text-xs px-2.5 py-0.5 rounded-full">
+            <span
+              class="bg-[#639922]/15 text-[#639922] border border-[#639922]/25 font-bold font-mono-dm text-xs px-2.5 py-0.5 rounded-full">
               {{ readyOrders().length }}
             </span>
           </div>
         </div>
 
-        <!-- Orders list -->
-        <div class="flex-1 overflow-y-auto space-y-4 pr-1">
+        <div class="flex-1 overflow-y-auto space-y-6 pr-1">
           @if (readyOrders().length === 0) {
-            <div class="flex flex-col items-center justify-center py-16 text-slate-600 select-none">
-              <!-- Empty state icon: Serving cloche with low opacity -->
-              <svg class="w-12 h-12 text-slate-700/35 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M3 19h18M12 6a1 1 0 110-2 1 1 0 010 2Zm0 0a8 8 0 00-8 8h16a8 8 0 00-8-8Z" />
-              </svg>
-              <span class="font-space text-sm italic">No orders ready.</span>
-            </div>
+          <div class="flex flex-col items-center justify-center py-16 text-slate-600 select-none">
+            <svg class="w-12 h-12 text-slate-700/35 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+              stroke-width="1.2">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M3 19h18M12 6a1 1 0 110-2 1 1 0 010 2Zm0 0a8 8 0 00-8 8h16a8 8 0 00-8-8Z" />
+            </svg>
+            <span class="font-space text-sm italic">No orders ready.</span>
+          </div>
           } @else {
-            @for (order of readyOrders(); track order.id) {
-              <app-order-card 
-                [order]="order" 
-              ></app-order-card>
-            }
+          @for (order of readyOrders(); track order.id) {
+          <app-order-card class="block" [order]="order"></app-order-card>
+          }
           }
         </div>
       </div>
@@ -196,54 +206,56 @@
 
     <!-- RIGHT DRAWER: Collapsible Batch Prep Summary -->
     @if (isSummaryOpen()) {
-      <aside class="w-80 bg-[#111827] border border-slate-800 rounded-3xl p-6 shadow-2xl shrink-0 flex flex-col h-full animate-scale-in">
-        <div class="flex items-center justify-between pb-3 border-b border-slate-800 shrink-0">
-          <h3 class="text-sm font-extrabold text-white tracking-wider uppercase font-syne">Prep Summary</h3>
-          <span class="text-[9px] font-extrabold text-slate-500 tracking-wider bg-slate-900 border border-slate-800 px-2 py-0.5 rounded uppercase">
-            BATCH COOKING
+    <aside
+      class="w-80 bg-[#111827] border border-slate-800 rounded-3xl p-6 shadow-2xl shrink-0 flex flex-col h-full animate-scale-in">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-800 shrink-0">
+        <h3 class="text-sm font-extrabold text-white tracking-wider uppercase font-syne">Prep Summary</h3>
+        <span
+          class="text-[9px] font-extrabold text-slate-500 tracking-wider bg-slate-900 border border-slate-800 px-2 py-0.5 rounded uppercase">
+          BATCH COOKING
+        </span>
+      </div>
+
+      <!-- Summary Items List -->
+      <div class="flex-1 overflow-y-auto py-4 space-y-3.5 pr-1">
+        @if (activeItemSummary().length === 0) {
+        <p class="text-xs text-slate-500 italic py-6 text-center">No active items to prepare.</p>
+        } @else {
+        @for (item of activeItemSummary(); track item.name) {
+        <div class="flex items-start justify-between text-sm leading-snug">
+          <span class="text-slate-300 font-semibold font-space">{{ item.name }}</span>
+          <span
+            class="bg-[#F28500]/15 text-[#F28500] border border-[#F28500]/25 font-bold text-xs px-2.5 py-0.5 rounded-full shrink-0">
+            {{ item.qty }}x
           </span>
         </div>
+        }
+        }
+      </div>
 
-        <!-- Summary Items List -->
-        <div class="flex-1 overflow-y-auto py-4 space-y-3.5 pr-1">
-          @if (activeItemSummary().length === 0) {
-            <p class="text-xs text-slate-500 italic py-6 text-center">No active items to prepare.</p>
-          } @else {
-            @for (item of activeItemSummary(); track item.name) {
-              <div class="flex items-start justify-between text-sm leading-snug">
-                <span class="text-slate-300 font-semibold font-space">{{ item.name }}</span>
-                <span class="bg-[#F28500]/15 text-[#F28500] border border-[#F28500]/25 font-bold text-xs px-2.5 py-0.5 rounded-full shrink-0">
-                  {{ item.qty }}x
-                </span>
-              </div>
-            }
-          }
-        </div>
-
-        <!-- Footer warnings -->
-        <div class="bg-slate-900/60 rounded-xl p-3 border border-slate-800 text-[10px] text-slate-400 font-medium leading-relaxed shrink-0">
-          Sums active receipt quantities (Pending & In Prep). Prepare these in batches to optimize prep times.
-        </div>
-      </aside>
+      <!-- Footer warnings -->
+      <div
+        class="bg-slate-900/60 rounded-xl p-3 border border-slate-800 text-[10px] text-slate-400 font-medium leading-relaxed shrink-0">
+        Sums active receipt quantities (Pending & In Prep). Prepare these in batches to optimize prep times.
+      </div>
+    </aside>
     }
 
   </div>
 
   <!-- FLOATING PREP SUMMARY TOGGLE BUTTON -->
-  <button 
-    (click)="toggleSummary()"
-    title="Toggle Prep Summary Sidebar"
+  <button (click)="toggleSummary()" title="Toggle Prep Summary Sidebar"
     [class]="'fixed bottom-6 right-6 z-40 p-4 rounded-full shadow-2xl transition-all duration-300 transform active:scale-95 outline-none border ' + 
-             (isSummaryOpen() ? 'bg-slate-800 text-white border-slate-700' : 'bg-[#F28500] hover:bg-[#D47300] text-white border-[#D47300]/20 hover:scale-105')"
-  >
+             (isSummaryOpen() ? 'bg-slate-800 text-white border-slate-700' : 'bg-[#F28500] hover:bg-[#D47300] text-white border-[#D47300]/20 hover:scale-105')">
     @if (isSummaryOpen()) {
-      <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
-      </svg>
+    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+    </svg>
     } @else {
-      <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a9.04 9.04 0 0 1-2.943 2.244A9.07 9.07 0 0 1 9 18.75m6-12v6a3 3 0 0 1-3 3H9a3 3 0 0 1-3-3v-6a3 3 0 0 1 3-3h3a3 3 0 0 1 3 3ZM9 10.5h.008v.008H9V10.5Zm3 0h.008v.008H12V10.5Z" />
-      </svg>
+    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round"
+        d="M14.857 17.082a9.04 9.04 0 0 1-2.943 2.244A9.07 9.07 0 0 1 9 18.75m6-12v6a3 3 0 0 1-3 3H9a3 3 0 0 1-3-3v-6a3 3 0 0 1 3-3h3a3 3 0 0 1 3 3ZM9 10.5h.008v.008H9V10.5Zm3 0h.008v.008H12V10.5Z" />
+    </svg>
     }
   </button>
 
