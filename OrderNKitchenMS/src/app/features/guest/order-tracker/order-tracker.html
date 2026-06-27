@@ -173,27 +173,11 @@
               <span>Call Waiter</span>
             </button>
 
-            @if (bill) {
-            @if (bill.statusName === 'Paid') {
-            <button (click)="goToPayment()"
-              class="flex-1 flex items-center justify-center space-x-2 px-6 py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white active:scale-98 rounded-2xl transition duration-200 font-bold tracking-wider text-xs uppercase shadow-sm cursor-pointer">
-              <span>✅</span>
-              <span>Paid (Receipt)</span>
-            </button>
-            } @else {
-            <button (click)="goToPayment()"
-              class="flex-1 flex items-center justify-center space-x-2 px-6 py-3.5 bg-[#8C5815] hover:bg-[#704610] text-white active:scale-98 rounded-2xl transition duration-200 font-bold tracking-wider text-xs uppercase shadow-sm cursor-pointer">
-              <span>💳</span>
-              <span>Pay Now</span>
-            </button>
-            }
-            } @else {
             <button (click)="requestBill()"
               class="flex-1 flex items-center justify-center space-x-2 px-6 py-3.5 bg-[#FAF3E8]/70 hover:bg-[#FAF3E8] border border-[#EFE5D3] text-[#8C663C] hover:text-[#704610] active:scale-98 rounded-2xl transition duration-200 font-bold tracking-wider text-xs uppercase shadow-xs cursor-pointer">
               <span>📄</span>
               <span>Bill Soon</span>
             </button>
-            }
           </div>
         </div>
       </div>

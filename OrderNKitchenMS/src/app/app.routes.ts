@@ -4,7 +4,6 @@ import { Register } from './features/auth/register/register';
 import { KdsBoard } from './features/chef/kds-board/kds-board';
 import { RoleGuard } from './core/guards/role.guard';
 import { LandingComponent } from './features/guest/landing-component/landing-component';
-import { BillView } from './features/guest/bill-view/bill-view';
 import { MenuItems } from './features/waiter/menu-items/menu-items';
 import { TableView } from './features/waiter/table-view/table-view';
 import { ActiveOrderComponent } from './features/waiter/active-order/active-order';
@@ -42,7 +41,6 @@ export const routes: Routes = [
 	},
 
 	{ path: 'guest/landing', component: LandingComponent },
-	{ path: 'guest/payment/:orderId', component: BillView },
 
 	{ path: '**', redirectTo: 'login' },
 ];

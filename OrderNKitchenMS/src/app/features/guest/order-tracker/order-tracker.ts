@@ -178,10 +178,4 @@ export class OrderTracker implements OnInit, OnDestroy, OnChanges {
       this.billTimeoutId = null;
     }
   }
-
-  public goToPayment() {
-    if (this.order && this.order.orderId) {
-      this.router.navigate(['/guest/payment', this.order.orderId], { queryParams: { tableId: this.tableNumber } });
-    }
-  }
 }
