@@ -40,6 +40,7 @@ export class LandingComponent implements OnInit, OnDestroy {
   private countdownInterval: any;
 
   private menuPriceMap: { [name: string]: number } = {};
+  private menuImageMap: { [name: string]: string } = {};
   private rawOrderDetails: any = null;
   private subscriptions: Subscription = new Subscription();
 
@@ -94,6 +95,7 @@ export class LandingComponent implements OnInit, OnDestroy {
       next: (menuItems) => {
         menuItems.forEach(item => {
           this.menuPriceMap[item.name] = item.price;
+          this.menuImageMap[item.name] = item.imageUrl;
         });
 
         const token = this.authService.getToken();
@@ -223,11 +225,12 @@ export class LandingComponent implements OnInit, OnDestroy {
 
       const orderItems = this.rawOrderDetails.orderItems.map((item: any) => {
         const unitPrice = item.unitPrice ?? this.menuPriceMap[item.menuItemName] ?? 0;
+        const dbImageUrl = this.menuImageMap[item.menuItemName];
         return {
           ...item,
           unitPrice: unitPrice,
           totalPrice: unitPrice * item.quantity,
-          imageUrl: this.getItemImageUrl(item.menuItemName)
+          imageUrl: this.getItemImageUrl(item.menuItemName, dbImageUrl)
         };
       });
 
@@ -248,23 +251,15 @@ export class LandingComponent implements OnInit, OnDestroy {
       console.error('Error occurred in enrichOrderDetails:', e);
       this.errorMessage = "Error structuring order details: " + e;
       this.orderDetails = null;
-      throw e; // rethrow to be caught by fetchOrderTracking's try-catch
+      throw e;
     }
   }
 
-  private getItemImageUrl(name: string): string {
-    const sanitized = name.toLowerCase().trim();
-    if (sanitized.includes('wagyu') || sanitized.includes('steak')) {
-      return '/wagyu_ribeye.png';
+  private getItemImageUrl(name: string, dbImageUrl?: string): string {
+    if (dbImageUrl && dbImageUrl.trim() !== '' && dbImageUrl !== 'none' && dbImageUrl !== '/favicon.ico') {
+      return dbImageUrl;
     }
-    if (sanitized.includes('salad') || sanitized.includes('beet')) {
-      return '/beet_salad.png';
-    }
-    if (sanitized.includes('spritz') || sanitized.includes('drink') || sanitized.includes('cocktail')) {
-      return '/summer_spritz.png';
-    }
-    // Standard default fallback
-    return '/favicon.ico';
+    return '/fallback_dish.png';
   }
 
   public fetchBillDetails(orderId: number) {

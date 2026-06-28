@@ -13,6 +13,7 @@ describe('OrderTracker', () => {
 
     fixture = TestBed.createComponent(OrderTracker);
     component = fixture.componentInstance;
+    component.order = { orderId: 123, status: 'Pending', orderItems: [] };
     await fixture.whenStable();
   });
 

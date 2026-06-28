@@ -92,7 +92,6 @@
             class="grid gap-4 pt-6 border-t border-[#8C5815]/10 mt-6 transition-all duration-300">
 
             @if (!isOverdue()) {
-            <!-- Queue Position Highlight Box -->
             <div
               class="col-span-1 bg-gradient-to-br from-[#FFF4E3] to-[#FCE4C3] border-2 border-[#E8A54B] rounded-2xl p-4 text-center space-y-1 shadow-md shadow-[#E8A54B]/10 relative overflow-hidden group">
               <span
@@ -127,7 +126,6 @@
               </span>
             </div>
 
-            <!-- Time Lapsed with soft amber color shift if overdue -->
             <div
               [ngClass]="isOverdue() ? 'bg-[#FFF3E0] border border-[#E8A54B]/30 text-[#E65100]' : 'bg-white/40 border border-[#E9C7A5]/30 text-[#8C5815]'"
               class="col-span-1 rounded-2xl p-4 text-center space-y-1 flex flex-col justify-center transition-all duration-300">
@@ -142,7 +140,6 @@
             </div>
           </div>
 
-          <!-- Wait Progress Bar Linking Time Elapsed and Est. Wait -->
           @if (order.estimatedTimeMinutes > 0) {
           <div class="mt-5 space-y-2 font-outfit">
             <div
@@ -165,7 +162,6 @@
           }
           }
 
-          <!-- Interactive Action Buttons Row -->
           <div class="border-t border-[#8C5815]/10 pt-6 mt-6 flex flex-col sm:flex-row gap-4">
             <button (click)="callWaiter()"
               class="flex-1 flex items-center justify-center space-x-2 px-6 py-3.5 bg-white/50 hover:bg-white/70 border border-[#E9C7A5] text-[#8C5815] hover:text-[#704610] active:scale-98 rounded-2xl transition duration-200 font-bold tracking-wider text-xs uppercase shadow-xs cursor-pointer">
@@ -230,75 +226,7 @@
     </div>
 
     <div class="lg:col-span-4">
-      <div
-        class="relative bg-gradient-to-br from-[#1C1510] to-[#2D2118] text-[#F9F6F0] rounded-3xl p-6 md:p-8 shadow-lg border border-[#3E2E22] overflow-hidden space-y-6">
-        <div class="absolute -right-20 -top-20 w-48 h-48 bg-[#C5A059]/10 rounded-full blur-3xl"></div>
-        <div class="absolute -left-20 -bottom-20 w-48 h-48 bg-[#E8A54B]/5 rounded-full blur-3xl"></div>
-
-        <div class="relative space-y-1">
-          <h4
-            class="text-[#E8A54B] text-xs font-bold uppercase tracking-widest flex items-center space-x-1.5 font-outfit">
-            <span>✨</span>
-            <span>Chef's Culinary Insights</span>
-          </h4>
-          <h3 class="text-xl font-syne text-white">Your Menu's Flavor Palette</h3>
-          <p class="text-sm text-[#A39081] leading-relaxed font-outfit font-normal">
-            Here is the flavor profile balance crafted by our kitchen based on your ordered items:
-          </p>
-        </div>
-
-        <div class="relative grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div class="space-y-1.5">
-            <div class="flex justify-between text-xxs font-semibold uppercase tracking-wider text-[#D5C5B9]">
-              <span>Umami & Savory</span>
-              <span class="text-[#E8A54B]">85%</span>
-            </div>
-            <div class="h-1 bg-white/10 rounded-full overflow-hidden">
-              <div class="h-full bg-gradient-to-r from-[#C5A059] to-[#E8A54B] rounded-full w-[85%]"></div>
-            </div>
-          </div>
-
-          <div class="space-y-1.5">
-            <div class="flex justify-between text-xxs font-semibold uppercase tracking-wider text-[#D5C5B9]">
-              <span>Zest & Acidity</span>
-              <span class="text-[#E8A54B]">45%</span>
-            </div>
-            <div class="h-1 bg-white/10 rounded-full overflow-hidden">
-              <div class="h-full bg-gradient-to-r from-[#C5A059] to-[#E8A54B] rounded-full w-[45%]"></div>
-            </div>
-          </div>
-
-          <div class="space-y-1.5">
-            <div class="flex justify-between text-xxs font-semibold uppercase tracking-wider text-[#D5C5B9]">
-              <span>Aromatic Complexity</span>
-              <span class="text-[#E8A54B]">65%</span>
-            </div>
-            <div class="h-1 bg-white/10 rounded-full overflow-hidden">
-              <div class="h-full bg-gradient-to-r from-[#C5A059] to-[#E8A54B] rounded-full w-[65%]"></div>
-            </div>
-          </div>
-
-          <div class="space-y-1.5">
-            <div class="flex justify-between text-xxs font-semibold uppercase tracking-wider text-[#D5C5B9]">
-              <span>Textural Richness</span>
-              <span class="text-[#E8A54B]">70%</span>
-            </div>
-            <div class="h-1 bg-white/10 rounded-full overflow-hidden">
-              <div class="h-full bg-gradient-to-r from-[#C5A059] to-[#E8A54B] rounded-full w-[70%]"></div>
-            </div>
-          </div>
-        </div>
-
-        <div
-          class="relative pt-2 border-t border-[#3E2E22] flex items-start space-x-3 text-sm text-[#A39081] leading-relaxed font-outfit font-normal">
-          <span class="text-[#E8A54B] text-base leading-none">👨‍🍳</span>
-          <p>
-            <strong>Chef's Note:</strong> The pairing of savory items is complemented perfectly by subtle hints of zest.
-            Sip your beverage slowly between bites to refresh your palate.
-          </p>
-        </div>
-      </div>
-
+      <app-dish-story [order]="order"></app-dish-story>
     </div>
 
   </div>

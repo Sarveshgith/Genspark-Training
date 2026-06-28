@@ -26,9 +26,9 @@
           class="w-full bg-[#FCFAF8] text-gray-800 text-sm font-normal py-2.5 px-3 rounded-lg border border-[#EFECE9] focus:ring-1 focus:ring-[#8C5815]/30 focus:bg-white outline-none appearance-none transition-all duration-200 shadow-sm">
           <option [value]="null" disabled selected>-- Choose Table --</option>
           @for (tbl of tables; track tbl.id) {
-            @if (tbl.status === 1 || tbl.id === selectedTableId) {
-              <option [value]="tbl.id">Table {{ tbl.number }} (Cap: {{ tbl.capacity }})</option>
-            }
+          @if (tbl.status === 1 || tbl.id === selectedTableId) {
+          <option [value]="tbl.id">Table {{ tbl.number }} (Cap: {{ tbl.capacity }})</option>
+          }
           }
         </select>
         <span class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400">
@@ -58,7 +58,7 @@
           <div class="flex items-start justify-between gap-3">
             <div class="flex items-center space-x-3">
               <!-- Mini Thumbnail -->
-              <img [src]="cartItem.menuItem.imageUrl || '/favicon.ico'"
+              <img [src]="(cartItem.menuItem.imageUrl) ? cartItem.menuItem.imageUrl : '/fallback_dish.png'"
                 class="w-10 h-10 object-cover rounded-md bg-gray-50 shrink-0" />
               <div>
                 <h4 class="text-sm font-medium text-gray-800 leading-tight font-space">{{ cartItem.menuItem.name }}</h4>

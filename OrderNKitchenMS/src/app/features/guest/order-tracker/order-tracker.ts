@@ -1,10 +1,11 @@
 import { Component, Input, OnInit, OnDestroy, OnChanges, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { DishStory } from '../dish-story/dish-story';
 
 @Component({
   selector: 'app-order-tracker',
-  imports: [CommonModule],
+  imports: [CommonModule, DishStory],
   templateUrl: './order-tracker.html',
   styleUrl: './order-tracker.css',
 })
