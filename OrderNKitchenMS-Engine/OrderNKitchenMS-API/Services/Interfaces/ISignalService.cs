@@ -14,5 +14,9 @@ public interface ISignalService
 
     //Waiter/Generic tables updates
     public Task NotifyTablesUpdatedAsync();
+
+    //Bill signals
+    public Task NotifyBillGeneratedAsync(int tableId, BillDto billDto);
+    public Task NotifyBillPaidAsync(int tableId, BillDto billDto);
 }
 

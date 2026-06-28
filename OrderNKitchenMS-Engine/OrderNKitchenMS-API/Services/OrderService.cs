@@ -178,10 +178,7 @@ public class OrderService : IOrderService
         }
 
         var table = order.Table;
-
-        var orderItems = await _orderItemRepository.GetByOrderIdAsync(order.Id);
-        var menuItems = orderItems.Select(oi => oi.MenuItem).ToList();
-
+        var (orderItems, menuItems) = await GetOrderItemsAndMenuItemsAsync(order.Id);
         return await MapOrderToDtoAsync(order, table, orderItems, menuItems);
     }
 
@@ -223,8 +220,7 @@ public class OrderService : IOrderService
         var result = new List<OrderDto>();
         foreach (var order in paginatedOrders)
         {
-            var orderItems = await _orderItemRepository.GetByOrderIdAsync(order.Id);
-            var menuItems = orderItems.Select(oi => oi.MenuItem).ToList();
+            var (orderItems, menuItems) = await GetOrderItemsAndMenuItemsAsync(order.Id);
             result.Add(await MapOrderToDtoAsync(order, order.Table, orderItems, menuItems));
         }
 
@@ -244,8 +240,7 @@ public class OrderService : IOrderService
         var result = new List<OrderDto>();
         foreach (var order in activeOrders)
         {
-            var orderItems = await _orderItemRepository.GetByOrderIdAsync(order.Id);
-            var menuItems = orderItems.Select(oi => oi.MenuItem).ToList();
+            var (orderItems, menuItems) = await GetOrderItemsAndMenuItemsAsync(order.Id);
             result.Add(await MapOrderToDtoAsync(order, order.Table, orderItems, menuItems));
         }
 
@@ -288,16 +283,7 @@ public class OrderService : IOrderService
 
             await transaction.CommitAsync();
 
-            try
-            {
-                var trackingInfo = await GetGuestOrderTrackingAsync(order.TableId);
-                await _signalService.NotifyOrderUpdateAsync(order.TableId, trackingInfo);
-                await _signalService.NotifyTablesUpdatedAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Failed to send SignalR update to table-{TableId} for OrderId: {OrderId} on item removal.", order.TableId, orderId);
-            }
+            await SafeNotifyOrderUpdateAsync(order, "item removal");
         }
         catch (Exception)
         {
@@ -392,16 +378,7 @@ public class OrderService : IOrderService
             await _context.SaveChangesAsync();
             await transaction.CommitAsync();
 
-            try
-            {
-                var trackingInfo = await GetGuestOrderTrackingAsync(order.TableId);
-                await _signalService.NotifyOrderUpdateAsync(order.TableId, trackingInfo);
-                await _signalService.NotifyTablesUpdatedAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Failed to send SignalR update to table-{TableId} for OrderId: {OrderId} on item addition.", order.TableId, orderId);
-            }
+            await SafeNotifyOrderUpdateAsync(order, "item addition");
         }
         catch (Exception)
         {
@@ -409,12 +386,8 @@ public class OrderService : IOrderService
             throw;
         }
 
-        var table = order.Table;
-
-        var orderItems = await _orderItemRepository.GetByOrderIdAsync(order.Id);
-        var orderMenuItems = orderItems.Select(oi => oi.MenuItem).ToList();
-
-        return await MapOrderToDtoAsync(order, table, orderItems, orderMenuItems);
+        var (orderItems, orderMenuItems) = await GetOrderItemsAndMenuItemsAsync(order.Id);
+        return await MapOrderToDtoAsync(order, order.Table, orderItems, orderMenuItems);
     }
 
     // Updates the status of an existing order.
@@ -455,34 +428,13 @@ public class OrderService : IOrderService
         var isChanged = await _orderRepository.UpdateStatusAsync(orderId, newStatus);
         _logger.LogInformation("UpdateOrderStatusAsync succeeded. OrderId: {OrderId} status changed to: {Status}", orderId, newStatus);
 
-        try
+        var trackingInfo = newStatus switch
         {
-            GuestOrderTrackingDto trackingInfo;
-            if (newStatus == OrderStatus.Cancelled)
-            {
-                trackingInfo = new GuestOrderTrackingDto
-                {
-                    OrderId = orderId,
-                    TableId = order.TableId,
-                    Status = "Cancelled",
-                    QueuePosition = 0,
-                    EstimatedReadyAt = null,
-                    EstimatedTimeMinutes = 0,
-                    CreatedAt = order.CreatedAt,
-                    OrderItems = Array.Empty<OrderItemTrackingDto>()
-                };
-            }
-            else
-            {
-                trackingInfo = await GetGuestOrderTrackingAsync(order.TableId);
-            }
-            await _signalService.NotifyOrderUpdateAsync(order.TableId, trackingInfo);
-            await _signalService.NotifyTablesUpdatedAsync();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Failed to send SignalR update to table-{TableId} for OrderId: {OrderId} on status update.", order.TableId, orderId);
-        }
+            OrderStatus.Cancelled => MapToGuestOrderTrackingDto(order, "Cancelled"),
+            OrderStatus.Completed => MapToGuestOrderTrackingDto(order, "Completed"),
+            _ => await GetGuestOrderTrackingAsync(order.TableId)
+        };
+        await SafeNotifyOrderUpdateAsync(order, "status update", trackingInfo);
 
         return true;
     }
@@ -521,16 +473,7 @@ public class OrderService : IOrderService
         await _context.SaveChangesAsync();
         _logger.LogInformation("AssignChefToOrderAsync succeeded. OrderId: {OrderId} assigned to ChefId: {ChefId}", orderId, chefId);
 
-        try
-        {
-            var trackingInfo = await GetGuestOrderTrackingAsync(order.TableId);
-            await _signalService.NotifyOrderUpdateAsync(order.TableId, trackingInfo);
-            await _signalService.NotifyTablesUpdatedAsync();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Failed to send SignalR update to table-{TableId} for OrderId: {OrderId} on chef assignment.", order.TableId, orderId);
-        }
+        await SafeNotifyOrderUpdateAsync(order, "chef assignment");
 
         return true;
     }
@@ -575,8 +518,7 @@ public class OrderService : IOrderService
             throw new NotFoundException($"No active order found for table with ID {tableId}.");
         }
 
-        var orderItems = await _orderItemRepository.GetByOrderIdAsync(activeOrder.Id);
-        var menuItems = orderItems.Select(oi => oi.MenuItem).ToList();
+        var (orderItems, menuItems) = await GetOrderItemsAndMenuItemsAsync(activeOrder.Id);
 
         _logger.LogInformation("GetActiveOrderByTableIdAsync succeeded. Active Order ID: {OrderId} found for TableId: {TableId}", activeOrder.Id, tableId);
         return await MapOrderToDtoAsync(activeOrder, activeOrder.Table, orderItems, menuItems);
@@ -598,8 +540,7 @@ public class OrderService : IOrderService
             throw new NotFoundException($"No active order found for table with ID {tableId}.");
         }
 
-        var orderItems = await _orderItemRepository.GetByOrderIdAsync(activeOrder.Id);
-        var menuItems = orderItems.Select(oi => oi.MenuItem).ToList();
+        var (orderItems, menuItems) = await GetOrderItemsAndMenuItemsAsync(activeOrder.Id);
 
         var queuePosition = 0;
         var estimatedTimeMinutes = 0;
@@ -620,22 +561,13 @@ public class OrderService : IOrderService
             estimatedTimeMinutes = Math.Max(0, (int)Math.Ceiling((estimatedReadyAt.Value - DateTime.UtcNow).TotalMinutes));
         }
 
-        return new GuestOrderTrackingDto
-        {
-            OrderId = activeOrder.Id,
-            TableId = activeOrder.TableId,
-            Status = activeOrder.Status.ToString(),
-            QueuePosition = queuePosition,
-            EstimatedReadyAt = estimatedReadyAt,
-            EstimatedTimeMinutes = estimatedTimeMinutes,
-            CreatedAt = activeOrder.CreatedAt,
-            OrderItems = orderItems.Select(oi => new OrderItemTrackingDto
-            {
-                MenuItemName = menuItems.First(mi => mi.Id == oi.MenuItemId).Name,
-                Quantity = oi.Quantity,
-                Notes = oi.Notes
-            }).ToArray()
-        };
+        return MapToGuestOrderTrackingDto(
+            activeOrder,
+            queuePosition,
+            estimatedReadyAt,
+            estimatedTimeMinutes,
+            orderItems,
+            menuItems);
     }
 
     private static void ValidateCreateDto(OrderCreateDto orderCreateDto)
@@ -697,5 +629,73 @@ public class OrderService : IOrderService
             Notes = orderItem.Notes,
             CreatedAt = orderItem.CreatedAt
         };
+    }
+
+    private async Task<(IEnumerable<OrderItem> OrderItems, IReadOnlyList<MenuItem> MenuItems)> GetOrderItemsAndMenuItemsAsync(int orderId)
+    {
+        var orderItems = await _orderItemRepository.GetByOrderIdAsync(orderId);
+        var menuItems = orderItems.Select(oi => oi.MenuItem).ToList();
+        return (orderItems, menuItems);
+    }
+
+    private static GuestOrderTrackingDto MapToGuestOrderTrackingDto(
+        Order order,
+        int queuePosition,
+        DateTime? estimatedReadyAt,
+        int estimatedTimeMinutes,
+        IEnumerable<OrderItem> orderItems,
+        IReadOnlyList<MenuItem> menuItems)
+    {
+        return new GuestOrderTrackingDto
+        {
+            OrderId = order.Id,
+            TableId = order.TableId,
+            Status = order.Status.ToString(),
+            QueuePosition = queuePosition,
+            EstimatedReadyAt = estimatedReadyAt,
+            EstimatedTimeMinutes = estimatedTimeMinutes,
+            CreatedAt = order.CreatedAt,
+            OrderItems = orderItems.Select(oi => new OrderItemTrackingDto
+            {
+                MenuItemName = menuItems.FirstOrDefault(mi => mi.Id == oi.MenuItemId)?.Name ?? string.Empty,
+                Quantity = oi.Quantity,
+                Notes = oi.Notes,
+                UnitPrice = oi.UnitPrice
+            }).ToArray()
+        };
+    }
+
+    private static GuestOrderTrackingDto MapToGuestOrderTrackingDto(Order order, string status)
+    {
+        return new GuestOrderTrackingDto
+        {
+            OrderId = order.Id,
+            TableId = order.TableId,
+            Status = status,
+            QueuePosition = 0,
+            EstimatedReadyAt = null,
+            EstimatedTimeMinutes = 0,
+            CreatedAt = order.CreatedAt,
+            OrderItems = Array.Empty<OrderItemTrackingDto>()
+        };
+    }
+
+    private async Task SafeNotifyOrderUpdateAsync(Order order, string actionDescription, GuestOrderTrackingDto? trackingInfo = null)
+    {
+        try
+        {
+            trackingInfo ??= await GetGuestOrderTrackingAsync(order.TableId);
+            await _signalService.NotifyOrderUpdateAsync(order.TableId, trackingInfo);
+            await _signalService.NotifyTablesUpdatedAsync();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to send SignalR update to table-{TableId} for OrderId: {OrderId} on {Action}.", order.TableId, order.Id, actionDescription);
+            try
+            {
+                await _signalService.NotifyTablesUpdatedAsync();
+            }
+            catch {}
+        }
     }
 }

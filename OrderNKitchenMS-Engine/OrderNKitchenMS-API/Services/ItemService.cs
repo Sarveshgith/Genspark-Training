@@ -130,11 +130,7 @@ public class ItemService : IItemService
         await _itemRepository.SaveChangesAsync();
 
         // Stock quantity could have changed, re-evaluate all menu items using this item
-        var ingredientMappings = await _ingredientRepository.GetByItemIdAsync(id);
-        foreach (var mapping in ingredientMappings)
-        {
-            await ReevaluateMenuItemAvailabilityAsync(mapping.MenuItemId);
-        }
+        await ReevaluateAffectedMenuItemsAsync(id);
 
         _logger.LogInformation("UpdateItemAsync succeeded for Item ID: {Id}", id);
         return MapToDto(item);
@@ -167,11 +163,7 @@ public class ItemService : IItemService
         await _itemRepository.SaveChangesAsync();
 
         // Re-evaluate affected menu items
-        var ingredientMappings = await _ingredientRepository.GetByItemIdAsync(id);
-        foreach (var mapping in ingredientMappings)
-        {
-            await ReevaluateMenuItemAvailabilityAsync(mapping.MenuItemId);
-        }
+        await ReevaluateAffectedMenuItemsAsync(id);
 
         _logger.LogInformation("RestockItemAsync succeeded for Item ID: {Id}. New StockQuantity: {StockQuantity}", id, item.StockQuantity);
         return MapToDto(item);
@@ -191,11 +183,7 @@ public class ItemService : IItemService
         await _itemRepository.SaveChangesAsync();
 
         // Re-evaluate affected menu items
-        var ingredientMappings = await _ingredientRepository.GetByItemIdAsync(id);
-        foreach (var mapping in ingredientMappings)
-        {
-            await ReevaluateMenuItemAvailabilityAsync(mapping.MenuItemId);
-        }
+        await ReevaluateAffectedMenuItemsAsync(id);
 
         _logger.LogInformation("ChangeItemStatusAsync succeeded for Item ID: {Id}", id);
     }
@@ -471,11 +459,19 @@ public class ItemService : IItemService
         }
         else
         {
-            // If we can't prepare it, it must be unavailable
             menuItem.IsAvailable = false;
         }
 
         await _menuItemRepository.UpdateAsync(menuItemId, menuItem);
+    }
+
+    private async Task ReevaluateAffectedMenuItemsAsync(int itemId)
+    {
+        var ingredientMappings = await _ingredientRepository.GetByItemIdAsync(itemId);
+        foreach (var mapping in ingredientMappings)
+        {
+            await ReevaluateMenuItemAvailabilityAsync(mapping.MenuItemId);
+        }
     }
 
     public async Task ValidateStockForOrderItemsAsync(List<OrderItemCreateDto> orderItems)

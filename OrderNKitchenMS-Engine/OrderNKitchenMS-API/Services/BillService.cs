@@ -15,12 +15,14 @@ public class BillService : IBillService
 {
     private readonly IBillRepository _billRepository;
     private readonly IOrderService _orderService;
+    private readonly ISignalService _signalService;
     private readonly ILogger<BillService> _logger;
 
-    public BillService(IBillRepository billRepository, IOrderService orderService, ILogger<BillService> logger)
+    public BillService(IBillRepository billRepository, IOrderService orderService, ISignalService signalService, ILogger<BillService> logger)
     {
         _billRepository = billRepository;
         _orderService = orderService;
+        _signalService = signalService;
         _logger = logger;
     }
 
@@ -67,7 +69,9 @@ public class BillService : IBillService
         var bill = MapBillCreateDtoToEntity(order, billCreateDto, subTotal);
         await _billRepository.CreateBillAsync(bill);
         _logger.LogInformation("CreateBillAsync succeeded. Generated Bill ID: {BillId} for Order ID: {OrderId}", bill.Id, bill.OrderId);
-        return MapBillToDto(bill);
+        var billDto = MapBillToDto(bill);
+        await _signalService.NotifyBillGeneratedAsync(order.TableId, billDto);
+        return billDto;
     }
 
     // Retrieves a bill associated with a specific order ID.
@@ -155,6 +159,21 @@ public class BillService : IBillService
 
         var result = await _billRepository.UpdateStatusAsync(billId, parsedStatus);
         _logger.LogInformation("UpdateBillStatusAsync completed for Bill ID {BillId}. Success: {Result}", billId, result);
+
+        if (result && parsedStatus == BillStatus.Paid)
+        {
+            var updatedBill = await _billRepository.GetByIdAsync(billId);
+            if (updatedBill != null)
+            {
+                var order = await _orderService.GetOrderByIdAsync(updatedBill.OrderId);
+                if (order != null)
+                {
+                    var billDto = MapBillToDto(updatedBill);
+                    await _signalService.NotifyBillPaidAsync(order.TableId, billDto);
+                }
+            }
+        }
+
         return result;
     }
 

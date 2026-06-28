@@ -14896,3 +14896,1218 @@ LIMIT 1
 2026-06-26 16:26:03.501 +05:30 [INF] SignalR client connecting. ConnectionId: K0Ydp-ddLC-fZW7qfmymEA
 2026-06-26 16:26:03.504 +05:30 [INF] Client authenticated. SessionType: Guest, ConnectionId: K0Ydp-ddLC-fZW7qfmymEA
 2026-06-26 16:26:03.504 +05:30 [INF] Guest client assigned to group: table-3 (ConnectionId: K0Ydp-ddLC-fZW7qfmymEA)
+2026-06-26 16:47:40.006 +05:30 [INF] User profile is available. Using '/Users/sarveswaranb/.aspnet/DataProtection-Keys' as key repository; keys will not be encrypted at rest.
+2026-06-26 16:47:40.060 +05:30 [INF] Now listening on: http://localhost:5182
+2026-06-26 16:47:40.061 +05:30 [INF] Application started. Press Ctrl+C to shut down.
+2026-06-26 16:47:40.061 +05:30 [INF] Hosting environment: Development
+2026-06-26 16:47:40.061 +05:30 [INF] Content root path: /Users/sarveswaranb/Proggies/Presidio/Genspark-Training/OrderNKitchenMS-Engine/OrderNKitchenMS-API
+2026-06-26 16:47:44.706 +05:30 [INF] Request starting HTTP/1.1 OPTIONS http://localhost:5182/api/auth/login - null null
+2026-06-26 16:47:44.710 +05:30 [WRN] Failed to determine the https port for redirect.
+2026-06-26 16:47:44.723 +05:30 [INF] CORS policy execution successful.
+2026-06-26 16:47:44.726 +05:30 [INF] Request finished HTTP/1.1 OPTIONS http://localhost:5182/api/auth/login - 204 null null 21.9298ms
+2026-06-26 16:47:44.728 +05:30 [INF] Request starting HTTP/1.1 POST http://localhost:5182/api/auth/login - application/json 57
+2026-06-26 16:47:44.730 +05:30 [INF] CORS policy execution successful.
+2026-06-26 16:47:44.745 +05:30 [INF] Executing endpoint 'OrderNKitchenMS_API.Controllers.AuthController.Login (OrderNKitchenMS-API)'
+2026-06-26 16:47:44.755 +05:30 [INF] Route matched with {action = "Login", controller = "Auth"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[OrderNKitchenMS_API.Models.DTOs.UserLoginResponseDto]] Login(OrderNKitchenMS_API.Models.DTOs.UserLoginDto) on controller OrderNKitchenMS_API.Controllers.AuthController (OrderNKitchenMS-API).
+2026-06-26 16:47:45.109 +05:30 [INF] Login requested for Email: sarvesh3@gmail.com
+2026-06-26 16:47:45.109 +05:30 [INF] Logging in user with Email: sarvesh3@gmail.com
+2026-06-26 16:47:45.436 +05:30 [INF] Executed DbCommand (26ms) [Parameters=[@ToLower='?'], CommandType='"Text"', CommandTimeout='30']
+SELECT u."Id", u."Address", u."CreatedAt", u."Email", u."IsDeleted", u."Name", u."PasswordHash", u."PhoneNumber", u."RoleId", u."UpdatedAt", r."Id", r."CreatedAt", r."Name", r."UpdatedAt"
+FROM "Users" AS u
+INNER JOIN "Roles" AS r ON u."RoleId" = r."Id"
+WHERE lower(u."Email") = @ToLower AND NOT (u."IsDeleted")
+LIMIT 1
+2026-06-26 16:47:45.531 +05:30 [INF] Login successful. Generated JWT and Refresh Token for User ID: 3
+2026-06-26 16:47:45.531 +05:30 [INF] Login succeeded for User: sarvesh3@gmail.com (ID: 3)
+2026-06-26 16:47:45.533 +05:30 [INF] Executing OkObjectResult, writing value of type 'OrderNKitchenMS_API.Models.DTOs.UserLoginResponseDto'.
+2026-06-26 16:47:45.538 +05:30 [INF] Executed action OrderNKitchenMS_API.Controllers.AuthController.Login (OrderNKitchenMS-API) in 781.2475ms
+2026-06-26 16:47:45.538 +05:30 [INF] Executed endpoint 'OrderNKitchenMS_API.Controllers.AuthController.Login (OrderNKitchenMS-API)'
+2026-06-26 16:47:45.541 +05:30 [INF] Request finished HTTP/1.1 POST http://localhost:5182/api/auth/login - 200 null application/json; charset=utf-8 812.8895ms
+2026-06-26 16:47:45.551 +05:30 [INF] Request starting HTTP/1.1 OPTIONS http://localhost:5182/api/tables - null null
+2026-06-26 16:47:45.551 +05:30 [INF] Request starting HTTP/1.1 OPTIONS http://localhost:5182/api/orders/active - null null
+2026-06-26 16:47:45.552 +05:30 [INF] CORS policy execution successful.
+2026-06-26 16:47:45.552 +05:30 [INF] CORS policy execution successful.
+2026-06-26 16:47:45.553 +05:30 [INF] Request starting HTTP/1.1 OPTIONS http://localhost:5182/restaurantHub/negotiate?negotiateVersion=1 - null null
+2026-06-26 16:47:45.553 +05:30 [INF] Request finished HTTP/1.1 OPTIONS http://localhost:5182/api/orders/active - 204 null null 1.5522ms
+2026-06-26 16:47:45.553 +05:30 [INF] Request finished HTTP/1.1 OPTIONS http://localhost:5182/api/tables - 204 null null 1.6906ms
+2026-06-26 16:47:45.553 +05:30 [INF] CORS policy execution successful.
+2026-06-26 16:47:45.553 +05:30 [INF] Request finished HTTP/1.1 OPTIONS http://localhost:5182/restaurantHub/negotiate?negotiateVersion=1 - 204 null null 0.5844ms
+2026-06-26 16:47:45.553 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5182/api/tables - null null
+2026-06-26 16:47:45.553 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5182/api/orders/active - null null
+2026-06-26 16:47:45.554 +05:30 [INF] CORS policy execution successful.
+2026-06-26 16:47:45.554 +05:30 [INF] Request starting HTTP/1.1 POST http://localhost:5182/restaurantHub/negotiate?negotiateVersion=1 - null 0
+2026-06-26 16:47:45.555 +05:30 [INF] CORS policy execution successful.
+2026-06-26 16:47:45.555 +05:30 [INF] CORS policy execution successful.
+2026-06-26 16:47:45.575 +05:30 [INF] Executing endpoint '/restaurantHub/negotiate'
+2026-06-26 16:47:45.577 +05:30 [INF] Executed endpoint '/restaurantHub/negotiate'
+2026-06-26 16:47:45.577 +05:30 [INF] Request finished HTTP/1.1 POST http://localhost:5182/restaurantHub/negotiate?negotiateVersion=1 - 200 316 application/json 22.6773ms
+2026-06-26 16:47:45.577 +05:30 [INF] Executing endpoint 'OrderNKitchenMS_API.Controllers.TableController.GetTables (OrderNKitchenMS-API)'
+2026-06-26 16:47:45.577 +05:30 [INF] Executing endpoint 'OrderNKitchenMS_API.Controllers.OrderController.GetActiveOrders (OrderNKitchenMS-API)'
+2026-06-26 16:47:45.579 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5182/restaurantHub?id=bR8pWaE2N7lebpXeK4Ci0A&access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjMiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiU2FydmVzaCIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL2VtYWlsYWRkcmVzcyI6InNhcnZlc2gzQGdtYWlsLmNvbSIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IldhaXRlciIsIlNlc3Npb25UeXBlIjoiVXNlciIsImV4cCI6MTc4MjQ3NjI2NSwiaXNzIjoiQW1icm9zaWFPcmRlclN5c3RlbXMiLCJhdWQiOiJBbWJyb3NpYU9yZGVyU3lzdGVtc1VzZXJzIn0.4_UqFQ26AVUMEisUmM4SKI-eyL7hRy0xy3Kk01XJW-w - null null
+2026-06-26 16:47:45.579 +05:30 [INF] CORS policy execution successful.
+2026-06-26 16:47:45.580 +05:30 [INF] Executing endpoint '/restaurantHub'
+2026-06-26 16:47:45.581 +05:30 [INF] Route matched with {action = "GetActiveOrders", controller = "Order"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[System.Collections.Generic.IEnumerable`1[OrderNKitchenMS_API.Models.DTOs.OrderDto]]] GetActiveOrders() on controller OrderNKitchenMS_API.Controllers.OrderController (OrderNKitchenMS-API).
+2026-06-26 16:47:45.581 +05:30 [INF] Route matched with {action = "GetTables", controller = "Table"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[System.Collections.Generic.IEnumerable`1[OrderNKitchenMS_API.Models.DTOs.TableDto]]] GetTables() on controller OrderNKitchenMS_API.Controllers.TableController (OrderNKitchenMS-API).
+2026-06-26 16:47:45.589 +05:30 [INF] SignalR client connecting. ConnectionId: CxIT995i0whRhi30eVLOrQ
+2026-06-26 16:47:45.589 +05:30 [INF] Client authenticated. SessionType: User, ConnectionId: CxIT995i0whRhi30eVLOrQ
+2026-06-26 16:47:45.589 +05:30 [INF] Staff client connected. Role: Waiter, ConnectionId: CxIT995i0whRhi30eVLOrQ
+2026-06-26 16:47:45.589 +05:30 [INF] Waiter assigned to group: waiter-3 (ConnectionId: CxIT995i0whRhi30eVLOrQ)
+2026-06-26 16:47:45.608 +05:30 [INF] GetActiveOrders requested
+2026-06-26 16:47:45.608 +05:30 [INF] GetAllAsync called for tables
+2026-06-26 16:47:45.608 +05:30 [INF] GetActiveOrdersAsync called
+2026-06-26 16:47:45.616 +05:30 [INF] Executed DbCommand (2ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT t."Id", t."Capacity", t."CreatedAt", t."IsDeleted", t."Number", t."Status", t."UpdatedAt"
+FROM "Tables" AS t
+WHERE NOT (t."IsDeleted")
+ORDER BY t."Number"
+2026-06-26 16:47:45.630 +05:30 [INF] Executed DbCommand (3ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT o."Id", o."AssignedChefId", o."AssignedWaiterId", o."CompletedAt", o."CreatedAt", o."Status", o."TableId", o."TotalAmount", o."UpdatedAt", t."Id", t."Capacity", t."CreatedAt", t."IsDeleted", t."Number", t."Status", t."UpdatedAt", u."Id", u."Address", u."CreatedAt", u."Email", u."IsDeleted", u."Name", u."PasswordHash", u."PhoneNumber", u."RoleId", u."UpdatedAt", u0."Id", u0."Address", u0."CreatedAt", u0."Email", u0."IsDeleted", u0."Name", u0."PasswordHash", u0."PhoneNumber", u0."RoleId", u0."UpdatedAt"
+FROM "Orders" AS o
+INNER JOIN "Tables" AS t ON o."TableId" = t."Id"
+LEFT JOIN "Users" AS u ON o."AssignedChefId" = u."Id"
+LEFT JOIN "Users" AS u0 ON o."AssignedWaiterId" = u0."Id"
+2026-06-26 16:47:45.632 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT o."Id", o."AssignedChefId", o."AssignedWaiterId", o."CompletedAt", o."CreatedAt", o."Status", o."TableId", o."TotalAmount", o."UpdatedAt"
+FROM "Orders" AS o
+WHERE o."Status" NOT IN (5, 6)
+2026-06-26 16:47:45.640 +05:30 [INF] Executing OkObjectResult, writing value of type 'System.Linq.Enumerable+ListSelectIterator`2[[OrderNKitchenMS_API.Models.Entities.Table, OrderNKitchenMS-API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null],[OrderNKitchenMS_API.Models.DTOs.TableDto, OrderNKitchenMS-API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-26 16:47:45.647 +05:30 [INF] Executed action OrderNKitchenMS_API.Controllers.TableController.GetTables (OrderNKitchenMS-API) in 66.1381ms
+2026-06-26 16:47:45.647 +05:30 [INF] Executed endpoint 'OrderNKitchenMS_API.Controllers.TableController.GetTables (OrderNKitchenMS-API)'
+2026-06-26 16:47:45.647 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:5182/api/tables - 200 null application/json; charset=utf-8 93.5864ms
+2026-06-26 16:47:45.650 +05:30 [INF] Executed DbCommand (3ms) [Parameters=[@orderId='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT o."Id", o."CreatedAt", o."MenuItemId", o."Notes", o."OrderId", o."Quantity", o."UnitPrice", o."UpdatedAt", m."Id", m."CategoryId", m."CreatedAt", m."Description", m."ImageUrl", m."IsAvailable", m."IsDeleted", m."IsManuallyDisabled", m."Name", m."PreparationTime", m."Price", m."UpdatedAt"
+FROM "OrderItems" AS o
+INNER JOIN "MenuItems" AS m ON o."MenuItemId" = m."Id"
+WHERE o."OrderId" = @orderId
+2026-06-26 16:47:45.710 +05:30 [INF] Executed DbCommand (27ms) [Parameters=[@menuItemIds='?' (DbType = Object)], CommandType='"Text"', CommandTimeout='30']
+SELECT max(m."PreparationTime")
+FROM "MenuItems" AS m
+WHERE m."Id" = ANY (@menuItemIds) AND NOT (m."IsDeleted")
+2026-06-26 16:47:45.718 +05:30 [INF] Executed DbCommand (2ms) [Parameters=[@excludeOrderId='?' (DbType = Int32), @createdAt='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT count(*)::int
+FROM "Orders" AS o
+WHERE o."Status" IN (1, 2) AND o."Id" <> @excludeOrderId AND o."CreatedAt" < @createdAt
+2026-06-26 16:47:45.722 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[@orderId='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT o."Id", o."CreatedAt", o."MenuItemId", o."Notes", o."OrderId", o."Quantity", o."UnitPrice", o."UpdatedAt", m."Id", m."CategoryId", m."CreatedAt", m."Description", m."ImageUrl", m."IsAvailable", m."IsDeleted", m."IsManuallyDisabled", m."Name", m."PreparationTime", m."Price", m."UpdatedAt"
+FROM "OrderItems" AS o
+INNER JOIN "MenuItems" AS m ON o."MenuItemId" = m."Id"
+WHERE o."OrderId" = @orderId
+2026-06-26 16:47:45.723 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[@menuItemIds='?' (DbType = Object)], CommandType='"Text"', CommandTimeout='30']
+SELECT max(m."PreparationTime")
+FROM "MenuItems" AS m
+WHERE m."Id" = ANY (@menuItemIds) AND NOT (m."IsDeleted")
+2026-06-26 16:47:45.724 +05:30 [INF] Executed DbCommand (0ms) [Parameters=[@excludeOrderId='?' (DbType = Int32), @createdAt='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT count(*)::int
+FROM "Orders" AS o
+WHERE o."Status" IN (1, 2) AND o."Id" <> @excludeOrderId AND o."CreatedAt" < @createdAt
+2026-06-26 16:47:45.725 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[@orderId='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT o."Id", o."CreatedAt", o."MenuItemId", o."Notes", o."OrderId", o."Quantity", o."UnitPrice", o."UpdatedAt", m."Id", m."CategoryId", m."CreatedAt", m."Description", m."ImageUrl", m."IsAvailable", m."IsDeleted", m."IsManuallyDisabled", m."Name", m."PreparationTime", m."Price", m."UpdatedAt"
+FROM "OrderItems" AS o
+INNER JOIN "MenuItems" AS m ON o."MenuItemId" = m."Id"
+WHERE o."OrderId" = @orderId
+2026-06-26 16:47:45.725 +05:30 [INF] Executed DbCommand (0ms) [Parameters=[@menuItemIds='?' (DbType = Object)], CommandType='"Text"', CommandTimeout='30']
+SELECT max(m."PreparationTime")
+FROM "MenuItems" AS m
+WHERE m."Id" = ANY (@menuItemIds) AND NOT (m."IsDeleted")
+2026-06-26 16:47:45.726 +05:30 [INF] Executed DbCommand (0ms) [Parameters=[@excludeOrderId='?' (DbType = Int32), @createdAt='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT count(*)::int
+FROM "Orders" AS o
+WHERE o."Status" IN (1, 2) AND o."Id" <> @excludeOrderId AND o."CreatedAt" < @createdAt
+2026-06-26 16:47:45.726 +05:30 [INF] Executed DbCommand (0ms) [Parameters=[@orderId='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT o."Id", o."CreatedAt", o."MenuItemId", o."Notes", o."OrderId", o."Quantity", o."UnitPrice", o."UpdatedAt", m."Id", m."CategoryId", m."CreatedAt", m."Description", m."ImageUrl", m."IsAvailable", m."IsDeleted", m."IsManuallyDisabled", m."Name", m."PreparationTime", m."Price", m."UpdatedAt"
+FROM "OrderItems" AS o
+INNER JOIN "MenuItems" AS m ON o."MenuItemId" = m."Id"
+WHERE o."OrderId" = @orderId
+2026-06-26 16:47:45.727 +05:30 [INF] Executed DbCommand (0ms) [Parameters=[@menuItemIds='?' (DbType = Object)], CommandType='"Text"', CommandTimeout='30']
+SELECT max(m."PreparationTime")
+FROM "MenuItems" AS m
+WHERE m."Id" = ANY (@menuItemIds) AND NOT (m."IsDeleted")
+2026-06-26 16:47:45.727 +05:30 [INF] Executed DbCommand (0ms) [Parameters=[@excludeOrderId='?' (DbType = Int32), @createdAt='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT count(*)::int
+FROM "Orders" AS o
+WHERE o."Status" IN (1, 2) AND o."Id" <> @excludeOrderId AND o."CreatedAt" < @createdAt
+2026-06-26 16:47:45.727 +05:30 [INF] GetActiveOrders completed. Returned 4 active orders.
+2026-06-26 16:47:45.727 +05:30 [INF] Executing OkObjectResult, writing value of type 'System.Collections.Generic.List`1[[OrderNKitchenMS_API.Models.DTOs.OrderDto, OrderNKitchenMS-API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-26 16:47:45.732 +05:30 [INF] Executed action OrderNKitchenMS_API.Controllers.OrderController.GetActiveOrders (OrderNKitchenMS-API) in 151.3778ms
+2026-06-26 16:47:45.732 +05:30 [INF] Executed endpoint 'OrderNKitchenMS_API.Controllers.OrderController.GetActiveOrders (OrderNKitchenMS-API)'
+2026-06-26 16:47:45.732 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:5182/api/orders/active - 200 null application/json; charset=utf-8 178.8244ms
+2026-06-26 16:48:00.816 +05:30 [INF] Request starting HTTP/1.1 OPTIONS http://localhost:5182/api/orders/table/2/active - null null
+2026-06-26 16:48:00.817 +05:30 [INF] CORS policy execution successful.
+2026-06-26 16:48:00.818 +05:30 [INF] Request finished HTTP/1.1 OPTIONS http://localhost:5182/api/orders/table/2/active - 204 null null 1.6878ms
+2026-06-26 16:48:00.819 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5182/api/orders/table/2/active - null null
+2026-06-26 16:48:00.821 +05:30 [INF] CORS policy execution successful.
+2026-06-26 16:48:00.823 +05:30 [INF] Executing endpoint 'OrderNKitchenMS_API.Controllers.OrderController.GetActiveOrderByTableId (OrderNKitchenMS-API)'
+2026-06-26 16:48:00.829 +05:30 [INF] Route matched with {action = "GetActiveOrderByTableId", controller = "Order"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[OrderNKitchenMS_API.Models.DTOs.OrderDto]] GetActiveOrderByTableId(Int32) on controller OrderNKitchenMS_API.Controllers.OrderController (OrderNKitchenMS-API).
+2026-06-26 16:48:00.843 +05:30 [INF] GetActiveOrderByTableId requested for TableId: 2
+2026-06-26 16:48:00.844 +05:30 [INF] GetActiveOrderByTableIdAsync called for TableId: 2
+2026-06-26 16:48:00.848 +05:30 [INF] Executed DbCommand (2ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT o."Id", o."AssignedChefId", o."AssignedWaiterId", o."CompletedAt", o."CreatedAt", o."Status", o."TableId", o."TotalAmount", o."UpdatedAt", t."Id", t."Capacity", t."CreatedAt", t."IsDeleted", t."Number", t."Status", t."UpdatedAt", u."Id", u."Address", u."CreatedAt", u."Email", u."IsDeleted", u."Name", u."PasswordHash", u."PhoneNumber", u."RoleId", u."UpdatedAt", u0."Id", u0."Address", u0."CreatedAt", u0."Email", u0."IsDeleted", u0."Name", u0."PasswordHash", u0."PhoneNumber", u0."RoleId", u0."UpdatedAt"
+FROM "Orders" AS o
+INNER JOIN "Tables" AS t ON o."TableId" = t."Id"
+LEFT JOIN "Users" AS u ON o."AssignedChefId" = u."Id"
+LEFT JOIN "Users" AS u0 ON o."AssignedWaiterId" = u0."Id"
+2026-06-26 16:48:00.850 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[@orderId='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT o."Id", o."CreatedAt", o."MenuItemId", o."Notes", o."OrderId", o."Quantity", o."UnitPrice", o."UpdatedAt", m."Id", m."CategoryId", m."CreatedAt", m."Description", m."ImageUrl", m."IsAvailable", m."IsDeleted", m."IsManuallyDisabled", m."Name", m."PreparationTime", m."Price", m."UpdatedAt"
+FROM "OrderItems" AS o
+INNER JOIN "MenuItems" AS m ON o."MenuItemId" = m."Id"
+WHERE o."OrderId" = @orderId
+2026-06-26 16:48:00.850 +05:30 [INF] GetActiveOrderByTableIdAsync succeeded. Active Order ID: 12 found for TableId: 2
+2026-06-26 16:48:00.851 +05:30 [INF] Executed DbCommand (0ms) [Parameters=[@menuItemIds='?' (DbType = Object)], CommandType='"Text"', CommandTimeout='30']
+SELECT max(m."PreparationTime")
+FROM "MenuItems" AS m
+WHERE m."Id" = ANY (@menuItemIds) AND NOT (m."IsDeleted")
+2026-06-26 16:48:00.852 +05:30 [INF] Executed DbCommand (0ms) [Parameters=[@excludeOrderId='?' (DbType = Int32), @createdAt='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT count(*)::int
+FROM "Orders" AS o
+WHERE o."Status" IN (1, 2) AND o."Id" <> @excludeOrderId AND o."CreatedAt" < @createdAt
+2026-06-26 16:48:00.852 +05:30 [INF] GetActiveOrderByTableId completed for TableId: 2. Order ID: 12
+2026-06-26 16:48:00.852 +05:30 [INF] Executing OkObjectResult, writing value of type 'OrderNKitchenMS_API.Models.DTOs.OrderDto'.
+2026-06-26 16:48:00.852 +05:30 [INF] Executed action OrderNKitchenMS_API.Controllers.OrderController.GetActiveOrderByTableId (OrderNKitchenMS-API) in 23.6957ms
+2026-06-26 16:48:00.852 +05:30 [INF] Executed endpoint 'OrderNKitchenMS_API.Controllers.OrderController.GetActiveOrderByTableId (OrderNKitchenMS-API)'
+2026-06-26 16:48:00.852 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:5182/api/orders/table/2/active - 200 null application/json; charset=utf-8 33.4418ms
+2026-06-26 16:48:00.854 +05:30 [INF] Request starting HTTP/1.1 OPTIONS http://localhost:5182/api/bills/order/12 - null null
+2026-06-26 16:48:00.854 +05:30 [INF] CORS policy execution successful.
+2026-06-26 16:48:00.854 +05:30 [INF] Request finished HTTP/1.1 OPTIONS http://localhost:5182/api/bills/order/12 - 204 null null 0.2523ms
+2026-06-26 16:48:00.855 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5182/api/bills/order/12 - null null
+2026-06-26 16:48:00.855 +05:30 [INF] CORS policy execution successful.
+2026-06-26 16:48:00.856 +05:30 [INF] Executing endpoint 'OrderNKitchenMS_API.Controllers.BillController.GetBillByOrderId (OrderNKitchenMS-API)'
+2026-06-26 16:48:00.860 +05:30 [INF] Route matched with {action = "GetBillByOrderId", controller = "Bill"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[OrderNKitchenMS_API.Models.DTOs.BillDto]] GetBillByOrderId(Int32) on controller OrderNKitchenMS_API.Controllers.BillController (OrderNKitchenMS-API).
+2026-06-26 16:48:00.861 +05:30 [INF] GetBillByOrderIdAsync called for Order ID: 12
+2026-06-26 16:48:00.869 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[@orderId='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."CreatedAt", b."DiscountAmount", b."OrderId", b."Status", b."SubTotal", b."TaxRate", b."TotalAmount", b."UpdatedAt"
+FROM "Bills" AS b
+WHERE b."OrderId" = @orderId
+LIMIT 1
+2026-06-26 16:48:00.878 +05:30 [INF] Executing OkObjectResult, writing value of type 'OrderNKitchenMS_API.Models.DTOs.BillDto'.
+2026-06-26 16:48:00.879 +05:30 [INF] Executed action OrderNKitchenMS_API.Controllers.BillController.GetBillByOrderId (OrderNKitchenMS-API) in 19.5342ms
+2026-06-26 16:48:00.880 +05:30 [INF] Executed endpoint 'OrderNKitchenMS_API.Controllers.BillController.GetBillByOrderId (OrderNKitchenMS-API)'
+2026-06-26 16:48:00.880 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:5182/api/bills/order/12 - 200 null application/json; charset=utf-8 24.6904ms
+2026-06-26 16:48:02.415 +05:30 [INF] Request starting HTTP/1.1 OPTIONS http://localhost:5182/api/bills/4/status - null null
+2026-06-26 16:48:02.415 +05:30 [INF] CORS policy execution successful.
+2026-06-26 16:48:02.416 +05:30 [INF] Request finished HTTP/1.1 OPTIONS http://localhost:5182/api/bills/4/status - 204 null null 1.0528ms
+2026-06-26 16:48:02.417 +05:30 [INF] Request starting HTTP/1.1 PATCH http://localhost:5182/api/bills/4/status - application/json 6
+2026-06-26 16:48:02.418 +05:30 [INF] CORS policy execution successful.
+2026-06-26 16:48:02.419 +05:30 [INF] Executing endpoint 'OrderNKitchenMS_API.Controllers.BillController.UpdateBillStatus (OrderNKitchenMS-API)'
+2026-06-26 16:48:02.427 +05:30 [INF] Route matched with {action = "UpdateBillStatus", controller = "Bill"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] UpdateBillStatus(Int32, System.String) on controller OrderNKitchenMS_API.Controllers.BillController (OrderNKitchenMS-API).
+2026-06-26 16:48:02.432 +05:30 [INF] UpdateBillStatusAsync started for Bill ID: 4, new status: Paid
+2026-06-26 16:48:02.447 +05:30 [INF] Executed DbCommand (2ms) [Parameters=[@p='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."CreatedAt", b."DiscountAmount", b."OrderId", b."Status", b."SubTotal", b."TaxRate", b."TotalAmount", b."UpdatedAt"
+FROM "Bills" AS b
+WHERE b."Id" = @p
+LIMIT 1
+2026-06-26 16:48:02.448 +05:30 [INF] Bill ID 4 is paid. Updating Order ID 12 status to Completed.
+2026-06-26 16:48:02.450 +05:30 [INF] UpdateOrderStatusAsync started. OrderId: 12, new status: 5
+2026-06-26 16:48:02.463 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[@id='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT o."Id", o."AssignedChefId", o."AssignedWaiterId", o."CompletedAt", o."CreatedAt", o."Status", o."TableId", o."TotalAmount", o."UpdatedAt", t."Id", t."Capacity", t."CreatedAt", t."IsDeleted", t."Number", t."Status", t."UpdatedAt", u."Id", u."Address", u."CreatedAt", u."Email", u."IsDeleted", u."Name", u."PasswordHash", u."PhoneNumber", u."RoleId", u."UpdatedAt", u0."Id", u0."Address", u0."CreatedAt", u0."Email", u0."IsDeleted", u0."Name", u0."PasswordHash", u0."PhoneNumber", u0."RoleId", u0."UpdatedAt"
+FROM "Orders" AS o
+INNER JOIN "Tables" AS t ON o."TableId" = t."Id"
+LEFT JOIN "Users" AS u ON o."AssignedChefId" = u."Id"
+LEFT JOIN "Users" AS u0 ON o."AssignedWaiterId" = u0."Id"
+WHERE o."Id" = @id
+LIMIT 1
+2026-06-26 16:48:02.468 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[@id='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT o."Id", o."AssignedChefId", o."AssignedWaiterId", o."CompletedAt", o."CreatedAt", o."Status", o."TableId", o."TotalAmount", o."UpdatedAt", t."Id", t."Capacity", t."CreatedAt", t."IsDeleted", t."Number", t."Status", t."UpdatedAt", u."Id", u."Address", u."CreatedAt", u."Email", u."IsDeleted", u."Name", u."PasswordHash", u."PhoneNumber", u."RoleId", u."UpdatedAt", u0."Id", u0."Address", u0."CreatedAt", u0."Email", u0."IsDeleted", u0."Name", u0."PasswordHash", u0."PhoneNumber", u0."RoleId", u0."UpdatedAt"
+FROM "Orders" AS o
+INNER JOIN "Tables" AS t ON o."TableId" = t."Id"
+LEFT JOIN "Users" AS u ON o."AssignedChefId" = u."Id"
+LEFT JOIN "Users" AS u0 ON o."AssignedWaiterId" = u0."Id"
+WHERE o."Id" = @id
+LIMIT 1
+2026-06-26 16:48:02.523 +05:30 [INF] Executed DbCommand (10ms) [Parameters=[@p2='?' (DbType = Int32), @p0='?' (DbType = DateTime), @p1='?' (DbType = Int32), @p4='?' (DbType = Int32), @p3='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+UPDATE "Orders" SET "CompletedAt" = @p0, "Status" = @p1
+WHERE "Id" = @p2;
+UPDATE "Tables" SET "Status" = @p3
+WHERE "Id" = @p4;
+2026-06-26 16:48:02.531 +05:30 [INF] UpdateOrderStatusAsync succeeded. OrderId: 12 status changed to: "Completed"
+2026-06-26 16:48:02.532 +05:30 [INF] GetGuestOrderTrackingAsync called for TableId: 2
+2026-06-26 16:48:02.533 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT o."Id", o."AssignedChefId", o."AssignedWaiterId", o."CompletedAt", o."CreatedAt", o."Status", o."TableId", o."TotalAmount", o."UpdatedAt", t."Id", t."Capacity", t."CreatedAt", t."IsDeleted", t."Number", t."Status", t."UpdatedAt", u."Id", u."Address", u."CreatedAt", u."Email", u."IsDeleted", u."Name", u."PasswordHash", u."PhoneNumber", u."RoleId", u."UpdatedAt", u0."Id", u0."Address", u0."CreatedAt", u0."Email", u0."IsDeleted", u0."Name", u0."PasswordHash", u0."PhoneNumber", u0."RoleId", u0."UpdatedAt"
+FROM "Orders" AS o
+INNER JOIN "Tables" AS t ON o."TableId" = t."Id"
+LEFT JOIN "Users" AS u ON o."AssignedChefId" = u."Id"
+LEFT JOIN "Users" AS u0 ON o."AssignedWaiterId" = u0."Id"
+2026-06-26 16:48:02.533 +05:30 [WRN] GetGuestOrderTrackingAsync failed: No active order found for TableId: 2
+2026-06-26 16:48:02.534 +05:30 [ERR] Failed to send SignalR update to table-2 for OrderId: 12 on status update.
+OrderNKitchenMS_API.Exceptions.NotFoundException: No active order found for table with ID 2.
+   at OrderNKitchenMS_API.Services.OrderService.GetGuestOrderTrackingAsync(Int32 tableId) in /Users/sarveswaranb/Proggies/Presidio/Genspark-Training/OrderNKitchenMS-Engine/OrderNKitchenMS-API/Services/OrderService.cs:line 598
+   at OrderNKitchenMS_API.Services.OrderService.UpdateOrderStatusAsync(Int32 orderId, Int32 status) in /Users/sarveswaranb/Proggies/Presidio/Genspark-Training/OrderNKitchenMS-Engine/OrderNKitchenMS-API/Services/OrderService.cs:line 477
+2026-06-26 16:48:02.538 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[@p1='?' (DbType = Int32), @p0='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+UPDATE "Bills" SET "Status" = @p0
+WHERE "Id" = @p1;
+2026-06-26 16:48:02.538 +05:30 [INF] UpdateBillStatusAsync completed for Bill ID 4. Success: true
+2026-06-26 16:48:02.539 +05:30 [INF] Executing StatusCodeResult, setting HTTP status code 204
+2026-06-26 16:48:02.539 +05:30 [INF] Executed action OrderNKitchenMS_API.Controllers.BillController.UpdateBillStatus (OrderNKitchenMS-API) in 112.6847ms
+2026-06-26 16:48:02.539 +05:30 [INF] Executed endpoint 'OrderNKitchenMS_API.Controllers.BillController.UpdateBillStatus (OrderNKitchenMS-API)'
+2026-06-26 16:48:02.540 +05:30 [INF] Request finished HTTP/1.1 PATCH http://localhost:5182/api/bills/4/status - 204 null null 122.2155ms
+2026-06-26 16:48:03.771 +05:30 [INF] Request starting HTTP/1.1 OPTIONS http://localhost:5182/api/orders/active - null null
+2026-06-26 16:48:03.771 +05:30 [INF] Request starting HTTP/1.1 OPTIONS http://localhost:5182/api/tables - null null
+2026-06-26 16:48:03.771 +05:30 [INF] CORS policy execution successful.
+2026-06-26 16:48:03.771 +05:30 [INF] CORS policy execution successful.
+2026-06-26 16:48:03.771 +05:30 [INF] Request finished HTTP/1.1 OPTIONS http://localhost:5182/api/tables - 204 null null 0.4034ms
+2026-06-26 16:48:03.772 +05:30 [INF] Request finished HTTP/1.1 OPTIONS http://localhost:5182/api/orders/active - 204 null null 0.8943ms
+2026-06-26 16:48:03.773 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5182/api/orders/active - null null
+2026-06-26 16:48:03.774 +05:30 [INF] CORS policy execution successful.
+2026-06-26 16:48:03.776 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5182/api/tables - null null
+2026-06-26 16:48:03.776 +05:30 [INF] CORS policy execution successful.
+2026-06-26 16:48:03.776 +05:30 [INF] Executing endpoint 'OrderNKitchenMS_API.Controllers.TableController.GetTables (OrderNKitchenMS-API)'
+2026-06-26 16:48:03.776 +05:30 [INF] Executing endpoint 'OrderNKitchenMS_API.Controllers.OrderController.GetActiveOrders (OrderNKitchenMS-API)'
+2026-06-26 16:48:03.777 +05:30 [INF] Route matched with {action = "GetTables", controller = "Table"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[System.Collections.Generic.IEnumerable`1[OrderNKitchenMS_API.Models.DTOs.TableDto]]] GetTables() on controller OrderNKitchenMS_API.Controllers.TableController (OrderNKitchenMS-API).
+2026-06-26 16:48:03.777 +05:30 [INF] Route matched with {action = "GetActiveOrders", controller = "Order"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[System.Collections.Generic.IEnumerable`1[OrderNKitchenMS_API.Models.DTOs.OrderDto]]] GetActiveOrders() on controller OrderNKitchenMS_API.Controllers.OrderController (OrderNKitchenMS-API).
+2026-06-26 16:48:03.780 +05:30 [INF] GetAllAsync called for tables
+2026-06-26 16:48:03.783 +05:30 [INF] Executed DbCommand (2ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT t."Id", t."Capacity", t."CreatedAt", t."IsDeleted", t."Number", t."Status", t."UpdatedAt"
+FROM "Tables" AS t
+WHERE NOT (t."IsDeleted")
+ORDER BY t."Number"
+2026-06-26 16:48:03.784 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT o."Id", o."AssignedChefId", o."AssignedWaiterId", o."CompletedAt", o."CreatedAt", o."Status", o."TableId", o."TotalAmount", o."UpdatedAt"
+FROM "Orders" AS o
+WHERE o."Status" NOT IN (5, 6)
+2026-06-26 16:48:03.785 +05:30 [INF] Executing OkObjectResult, writing value of type 'System.Linq.Enumerable+ListSelectIterator`2[[OrderNKitchenMS_API.Models.Entities.Table, OrderNKitchenMS-API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null],[OrderNKitchenMS_API.Models.DTOs.TableDto, OrderNKitchenMS-API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-26 16:48:03.785 +05:30 [INF] GetActiveOrders requested
+2026-06-26 16:48:03.785 +05:30 [INF] GetActiveOrdersAsync called
+2026-06-26 16:48:03.785 +05:30 [INF] Executed action OrderNKitchenMS_API.Controllers.TableController.GetTables (OrderNKitchenMS-API) in 7.9391ms
+2026-06-26 16:48:03.785 +05:30 [INF] Executed endpoint 'OrderNKitchenMS_API.Controllers.TableController.GetTables (OrderNKitchenMS-API)'
+2026-06-26 16:48:03.785 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:5182/api/tables - 200 null application/json; charset=utf-8 9.0738ms
+2026-06-26 16:48:03.786 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT o."Id", o."AssignedChefId", o."AssignedWaiterId", o."CompletedAt", o."CreatedAt", o."Status", o."TableId", o."TotalAmount", o."UpdatedAt", t."Id", t."Capacity", t."CreatedAt", t."IsDeleted", t."Number", t."Status", t."UpdatedAt", u."Id", u."Address", u."CreatedAt", u."Email", u."IsDeleted", u."Name", u."PasswordHash", u."PhoneNumber", u."RoleId", u."UpdatedAt", u0."Id", u0."Address", u0."CreatedAt", u0."Email", u0."IsDeleted", u0."Name", u0."PasswordHash", u0."PhoneNumber", u0."RoleId", u0."UpdatedAt"
+FROM "Orders" AS o
+INNER JOIN "Tables" AS t ON o."TableId" = t."Id"
+LEFT JOIN "Users" AS u ON o."AssignedChefId" = u."Id"
+LEFT JOIN "Users" AS u0 ON o."AssignedWaiterId" = u0."Id"
+2026-06-26 16:48:03.787 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[@orderId='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT o."Id", o."CreatedAt", o."MenuItemId", o."Notes", o."OrderId", o."Quantity", o."UnitPrice", o."UpdatedAt", m."Id", m."CategoryId", m."CreatedAt", m."Description", m."ImageUrl", m."IsAvailable", m."IsDeleted", m."IsManuallyDisabled", m."Name", m."PreparationTime", m."Price", m."UpdatedAt"
+FROM "OrderItems" AS o
+INNER JOIN "MenuItems" AS m ON o."MenuItemId" = m."Id"
+WHERE o."OrderId" = @orderId
+2026-06-26 16:48:03.789 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[@menuItemIds='?' (DbType = Object)], CommandType='"Text"', CommandTimeout='30']
+SELECT max(m."PreparationTime")
+FROM "MenuItems" AS m
+WHERE m."Id" = ANY (@menuItemIds) AND NOT (m."IsDeleted")
+2026-06-26 16:48:03.790 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[@excludeOrderId='?' (DbType = Int32), @createdAt='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT count(*)::int
+FROM "Orders" AS o
+WHERE o."Status" IN (1, 2) AND o."Id" <> @excludeOrderId AND o."CreatedAt" < @createdAt
+2026-06-26 16:48:03.791 +05:30 [INF] Executed DbCommand (0ms) [Parameters=[@orderId='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT o."Id", o."CreatedAt", o."MenuItemId", o."Notes", o."OrderId", o."Quantity", o."UnitPrice", o."UpdatedAt", m."Id", m."CategoryId", m."CreatedAt", m."Description", m."ImageUrl", m."IsAvailable", m."IsDeleted", m."IsManuallyDisabled", m."Name", m."PreparationTime", m."Price", m."UpdatedAt"
+FROM "OrderItems" AS o
+INNER JOIN "MenuItems" AS m ON o."MenuItemId" = m."Id"
+WHERE o."OrderId" = @orderId
+2026-06-26 16:48:03.792 +05:30 [INF] Executed DbCommand (0ms) [Parameters=[@menuItemIds='?' (DbType = Object)], CommandType='"Text"', CommandTimeout='30']
+SELECT max(m."PreparationTime")
+FROM "MenuItems" AS m
+WHERE m."Id" = ANY (@menuItemIds) AND NOT (m."IsDeleted")
+2026-06-26 16:48:03.792 +05:30 [INF] Executed DbCommand (0ms) [Parameters=[@excludeOrderId='?' (DbType = Int32), @createdAt='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT count(*)::int
+FROM "Orders" AS o
+WHERE o."Status" IN (1, 2) AND o."Id" <> @excludeOrderId AND o."CreatedAt" < @createdAt
+2026-06-26 16:48:03.793 +05:30 [INF] Executed DbCommand (0ms) [Parameters=[@orderId='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT o."Id", o."CreatedAt", o."MenuItemId", o."Notes", o."OrderId", o."Quantity", o."UnitPrice", o."UpdatedAt", m."Id", m."CategoryId", m."CreatedAt", m."Description", m."ImageUrl", m."IsAvailable", m."IsDeleted", m."IsManuallyDisabled", m."Name", m."PreparationTime", m."Price", m."UpdatedAt"
+FROM "OrderItems" AS o
+INNER JOIN "MenuItems" AS m ON o."MenuItemId" = m."Id"
+WHERE o."OrderId" = @orderId
+2026-06-26 16:48:03.794 +05:30 [INF] Executed DbCommand (0ms) [Parameters=[@menuItemIds='?' (DbType = Object)], CommandType='"Text"', CommandTimeout='30']
+SELECT max(m."PreparationTime")
+FROM "MenuItems" AS m
+WHERE m."Id" = ANY (@menuItemIds) AND NOT (m."IsDeleted")
+2026-06-26 16:48:03.795 +05:30 [INF] Executed DbCommand (0ms) [Parameters=[@excludeOrderId='?' (DbType = Int32), @createdAt='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT count(*)::int
+FROM "Orders" AS o
+WHERE o."Status" IN (1, 2) AND o."Id" <> @excludeOrderId AND o."CreatedAt" < @createdAt
+2026-06-26 16:48:03.795 +05:30 [INF] GetActiveOrders completed. Returned 3 active orders.
+2026-06-26 16:48:03.795 +05:30 [INF] Executing OkObjectResult, writing value of type 'System.Collections.Generic.List`1[[OrderNKitchenMS_API.Models.DTOs.OrderDto, OrderNKitchenMS-API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-26 16:48:03.795 +05:30 [INF] Executed action OrderNKitchenMS_API.Controllers.OrderController.GetActiveOrders (OrderNKitchenMS-API) in 18.3931ms
+2026-06-26 16:48:03.795 +05:30 [INF] Executed endpoint 'OrderNKitchenMS_API.Controllers.OrderController.GetActiveOrders (OrderNKitchenMS-API)'
+2026-06-26 16:48:03.796 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:5182/api/orders/active - 200 null application/json; charset=utf-8 22.3129ms
+2026-06-26 16:49:08.595 +05:30 [INF] Request starting HTTP/1.1 OPTIONS http://localhost:5182/api/categories/ - null null
+2026-06-26 16:49:08.596 +05:30 [INF] CORS policy execution successful.
+2026-06-26 16:49:08.596 +05:30 [INF] Request finished HTTP/1.1 OPTIONS http://localhost:5182/api/categories/ - 204 null null 0.8788ms
+2026-06-26 16:49:08.595 +05:30 [INF] Request starting HTTP/1.1 OPTIONS http://localhost:5182/api/tables - null null
+2026-06-26 16:49:08.596 +05:30 [INF] CORS policy execution successful.
+2026-06-26 16:49:08.596 +05:30 [INF] Request finished HTTP/1.1 OPTIONS http://localhost:5182/api/tables - 204 null null 1.2025ms
+2026-06-26 16:49:08.597 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5182/api/categories/ - null null
+2026-06-26 16:49:08.597 +05:30 [INF] CORS policy execution successful.
+2026-06-26 16:49:08.598 +05:30 [INF] Executing endpoint 'OrderNKitchenMS_API.Controllers.CategoryController.GetCategories (OrderNKitchenMS-API)'
+2026-06-26 16:49:08.600 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5182/api/tables - null null
+2026-06-26 16:49:08.600 +05:30 [INF] CORS policy execution successful.
+2026-06-26 16:49:08.600 +05:30 [INF] Executing endpoint 'OrderNKitchenMS_API.Controllers.TableController.GetTables (OrderNKitchenMS-API)'
+2026-06-26 16:49:08.600 +05:30 [INF] Route matched with {action = "GetTables", controller = "Table"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[System.Collections.Generic.IEnumerable`1[OrderNKitchenMS_API.Models.DTOs.TableDto]]] GetTables() on controller OrderNKitchenMS_API.Controllers.TableController (OrderNKitchenMS-API).
+2026-06-26 16:49:08.602 +05:30 [INF] GetAllAsync called for tables
+2026-06-26 16:49:08.603 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT t."Id", t."Capacity", t."CreatedAt", t."IsDeleted", t."Number", t."Status", t."UpdatedAt"
+FROM "Tables" AS t
+WHERE NOT (t."IsDeleted")
+ORDER BY t."Number"
+2026-06-26 16:49:08.604 +05:30 [INF] Executed DbCommand (0ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT o."Id", o."AssignedChefId", o."AssignedWaiterId", o."CompletedAt", o."CreatedAt", o."Status", o."TableId", o."TotalAmount", o."UpdatedAt"
+FROM "Orders" AS o
+WHERE o."Status" NOT IN (5, 6)
+2026-06-26 16:49:08.604 +05:30 [INF] Executing OkObjectResult, writing value of type 'System.Linq.Enumerable+ListSelectIterator`2[[OrderNKitchenMS_API.Models.Entities.Table, OrderNKitchenMS-API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null],[OrderNKitchenMS_API.Models.DTOs.TableDto, OrderNKitchenMS-API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-26 16:49:08.604 +05:30 [INF] Executed action OrderNKitchenMS_API.Controllers.TableController.GetTables (OrderNKitchenMS-API) in 3.9622ms
+2026-06-26 16:49:08.604 +05:30 [INF] Executed endpoint 'OrderNKitchenMS_API.Controllers.TableController.GetTables (OrderNKitchenMS-API)'
+2026-06-26 16:49:08.604 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:5182/api/tables - 200 null application/json; charset=utf-8 4.7787ms
+2026-06-26 16:49:08.605 +05:30 [INF] Route matched with {action = "GetCategories", controller = "Category"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[System.Collections.Generic.IEnumerable`1[OrderNKitchenMS_API.Models.DTOs.CategoryDto]]] GetCategories(System.Nullable`1[System.Boolean]) on controller OrderNKitchenMS_API.Controllers.CategoryController (OrderNKitchenMS-API).
+2026-06-26 16:49:08.606 +05:30 [INF] GetAllAsync called with isNonVeg: null
+2026-06-26 16:49:08.617 +05:30 [INF] Executed DbCommand (5ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT c."Id", c."CreatedAt", c."IsDeleted", c."IsNonVeg", c."Name", c."UpdatedAt"
+FROM "Categories" AS c
+WHERE NOT (c."IsDeleted")
+ORDER BY c."Name"
+2026-06-26 16:49:08.622 +05:30 [INF] GetAllAsync completed. Returned 8 categories.
+2026-06-26 16:49:08.623 +05:30 [INF] Executing OkObjectResult, writing value of type 'System.Linq.Enumerable+ListSelectIterator`2[[OrderNKitchenMS_API.Models.Entities.Category, OrderNKitchenMS-API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null],[OrderNKitchenMS_API.Models.DTOs.CategoryDto, OrderNKitchenMS-API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-26 16:49:08.624 +05:30 [INF] Executed action OrderNKitchenMS_API.Controllers.CategoryController.GetCategories (OrderNKitchenMS-API) in 18.7873ms
+2026-06-26 16:49:08.624 +05:30 [INF] Executed endpoint 'OrderNKitchenMS_API.Controllers.CategoryController.GetCategories (OrderNKitchenMS-API)'
+2026-06-26 16:49:08.624 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:5182/api/categories/ - 200 null application/json; charset=utf-8 26.5683ms
+2026-06-26 16:49:08.625 +05:30 [INF] Request starting HTTP/1.1 OPTIONS http://localhost:5182/api/menu/?pageSize=100 - null null
+2026-06-26 16:49:08.625 +05:30 [INF] CORS policy execution successful.
+2026-06-26 16:49:08.625 +05:30 [INF] Request finished HTTP/1.1 OPTIONS http://localhost:5182/api/menu/?pageSize=100 - 204 null null 0.1018ms
+2026-06-26 16:49:08.626 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5182/api/menu/?pageSize=100 - null null
+2026-06-26 16:49:08.626 +05:30 [INF] CORS policy execution successful.
+2026-06-26 16:49:08.626 +05:30 [INF] Executing endpoint 'OrderNKitchenMS_API.Controllers.MenuController.GetMenuItems (OrderNKitchenMS-API)'
+2026-06-26 16:49:08.632 +05:30 [INF] Route matched with {action = "GetMenuItems", controller = "Menu"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[System.Collections.Generic.IEnumerable`1[OrderNKitchenMS_API.Models.DTOs.MenuItemDto]]] GetMenuItems(OrderNKitchenMS_API.Models.DTOs.QueryMenuItemDto) on controller OrderNKitchenMS_API.Controllers.MenuController (OrderNKitchenMS-API).
+2026-06-26 16:49:08.637 +05:30 [INF] GetAllAsync called for menu items. CategoryId: null, Search: ''
+2026-06-26 16:49:08.650 +05:30 [INF] Executed DbCommand (2ms) [Parameters=[@p1='?' (DbType = Int32), @p='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT m0."Id", m0."CategoryId", m0."CreatedAt", m0."Description", m0."ImageUrl", m0."IsAvailable", m0."IsDeleted", m0."IsManuallyDisabled", m0."Name", m0."PreparationTime", m0."Price", m0."UpdatedAt", c."Id", c."CreatedAt", c."IsDeleted", c."IsNonVeg", c."Name", c."UpdatedAt"
+FROM (
+    SELECT m."Id", m."CategoryId", m."CreatedAt", m."Description", m."ImageUrl", m."IsAvailable", m."IsDeleted", m."IsManuallyDisabled", m."Name", m."PreparationTime", m."Price", m."UpdatedAt"
+    FROM "MenuItems" AS m
+    WHERE NOT (m."IsDeleted")
+    ORDER BY m."Name"
+    LIMIT @p1 OFFSET @p
+) AS m0
+INNER JOIN "Categories" AS c ON m0."CategoryId" = c."Id"
+ORDER BY m0."Name"
+2026-06-26 16:49:08.652 +05:30 [INF] GetAllAsync completed. Returned 6 menu items.
+2026-06-26 16:49:08.652 +05:30 [INF] Executing OkObjectResult, writing value of type 'System.Linq.Enumerable+ListSelectIterator`2[[OrderNKitchenMS_API.Models.Entities.MenuItem, OrderNKitchenMS-API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null],[OrderNKitchenMS_API.Models.DTOs.MenuItemDto, OrderNKitchenMS-API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-26 16:49:08.654 +05:30 [INF] Executed action OrderNKitchenMS_API.Controllers.MenuController.GetMenuItems (OrderNKitchenMS-API) in 22.0918ms
+2026-06-26 16:49:08.654 +05:30 [INF] Executed endpoint 'OrderNKitchenMS_API.Controllers.MenuController.GetMenuItems (OrderNKitchenMS-API)'
+2026-06-26 16:49:08.654 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:5182/api/menu/?pageSize=100 - 200 null application/json; charset=utf-8 28.5492ms
+2026-06-26 16:49:12.882 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5182/api/tables - null null
+2026-06-26 16:49:12.882 +05:30 [INF] Request starting HTTP/1.1 OPTIONS http://localhost:5182/api/orders/active - null null
+2026-06-26 16:49:12.883 +05:30 [INF] CORS policy execution successful.
+2026-06-26 16:49:12.883 +05:30 [INF] CORS policy execution successful.
+2026-06-26 16:49:12.883 +05:30 [INF] Request finished HTTP/1.1 OPTIONS http://localhost:5182/api/orders/active - 204 null null 0.7727ms
+2026-06-26 16:49:12.884 +05:30 [INF] Executing endpoint 'OrderNKitchenMS_API.Controllers.TableController.GetTables (OrderNKitchenMS-API)'
+2026-06-26 16:49:12.884 +05:30 [INF] Route matched with {action = "GetTables", controller = "Table"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[System.Collections.Generic.IEnumerable`1[OrderNKitchenMS_API.Models.DTOs.TableDto]]] GetTables() on controller OrderNKitchenMS_API.Controllers.TableController (OrderNKitchenMS-API).
+2026-06-26 16:49:12.886 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5182/api/orders/active - null null
+2026-06-26 16:49:12.886 +05:30 [INF] CORS policy execution successful.
+2026-06-26 16:49:12.886 +05:30 [INF] GetAllAsync called for tables
+2026-06-26 16:49:12.886 +05:30 [INF] Executing endpoint 'OrderNKitchenMS_API.Controllers.OrderController.GetActiveOrders (OrderNKitchenMS-API)'
+2026-06-26 16:49:12.887 +05:30 [INF] Route matched with {action = "GetActiveOrders", controller = "Order"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[System.Collections.Generic.IEnumerable`1[OrderNKitchenMS_API.Models.DTOs.OrderDto]]] GetActiveOrders() on controller OrderNKitchenMS_API.Controllers.OrderController (OrderNKitchenMS-API).
+2026-06-26 16:49:12.887 +05:30 [INF] GetActiveOrders requested
+2026-06-26 16:49:12.887 +05:30 [INF] GetActiveOrdersAsync called
+2026-06-26 16:49:12.888 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT t."Id", t."Capacity", t."CreatedAt", t."IsDeleted", t."Number", t."Status", t."UpdatedAt"
+FROM "Tables" AS t
+WHERE NOT (t."IsDeleted")
+ORDER BY t."Number"
+2026-06-26 16:49:12.889 +05:30 [INF] Executed DbCommand (0ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT o."Id", o."AssignedChefId", o."AssignedWaiterId", o."CompletedAt", o."CreatedAt", o."Status", o."TableId", o."TotalAmount", o."UpdatedAt"
+FROM "Orders" AS o
+WHERE o."Status" NOT IN (5, 6)
+2026-06-26 16:49:12.889 +05:30 [INF] Executing OkObjectResult, writing value of type 'System.Linq.Enumerable+ListSelectIterator`2[[OrderNKitchenMS_API.Models.Entities.Table, OrderNKitchenMS-API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null],[OrderNKitchenMS_API.Models.DTOs.TableDto, OrderNKitchenMS-API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-26 16:49:12.889 +05:30 [INF] Executed DbCommand (2ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT o."Id", o."AssignedChefId", o."AssignedWaiterId", o."CompletedAt", o."CreatedAt", o."Status", o."TableId", o."TotalAmount", o."UpdatedAt", t."Id", t."Capacity", t."CreatedAt", t."IsDeleted", t."Number", t."Status", t."UpdatedAt", u."Id", u."Address", u."CreatedAt", u."Email", u."IsDeleted", u."Name", u."PasswordHash", u."PhoneNumber", u."RoleId", u."UpdatedAt", u0."Id", u0."Address", u0."CreatedAt", u0."Email", u0."IsDeleted", u0."Name", u0."PasswordHash", u0."PhoneNumber", u0."RoleId", u0."UpdatedAt"
+FROM "Orders" AS o
+INNER JOIN "Tables" AS t ON o."TableId" = t."Id"
+LEFT JOIN "Users" AS u ON o."AssignedChefId" = u."Id"
+LEFT JOIN "Users" AS u0 ON o."AssignedWaiterId" = u0."Id"
+2026-06-26 16:49:12.889 +05:30 [INF] Executed action OrderNKitchenMS_API.Controllers.TableController.GetTables (OrderNKitchenMS-API) in 5.1145ms
+2026-06-26 16:49:12.889 +05:30 [INF] Executed endpoint 'OrderNKitchenMS_API.Controllers.TableController.GetTables (OrderNKitchenMS-API)'
+2026-06-26 16:49:12.890 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:5182/api/tables - 200 null application/json; charset=utf-8 7.4484ms
+2026-06-26 16:49:12.892 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[@orderId='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT o."Id", o."CreatedAt", o."MenuItemId", o."Notes", o."OrderId", o."Quantity", o."UnitPrice", o."UpdatedAt", m."Id", m."CategoryId", m."CreatedAt", m."Description", m."ImageUrl", m."IsAvailable", m."IsDeleted", m."IsManuallyDisabled", m."Name", m."PreparationTime", m."Price", m."UpdatedAt"
+FROM "OrderItems" AS o
+INNER JOIN "MenuItems" AS m ON o."MenuItemId" = m."Id"
+WHERE o."OrderId" = @orderId
+2026-06-26 16:49:12.893 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[@menuItemIds='?' (DbType = Object)], CommandType='"Text"', CommandTimeout='30']
+SELECT max(m."PreparationTime")
+FROM "MenuItems" AS m
+WHERE m."Id" = ANY (@menuItemIds) AND NOT (m."IsDeleted")
+2026-06-26 16:49:12.894 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[@excludeOrderId='?' (DbType = Int32), @createdAt='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT count(*)::int
+FROM "Orders" AS o
+WHERE o."Status" IN (1, 2) AND o."Id" <> @excludeOrderId AND o."CreatedAt" < @createdAt
+2026-06-26 16:49:12.895 +05:30 [INF] Executed DbCommand (0ms) [Parameters=[@orderId='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT o."Id", o."CreatedAt", o."MenuItemId", o."Notes", o."OrderId", o."Quantity", o."UnitPrice", o."UpdatedAt", m."Id", m."CategoryId", m."CreatedAt", m."Description", m."ImageUrl", m."IsAvailable", m."IsDeleted", m."IsManuallyDisabled", m."Name", m."PreparationTime", m."Price", m."UpdatedAt"
+FROM "OrderItems" AS o
+INNER JOIN "MenuItems" AS m ON o."MenuItemId" = m."Id"
+WHERE o."OrderId" = @orderId
+2026-06-26 16:49:12.896 +05:30 [INF] Executed DbCommand (0ms) [Parameters=[@menuItemIds='?' (DbType = Object)], CommandType='"Text"', CommandTimeout='30']
+SELECT max(m."PreparationTime")
+FROM "MenuItems" AS m
+WHERE m."Id" = ANY (@menuItemIds) AND NOT (m."IsDeleted")
+2026-06-26 16:49:12.896 +05:30 [INF] Executed DbCommand (0ms) [Parameters=[@excludeOrderId='?' (DbType = Int32), @createdAt='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT count(*)::int
+FROM "Orders" AS o
+WHERE o."Status" IN (1, 2) AND o."Id" <> @excludeOrderId AND o."CreatedAt" < @createdAt
+2026-06-26 16:49:12.897 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[@orderId='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT o."Id", o."CreatedAt", o."MenuItemId", o."Notes", o."OrderId", o."Quantity", o."UnitPrice", o."UpdatedAt", m."Id", m."CategoryId", m."CreatedAt", m."Description", m."ImageUrl", m."IsAvailable", m."IsDeleted", m."IsManuallyDisabled", m."Name", m."PreparationTime", m."Price", m."UpdatedAt"
+FROM "OrderItems" AS o
+INNER JOIN "MenuItems" AS m ON o."MenuItemId" = m."Id"
+WHERE o."OrderId" = @orderId
+2026-06-26 16:49:12.898 +05:30 [INF] Executed DbCommand (0ms) [Parameters=[@menuItemIds='?' (DbType = Object)], CommandType='"Text"', CommandTimeout='30']
+SELECT max(m."PreparationTime")
+FROM "MenuItems" AS m
+WHERE m."Id" = ANY (@menuItemIds) AND NOT (m."IsDeleted")
+2026-06-26 16:49:12.898 +05:30 [INF] Executed DbCommand (0ms) [Parameters=[@excludeOrderId='?' (DbType = Int32), @createdAt='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT count(*)::int
+FROM "Orders" AS o
+WHERE o."Status" IN (1, 2) AND o."Id" <> @excludeOrderId AND o."CreatedAt" < @createdAt
+2026-06-26 16:49:12.899 +05:30 [INF] GetActiveOrders completed. Returned 3 active orders.
+2026-06-26 16:49:12.899 +05:30 [INF] Executing OkObjectResult, writing value of type 'System.Collections.Generic.List`1[[OrderNKitchenMS_API.Models.DTOs.OrderDto, OrderNKitchenMS-API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-26 16:49:12.899 +05:30 [INF] Executed action OrderNKitchenMS_API.Controllers.OrderController.GetActiveOrders (OrderNKitchenMS-API) in 12.0943ms
+2026-06-26 16:49:12.899 +05:30 [INF] Executed endpoint 'OrderNKitchenMS_API.Controllers.OrderController.GetActiveOrders (OrderNKitchenMS-API)'
+2026-06-26 16:49:12.899 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:5182/api/orders/active - 200 null application/json; charset=utf-8 13.0468ms
+2026-06-26 17:00:21.614 +05:30 [INF] Connection id "0HNMJEI5RBRET", Request id "0HNMJEI5RBRET:00000001": the application aborted the connection.
+2026-06-26 17:00:21.617 +05:30 [INF] Request starting HTTP/1.1 OPTIONS http://localhost:5182/restaurantHub/negotiate?negotiateVersion=1 - null null
+2026-06-26 17:00:21.617 +05:30 [INF] CORS policy execution successful.
+2026-06-26 17:00:21.617 +05:30 [INF] Request finished HTTP/1.1 OPTIONS http://localhost:5182/restaurantHub/negotiate?negotiateVersion=1 - 204 null null 0.3317ms
+2026-06-26 17:00:21.618 +05:30 [INF] Request starting HTTP/1.1 POST http://localhost:5182/restaurantHub/negotiate?negotiateVersion=1 - null 0
+2026-06-26 17:00:21.619 +05:30 [INF] CORS policy execution successful.
+2026-06-26 17:00:21.619 +05:30 [INF] Executing endpoint '/restaurantHub/negotiate'
+2026-06-26 17:00:21.619 +05:30 [INF] Executed endpoint '/restaurantHub'
+2026-06-26 17:00:21.619 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:5182/restaurantHub?id=bR8pWaE2N7lebpXeK4Ci0A&access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjMiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiU2FydmVzaCIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL2VtYWlsYWRkcmVzcyI6InNhcnZlc2gzQGdtYWlsLmNvbSIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IldhaXRlciIsIlNlc3Npb25UeXBlIjoiVXNlciIsImV4cCI6MTc4MjQ3NjI2NSwiaXNzIjoiQW1icm9zaWFPcmRlclN5c3RlbXMiLCJhdWQiOiJBbWJyb3NpYU9yZGVyU3lzdGVtc1VzZXJzIn0.4_UqFQ26AVUMEisUmM4SKI-eyL7hRy0xy3Kk01XJW-w - 101 null null 756047.1727ms
+2026-06-26 17:00:21.619 +05:30 [INF] Executed endpoint '/restaurantHub/negotiate'
+2026-06-26 17:00:21.620 +05:30 [INF] Request finished HTTP/1.1 POST http://localhost:5182/restaurantHub/negotiate?negotiateVersion=1 - 200 316 application/json 1.9105ms
+2026-06-26 17:00:21.622 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5182/restaurantHub?id=l5pReTnkz9580FzjF_Fx9w&access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjMiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiU2FydmVzaCIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL2VtYWlsYWRkcmVzcyI6InNhcnZlc2gzQGdtYWlsLmNvbSIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IldhaXRlciIsIlNlc3Npb25UeXBlIjoiVXNlciIsImV4cCI6MTc4MjQ3NjI2NSwiaXNzIjoiQW1icm9zaWFPcmRlclN5c3RlbXMiLCJhdWQiOiJBbWJyb3NpYU9yZGVyU3lzdGVtc1VzZXJzIn0.4_UqFQ26AVUMEisUmM4SKI-eyL7hRy0xy3Kk01XJW-w - null null
+2026-06-26 17:00:21.622 +05:30 [INF] CORS policy execution successful.
+2026-06-26 17:00:21.622 +05:30 [INF] Executing endpoint '/restaurantHub'
+2026-06-26 17:00:21.627 +05:30 [INF] SignalR client connecting. ConnectionId: Jhy4P60cDasIOiMBrsmjcQ
+2026-06-26 17:00:21.628 +05:30 [INF] Client authenticated. SessionType: User, ConnectionId: Jhy4P60cDasIOiMBrsmjcQ
+2026-06-26 17:00:21.628 +05:30 [INF] Staff client connected. Role: Waiter, ConnectionId: Jhy4P60cDasIOiMBrsmjcQ
+2026-06-26 17:00:21.628 +05:30 [INF] Waiter assigned to group: waiter-3 (ConnectionId: Jhy4P60cDasIOiMBrsmjcQ)
+2026-06-26 17:00:21.642 +05:30 [INF] Executed endpoint '/restaurantHub'
+2026-06-26 17:00:21.642 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:5182/restaurantHub?id=l5pReTnkz9580FzjF_Fx9w&access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjMiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiU2FydmVzaCIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL2VtYWlsYWRkcmVzcyI6InNhcnZlc2gzQGdtYWlsLmNvbSIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IldhaXRlciIsIlNlc3Npb25UeXBlIjoiVXNlciIsImV4cCI6MTc4MjQ3NjI2NSwiaXNzIjoiQW1icm9zaWFPcmRlclN5c3RlbXMiLCJhdWQiOiJBbWJyb3NpYU9yZGVyU3lzdGVtc1VzZXJzIn0.4_UqFQ26AVUMEisUmM4SKI-eyL7hRy0xy3Kk01XJW-w - 101 null null 20.6947ms
+2026-06-26 17:00:21.749 +05:30 [INF] Request starting HTTP/1.1 OPTIONS http://localhost:5182/api/orders/active - null null
+2026-06-26 17:00:21.749 +05:30 [INF] CORS policy execution successful.
+2026-06-26 17:00:21.749 +05:30 [INF] Request finished HTTP/1.1 OPTIONS http://localhost:5182/api/orders/active - 204 null null 0.2909ms
+2026-06-26 17:00:21.749 +05:30 [INF] Request starting HTTP/1.1 OPTIONS http://localhost:5182/restaurantHub/negotiate?negotiateVersion=1 - null null
+2026-06-26 17:00:21.749 +05:30 [INF] CORS policy execution successful.
+2026-06-26 17:00:21.749 +05:30 [INF] Request finished HTTP/1.1 OPTIONS http://localhost:5182/restaurantHub/negotiate?negotiateVersion=1 - 204 null null 0.272ms
+2026-06-26 17:00:21.750 +05:30 [INF] Request starting HTTP/1.1 OPTIONS http://localhost:5182/api/tables - null null
+2026-06-26 17:00:21.750 +05:30 [INF] CORS policy execution successful.
+2026-06-26 17:00:21.750 +05:30 [INF] Request finished HTTP/1.1 OPTIONS http://localhost:5182/api/tables - 204 null null 0.0636ms
+2026-06-26 17:00:21.752 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5182/api/orders/active - null null
+2026-06-26 17:00:21.752 +05:30 [INF] Request starting HTTP/1.1 POST http://localhost:5182/restaurantHub/negotiate?negotiateVersion=1 - null 0
+2026-06-26 17:00:21.752 +05:30 [INF] CORS policy execution successful.
+2026-06-26 17:00:21.752 +05:30 [INF] CORS policy execution successful.
+2026-06-26 17:00:21.752 +05:30 [INF] Executing endpoint '/restaurantHub/negotiate'
+2026-06-26 17:00:21.752 +05:30 [INF] Executed endpoint '/restaurantHub/negotiate'
+2026-06-26 17:00:21.752 +05:30 [INF] Request finished HTTP/1.1 POST http://localhost:5182/restaurantHub/negotiate?negotiateVersion=1 - 200 316 application/json 0.4065ms
+2026-06-26 17:00:21.752 +05:30 [INF] Executing endpoint 'OrderNKitchenMS_API.Controllers.OrderController.GetActiveOrders (OrderNKitchenMS-API)'
+2026-06-26 17:00:21.752 +05:30 [INF] Route matched with {action = "GetActiveOrders", controller = "Order"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[System.Collections.Generic.IEnumerable`1[OrderNKitchenMS_API.Models.DTOs.OrderDto]]] GetActiveOrders() on controller OrderNKitchenMS_API.Controllers.OrderController (OrderNKitchenMS-API).
+2026-06-26 17:00:21.752 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5182/api/tables - null null
+2026-06-26 17:00:21.753 +05:30 [INF] CORS policy execution successful.
+2026-06-26 17:00:21.754 +05:30 [INF] Executing endpoint 'OrderNKitchenMS_API.Controllers.TableController.GetTables (OrderNKitchenMS-API)'
+2026-06-26 17:00:21.754 +05:30 [INF] Route matched with {action = "GetTables", controller = "Table"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[System.Collections.Generic.IEnumerable`1[OrderNKitchenMS_API.Models.DTOs.TableDto]]] GetTables() on controller OrderNKitchenMS_API.Controllers.TableController (OrderNKitchenMS-API).
+2026-06-26 17:00:21.755 +05:30 [INF] GetAllAsync called for tables
+2026-06-26 17:00:21.755 +05:30 [INF] GetActiveOrders requested
+2026-06-26 17:00:21.755 +05:30 [INF] GetActiveOrdersAsync called
+2026-06-26 17:00:21.756 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5182/restaurantHub?id=Y-roLv5VVGkVJCXcB8cuZA&access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjMiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiU2FydmVzaCIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL2VtYWlsYWRkcmVzcyI6InNhcnZlc2gzQGdtYWlsLmNvbSIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IldhaXRlciIsIlNlc3Npb25UeXBlIjoiVXNlciIsImV4cCI6MTc4MjQ3NjI2NSwiaXNzIjoiQW1icm9zaWFPcmRlclN5c3RlbXMiLCJhdWQiOiJBbWJyb3NpYU9yZGVyU3lzdGVtc1VzZXJzIn0.4_UqFQ26AVUMEisUmM4SKI-eyL7hRy0xy3Kk01XJW-w - null null
+2026-06-26 17:00:21.756 +05:30 [INF] CORS policy execution successful.
+2026-06-26 17:00:21.757 +05:30 [INF] Executing endpoint '/restaurantHub'
+2026-06-26 17:00:21.767 +05:30 [INF] SignalR client connecting. ConnectionId: U7IPaM6cFHecnMEE-1qy-g
+2026-06-26 17:00:21.767 +05:30 [INF] Client authenticated. SessionType: User, ConnectionId: U7IPaM6cFHecnMEE-1qy-g
+2026-06-26 17:00:21.767 +05:30 [INF] Staff client connected. Role: Waiter, ConnectionId: U7IPaM6cFHecnMEE-1qy-g
+2026-06-26 17:00:21.767 +05:30 [INF] Waiter assigned to group: waiter-3 (ConnectionId: U7IPaM6cFHecnMEE-1qy-g)
+2026-06-26 17:00:21.775 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT t."Id", t."Capacity", t."CreatedAt", t."IsDeleted", t."Number", t."Status", t."UpdatedAt"
+FROM "Tables" AS t
+WHERE NOT (t."IsDeleted")
+ORDER BY t."Number"
+2026-06-26 17:00:21.777 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT o."Id", o."AssignedChefId", o."AssignedWaiterId", o."CompletedAt", o."CreatedAt", o."Status", o."TableId", o."TotalAmount", o."UpdatedAt"
+FROM "Orders" AS o
+WHERE o."Status" NOT IN (5, 6)
+2026-06-26 17:00:21.777 +05:30 [INF] Executing OkObjectResult, writing value of type 'System.Linq.Enumerable+ListSelectIterator`2[[OrderNKitchenMS_API.Models.Entities.Table, OrderNKitchenMS-API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null],[OrderNKitchenMS_API.Models.DTOs.TableDto, OrderNKitchenMS-API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-26 17:00:21.777 +05:30 [INF] Executed action OrderNKitchenMS_API.Controllers.TableController.GetTables (OrderNKitchenMS-API) in 23.5041ms
+2026-06-26 17:00:21.777 +05:30 [INF] Executed endpoint 'OrderNKitchenMS_API.Controllers.TableController.GetTables (OrderNKitchenMS-API)'
+2026-06-26 17:00:21.777 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:5182/api/tables - 200 null application/json; charset=utf-8 25.43ms
+2026-06-26 17:00:21.778 +05:30 [INF] Executed DbCommand (4ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT o."Id", o."AssignedChefId", o."AssignedWaiterId", o."CompletedAt", o."CreatedAt", o."Status", o."TableId", o."TotalAmount", o."UpdatedAt", t."Id", t."Capacity", t."CreatedAt", t."IsDeleted", t."Number", t."Status", t."UpdatedAt", u."Id", u."Address", u."CreatedAt", u."Email", u."IsDeleted", u."Name", u."PasswordHash", u."PhoneNumber", u."RoleId", u."UpdatedAt", u0."Id", u0."Address", u0."CreatedAt", u0."Email", u0."IsDeleted", u0."Name", u0."PasswordHash", u0."PhoneNumber", u0."RoleId", u0."UpdatedAt"
+FROM "Orders" AS o
+INNER JOIN "Tables" AS t ON o."TableId" = t."Id"
+LEFT JOIN "Users" AS u ON o."AssignedChefId" = u."Id"
+LEFT JOIN "Users" AS u0 ON o."AssignedWaiterId" = u0."Id"
+2026-06-26 17:00:21.780 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[@orderId='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT o."Id", o."CreatedAt", o."MenuItemId", o."Notes", o."OrderId", o."Quantity", o."UnitPrice", o."UpdatedAt", m."Id", m."CategoryId", m."CreatedAt", m."Description", m."ImageUrl", m."IsAvailable", m."IsDeleted", m."IsManuallyDisabled", m."Name", m."PreparationTime", m."Price", m."UpdatedAt"
+FROM "OrderItems" AS o
+INNER JOIN "MenuItems" AS m ON o."MenuItemId" = m."Id"
+WHERE o."OrderId" = @orderId
+2026-06-26 17:00:21.782 +05:30 [INF] Executed DbCommand (2ms) [Parameters=[@menuItemIds='?' (DbType = Object)], CommandType='"Text"', CommandTimeout='30']
+SELECT max(m."PreparationTime")
+FROM "MenuItems" AS m
+WHERE m."Id" = ANY (@menuItemIds) AND NOT (m."IsDeleted")
+2026-06-26 17:00:21.784 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[@excludeOrderId='?' (DbType = Int32), @createdAt='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT count(*)::int
+FROM "Orders" AS o
+WHERE o."Status" IN (1, 2) AND o."Id" <> @excludeOrderId AND o."CreatedAt" < @createdAt
+2026-06-26 17:00:21.794 +05:30 [INF] Executed DbCommand (10ms) [Parameters=[@orderId='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT o."Id", o."CreatedAt", o."MenuItemId", o."Notes", o."OrderId", o."Quantity", o."UnitPrice", o."UpdatedAt", m."Id", m."CategoryId", m."CreatedAt", m."Description", m."ImageUrl", m."IsAvailable", m."IsDeleted", m."IsManuallyDisabled", m."Name", m."PreparationTime", m."Price", m."UpdatedAt"
+FROM "OrderItems" AS o
+INNER JOIN "MenuItems" AS m ON o."MenuItemId" = m."Id"
+WHERE o."OrderId" = @orderId
+2026-06-26 17:00:21.795 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[@menuItemIds='?' (DbType = Object)], CommandType='"Text"', CommandTimeout='30']
+SELECT max(m."PreparationTime")
+FROM "MenuItems" AS m
+WHERE m."Id" = ANY (@menuItemIds) AND NOT (m."IsDeleted")
+2026-06-26 17:00:21.796 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[@excludeOrderId='?' (DbType = Int32), @createdAt='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT count(*)::int
+FROM "Orders" AS o
+WHERE o."Status" IN (1, 2) AND o."Id" <> @excludeOrderId AND o."CreatedAt" < @createdAt
+2026-06-26 17:00:21.796 +05:30 [INF] Executed DbCommand (0ms) [Parameters=[@orderId='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT o."Id", o."CreatedAt", o."MenuItemId", o."Notes", o."OrderId", o."Quantity", o."UnitPrice", o."UpdatedAt", m."Id", m."CategoryId", m."CreatedAt", m."Description", m."ImageUrl", m."IsAvailable", m."IsDeleted", m."IsManuallyDisabled", m."Name", m."PreparationTime", m."Price", m."UpdatedAt"
+FROM "OrderItems" AS o
+INNER JOIN "MenuItems" AS m ON o."MenuItemId" = m."Id"
+WHERE o."OrderId" = @orderId
+2026-06-26 17:00:21.797 +05:30 [INF] Executed DbCommand (0ms) [Parameters=[@menuItemIds='?' (DbType = Object)], CommandType='"Text"', CommandTimeout='30']
+SELECT max(m."PreparationTime")
+FROM "MenuItems" AS m
+WHERE m."Id" = ANY (@menuItemIds) AND NOT (m."IsDeleted")
+2026-06-26 17:00:21.797 +05:30 [INF] Executed DbCommand (0ms) [Parameters=[@excludeOrderId='?' (DbType = Int32), @createdAt='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT count(*)::int
+FROM "Orders" AS o
+WHERE o."Status" IN (1, 2) AND o."Id" <> @excludeOrderId AND o."CreatedAt" < @createdAt
+2026-06-26 17:00:21.797 +05:30 [INF] GetActiveOrders completed. Returned 3 active orders.
+2026-06-26 17:00:21.798 +05:30 [INF] Executing OkObjectResult, writing value of type 'System.Collections.Generic.List`1[[OrderNKitchenMS_API.Models.DTOs.OrderDto, OrderNKitchenMS-API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-26 17:00:21.798 +05:30 [INF] Executed action OrderNKitchenMS_API.Controllers.OrderController.GetActiveOrders (OrderNKitchenMS-API) in 45.2311ms
+2026-06-26 17:00:21.798 +05:30 [INF] Executed endpoint 'OrderNKitchenMS_API.Controllers.OrderController.GetActiveOrders (OrderNKitchenMS-API)'
+2026-06-26 17:00:21.798 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:5182/api/orders/active - 200 null application/json; charset=utf-8 45.8496ms
+2026-06-26 17:00:22.116 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5182/api/orders/active - null null
+2026-06-26 17:00:22.117 +05:30 [INF] CORS policy execution successful.
+2026-06-26 17:00:22.117 +05:30 [INF] Executing endpoint 'OrderNKitchenMS_API.Controllers.OrderController.GetActiveOrders (OrderNKitchenMS-API)'
+2026-06-26 17:00:22.117 +05:30 [INF] Route matched with {action = "GetActiveOrders", controller = "Order"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[System.Collections.Generic.IEnumerable`1[OrderNKitchenMS_API.Models.DTOs.OrderDto]]] GetActiveOrders() on controller OrderNKitchenMS_API.Controllers.OrderController (OrderNKitchenMS-API).
+2026-06-26 17:00:22.117 +05:30 [INF] GetActiveOrders requested
+2026-06-26 17:00:22.117 +05:30 [INF] GetActiveOrdersAsync called
+2026-06-26 17:00:22.119 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT o."Id", o."AssignedChefId", o."AssignedWaiterId", o."CompletedAt", o."CreatedAt", o."Status", o."TableId", o."TotalAmount", o."UpdatedAt", t."Id", t."Capacity", t."CreatedAt", t."IsDeleted", t."Number", t."Status", t."UpdatedAt", u."Id", u."Address", u."CreatedAt", u."Email", u."IsDeleted", u."Name", u."PasswordHash", u."PhoneNumber", u."RoleId", u."UpdatedAt", u0."Id", u0."Address", u0."CreatedAt", u0."Email", u0."IsDeleted", u0."Name", u0."PasswordHash", u0."PhoneNumber", u0."RoleId", u0."UpdatedAt"
+FROM "Orders" AS o
+INNER JOIN "Tables" AS t ON o."TableId" = t."Id"
+LEFT JOIN "Users" AS u ON o."AssignedChefId" = u."Id"
+LEFT JOIN "Users" AS u0 ON o."AssignedWaiterId" = u0."Id"
+2026-06-26 17:00:22.120 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[@orderId='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT o."Id", o."CreatedAt", o."MenuItemId", o."Notes", o."OrderId", o."Quantity", o."UnitPrice", o."UpdatedAt", m."Id", m."CategoryId", m."CreatedAt", m."Description", m."ImageUrl", m."IsAvailable", m."IsDeleted", m."IsManuallyDisabled", m."Name", m."PreparationTime", m."Price", m."UpdatedAt"
+FROM "OrderItems" AS o
+INNER JOIN "MenuItems" AS m ON o."MenuItemId" = m."Id"
+WHERE o."OrderId" = @orderId
+2026-06-26 17:00:22.120 +05:30 [INF] Executed DbCommand (0ms) [Parameters=[@menuItemIds='?' (DbType = Object)], CommandType='"Text"', CommandTimeout='30']
+SELECT max(m."PreparationTime")
+FROM "MenuItems" AS m
+WHERE m."Id" = ANY (@menuItemIds) AND NOT (m."IsDeleted")
+2026-06-26 17:00:22.121 +05:30 [INF] Executed DbCommand (0ms) [Parameters=[@excludeOrderId='?' (DbType = Int32), @createdAt='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT count(*)::int
+FROM "Orders" AS o
+WHERE o."Status" IN (1, 2) AND o."Id" <> @excludeOrderId AND o."CreatedAt" < @createdAt
+2026-06-26 17:00:22.121 +05:30 [INF] Executed DbCommand (0ms) [Parameters=[@orderId='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT o."Id", o."CreatedAt", o."MenuItemId", o."Notes", o."OrderId", o."Quantity", o."UnitPrice", o."UpdatedAt", m."Id", m."CategoryId", m."CreatedAt", m."Description", m."ImageUrl", m."IsAvailable", m."IsDeleted", m."IsManuallyDisabled", m."Name", m."PreparationTime", m."Price", m."UpdatedAt"
+FROM "OrderItems" AS o
+INNER JOIN "MenuItems" AS m ON o."MenuItemId" = m."Id"
+WHERE o."OrderId" = @orderId
+2026-06-26 17:00:22.122 +05:30 [INF] Executed DbCommand (0ms) [Parameters=[@menuItemIds='?' (DbType = Object)], CommandType='"Text"', CommandTimeout='30']
+SELECT max(m."PreparationTime")
+FROM "MenuItems" AS m
+WHERE m."Id" = ANY (@menuItemIds) AND NOT (m."IsDeleted")
+2026-06-26 17:00:22.122 +05:30 [INF] Executed DbCommand (0ms) [Parameters=[@excludeOrderId='?' (DbType = Int32), @createdAt='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT count(*)::int
+FROM "Orders" AS o
+WHERE o."Status" IN (1, 2) AND o."Id" <> @excludeOrderId AND o."CreatedAt" < @createdAt
+2026-06-26 17:00:22.123 +05:30 [INF] Executed DbCommand (0ms) [Parameters=[@orderId='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT o."Id", o."CreatedAt", o."MenuItemId", o."Notes", o."OrderId", o."Quantity", o."UnitPrice", o."UpdatedAt", m."Id", m."CategoryId", m."CreatedAt", m."Description", m."ImageUrl", m."IsAvailable", m."IsDeleted", m."IsManuallyDisabled", m."Name", m."PreparationTime", m."Price", m."UpdatedAt"
+FROM "OrderItems" AS o
+INNER JOIN "MenuItems" AS m ON o."MenuItemId" = m."Id"
+WHERE o."OrderId" = @orderId
+2026-06-26 17:00:22.123 +05:30 [INF] Executed DbCommand (0ms) [Parameters=[@menuItemIds='?' (DbType = Object)], CommandType='"Text"', CommandTimeout='30']
+SELECT max(m."PreparationTime")
+FROM "MenuItems" AS m
+WHERE m."Id" = ANY (@menuItemIds) AND NOT (m."IsDeleted")
+2026-06-26 17:00:22.124 +05:30 [INF] Executed DbCommand (0ms) [Parameters=[@excludeOrderId='?' (DbType = Int32), @createdAt='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT count(*)::int
+FROM "Orders" AS o
+WHERE o."Status" IN (1, 2) AND o."Id" <> @excludeOrderId AND o."CreatedAt" < @createdAt
+2026-06-26 17:00:22.124 +05:30 [INF] GetActiveOrders completed. Returned 3 active orders.
+2026-06-26 17:00:22.124 +05:30 [INF] Executing OkObjectResult, writing value of type 'System.Collections.Generic.List`1[[OrderNKitchenMS_API.Models.DTOs.OrderDto, OrderNKitchenMS-API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-26 17:00:22.124 +05:30 [INF] Executed action OrderNKitchenMS_API.Controllers.OrderController.GetActiveOrders (OrderNKitchenMS-API) in 7.1075ms
+2026-06-26 17:00:22.124 +05:30 [INF] Executed endpoint 'OrderNKitchenMS_API.Controllers.OrderController.GetActiveOrders (OrderNKitchenMS-API)'
+2026-06-26 17:00:22.124 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:5182/api/orders/active - 200 null application/json; charset=utf-8 7.6244ms
+2026-06-26 17:00:22.138 +05:30 [INF] Request starting HTTP/1.1 OPTIONS http://localhost:5182/restaurantHub/negotiate?negotiateVersion=1 - null null
+2026-06-26 17:00:22.138 +05:30 [INF] CORS policy execution successful.
+2026-06-26 17:00:22.138 +05:30 [INF] Request finished HTTP/1.1 OPTIONS http://localhost:5182/restaurantHub/negotiate?negotiateVersion=1 - 204 null null 0.1947ms
+2026-06-26 17:00:22.139 +05:30 [INF] Request starting HTTP/1.1 POST http://localhost:5182/restaurantHub/negotiate?negotiateVersion=1 - null 0
+2026-06-26 17:00:22.139 +05:30 [INF] CORS policy execution successful.
+2026-06-26 17:00:22.139 +05:30 [INF] Executing endpoint '/restaurantHub/negotiate'
+2026-06-26 17:00:22.139 +05:30 [INF] Executed endpoint '/restaurantHub/negotiate'
+2026-06-26 17:00:22.139 +05:30 [INF] Request finished HTTP/1.1 POST http://localhost:5182/restaurantHub/negotiate?negotiateVersion=1 - 200 316 application/json 0.2974ms
+2026-06-26 17:00:22.155 +05:30 [INF] Request starting HTTP/1.1 OPTIONS http://localhost:5182/api/menu/?pageSize=100 - null null
+2026-06-26 17:00:22.155 +05:30 [INF] CORS policy execution successful.
+2026-06-26 17:00:22.155 +05:30 [INF] Request finished HTTP/1.1 OPTIONS http://localhost:5182/api/menu/?pageSize=100 - 204 null null 0.1233ms
+2026-06-26 17:00:22.155 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5182/api/menu/?pageSize=100 - null null
+2026-06-26 17:00:22.155 +05:30 [INF] CORS policy execution successful.
+2026-06-26 17:00:22.156 +05:30 [INF] Executing endpoint 'OrderNKitchenMS_API.Controllers.MenuController.GetMenuItems (OrderNKitchenMS-API)'
+2026-06-26 17:00:22.156 +05:30 [INF] Route matched with {action = "GetMenuItems", controller = "Menu"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[System.Collections.Generic.IEnumerable`1[OrderNKitchenMS_API.Models.DTOs.MenuItemDto]]] GetMenuItems(OrderNKitchenMS_API.Models.DTOs.QueryMenuItemDto) on controller OrderNKitchenMS_API.Controllers.MenuController (OrderNKitchenMS-API).
+2026-06-26 17:00:22.157 +05:30 [INF] GetAllAsync called for menu items. CategoryId: null, Search: ''
+2026-06-26 17:00:22.159 +05:30 [INF] Executed DbCommand (2ms) [Parameters=[@p1='?' (DbType = Int32), @p='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT m0."Id", m0."CategoryId", m0."CreatedAt", m0."Description", m0."ImageUrl", m0."IsAvailable", m0."IsDeleted", m0."IsManuallyDisabled", m0."Name", m0."PreparationTime", m0."Price", m0."UpdatedAt", c."Id", c."CreatedAt", c."IsDeleted", c."IsNonVeg", c."Name", c."UpdatedAt"
+FROM (
+    SELECT m."Id", m."CategoryId", m."CreatedAt", m."Description", m."ImageUrl", m."IsAvailable", m."IsDeleted", m."IsManuallyDisabled", m."Name", m."PreparationTime", m."Price", m."UpdatedAt"
+    FROM "MenuItems" AS m
+    WHERE NOT (m."IsDeleted")
+    ORDER BY m."Name"
+    LIMIT @p1 OFFSET @p
+) AS m0
+INNER JOIN "Categories" AS c ON m0."CategoryId" = c."Id"
+ORDER BY m0."Name"
+2026-06-26 17:00:22.159 +05:30 [INF] GetAllAsync completed. Returned 6 menu items.
+2026-06-26 17:00:22.159 +05:30 [INF] Executing OkObjectResult, writing value of type 'System.Linq.Enumerable+ListSelectIterator`2[[OrderNKitchenMS_API.Models.Entities.MenuItem, OrderNKitchenMS-API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null],[OrderNKitchenMS_API.Models.DTOs.MenuItemDto, OrderNKitchenMS-API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-26 17:00:22.159 +05:30 [INF] Executed action OrderNKitchenMS_API.Controllers.MenuController.GetMenuItems (OrderNKitchenMS-API) in 3.3655ms
+2026-06-26 17:00:22.159 +05:30 [INF] Executed endpoint 'OrderNKitchenMS_API.Controllers.MenuController.GetMenuItems (OrderNKitchenMS-API)'
+2026-06-26 17:00:22.159 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:5182/api/menu/?pageSize=100 - 200 null application/json; charset=utf-8 3.7313ms
+2026-06-26 17:00:22.190 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5182/api/menu/?pageSize=100 - null null
+2026-06-26 17:00:22.190 +05:30 [INF] CORS policy execution successful.
+2026-06-26 17:00:22.190 +05:30 [INF] Executing endpoint 'OrderNKitchenMS_API.Controllers.MenuController.GetMenuItems (OrderNKitchenMS-API)'
+2026-06-26 17:00:22.190 +05:30 [INF] Route matched with {action = "GetMenuItems", controller = "Menu"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[System.Collections.Generic.IEnumerable`1[OrderNKitchenMS_API.Models.DTOs.MenuItemDto]]] GetMenuItems(OrderNKitchenMS_API.Models.DTOs.QueryMenuItemDto) on controller OrderNKitchenMS_API.Controllers.MenuController (OrderNKitchenMS-API).
+2026-06-26 17:00:22.192 +05:30 [INF] GetAllAsync called for menu items. CategoryId: null, Search: ''
+2026-06-26 17:00:22.194 +05:30 [INF] Executed DbCommand (2ms) [Parameters=[@p1='?' (DbType = Int32), @p='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT m0."Id", m0."CategoryId", m0."CreatedAt", m0."Description", m0."ImageUrl", m0."IsAvailable", m0."IsDeleted", m0."IsManuallyDisabled", m0."Name", m0."PreparationTime", m0."Price", m0."UpdatedAt", c."Id", c."CreatedAt", c."IsDeleted", c."IsNonVeg", c."Name", c."UpdatedAt"
+FROM (
+    SELECT m."Id", m."CategoryId", m."CreatedAt", m."Description", m."ImageUrl", m."IsAvailable", m."IsDeleted", m."IsManuallyDisabled", m."Name", m."PreparationTime", m."Price", m."UpdatedAt"
+    FROM "MenuItems" AS m
+    WHERE NOT (m."IsDeleted")
+    ORDER BY m."Name"
+    LIMIT @p1 OFFSET @p
+) AS m0
+INNER JOIN "Categories" AS c ON m0."CategoryId" = c."Id"
+ORDER BY m0."Name"
+2026-06-26 17:00:22.194 +05:30 [INF] GetAllAsync completed. Returned 6 menu items.
+2026-06-26 17:00:22.194 +05:30 [INF] Executing OkObjectResult, writing value of type 'System.Linq.Enumerable+ListSelectIterator`2[[OrderNKitchenMS_API.Models.Entities.MenuItem, OrderNKitchenMS-API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null],[OrderNKitchenMS_API.Models.DTOs.MenuItemDto, OrderNKitchenMS-API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-26 17:00:22.194 +05:30 [INF] Executed action OrderNKitchenMS_API.Controllers.MenuController.GetMenuItems (OrderNKitchenMS-API) in 3.7127ms
+2026-06-26 17:00:22.194 +05:30 [INF] Executed endpoint 'OrderNKitchenMS_API.Controllers.MenuController.GetMenuItems (OrderNKitchenMS-API)'
+2026-06-26 17:00:22.194 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:5182/api/menu/?pageSize=100 - 200 null application/json; charset=utf-8 4.1486ms
+2026-06-26 17:00:22.215 +05:30 [INF] Request starting HTTP/1.1 OPTIONS http://localhost:5182/restaurantHub/negotiate?negotiateVersion=1 - null null
+2026-06-26 17:00:22.215 +05:30 [INF] CORS policy execution successful.
+2026-06-26 17:00:22.215 +05:30 [INF] Request finished HTTP/1.1 OPTIONS http://localhost:5182/restaurantHub/negotiate?negotiateVersion=1 - 204 null null 0.132ms
+2026-06-26 17:00:22.216 +05:30 [INF] Request starting HTTP/1.1 POST http://localhost:5182/restaurantHub/negotiate?negotiateVersion=1 - null 0
+2026-06-26 17:00:22.216 +05:30 [INF] CORS policy execution successful.
+2026-06-26 17:00:22.216 +05:30 [INF] Request starting HTTP/1.1 OPTIONS http://localhost:5182/api/orders/track - null null
+2026-06-26 17:00:22.216 +05:30 [INF] CORS policy execution successful.
+2026-06-26 17:00:22.216 +05:30 [INF] Executing endpoint '/restaurantHub/negotiate'
+2026-06-26 17:00:22.216 +05:30 [INF] Request finished HTTP/1.1 OPTIONS http://localhost:5182/api/orders/track - 204 null null 0.0624ms
+2026-06-26 17:00:22.216 +05:30 [INF] Executed endpoint '/restaurantHub/negotiate'
+2026-06-26 17:00:22.216 +05:30 [INF] Request finished HTTP/1.1 POST http://localhost:5182/restaurantHub/negotiate?negotiateVersion=1 - 200 316 application/json 0.3386ms
+2026-06-26 17:00:22.216 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5182/api/orders/track - null null
+2026-06-26 17:00:22.216 +05:30 [INF] CORS policy execution successful.
+2026-06-26 17:00:22.217 +05:30 [INF] Executing endpoint 'OrderNKitchenMS_API.Controllers.OrderController.TrackMyOrder (OrderNKitchenMS-API)'
+2026-06-26 17:00:22.220 +05:30 [INF] Route matched with {action = "TrackMyOrder", controller = "Order"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[OrderNKitchenMS_API.Models.DTOs.GuestOrderTrackingDto]] TrackMyOrder() on controller OrderNKitchenMS_API.Controllers.OrderController (OrderNKitchenMS-API).
+2026-06-26 17:00:22.221 +05:30 [INF] TrackMyOrder requested for TableId from Claims: 3
+2026-06-26 17:00:22.221 +05:30 [INF] GetGuestOrderTrackingAsync called for TableId: 3
+2026-06-26 17:00:22.222 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT o."Id", o."AssignedChefId", o."AssignedWaiterId", o."CompletedAt", o."CreatedAt", o."Status", o."TableId", o."TotalAmount", o."UpdatedAt", t."Id", t."Capacity", t."CreatedAt", t."IsDeleted", t."Number", t."Status", t."UpdatedAt", u."Id", u."Address", u."CreatedAt", u."Email", u."IsDeleted", u."Name", u."PasswordHash", u."PhoneNumber", u."RoleId", u."UpdatedAt", u0."Id", u0."Address", u0."CreatedAt", u0."Email", u0."IsDeleted", u0."Name", u0."PasswordHash", u0."PhoneNumber", u0."RoleId", u0."UpdatedAt"
+FROM "Orders" AS o
+INNER JOIN "Tables" AS t ON o."TableId" = t."Id"
+LEFT JOIN "Users" AS u ON o."AssignedChefId" = u."Id"
+LEFT JOIN "Users" AS u0 ON o."AssignedWaiterId" = u0."Id"
+2026-06-26 17:00:22.224 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[@orderId='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT o."Id", o."CreatedAt", o."MenuItemId", o."Notes", o."OrderId", o."Quantity", o."UnitPrice", o."UpdatedAt", m."Id", m."CategoryId", m."CreatedAt", m."Description", m."ImageUrl", m."IsAvailable", m."IsDeleted", m."IsManuallyDisabled", m."Name", m."PreparationTime", m."Price", m."UpdatedAt"
+FROM "OrderItems" AS o
+INNER JOIN "MenuItems" AS m ON o."MenuItemId" = m."Id"
+WHERE o."OrderId" = @orderId
+2026-06-26 17:00:22.225 +05:30 [INF] TrackMyOrder completed for TableId: 3. Order ID: 13
+2026-06-26 17:00:22.225 +05:30 [INF] Executing OkObjectResult, writing value of type 'OrderNKitchenMS_API.Models.DTOs.GuestOrderTrackingDto'.
+2026-06-26 17:00:22.226 +05:30 [INF] Executed action OrderNKitchenMS_API.Controllers.OrderController.TrackMyOrder (OrderNKitchenMS-API) in 5.8408ms
+2026-06-26 17:00:22.226 +05:30 [INF] Executed endpoint 'OrderNKitchenMS_API.Controllers.OrderController.TrackMyOrder (OrderNKitchenMS-API)'
+2026-06-26 17:00:22.226 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:5182/api/orders/track - 200 null application/json; charset=utf-8 9.8269ms
+2026-06-26 17:00:22.228 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5182/restaurantHub?id=CXKRMd5Zzpi5sxwDKrld5Q&access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0YWJsZUlkIjoiMyIsIlNlc3Npb25UeXBlIjoiR3Vlc3QiLCJleHAiOjE3ODI0NzcxNjAsImlzcyI6IkFtYnJvc2lhT3JkZXJTeXN0ZW1zIiwiYXVkIjoiQW1icm9zaWFPcmRlclN5c3RlbXNVc2VycyJ9.ctK6EQlAEF4o51QhOiqRV6_4tio_TQpwwNq7vAP0L8A - null null
+2026-06-26 17:00:22.228 +05:30 [INF] CORS policy execution successful.
+2026-06-26 17:00:22.229 +05:30 [INF] Executing endpoint '/restaurantHub'
+2026-06-26 17:00:22.238 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5182/api/orders/track - null null
+2026-06-26 17:00:22.238 +05:30 [INF] CORS policy execution successful.
+2026-06-26 17:00:22.238 +05:30 [INF] Executing endpoint 'OrderNKitchenMS_API.Controllers.OrderController.TrackMyOrder (OrderNKitchenMS-API)'
+2026-06-26 17:00:22.238 +05:30 [INF] Route matched with {action = "TrackMyOrder", controller = "Order"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[OrderNKitchenMS_API.Models.DTOs.GuestOrderTrackingDto]] TrackMyOrder() on controller OrderNKitchenMS_API.Controllers.OrderController (OrderNKitchenMS-API).
+2026-06-26 17:00:22.238 +05:30 [INF] TrackMyOrder requested for TableId from Claims: 2
+2026-06-26 17:00:22.238 +05:30 [INF] GetGuestOrderTrackingAsync called for TableId: 2
+2026-06-26 17:00:22.240 +05:30 [INF] Executed DbCommand (2ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT o."Id", o."AssignedChefId", o."AssignedWaiterId", o."CompletedAt", o."CreatedAt", o."Status", o."TableId", o."TotalAmount", o."UpdatedAt", t."Id", t."Capacity", t."CreatedAt", t."IsDeleted", t."Number", t."Status", t."UpdatedAt", u."Id", u."Address", u."CreatedAt", u."Email", u."IsDeleted", u."Name", u."PasswordHash", u."PhoneNumber", u."RoleId", u."UpdatedAt", u0."Id", u0."Address", u0."CreatedAt", u0."Email", u0."IsDeleted", u0."Name", u0."PasswordHash", u0."PhoneNumber", u0."RoleId", u0."UpdatedAt"
+FROM "Orders" AS o
+INNER JOIN "Tables" AS t ON o."TableId" = t."Id"
+LEFT JOIN "Users" AS u ON o."AssignedChefId" = u."Id"
+LEFT JOIN "Users" AS u0 ON o."AssignedWaiterId" = u0."Id"
+2026-06-26 17:00:22.240 +05:30 [WRN] GetGuestOrderTrackingAsync failed: No active order found for TableId: 2
+2026-06-26 17:00:22.240 +05:30 [INF] Executed action OrderNKitchenMS_API.Controllers.OrderController.TrackMyOrder (OrderNKitchenMS-API) in 2.4997ms
+2026-06-26 17:00:22.240 +05:30 [INF] Executed endpoint 'OrderNKitchenMS_API.Controllers.OrderController.TrackMyOrder (OrderNKitchenMS-API)'
+2026-06-26 17:00:22.241 +05:30 [INF] Request starting HTTP/1.1 OPTIONS http://localhost:5182/restaurantHub/negotiate?negotiateVersion=1 - null null
+2026-06-26 17:00:22.241 +05:30 [INF] CORS policy execution successful.
+2026-06-26 17:00:22.241 +05:30 [INF] Request finished HTTP/1.1 OPTIONS http://localhost:5182/restaurantHub/negotiate?negotiateVersion=1 - 204 null null 0.0813ms
+2026-06-26 17:00:22.241 +05:30 [INF] Request starting HTTP/1.1 POST http://localhost:5182/restaurantHub/negotiate?negotiateVersion=1 - null 0
+2026-06-26 17:00:22.241 +05:30 [INF] CORS policy execution successful.
+2026-06-26 17:00:22.241 +05:30 [INF] Executing endpoint '/restaurantHub/negotiate'
+2026-06-26 17:00:22.241 +05:30 [INF] Executed endpoint '/restaurantHub/negotiate'
+2026-06-26 17:00:22.241 +05:30 [INF] Request finished HTTP/1.1 POST http://localhost:5182/restaurantHub/negotiate?negotiateVersion=1 - 200 316 application/json 0.2017ms
+2026-06-26 17:00:22.243 +05:30 [WRN] Business/Validation error occurred (Status 404): No active order found for table with ID 2.
+2026-06-26 17:00:22.247 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:5182/api/orders/track - 404 null application/json; charset=utf-8 9.3023ms
+2026-06-26 17:00:22.255 +05:30 [INF] Request starting HTTP/1.1 OPTIONS http://localhost:5182/api/bills/order/13 - null null
+2026-06-26 17:00:22.255 +05:30 [INF] CORS policy execution successful.
+2026-06-26 17:00:22.255 +05:30 [INF] Request finished HTTP/1.1 OPTIONS http://localhost:5182/api/bills/order/13 - 204 null null 0.0985ms
+2026-06-26 17:00:22.255 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5182/api/bills/order/13 - null null
+2026-06-26 17:00:22.255 +05:30 [INF] CORS policy execution successful.
+2026-06-26 17:00:22.255 +05:30 [INF] Executing endpoint 'OrderNKitchenMS_API.Controllers.BillController.GetBillByOrderId (OrderNKitchenMS-API)'
+2026-06-26 17:00:22.255 +05:30 [INF] Route matched with {action = "GetBillByOrderId", controller = "Bill"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[OrderNKitchenMS_API.Models.DTOs.BillDto]] GetBillByOrderId(Int32) on controller OrderNKitchenMS_API.Controllers.BillController (OrderNKitchenMS-API).
+2026-06-26 17:00:22.257 +05:30 [INF] GetBillByOrderIdAsync called for Order ID: 13
+2026-06-26 17:00:22.258 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[@orderId='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."CreatedAt", b."DiscountAmount", b."OrderId", b."Status", b."SubTotal", b."TaxRate", b."TotalAmount", b."UpdatedAt"
+FROM "Bills" AS b
+WHERE b."OrderId" = @orderId
+LIMIT 1
+2026-06-26 17:00:22.258 +05:30 [WRN] GetBillByOrderIdAsync failed: Bill for Order ID 13 not found.
+2026-06-26 17:00:22.258 +05:30 [INF] Executed action OrderNKitchenMS_API.Controllers.BillController.GetBillByOrderId (OrderNKitchenMS-API) in 3.0169ms
+2026-06-26 17:00:22.258 +05:30 [INF] Executed endpoint 'OrderNKitchenMS_API.Controllers.BillController.GetBillByOrderId (OrderNKitchenMS-API)'
+2026-06-26 17:00:22.259 +05:30 [WRN] Business/Validation error occurred (Status 404): Bill for Order ID 13 not found.
+2026-06-26 17:00:22.259 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:5182/api/bills/order/13 - 404 null application/json; charset=utf-8 3.755ms
+2026-06-26 17:00:22.259 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5182/restaurantHub?id=-ZQm-CZHE-bQyUBKWC6L_Q&access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0YWJsZUlkIjoiMiIsIlNlc3Npb25UeXBlIjoiR3Vlc3QiLCJleHAiOjE3ODI0NzcwNTQsImlzcyI6IkFtYnJvc2lhT3JkZXJTeXN0ZW1zIiwiYXVkIjoiQW1icm9zaWFPcmRlclN5c3RlbXNVc2VycyJ9.jmpQPEoRoqHjQv07h0jdnl2p4PqwPulGlSc_5A9FEeE - null null
+2026-06-26 17:00:22.259 +05:30 [INF] CORS policy execution successful.
+2026-06-26 17:00:22.259 +05:30 [INF] Executing endpoint '/restaurantHub'
+2026-06-26 17:00:22.270 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5182/restaurantHub?id=DtsvoT1pWzQED_mCbItDag&access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjIiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiU2FydmVzaCIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL2VtYWlsYWRkcmVzcyI6InNhcnZlc2gyQGdtYWlsLmNvbSIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkNoZWYiLCJTZXNzaW9uVHlwZSI6IlVzZXIiLCJleHAiOjE3ODI0NzM2MjIsImlzcyI6IkFtYnJvc2lhT3JkZXJTeXN0ZW1zIiwiYXVkIjoiQW1icm9zaWFPcmRlclN5c3RlbXNVc2VycyJ9.laD1a5UGUayp3VGRsCeRAoyprSZsOoobtJhtvNBbTQE - null null
+2026-06-26 17:00:22.270 +05:30 [INF] CORS policy execution successful.
+2026-06-26 17:00:22.270 +05:30 [INF] Executing endpoint '/restaurantHub'
+2026-06-26 17:00:22.276 +05:30 [INF] SignalR client connecting. ConnectionId: NQiDeg6FFvLGlb1KXA4ebA
+2026-06-26 17:00:22.276 +05:30 [INF] Client authenticated. SessionType: User, ConnectionId: NQiDeg6FFvLGlb1KXA4ebA
+2026-06-26 17:00:22.276 +05:30 [INF] Staff client connected. Role: Chef, ConnectionId: NQiDeg6FFvLGlb1KXA4ebA
+2026-06-26 17:00:22.276 +05:30 [INF] Chef assigned to group: kitchen (ConnectionId: NQiDeg6FFvLGlb1KXA4ebA)
+2026-06-26 17:00:22.289 +05:30 [INF] SignalR client connecting. ConnectionId: FKpGCeba9Yd4Zp-G6PCC2Q
+2026-06-26 17:00:22.289 +05:30 [INF] Client authenticated. SessionType: Guest, ConnectionId: FKpGCeba9Yd4Zp-G6PCC2Q
+2026-06-26 17:00:22.289 +05:30 [INF] Guest client assigned to group: table-2 (ConnectionId: FKpGCeba9Yd4Zp-G6PCC2Q)
+2026-06-26 17:00:22.310 +05:30 [INF] SignalR client connecting. ConnectionId: adMlT5o5pqFC9Hky1mT3Qw
+2026-06-26 17:00:22.310 +05:30 [INF] Client authenticated. SessionType: Guest, ConnectionId: adMlT5o5pqFC9Hky1mT3Qw
+2026-06-26 17:00:22.310 +05:30 [INF] Guest client assigned to group: table-3 (ConnectionId: adMlT5o5pqFC9Hky1mT3Qw)
+2026-06-26 17:42:19.800 +05:30 [INF] Connection id "0HNMJEI5RBRF6", Request id "0HNMJEI5RBRF6:00000001": the application aborted the connection.
+2026-06-26 17:42:19.800 +05:30 [INF] Connection id "0HNMJEI5RBRF4", Request id "0HNMJEI5RBRF4:00000001": the application aborted the connection.
+2026-06-26 17:42:19.812 +05:30 [INF] Connection id "0HNMJEI5RBRF3", Request id "0HNMJEI5RBRF3:00000001": the application aborted the connection.
+2026-06-26 17:42:19.813 +05:30 [INF] Connection id "0HNMJEI5RBRF5", Request id "0HNMJEI5RBRF5:00000001": the application aborted the connection.
+2026-06-26 17:42:19.823 +05:30 [INF] Executed endpoint '/restaurantHub'
+2026-06-26 17:42:19.823 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:5182/restaurantHub?id=CXKRMd5Zzpi5sxwDKrld5Q&access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0YWJsZUlkIjoiMyIsIlNlc3Npb25UeXBlIjoiR3Vlc3QiLCJleHAiOjE3ODI0NzcxNjAsImlzcyI6IkFtYnJvc2lhT3JkZXJTeXN0ZW1zIiwiYXVkIjoiQW1icm9zaWFPcmRlclN5c3RlbXNVc2VycyJ9.ctK6EQlAEF4o51QhOiqRV6_4tio_TQpwwNq7vAP0L8A - 101 null null 1221121.1473ms
+2026-06-26 17:42:19.823 +05:30 [INF] Executed endpoint '/restaurantHub'
+2026-06-26 17:42:19.823 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:5182/restaurantHub?id=DtsvoT1pWzQED_mCbItDag&access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjIiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiU2FydmVzaCIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL2VtYWlsYWRkcmVzcyI6InNhcnZlc2gyQGdtYWlsLmNvbSIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkNoZWYiLCJTZXNzaW9uVHlwZSI6IlVzZXIiLCJleHAiOjE3ODI0NzM2MjIsImlzcyI6IkFtYnJvc2lhT3JkZXJTeXN0ZW1zIiwiYXVkIjoiQW1icm9zaWFPcmRlclN5c3RlbXNVc2VycyJ9.laD1a5UGUayp3VGRsCeRAoyprSZsOoobtJhtvNBbTQE - 101 null null 1221079.8917ms
+2026-06-26 17:42:19.823 +05:30 [INF] Executed endpoint '/restaurantHub'
+2026-06-26 17:42:19.823 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:5182/restaurantHub?id=Y-roLv5VVGkVJCXcB8cuZA&access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjMiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiU2FydmVzaCIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL2VtYWlsYWRkcmVzcyI6InNhcnZlc2gzQGdtYWlsLmNvbSIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IldhaXRlciIsIlNlc3Npb25UeXBlIjoiVXNlciIsImV4cCI6MTc4MjQ3NjI2NSwiaXNzIjoiQW1icm9zaWFPcmRlclN5c3RlbXMiLCJhdWQiOiJBbWJyb3NpYU9yZGVyU3lzdGVtc1VzZXJzIn0.4_UqFQ26AVUMEisUmM4SKI-eyL7hRy0xy3Kk01XJW-w - 101 null null 1221594.1845ms
+2026-06-26 17:42:19.823 +05:30 [INF] Executed endpoint '/restaurantHub'
+2026-06-26 17:42:19.823 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:5182/restaurantHub?id=-ZQm-CZHE-bQyUBKWC6L_Q&access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0YWJsZUlkIjoiMiIsIlNlc3Npb25UeXBlIjoiR3Vlc3QiLCJleHAiOjE3ODI0NzcwNTQsImlzcyI6IkFtYnJvc2lhT3JkZXJTeXN0ZW1zIiwiYXVkIjoiQW1icm9zaWFPcmRlclN5c3RlbXNVc2VycyJ9.jmpQPEoRoqHjQv07h0jdnl2p4PqwPulGlSc_5A9FEeE - 101 null null 1221090.7347ms
+2026-06-26 17:42:19.825 +05:30 [INF] Request starting HTTP/1.1 OPTIONS http://localhost:5182/restaurantHub/negotiate?negotiateVersion=1 - null null
+2026-06-26 17:42:19.826 +05:30 [INF] CORS policy execution successful.
+2026-06-26 17:42:19.826 +05:30 [INF] Request finished HTTP/1.1 OPTIONS http://localhost:5182/restaurantHub/negotiate?negotiateVersion=1 - 204 null null 1.3084ms
+2026-06-26 17:42:19.831 +05:30 [INF] Request starting HTTP/1.1 POST http://localhost:5182/restaurantHub/negotiate?negotiateVersion=1 - null 0
+2026-06-26 17:42:19.831 +05:30 [INF] CORS policy execution successful.
+2026-06-26 17:42:19.831 +05:30 [INF] Executing endpoint '/restaurantHub/negotiate'
+2026-06-26 17:42:19.832 +05:30 [INF] Executed endpoint '/restaurantHub/negotiate'
+2026-06-26 17:42:19.832 +05:30 [INF] Request finished HTTP/1.1 POST http://localhost:5182/restaurantHub/negotiate?negotiateVersion=1 - 200 316 application/json 0.4803ms
+2026-06-26 17:42:19.834 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5182/restaurantHub?id=vGXik3WzRfZiD_ppXfzIYg&access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjMiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiU2FydmVzaCIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL2VtYWlsYWRkcmVzcyI6InNhcnZlc2gzQGdtYWlsLmNvbSIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IldhaXRlciIsIlNlc3Npb25UeXBlIjoiVXNlciIsImV4cCI6MTc4MjQ3NjI2NSwiaXNzIjoiQW1icm9zaWFPcmRlclN5c3RlbXMiLCJhdWQiOiJBbWJyb3NpYU9yZGVyU3lzdGVtc1VzZXJzIn0.4_UqFQ26AVUMEisUmM4SKI-eyL7hRy0xy3Kk01XJW-w - null null
+2026-06-26 17:42:19.834 +05:30 [INF] CORS policy execution successful.
+2026-06-26 17:42:19.835 +05:30 [INF] Executing endpoint '/restaurantHub'
+2026-06-26 17:42:19.835 +05:30 [INF] Connection id "0HNMJEI5RBRF9", Request id "0HNMJEI5RBRF9:00000001": the application aborted the connection.
+2026-06-26 17:42:19.836 +05:30 [INF] Executed endpoint '/restaurantHub'
+2026-06-26 17:42:19.836 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:5182/restaurantHub?id=vGXik3WzRfZiD_ppXfzIYg&access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjMiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiU2FydmVzaCIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL2VtYWlsYWRkcmVzcyI6InNhcnZlc2gzQGdtYWlsLmNvbSIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IldhaXRlciIsIlNlc3Npb25UeXBlIjoiVXNlciIsImV4cCI6MTc4MjQ3NjI2NSwiaXNzIjoiQW1icm9zaWFPcmRlclN5c3RlbXMiLCJhdWQiOiJBbWJyb3NpYU9yZGVyU3lzdGVtc1VzZXJzIn0.4_UqFQ26AVUMEisUmM4SKI-eyL7hRy0xy3Kk01XJW-w - 101 null null 1.2867ms
+2026-06-26 17:42:19.888 +05:30 [INF] Request starting HTTP/1.1 OPTIONS http://localhost:5182/api/orders/active - null null
+2026-06-26 17:42:19.888 +05:30 [INF] CORS policy execution successful.
+2026-06-26 17:42:19.888 +05:30 [INF] Request starting HTTP/1.1 OPTIONS http://localhost:5182/api/tables - null null
+2026-06-26 17:42:19.888 +05:30 [INF] CORS policy execution successful.
+2026-06-26 17:42:19.888 +05:30 [INF] Request finished HTTP/1.1 OPTIONS http://localhost:5182/api/orders/active - 204 null null 0.1322ms
+2026-06-26 17:42:19.888 +05:30 [INF] Request finished HTTP/1.1 OPTIONS http://localhost:5182/api/tables - 204 null null 0.0465ms
+2026-06-26 17:42:19.888 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5182/api/orders/active - null null
+2026-06-26 17:42:19.888 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5182/api/tables - null null
+2026-06-26 17:42:19.888 +05:30 [INF] Request starting HTTP/1.1 OPTIONS http://localhost:5182/restaurantHub/negotiate?negotiateVersion=1 - null null
+2026-06-26 17:42:19.888 +05:30 [INF] CORS policy execution successful.
+2026-06-26 17:42:19.888 +05:30 [INF] CORS policy execution successful.
+2026-06-26 17:42:19.888 +05:30 [INF] CORS policy execution successful.
+2026-06-26 17:42:19.888 +05:30 [INF] Request finished HTTP/1.1 OPTIONS http://localhost:5182/restaurantHub/negotiate?negotiateVersion=1 - 204 null null 0.1045ms
+2026-06-26 17:42:19.889 +05:30 [INF] Executing endpoint 'OrderNKitchenMS_API.Controllers.TableController.GetTables (OrderNKitchenMS-API)'
+2026-06-26 17:42:19.889 +05:30 [INF] Executing endpoint 'OrderNKitchenMS_API.Controllers.OrderController.GetActiveOrders (OrderNKitchenMS-API)'
+2026-06-26 17:42:19.889 +05:30 [INF] Route matched with {action = "GetTables", controller = "Table"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[System.Collections.Generic.IEnumerable`1[OrderNKitchenMS_API.Models.DTOs.TableDto]]] GetTables() on controller OrderNKitchenMS_API.Controllers.TableController (OrderNKitchenMS-API).
+2026-06-26 17:42:19.889 +05:30 [INF] Route matched with {action = "GetActiveOrders", controller = "Order"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[System.Collections.Generic.IEnumerable`1[OrderNKitchenMS_API.Models.DTOs.OrderDto]]] GetActiveOrders() on controller OrderNKitchenMS_API.Controllers.OrderController (OrderNKitchenMS-API).
+2026-06-26 17:42:19.889 +05:30 [INF] Request starting HTTP/1.1 POST http://localhost:5182/restaurantHub/negotiate?negotiateVersion=1 - null 0
+2026-06-26 17:42:19.889 +05:30 [INF] CORS policy execution successful.
+2026-06-26 17:42:19.889 +05:30 [INF] Executing endpoint '/restaurantHub/negotiate'
+2026-06-26 17:42:19.889 +05:30 [INF] Executed endpoint '/restaurantHub/negotiate'
+2026-06-26 17:42:19.889 +05:30 [INF] GetActiveOrders requested
+2026-06-26 17:42:19.889 +05:30 [INF] GetActiveOrdersAsync called
+2026-06-26 17:42:19.889 +05:30 [INF] Request finished HTTP/1.1 POST http://localhost:5182/restaurantHub/negotiate?negotiateVersion=1 - 200 316 application/json 0.198ms
+2026-06-26 17:42:19.889 +05:30 [INF] GetAllAsync called for tables
+2026-06-26 17:42:19.909 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5182/restaurantHub?id=1mWNOgULkzSn0cy86cciVQ&access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjMiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiU2FydmVzaCIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL2VtYWlsYWRkcmVzcyI6InNhcnZlc2gzQGdtYWlsLmNvbSIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IldhaXRlciIsIlNlc3Npb25UeXBlIjoiVXNlciIsImV4cCI6MTc4MjQ3NjI2NSwiaXNzIjoiQW1icm9zaWFPcmRlclN5c3RlbXMiLCJhdWQiOiJBbWJyb3NpYU9yZGVyU3lzdGVtc1VzZXJzIn0.4_UqFQ26AVUMEisUmM4SKI-eyL7hRy0xy3Kk01XJW-w - null null
+2026-06-26 17:42:19.909 +05:30 [INF] CORS policy execution successful.
+2026-06-26 17:42:19.909 +05:30 [INF] Executing endpoint '/restaurantHub'
+2026-06-26 17:42:19.910 +05:30 [INF] SignalR client connecting. ConnectionId: Zzu-o2mdNSDh_j9CJ6gYYQ
+2026-06-26 17:42:19.910 +05:30 [INF] Client authenticated. SessionType: User, ConnectionId: Zzu-o2mdNSDh_j9CJ6gYYQ
+2026-06-26 17:42:19.910 +05:30 [INF] Staff client connected. Role: Waiter, ConnectionId: Zzu-o2mdNSDh_j9CJ6gYYQ
+2026-06-26 17:42:19.910 +05:30 [INF] Waiter assigned to group: waiter-3 (ConnectionId: Zzu-o2mdNSDh_j9CJ6gYYQ)
+2026-06-26 17:42:20.011 +05:30 [INF] Executed DbCommand (13ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT t."Id", t."Capacity", t."CreatedAt", t."IsDeleted", t."Number", t."Status", t."UpdatedAt"
+FROM "Tables" AS t
+WHERE NOT (t."IsDeleted")
+ORDER BY t."Number"
+2026-06-26 17:42:20.022 +05:30 [INF] Executed DbCommand (10ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT o."Id", o."AssignedChefId", o."AssignedWaiterId", o."CompletedAt", o."CreatedAt", o."Status", o."TableId", o."TotalAmount", o."UpdatedAt"
+FROM "Orders" AS o
+WHERE o."Status" NOT IN (5, 6)
+2026-06-26 17:42:20.022 +05:30 [INF] Executed DbCommand (10ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT o."Id", o."AssignedChefId", o."AssignedWaiterId", o."CompletedAt", o."CreatedAt", o."Status", o."TableId", o."TotalAmount", o."UpdatedAt", t."Id", t."Capacity", t."CreatedAt", t."IsDeleted", t."Number", t."Status", t."UpdatedAt", u."Id", u."Address", u."CreatedAt", u."Email", u."IsDeleted", u."Name", u."PasswordHash", u."PhoneNumber", u."RoleId", u."UpdatedAt", u0."Id", u0."Address", u0."CreatedAt", u0."Email", u0."IsDeleted", u0."Name", u0."PasswordHash", u0."PhoneNumber", u0."RoleId", u0."UpdatedAt"
+FROM "Orders" AS o
+INNER JOIN "Tables" AS t ON o."TableId" = t."Id"
+LEFT JOIN "Users" AS u ON o."AssignedChefId" = u."Id"
+LEFT JOIN "Users" AS u0 ON o."AssignedWaiterId" = u0."Id"
+2026-06-26 17:42:20.022 +05:30 [INF] Executing OkObjectResult, writing value of type 'System.Linq.Enumerable+ListSelectIterator`2[[OrderNKitchenMS_API.Models.Entities.Table, OrderNKitchenMS-API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null],[OrderNKitchenMS_API.Models.DTOs.TableDto, OrderNKitchenMS-API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-26 17:42:20.022 +05:30 [INF] Executed action OrderNKitchenMS_API.Controllers.TableController.GetTables (OrderNKitchenMS-API) in 133.7905ms
+2026-06-26 17:42:20.023 +05:30 [INF] Executed endpoint 'OrderNKitchenMS_API.Controllers.TableController.GetTables (OrderNKitchenMS-API)'
+2026-06-26 17:42:20.023 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:5182/api/tables - 200 null application/json; charset=utf-8 134.4085ms
+2026-06-26 17:42:20.032 +05:30 [INF] Executed DbCommand (9ms) [Parameters=[@orderId='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT o."Id", o."CreatedAt", o."MenuItemId", o."Notes", o."OrderId", o."Quantity", o."UnitPrice", o."UpdatedAt", m."Id", m."CategoryId", m."CreatedAt", m."Description", m."ImageUrl", m."IsAvailable", m."IsDeleted", m."IsManuallyDisabled", m."Name", m."PreparationTime", m."Price", m."UpdatedAt"
+FROM "OrderItems" AS o
+INNER JOIN "MenuItems" AS m ON o."MenuItemId" = m."Id"
+WHERE o."OrderId" = @orderId
+2026-06-26 17:42:20.043 +05:30 [INF] Executed DbCommand (10ms) [Parameters=[@menuItemIds='?' (DbType = Object)], CommandType='"Text"', CommandTimeout='30']
+SELECT max(m."PreparationTime")
+FROM "MenuItems" AS m
+WHERE m."Id" = ANY (@menuItemIds) AND NOT (m."IsDeleted")
+2026-06-26 17:42:20.044 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[@excludeOrderId='?' (DbType = Int32), @createdAt='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT count(*)::int
+FROM "Orders" AS o
+WHERE o."Status" IN (1, 2) AND o."Id" <> @excludeOrderId AND o."CreatedAt" < @createdAt
+2026-06-26 17:42:20.048 +05:30 [INF] Executed DbCommand (4ms) [Parameters=[@orderId='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT o."Id", o."CreatedAt", o."MenuItemId", o."Notes", o."OrderId", o."Quantity", o."UnitPrice", o."UpdatedAt", m."Id", m."CategoryId", m."CreatedAt", m."Description", m."ImageUrl", m."IsAvailable", m."IsDeleted", m."IsManuallyDisabled", m."Name", m."PreparationTime", m."Price", m."UpdatedAt"
+FROM "OrderItems" AS o
+INNER JOIN "MenuItems" AS m ON o."MenuItemId" = m."Id"
+WHERE o."OrderId" = @orderId
+2026-06-26 17:42:20.049 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[@menuItemIds='?' (DbType = Object)], CommandType='"Text"', CommandTimeout='30']
+SELECT max(m."PreparationTime")
+FROM "MenuItems" AS m
+WHERE m."Id" = ANY (@menuItemIds) AND NOT (m."IsDeleted")
+2026-06-26 17:42:20.051 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[@excludeOrderId='?' (DbType = Int32), @createdAt='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT count(*)::int
+FROM "Orders" AS o
+WHERE o."Status" IN (1, 2) AND o."Id" <> @excludeOrderId AND o."CreatedAt" < @createdAt
+2026-06-26 17:42:20.051 +05:30 [INF] Executed DbCommand (0ms) [Parameters=[@orderId='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT o."Id", o."CreatedAt", o."MenuItemId", o."Notes", o."OrderId", o."Quantity", o."UnitPrice", o."UpdatedAt", m."Id", m."CategoryId", m."CreatedAt", m."Description", m."ImageUrl", m."IsAvailable", m."IsDeleted", m."IsManuallyDisabled", m."Name", m."PreparationTime", m."Price", m."UpdatedAt"
+FROM "OrderItems" AS o
+INNER JOIN "MenuItems" AS m ON o."MenuItemId" = m."Id"
+WHERE o."OrderId" = @orderId
+2026-06-26 17:42:20.052 +05:30 [INF] Executed DbCommand (0ms) [Parameters=[@menuItemIds='?' (DbType = Object)], CommandType='"Text"', CommandTimeout='30']
+SELECT max(m."PreparationTime")
+FROM "MenuItems" AS m
+WHERE m."Id" = ANY (@menuItemIds) AND NOT (m."IsDeleted")
+2026-06-26 17:42:20.052 +05:30 [INF] Executed DbCommand (0ms) [Parameters=[@excludeOrderId='?' (DbType = Int32), @createdAt='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT count(*)::int
+FROM "Orders" AS o
+WHERE o."Status" IN (1, 2) AND o."Id" <> @excludeOrderId AND o."CreatedAt" < @createdAt
+2026-06-26 17:42:20.052 +05:30 [INF] GetActiveOrders completed. Returned 3 active orders.
+2026-06-26 17:42:20.052 +05:30 [INF] Executing OkObjectResult, writing value of type 'System.Collections.Generic.List`1[[OrderNKitchenMS_API.Models.DTOs.OrderDto, OrderNKitchenMS-API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-26 17:42:20.053 +05:30 [INF] Executed action OrderNKitchenMS_API.Controllers.OrderController.GetActiveOrders (OrderNKitchenMS-API) in 163.958ms
+2026-06-26 17:42:20.053 +05:30 [INF] Executed endpoint 'OrderNKitchenMS_API.Controllers.OrderController.GetActiveOrders (OrderNKitchenMS-API)'
+2026-06-26 17:42:20.053 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:5182/api/orders/active - 200 null application/json; charset=utf-8 164.4365ms
+2026-06-26 17:42:20.087 +05:30 [INF] Request starting HTTP/1.1 OPTIONS http://localhost:5182/restaurantHub/negotiate?negotiateVersion=1 - null null
+2026-06-26 17:42:20.087 +05:30 [INF] CORS policy execution successful.
+2026-06-26 17:42:20.087 +05:30 [INF] Request finished HTTP/1.1 OPTIONS http://localhost:5182/restaurantHub/negotiate?negotiateVersion=1 - 204 null null 0.1244ms
+2026-06-26 17:42:20.087 +05:30 [INF] Request starting HTTP/1.1 POST http://localhost:5182/restaurantHub/negotiate?negotiateVersion=1 - null 0
+2026-06-26 17:42:20.087 +05:30 [INF] CORS policy execution successful.
+2026-06-26 17:42:20.088 +05:30 [INF] Executing endpoint '/restaurantHub/negotiate'
+2026-06-26 17:42:20.088 +05:30 [INF] Executed endpoint '/restaurantHub/negotiate'
+2026-06-26 17:42:20.088 +05:30 [INF] Request finished HTTP/1.1 POST http://localhost:5182/restaurantHub/negotiate?negotiateVersion=1 - 200 316 application/json 0.3478ms
+2026-06-26 17:42:20.089 +05:30 [INF] Request starting HTTP/1.1 OPTIONS http://localhost:5182/restaurantHub/negotiate?negotiateVersion=1 - null null
+2026-06-26 17:42:20.089 +05:30 [INF] CORS policy execution successful.
+2026-06-26 17:42:20.089 +05:30 [INF] Request finished HTTP/1.1 OPTIONS http://localhost:5182/restaurantHub/negotiate?negotiateVersion=1 - 204 null null 0.0818ms
+2026-06-26 17:42:20.090 +05:30 [INF] Request starting HTTP/1.1 POST http://localhost:5182/restaurantHub/negotiate?negotiateVersion=1 - null 0
+2026-06-26 17:42:20.090 +05:30 [INF] CORS policy execution successful.
+2026-06-26 17:42:20.091 +05:30 [INF] Request starting HTTP/1.1 OPTIONS http://localhost:5182/restaurantHub/negotiate?negotiateVersion=1 - null null
+2026-06-26 17:42:20.091 +05:30 [INF] CORS policy execution successful.
+2026-06-26 17:42:20.091 +05:30 [INF] Request finished HTTP/1.1 OPTIONS http://localhost:5182/restaurantHub/negotiate?negotiateVersion=1 - 204 null null 0.1192ms
+2026-06-26 17:42:20.091 +05:30 [INF] Failed to validate the token.
+Microsoft.IdentityModel.Tokens.SecurityTokenExpiredException: IDX10223: Lifetime validation failed. The token is expired. ValidTo (UTC): '6/26/2026 11:33:42 AM', Current time (UTC): '6/26/2026 12:12:20 PM'.
+   at Microsoft.IdentityModel.Tokens.ValidatorUtilities.ValidateLifetime(Nullable`1 notBefore, Nullable`1 expires, SecurityToken securityToken, TokenValidationParameters validationParameters)
+   at Microsoft.IdentityModel.Tokens.Validators.ValidateLifetime(Nullable`1 notBefore, Nullable`1 expires, SecurityToken securityToken, TokenValidationParameters validationParameters)
+   at Microsoft.IdentityModel.JsonWebTokens.JsonWebTokenHandler.ValidateTokenPayloadAsync(JsonWebToken jsonWebToken, TokenValidationParameters validationParameters, BaseConfiguration configuration)
+   at Microsoft.IdentityModel.JsonWebTokens.JsonWebTokenHandler.ValidateJWSAsync(JsonWebToken jsonWebToken, TokenValidationParameters validationParameters, BaseConfiguration configuration)
+2026-06-26 17:42:20.092 +05:30 [INF] Request starting HTTP/1.1 POST http://localhost:5182/restaurantHub/negotiate?negotiateVersion=1 - null 0
+2026-06-26 17:42:20.093 +05:30 [INF] CORS policy execution successful.
+2026-06-26 17:42:20.093 +05:30 [INF] Executing endpoint '/restaurantHub/negotiate'
+2026-06-26 17:42:20.093 +05:30 [INF] Executed endpoint '/restaurantHub/negotiate'
+2026-06-26 17:42:20.093 +05:30 [INF] Bearer was not authenticated. Failure message: IDX10223: Lifetime validation failed. The token is expired. ValidTo (UTC): '6/26/2026 11:33:42 AM', Current time (UTC): '6/26/2026 12:12:20 PM'.
+2026-06-26 17:42:20.093 +05:30 [INF] Request finished HTTP/1.1 POST http://localhost:5182/restaurantHub/negotiate?negotiateVersion=1 - 200 316 application/json 1.8001ms
+2026-06-26 17:42:20.093 +05:30 [INF] Executing endpoint '/restaurantHub/negotiate'
+2026-06-26 17:42:20.093 +05:30 [INF] Executed endpoint '/restaurantHub/negotiate'
+2026-06-26 17:42:20.093 +05:30 [INF] Request finished HTTP/1.1 POST http://localhost:5182/restaurantHub/negotiate?negotiateVersion=1 - 200 316 application/json 3.8882ms
+2026-06-26 17:42:20.095 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5182/restaurantHub?id=tsxCOKMRRPpiNGgsNswzbA&access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0YWJsZUlkIjoiMyIsIlNlc3Npb25UeXBlIjoiR3Vlc3QiLCJleHAiOjE3ODI0NzcxNjAsImlzcyI6IkFtYnJvc2lhT3JkZXJTeXN0ZW1zIiwiYXVkIjoiQW1icm9zaWFPcmRlclN5c3RlbXNVc2VycyJ9.ctK6EQlAEF4o51QhOiqRV6_4tio_TQpwwNq7vAP0L8A - null null
+2026-06-26 17:42:20.095 +05:30 [INF] CORS policy execution successful.
+2026-06-26 17:42:20.095 +05:30 [INF] Executing endpoint '/restaurantHub'
+2026-06-26 17:42:20.108 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5182/restaurantHub?id=IDDmySX5DPMzIX2DPY5nUw&access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0YWJsZUlkIjoiMiIsIlNlc3Npb25UeXBlIjoiR3Vlc3QiLCJleHAiOjE3ODI0NzcwNTQsImlzcyI6IkFtYnJvc2lhT3JkZXJTeXN0ZW1zIiwiYXVkIjoiQW1icm9zaWFPcmRlclN5c3RlbXNVc2VycyJ9.jmpQPEoRoqHjQv07h0jdnl2p4PqwPulGlSc_5A9FEeE - null null
+2026-06-26 17:42:20.108 +05:30 [INF] CORS policy execution successful.
+2026-06-26 17:42:20.108 +05:30 [INF] Executing endpoint '/restaurantHub'
+2026-06-26 17:42:20.114 +05:30 [INF] SignalR client connecting. ConnectionId: Pq4Zhp8NFy3Lt5vSXWkiIQ
+2026-06-26 17:42:20.114 +05:30 [INF] Client authenticated. SessionType: Guest, ConnectionId: Pq4Zhp8NFy3Lt5vSXWkiIQ
+2026-06-26 17:42:20.114 +05:30 [INF] Guest client assigned to group: table-2 (ConnectionId: Pq4Zhp8NFy3Lt5vSXWkiIQ)
+2026-06-26 17:42:20.120 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5182/restaurantHub?id=LtcQEfSU4wSlr5fgKNqSRg&access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjIiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiU2FydmVzaCIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL2VtYWlsYWRkcmVzcyI6InNhcnZlc2gyQGdtYWlsLmNvbSIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkNoZWYiLCJTZXNzaW9uVHlwZSI6IlVzZXIiLCJleHAiOjE3ODI0NzM2MjIsImlzcyI6IkFtYnJvc2lhT3JkZXJTeXN0ZW1zIiwiYXVkIjoiQW1icm9zaWFPcmRlclN5c3RlbXNVc2VycyJ9.laD1a5UGUayp3VGRsCeRAoyprSZsOoobtJhtvNBbTQE - null null
+2026-06-26 17:42:20.120 +05:30 [INF] CORS policy execution successful.
+2026-06-26 17:42:20.121 +05:30 [INF] Failed to validate the token.
+Microsoft.IdentityModel.Tokens.SecurityTokenExpiredException: IDX10223: Lifetime validation failed. The token is expired. ValidTo (UTC): '6/26/2026 11:33:42 AM', Current time (UTC): '6/26/2026 12:12:20 PM'.
+   at Microsoft.IdentityModel.Tokens.ValidatorUtilities.ValidateLifetime(Nullable`1 notBefore, Nullable`1 expires, SecurityToken securityToken, TokenValidationParameters validationParameters)
+   at Microsoft.IdentityModel.Tokens.Validators.ValidateLifetime(Nullable`1 notBefore, Nullable`1 expires, SecurityToken securityToken, TokenValidationParameters validationParameters)
+   at Microsoft.IdentityModel.JsonWebTokens.JsonWebTokenHandler.ValidateTokenPayloadAsync(JsonWebToken jsonWebToken, TokenValidationParameters validationParameters, BaseConfiguration configuration)
+   at Microsoft.IdentityModel.JsonWebTokens.JsonWebTokenHandler.ValidateJWSAsync(JsonWebToken jsonWebToken, TokenValidationParameters validationParameters, BaseConfiguration configuration)
+2026-06-26 17:42:20.121 +05:30 [INF] Bearer was not authenticated. Failure message: IDX10223: Lifetime validation failed. The token is expired. ValidTo (UTC): '6/26/2026 11:33:42 AM', Current time (UTC): '6/26/2026 12:12:20 PM'.
+2026-06-26 17:42:20.121 +05:30 [INF] Executing endpoint '/restaurantHub'
+2026-06-26 17:42:20.124 +05:30 [INF] SignalR client connecting. ConnectionId: Xm9DBawijVvXMMPBq-P5dw
+2026-06-26 17:42:20.124 +05:30 [WRN] Unauthenticated client connected. ConnectionId: Xm9DBawijVvXMMPBq-P5dw
+2026-06-26 17:42:20.126 +05:30 [INF] Executed endpoint '/restaurantHub'
+2026-06-26 17:42:20.126 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:5182/restaurantHub?id=IDDmySX5DPMzIX2DPY5nUw&access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0YWJsZUlkIjoiMiIsIlNlc3Npb25UeXBlIjoiR3Vlc3QiLCJleHAiOjE3ODI0NzcwNTQsImlzcyI6IkFtYnJvc2lhT3JkZXJTeXN0ZW1zIiwiYXVkIjoiQW1icm9zaWFPcmRlclN5c3RlbXNVc2VycyJ9.jmpQPEoRoqHjQv07h0jdnl2p4PqwPulGlSc_5A9FEeE - 101 null null 17.8792ms
+2026-06-26 17:42:20.142 +05:30 [INF] Executed endpoint '/restaurantHub'
+2026-06-26 17:42:20.142 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:5182/restaurantHub?id=LtcQEfSU4wSlr5fgKNqSRg&access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjIiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiU2FydmVzaCIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL2VtYWlsYWRkcmVzcyI6InNhcnZlc2gyQGdtYWlsLmNvbSIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkNoZWYiLCJTZXNzaW9uVHlwZSI6IlVzZXIiLCJleHAiOjE3ODI0NzM2MjIsImlzcyI6IkFtYnJvc2lhT3JkZXJTeXN0ZW1zIiwiYXVkIjoiQW1icm9zaWFPcmRlclN5c3RlbXNVc2VycyJ9.laD1a5UGUayp3VGRsCeRAoyprSZsOoobtJhtvNBbTQE - 101 null null 21.2765ms
+2026-06-26 17:42:20.166 +05:30 [INF] SignalR client connecting. ConnectionId: ezDsu6hNoE1S0VlbQdxVPg
+2026-06-26 17:42:20.166 +05:30 [INF] Client authenticated. SessionType: Guest, ConnectionId: ezDsu6hNoE1S0VlbQdxVPg
+2026-06-26 17:42:20.166 +05:30 [INF] Guest client assigned to group: table-3 (ConnectionId: ezDsu6hNoE1S0VlbQdxVPg)
+2026-06-26 17:42:20.212 +05:30 [INF] Executed endpoint '/restaurantHub'
+2026-06-26 17:42:20.213 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:5182/restaurantHub?id=tsxCOKMRRPpiNGgsNswzbA&access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0YWJsZUlkIjoiMyIsIlNlc3Npb25UeXBlIjoiR3Vlc3QiLCJleHAiOjE3ODI0NzcxNjAsImlzcyI6IkFtYnJvc2lhT3JkZXJTeXN0ZW1zIiwiYXVkIjoiQW1icm9zaWFPcmRlclN5c3RlbXNVc2VycyJ9.ctK6EQlAEF4o51QhOiqRV6_4tio_TQpwwNq7vAP0L8A - 101 null null 117.4433ms
+2026-06-26 17:42:20.235 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5182/api/orders/active - null null
+2026-06-26 17:42:20.235 +05:30 [INF] CORS policy execution successful.
+2026-06-26 17:42:20.235 +05:30 [INF] Failed to validate the token.
+Microsoft.IdentityModel.Tokens.SecurityTokenExpiredException: IDX10223: Lifetime validation failed. The token is expired. ValidTo (UTC): '6/26/2026 11:33:42 AM', Current time (UTC): '6/26/2026 12:12:20 PM'.
+   at Microsoft.IdentityModel.Tokens.ValidatorUtilities.ValidateLifetime(Nullable`1 notBefore, Nullable`1 expires, SecurityToken securityToken, TokenValidationParameters validationParameters)
+   at Microsoft.IdentityModel.Tokens.Validators.ValidateLifetime(Nullable`1 notBefore, Nullable`1 expires, SecurityToken securityToken, TokenValidationParameters validationParameters)
+   at Microsoft.IdentityModel.JsonWebTokens.JsonWebTokenHandler.ValidateTokenPayloadAsync(JsonWebToken jsonWebToken, TokenValidationParameters validationParameters, BaseConfiguration configuration)
+   at Microsoft.IdentityModel.JsonWebTokens.JsonWebTokenHandler.ValidateJWSAsync(JsonWebToken jsonWebToken, TokenValidationParameters validationParameters, BaseConfiguration configuration)
+2026-06-26 17:42:20.235 +05:30 [INF] Bearer was not authenticated. Failure message: IDX10223: Lifetime validation failed. The token is expired. ValidTo (UTC): '6/26/2026 11:33:42 AM', Current time (UTC): '6/26/2026 12:12:20 PM'.
+2026-06-26 17:42:20.235 +05:30 [INF] Authorization failed. These requirements were not met:
+RolesAuthorizationRequirement:User.IsInRole must be true for one of the following roles: (Admin|Chef|Waiter)
+2026-06-26 17:42:20.238 +05:30 [INF] AuthenticationScheme: Bearer was challenged.
+2026-06-26 17:42:20.238 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:5182/api/orders/active - 401 0 null 3.1775ms
+2026-06-26 17:42:20.277 +05:30 [INF] Request starting HTTP/1.1 OPTIONS http://localhost:5182/api/menu/?pageSize=100 - null null
+2026-06-26 17:42:20.277 +05:30 [INF] CORS policy execution successful.
+2026-06-26 17:42:20.277 +05:30 [INF] Request finished HTTP/1.1 OPTIONS http://localhost:5182/api/menu/?pageSize=100 - 204 null null 0.0975ms
+2026-06-26 17:42:20.277 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5182/api/menu/?pageSize=100 - null null
+2026-06-26 17:42:20.277 +05:30 [INF] CORS policy execution successful.
+2026-06-26 17:42:20.278 +05:30 [INF] Executing endpoint 'OrderNKitchenMS_API.Controllers.MenuController.GetMenuItems (OrderNKitchenMS-API)'
+2026-06-26 17:42:20.278 +05:30 [INF] Route matched with {action = "GetMenuItems", controller = "Menu"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[System.Collections.Generic.IEnumerable`1[OrderNKitchenMS_API.Models.DTOs.MenuItemDto]]] GetMenuItems(OrderNKitchenMS_API.Models.DTOs.QueryMenuItemDto) on controller OrderNKitchenMS_API.Controllers.MenuController (OrderNKitchenMS-API).
+2026-06-26 17:42:20.278 +05:30 [INF] GetAllAsync called for menu items. CategoryId: null, Search: ''
+2026-06-26 17:42:20.280 +05:30 [INF] Executed DbCommand (2ms) [Parameters=[@p1='?' (DbType = Int32), @p='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT m0."Id", m0."CategoryId", m0."CreatedAt", m0."Description", m0."ImageUrl", m0."IsAvailable", m0."IsDeleted", m0."IsManuallyDisabled", m0."Name", m0."PreparationTime", m0."Price", m0."UpdatedAt", c."Id", c."CreatedAt", c."IsDeleted", c."IsNonVeg", c."Name", c."UpdatedAt"
+FROM (
+    SELECT m."Id", m."CategoryId", m."CreatedAt", m."Description", m."ImageUrl", m."IsAvailable", m."IsDeleted", m."IsManuallyDisabled", m."Name", m."PreparationTime", m."Price", m."UpdatedAt"
+    FROM "MenuItems" AS m
+    WHERE NOT (m."IsDeleted")
+    ORDER BY m."Name"
+    LIMIT @p1 OFFSET @p
+) AS m0
+INNER JOIN "Categories" AS c ON m0."CategoryId" = c."Id"
+ORDER BY m0."Name"
+2026-06-26 17:42:20.280 +05:30 [INF] GetAllAsync completed. Returned 6 menu items.
+2026-06-26 17:42:20.280 +05:30 [INF] Executing OkObjectResult, writing value of type 'System.Linq.Enumerable+ListSelectIterator`2[[OrderNKitchenMS_API.Models.Entities.MenuItem, OrderNKitchenMS-API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null],[OrderNKitchenMS_API.Models.DTOs.MenuItemDto, OrderNKitchenMS-API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-26 17:42:20.280 +05:30 [INF] Executed action OrderNKitchenMS_API.Controllers.MenuController.GetMenuItems (OrderNKitchenMS-API) in 2.7692ms
+2026-06-26 17:42:20.280 +05:30 [INF] Executed endpoint 'OrderNKitchenMS_API.Controllers.MenuController.GetMenuItems (OrderNKitchenMS-API)'
+2026-06-26 17:42:20.280 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:5182/api/menu/?pageSize=100 - 200 null application/json; charset=utf-8 3.1821ms
+2026-06-26 17:42:20.355 +05:30 [INF] Request starting HTTP/1.1 OPTIONS http://localhost:5182/restaurantHub/negotiate?negotiateVersion=1 - null null
+2026-06-26 17:42:20.355 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5182/api/menu/?pageSize=100 - null null
+2026-06-26 17:42:20.355 +05:30 [INF] CORS policy execution successful.
+2026-06-26 17:42:20.355 +05:30 [INF] CORS policy execution successful.
+2026-06-26 17:42:20.355 +05:30 [INF] Request finished HTTP/1.1 OPTIONS http://localhost:5182/restaurantHub/negotiate?negotiateVersion=1 - 204 null null 0.3187ms
+2026-06-26 17:42:20.356 +05:30 [INF] Executing endpoint 'OrderNKitchenMS_API.Controllers.MenuController.GetMenuItems (OrderNKitchenMS-API)'
+2026-06-26 17:42:20.356 +05:30 [INF] Route matched with {action = "GetMenuItems", controller = "Menu"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[System.Collections.Generic.IEnumerable`1[OrderNKitchenMS_API.Models.DTOs.MenuItemDto]]] GetMenuItems(OrderNKitchenMS_API.Models.DTOs.QueryMenuItemDto) on controller OrderNKitchenMS_API.Controllers.MenuController (OrderNKitchenMS-API).
+2026-06-26 17:42:20.356 +05:30 [INF] Request starting HTTP/1.1 POST http://localhost:5182/restaurantHub/negotiate?negotiateVersion=1 - null 0
+2026-06-26 17:42:20.356 +05:30 [INF] CORS policy execution successful.
+2026-06-26 17:42:20.356 +05:30 [INF] Failed to validate the token.
+Microsoft.IdentityModel.Tokens.SecurityTokenExpiredException: IDX10223: Lifetime validation failed. The token is expired. ValidTo (UTC): '6/26/2026 11:33:42 AM', Current time (UTC): '6/26/2026 12:12:20 PM'.
+   at Microsoft.IdentityModel.Tokens.ValidatorUtilities.ValidateLifetime(Nullable`1 notBefore, Nullable`1 expires, SecurityToken securityToken, TokenValidationParameters validationParameters)
+   at Microsoft.IdentityModel.Tokens.Validators.ValidateLifetime(Nullable`1 notBefore, Nullable`1 expires, SecurityToken securityToken, TokenValidationParameters validationParameters)
+   at Microsoft.IdentityModel.JsonWebTokens.JsonWebTokenHandler.ValidateTokenPayloadAsync(JsonWebToken jsonWebToken, TokenValidationParameters validationParameters, BaseConfiguration configuration)
+   at Microsoft.IdentityModel.JsonWebTokens.JsonWebTokenHandler.ValidateJWSAsync(JsonWebToken jsonWebToken, TokenValidationParameters validationParameters, BaseConfiguration configuration)
+2026-06-26 17:42:20.357 +05:30 [INF] Bearer was not authenticated. Failure message: IDX10223: Lifetime validation failed. The token is expired. ValidTo (UTC): '6/26/2026 11:33:42 AM', Current time (UTC): '6/26/2026 12:12:20 PM'.
+2026-06-26 17:42:20.357 +05:30 [INF] Executing endpoint '/restaurantHub/negotiate'
+2026-06-26 17:42:20.357 +05:30 [INF] GetAllAsync called for menu items. CategoryId: null, Search: ''
+2026-06-26 17:42:20.357 +05:30 [INF] Executed endpoint '/restaurantHub/negotiate'
+2026-06-26 17:42:20.357 +05:30 [INF] Request finished HTTP/1.1 POST http://localhost:5182/restaurantHub/negotiate?negotiateVersion=1 - 200 316 application/json 0.8854ms
+2026-06-26 17:42:20.360 +05:30 [INF] Executed DbCommand (3ms) [Parameters=[@p1='?' (DbType = Int32), @p='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT m0."Id", m0."CategoryId", m0."CreatedAt", m0."Description", m0."ImageUrl", m0."IsAvailable", m0."IsDeleted", m0."IsManuallyDisabled", m0."Name", m0."PreparationTime", m0."Price", m0."UpdatedAt", c."Id", c."CreatedAt", c."IsDeleted", c."IsNonVeg", c."Name", c."UpdatedAt"
+FROM (
+    SELECT m."Id", m."CategoryId", m."CreatedAt", m."Description", m."ImageUrl", m."IsAvailable", m."IsDeleted", m."IsManuallyDisabled", m."Name", m."PreparationTime", m."Price", m."UpdatedAt"
+    FROM "MenuItems" AS m
+    WHERE NOT (m."IsDeleted")
+    ORDER BY m."Name"
+    LIMIT @p1 OFFSET @p
+) AS m0
+INNER JOIN "Categories" AS c ON m0."CategoryId" = c."Id"
+ORDER BY m0."Name"
+2026-06-26 17:42:20.360 +05:30 [INF] GetAllAsync completed. Returned 6 menu items.
+2026-06-26 17:42:20.360 +05:30 [INF] Executing OkObjectResult, writing value of type 'System.Linq.Enumerable+ListSelectIterator`2[[OrderNKitchenMS_API.Models.Entities.MenuItem, OrderNKitchenMS-API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null],[OrderNKitchenMS_API.Models.DTOs.MenuItemDto, OrderNKitchenMS-API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-26 17:42:20.360 +05:30 [INF] Executed action OrderNKitchenMS_API.Controllers.MenuController.GetMenuItems (OrderNKitchenMS-API) in 4.5388ms
+2026-06-26 17:42:20.360 +05:30 [INF] Executed endpoint 'OrderNKitchenMS_API.Controllers.MenuController.GetMenuItems (OrderNKitchenMS-API)'
+2026-06-26 17:42:20.361 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:5182/api/menu/?pageSize=100 - 200 null application/json; charset=utf-8 5.3552ms
+2026-06-26 17:42:20.376 +05:30 [INF] Request starting HTTP/1.1 OPTIONS http://localhost:5182/api/orders/track - null null
+2026-06-26 17:42:20.376 +05:30 [INF] CORS policy execution successful.
+2026-06-26 17:42:20.376 +05:30 [INF] Request finished HTTP/1.1 OPTIONS http://localhost:5182/api/orders/track - 204 null null 0.2857ms
+2026-06-26 17:42:20.376 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5182/api/orders/track - null null
+2026-06-26 17:42:20.377 +05:30 [INF] CORS policy execution successful.
+2026-06-26 17:42:20.377 +05:30 [INF] Executing endpoint 'OrderNKitchenMS_API.Controllers.OrderController.TrackMyOrder (OrderNKitchenMS-API)'
+2026-06-26 17:42:20.377 +05:30 [INF] Route matched with {action = "TrackMyOrder", controller = "Order"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[OrderNKitchenMS_API.Models.DTOs.GuestOrderTrackingDto]] TrackMyOrder() on controller OrderNKitchenMS_API.Controllers.OrderController (OrderNKitchenMS-API).
+2026-06-26 17:42:20.378 +05:30 [INF] TrackMyOrder requested for TableId from Claims: 2
+2026-06-26 17:42:20.378 +05:30 [INF] GetGuestOrderTrackingAsync called for TableId: 2
+2026-06-26 17:42:20.380 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT o."Id", o."AssignedChefId", o."AssignedWaiterId", o."CompletedAt", o."CreatedAt", o."Status", o."TableId", o."TotalAmount", o."UpdatedAt", t."Id", t."Capacity", t."CreatedAt", t."IsDeleted", t."Number", t."Status", t."UpdatedAt", u."Id", u."Address", u."CreatedAt", u."Email", u."IsDeleted", u."Name", u."PasswordHash", u."PhoneNumber", u."RoleId", u."UpdatedAt", u0."Id", u0."Address", u0."CreatedAt", u0."Email", u0."IsDeleted", u0."Name", u0."PasswordHash", u0."PhoneNumber", u0."RoleId", u0."UpdatedAt"
+FROM "Orders" AS o
+INNER JOIN "Tables" AS t ON o."TableId" = t."Id"
+LEFT JOIN "Users" AS u ON o."AssignedChefId" = u."Id"
+LEFT JOIN "Users" AS u0 ON o."AssignedWaiterId" = u0."Id"
+2026-06-26 17:42:20.381 +05:30 [WRN] GetGuestOrderTrackingAsync failed: No active order found for TableId: 2
+2026-06-26 17:42:20.381 +05:30 [INF] Executed action OrderNKitchenMS_API.Controllers.OrderController.TrackMyOrder (OrderNKitchenMS-API) in 3.741ms
+2026-06-26 17:42:20.381 +05:30 [INF] Executed endpoint 'OrderNKitchenMS_API.Controllers.OrderController.TrackMyOrder (OrderNKitchenMS-API)'
+2026-06-26 17:42:20.381 +05:30 [WRN] Business/Validation error occurred (Status 404): No active order found for table with ID 2.
+2026-06-26 17:42:20.381 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:5182/api/orders/track - 404 null application/json; charset=utf-8 4.8655ms
+2026-06-26 17:42:20.385 +05:30 [INF] Request starting HTTP/1.1 OPTIONS http://localhost:5182/restaurantHub/negotiate?negotiateVersion=1 - null null
+2026-06-26 17:42:20.386 +05:30 [INF] CORS policy execution successful.
+2026-06-26 17:42:20.386 +05:30 [INF] Request finished HTTP/1.1 OPTIONS http://localhost:5182/restaurantHub/negotiate?negotiateVersion=1 - 204 null null 0.2057ms
+2026-06-26 17:42:20.386 +05:30 [INF] Request starting HTTP/1.1 POST http://localhost:5182/restaurantHub/negotiate?negotiateVersion=1 - null 0
+2026-06-26 17:42:20.386 +05:30 [INF] CORS policy execution successful.
+2026-06-26 17:42:20.387 +05:30 [INF] Executing endpoint '/restaurantHub/negotiate'
+2026-06-26 17:42:20.387 +05:30 [INF] Executed endpoint '/restaurantHub/negotiate'
+2026-06-26 17:42:20.387 +05:30 [INF] Request finished HTTP/1.1 POST http://localhost:5182/restaurantHub/negotiate?negotiateVersion=1 - 200 316 application/json 0.5624ms
+2026-06-26 17:42:20.528 +05:30 [INF] Request starting HTTP/1.1 OPTIONS http://localhost:5182/restaurantHub/negotiate?negotiateVersion=1 - null null
+2026-06-26 17:42:20.528 +05:30 [INF] CORS policy execution successful.
+2026-06-26 17:42:20.528 +05:30 [INF] Request finished HTTP/1.1 OPTIONS http://localhost:5182/restaurantHub/negotiate?negotiateVersion=1 - 204 null null 0.1336ms
+2026-06-26 17:42:20.529 +05:30 [INF] Request starting HTTP/1.1 POST http://localhost:5182/restaurantHub/negotiate?negotiateVersion=1 - null 0
+2026-06-26 17:42:20.529 +05:30 [INF] CORS policy execution successful.
+2026-06-26 17:42:20.529 +05:30 [INF] Executing endpoint '/restaurantHub/negotiate'
+2026-06-26 17:42:20.529 +05:30 [INF] Executed endpoint '/restaurantHub/negotiate'
+2026-06-26 17:42:20.529 +05:30 [INF] Request finished HTTP/1.1 POST http://localhost:5182/restaurantHub/negotiate?negotiateVersion=1 - 200 316 application/json 0.2745ms
+2026-06-26 17:42:20.532 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5182/api/orders/track - null null
+2026-06-26 17:42:20.532 +05:30 [INF] CORS policy execution successful.
+2026-06-26 17:42:20.532 +05:30 [INF] Executing endpoint 'OrderNKitchenMS_API.Controllers.OrderController.TrackMyOrder (OrderNKitchenMS-API)'
+2026-06-26 17:42:20.532 +05:30 [INF] Route matched with {action = "TrackMyOrder", controller = "Order"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[OrderNKitchenMS_API.Models.DTOs.GuestOrderTrackingDto]] TrackMyOrder() on controller OrderNKitchenMS_API.Controllers.OrderController (OrderNKitchenMS-API).
+2026-06-26 17:42:20.533 +05:30 [INF] TrackMyOrder requested for TableId from Claims: 3
+2026-06-26 17:42:20.533 +05:30 [INF] GetGuestOrderTrackingAsync called for TableId: 3
+2026-06-26 17:42:20.535 +05:30 [INF] Executed DbCommand (2ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT o."Id", o."AssignedChefId", o."AssignedWaiterId", o."CompletedAt", o."CreatedAt", o."Status", o."TableId", o."TotalAmount", o."UpdatedAt", t."Id", t."Capacity", t."CreatedAt", t."IsDeleted", t."Number", t."Status", t."UpdatedAt", u."Id", u."Address", u."CreatedAt", u."Email", u."IsDeleted", u."Name", u."PasswordHash", u."PhoneNumber", u."RoleId", u."UpdatedAt", u0."Id", u0."Address", u0."CreatedAt", u0."Email", u0."IsDeleted", u0."Name", u0."PasswordHash", u0."PhoneNumber", u0."RoleId", u0."UpdatedAt"
+FROM "Orders" AS o
+INNER JOIN "Tables" AS t ON o."TableId" = t."Id"
+LEFT JOIN "Users" AS u ON o."AssignedChefId" = u."Id"
+LEFT JOIN "Users" AS u0 ON o."AssignedWaiterId" = u0."Id"
+2026-06-26 17:42:20.535 +05:30 [INF] Request starting HTTP/1.1 OPTIONS http://localhost:5182/api/auth/refresh - null null
+2026-06-26 17:42:20.535 +05:30 [INF] CORS policy execution successful.
+2026-06-26 17:42:20.535 +05:30 [INF] Request finished HTTP/1.1 OPTIONS http://localhost:5182/api/auth/refresh - 204 null null 0.045ms
+2026-06-26 17:42:20.535 +05:30 [INF] Request starting HTTP/1.1 POST http://localhost:5182/api/auth/refresh - application/json 430
+2026-06-26 17:42:20.535 +05:30 [INF] CORS policy execution successful.
+2026-06-26 17:42:20.535 +05:30 [INF] Executing endpoint 'OrderNKitchenMS_API.Controllers.AuthController.Refresh (OrderNKitchenMS-API)'
+2026-06-26 17:42:20.535 +05:30 [INF] Executed DbCommand (0ms) [Parameters=[@orderId='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT o."Id", o."CreatedAt", o."MenuItemId", o."Notes", o."OrderId", o."Quantity", o."UnitPrice", o."UpdatedAt", m."Id", m."CategoryId", m."CreatedAt", m."Description", m."ImageUrl", m."IsAvailable", m."IsDeleted", m."IsManuallyDisabled", m."Name", m."PreparationTime", m."Price", m."UpdatedAt"
+FROM "OrderItems" AS o
+INNER JOIN "MenuItems" AS m ON o."MenuItemId" = m."Id"
+WHERE o."OrderId" = @orderId
+2026-06-26 17:42:20.535 +05:30 [INF] TrackMyOrder completed for TableId: 3. Order ID: 13
+2026-06-26 17:42:20.535 +05:30 [INF] Executing OkObjectResult, writing value of type 'OrderNKitchenMS_API.Models.DTOs.GuestOrderTrackingDto'.
+2026-06-26 17:42:20.536 +05:30 [INF] Executed action OrderNKitchenMS_API.Controllers.OrderController.TrackMyOrder (OrderNKitchenMS-API) in 3.1282ms
+2026-06-26 17:42:20.536 +05:30 [INF] Executed endpoint 'OrderNKitchenMS_API.Controllers.OrderController.TrackMyOrder (OrderNKitchenMS-API)'
+2026-06-26 17:42:20.536 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:5182/api/orders/track - 200 null application/json; charset=utf-8 3.3653ms
+2026-06-26 17:42:20.539 +05:30 [INF] Route matched with {action = "Refresh", controller = "Auth"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[OrderNKitchenMS_API.Models.DTOs.UserLoginResponseDto]] Refresh(OrderNKitchenMS_API.Models.DTOs.TokenRefreshDto) on controller OrderNKitchenMS_API.Controllers.AuthController (OrderNKitchenMS-API).
+2026-06-26 17:42:20.540 +05:30 [INF] Token refresh requested
+2026-06-26 17:42:20.540 +05:30 [INF] Refreshing tokens
+2026-06-26 17:42:20.547 +05:30 [INF] Extracted UserId: 2 from refresh token
+2026-06-26 17:42:20.553 +05:30 [INF] Executed DbCommand (2ms) [Parameters=[@id='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT u."Id", u."Address", u."CreatedAt", u."Email", u."IsDeleted", u."Name", u."PasswordHash", u."PhoneNumber", u."RoleId", u."UpdatedAt", r."Id", r."CreatedAt", r."Name", r."UpdatedAt"
+FROM "Users" AS u
+INNER JOIN "Roles" AS r ON u."RoleId" = r."Id"
+WHERE u."Id" = @id AND NOT (u."IsDeleted")
+LIMIT 1
+2026-06-26 17:42:20.554 +05:30 [INF] Refresh successful. Generated new JWT and Refresh Token for User ID: 2
+2026-06-26 17:42:20.554 +05:30 [INF] Token refresh succeeded for User: sarvesh2@gmail.com (ID: 2)
+2026-06-26 17:42:20.554 +05:30 [INF] Executing OkObjectResult, writing value of type 'OrderNKitchenMS_API.Models.DTOs.UserLoginResponseDto'.
+2026-06-26 17:42:20.554 +05:30 [INF] Executed action OrderNKitchenMS_API.Controllers.AuthController.Refresh (OrderNKitchenMS-API) in 15.4816ms
+2026-06-26 17:42:20.554 +05:30 [INF] Executed endpoint 'OrderNKitchenMS_API.Controllers.AuthController.Refresh (OrderNKitchenMS-API)'
+2026-06-26 17:42:20.554 +05:30 [INF] Request finished HTTP/1.1 POST http://localhost:5182/api/auth/refresh - 200 null application/json; charset=utf-8 18.9517ms
+2026-06-26 17:42:20.563 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5182/restaurantHub?id=SZhZxTJoYfj7TtkDfjFdXg&access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjIiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiU2FydmVzaCIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL2VtYWlsYWRkcmVzcyI6InNhcnZlc2gyQGdtYWlsLmNvbSIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkNoZWYiLCJTZXNzaW9uVHlwZSI6IlVzZXIiLCJleHAiOjE3ODI0NzM2MjIsImlzcyI6IkFtYnJvc2lhT3JkZXJTeXN0ZW1zIiwiYXVkIjoiQW1icm9zaWFPcmRlclN5c3RlbXNVc2VycyJ9.laD1a5UGUayp3VGRsCeRAoyprSZsOoobtJhtvNBbTQE - null null
+2026-06-26 17:42:20.563 +05:30 [INF] CORS policy execution successful.
+2026-06-26 17:42:20.563 +05:30 [INF] Failed to validate the token.
+Microsoft.IdentityModel.Tokens.SecurityTokenExpiredException: IDX10223: Lifetime validation failed. The token is expired. ValidTo (UTC): '6/26/2026 11:33:42 AM', Current time (UTC): '6/26/2026 12:12:20 PM'.
+   at Microsoft.IdentityModel.Tokens.ValidatorUtilities.ValidateLifetime(Nullable`1 notBefore, Nullable`1 expires, SecurityToken securityToken, TokenValidationParameters validationParameters)
+   at Microsoft.IdentityModel.Tokens.Validators.ValidateLifetime(Nullable`1 notBefore, Nullable`1 expires, SecurityToken securityToken, TokenValidationParameters validationParameters)
+   at Microsoft.IdentityModel.JsonWebTokens.JsonWebTokenHandler.ValidateTokenPayloadAsync(JsonWebToken jsonWebToken, TokenValidationParameters validationParameters, BaseConfiguration configuration)
+   at Microsoft.IdentityModel.JsonWebTokens.JsonWebTokenHandler.ValidateJWSAsync(JsonWebToken jsonWebToken, TokenValidationParameters validationParameters, BaseConfiguration configuration)
+2026-06-26 17:42:20.563 +05:30 [INF] Bearer was not authenticated. Failure message: IDX10223: Lifetime validation failed. The token is expired. ValidTo (UTC): '6/26/2026 11:33:42 AM', Current time (UTC): '6/26/2026 12:12:20 PM'.
+2026-06-26 17:42:20.563 +05:30 [INF] Executing endpoint '/restaurantHub'
+2026-06-26 17:42:20.566 +05:30 [INF] Request starting HTTP/1.1 OPTIONS http://localhost:5182/api/bills/order/13 - null null
+2026-06-26 17:42:20.566 +05:30 [INF] CORS policy execution successful.
+2026-06-26 17:42:20.566 +05:30 [INF] Request finished HTTP/1.1 OPTIONS http://localhost:5182/api/bills/order/13 - 204 null null 0.0831ms
+2026-06-26 17:42:20.566 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5182/api/bills/order/13 - null null
+2026-06-26 17:42:20.566 +05:30 [INF] CORS policy execution successful.
+2026-06-26 17:42:20.566 +05:30 [INF] Executing endpoint 'OrderNKitchenMS_API.Controllers.BillController.GetBillByOrderId (OrderNKitchenMS-API)'
+2026-06-26 17:42:20.566 +05:30 [INF] Route matched with {action = "GetBillByOrderId", controller = "Bill"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[OrderNKitchenMS_API.Models.DTOs.BillDto]] GetBillByOrderId(Int32) on controller OrderNKitchenMS_API.Controllers.BillController (OrderNKitchenMS-API).
+2026-06-26 17:42:20.566 +05:30 [INF] GetBillByOrderIdAsync called for Order ID: 13
+2026-06-26 17:42:20.568 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[@orderId='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT b."Id", b."CreatedAt", b."DiscountAmount", b."OrderId", b."Status", b."SubTotal", b."TaxRate", b."TotalAmount", b."UpdatedAt"
+FROM "Bills" AS b
+WHERE b."OrderId" = @orderId
+LIMIT 1
+2026-06-26 17:42:20.568 +05:30 [WRN] GetBillByOrderIdAsync failed: Bill for Order ID 13 not found.
+2026-06-26 17:42:20.568 +05:30 [INF] Executed action OrderNKitchenMS_API.Controllers.BillController.GetBillByOrderId (OrderNKitchenMS-API) in 1.5349ms
+2026-06-26 17:42:20.568 +05:30 [INF] Executed endpoint 'OrderNKitchenMS_API.Controllers.BillController.GetBillByOrderId (OrderNKitchenMS-API)'
+2026-06-26 17:42:20.568 +05:30 [WRN] Business/Validation error occurred (Status 404): Bill for Order ID 13 not found.
+2026-06-26 17:42:20.568 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:5182/api/bills/order/13 - 404 null application/json; charset=utf-8 1.9223ms
+2026-06-26 17:42:20.568 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5182/api/orders/active - null null
+2026-06-26 17:42:20.568 +05:30 [INF] CORS policy execution successful.
+2026-06-26 17:42:20.568 +05:30 [INF] Executing endpoint 'OrderNKitchenMS_API.Controllers.OrderController.GetActiveOrders (OrderNKitchenMS-API)'
+2026-06-26 17:42:20.568 +05:30 [INF] Route matched with {action = "GetActiveOrders", controller = "Order"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[System.Collections.Generic.IEnumerable`1[OrderNKitchenMS_API.Models.DTOs.OrderDto]]] GetActiveOrders() on controller OrderNKitchenMS_API.Controllers.OrderController (OrderNKitchenMS-API).
+2026-06-26 17:42:20.568 +05:30 [INF] GetActiveOrders requested
+2026-06-26 17:42:20.568 +05:30 [INF] GetActiveOrdersAsync called
+2026-06-26 17:42:20.569 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT o."Id", o."AssignedChefId", o."AssignedWaiterId", o."CompletedAt", o."CreatedAt", o."Status", o."TableId", o."TotalAmount", o."UpdatedAt", t."Id", t."Capacity", t."CreatedAt", t."IsDeleted", t."Number", t."Status", t."UpdatedAt", u."Id", u."Address", u."CreatedAt", u."Email", u."IsDeleted", u."Name", u."PasswordHash", u."PhoneNumber", u."RoleId", u."UpdatedAt", u0."Id", u0."Address", u0."CreatedAt", u0."Email", u0."IsDeleted", u0."Name", u0."PasswordHash", u0."PhoneNumber", u0."RoleId", u0."UpdatedAt"
+FROM "Orders" AS o
+INNER JOIN "Tables" AS t ON o."TableId" = t."Id"
+LEFT JOIN "Users" AS u ON o."AssignedChefId" = u."Id"
+LEFT JOIN "Users" AS u0 ON o."AssignedWaiterId" = u0."Id"
+2026-06-26 17:42:20.570 +05:30 [INF] Executed DbCommand (0ms) [Parameters=[@orderId='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT o."Id", o."CreatedAt", o."MenuItemId", o."Notes", o."OrderId", o."Quantity", o."UnitPrice", o."UpdatedAt", m."Id", m."CategoryId", m."CreatedAt", m."Description", m."ImageUrl", m."IsAvailable", m."IsDeleted", m."IsManuallyDisabled", m."Name", m."PreparationTime", m."Price", m."UpdatedAt"
+FROM "OrderItems" AS o
+INNER JOIN "MenuItems" AS m ON o."MenuItemId" = m."Id"
+WHERE o."OrderId" = @orderId
+2026-06-26 17:42:20.571 +05:30 [INF] Executed DbCommand (0ms) [Parameters=[@menuItemIds='?' (DbType = Object)], CommandType='"Text"', CommandTimeout='30']
+SELECT max(m."PreparationTime")
+FROM "MenuItems" AS m
+WHERE m."Id" = ANY (@menuItemIds) AND NOT (m."IsDeleted")
+2026-06-26 17:42:20.571 +05:30 [INF] Executed DbCommand (0ms) [Parameters=[@excludeOrderId='?' (DbType = Int32), @createdAt='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT count(*)::int
+FROM "Orders" AS o
+WHERE o."Status" IN (1, 2) AND o."Id" <> @excludeOrderId AND o."CreatedAt" < @createdAt
+2026-06-26 17:42:20.571 +05:30 [INF] Executed DbCommand (0ms) [Parameters=[@orderId='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT o."Id", o."CreatedAt", o."MenuItemId", o."Notes", o."OrderId", o."Quantity", o."UnitPrice", o."UpdatedAt", m."Id", m."CategoryId", m."CreatedAt", m."Description", m."ImageUrl", m."IsAvailable", m."IsDeleted", m."IsManuallyDisabled", m."Name", m."PreparationTime", m."Price", m."UpdatedAt"
+FROM "OrderItems" AS o
+INNER JOIN "MenuItems" AS m ON o."MenuItemId" = m."Id"
+WHERE o."OrderId" = @orderId
+2026-06-26 17:42:20.572 +05:30 [INF] Executed DbCommand (0ms) [Parameters=[@menuItemIds='?' (DbType = Object)], CommandType='"Text"', CommandTimeout='30']
+SELECT max(m."PreparationTime")
+FROM "MenuItems" AS m
+WHERE m."Id" = ANY (@menuItemIds) AND NOT (m."IsDeleted")
+2026-06-26 17:42:20.572 +05:30 [INF] SignalR client connecting. ConnectionId: Tr9HGkMcUBrZyAmxpdHyuA
+2026-06-26 17:42:20.572 +05:30 [WRN] Unauthenticated client connected. ConnectionId: Tr9HGkMcUBrZyAmxpdHyuA
+2026-06-26 17:42:20.572 +05:30 [INF] Executed DbCommand (0ms) [Parameters=[@excludeOrderId='?' (DbType = Int32), @createdAt='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT count(*)::int
+FROM "Orders" AS o
+WHERE o."Status" IN (1, 2) AND o."Id" <> @excludeOrderId AND o."CreatedAt" < @createdAt
+2026-06-26 17:42:20.572 +05:30 [INF] Executed DbCommand (0ms) [Parameters=[@orderId='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT o."Id", o."CreatedAt", o."MenuItemId", o."Notes", o."OrderId", o."Quantity", o."UnitPrice", o."UpdatedAt", m."Id", m."CategoryId", m."CreatedAt", m."Description", m."ImageUrl", m."IsAvailable", m."IsDeleted", m."IsManuallyDisabled", m."Name", m."PreparationTime", m."Price", m."UpdatedAt"
+FROM "OrderItems" AS o
+INNER JOIN "MenuItems" AS m ON o."MenuItemId" = m."Id"
+WHERE o."OrderId" = @orderId
+2026-06-26 17:42:20.573 +05:30 [INF] Executed DbCommand (0ms) [Parameters=[@menuItemIds='?' (DbType = Object)], CommandType='"Text"', CommandTimeout='30']
+SELECT max(m."PreparationTime")
+FROM "MenuItems" AS m
+WHERE m."Id" = ANY (@menuItemIds) AND NOT (m."IsDeleted")
+2026-06-26 17:42:20.573 +05:30 [INF] Executed DbCommand (0ms) [Parameters=[@excludeOrderId='?' (DbType = Int32), @createdAt='?' (DbType = DateTime)], CommandType='"Text"', CommandTimeout='30']
+SELECT count(*)::int
+FROM "Orders" AS o
+WHERE o."Status" IN (1, 2) AND o."Id" <> @excludeOrderId AND o."CreatedAt" < @createdAt
+2026-06-26 17:42:20.573 +05:30 [INF] GetActiveOrders completed. Returned 3 active orders.
+2026-06-26 17:42:20.573 +05:30 [INF] Executing OkObjectResult, writing value of type 'System.Collections.Generic.List`1[[OrderNKitchenMS_API.Models.DTOs.OrderDto, OrderNKitchenMS-API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-06-26 17:42:20.573 +05:30 [INF] Executed action OrderNKitchenMS_API.Controllers.OrderController.GetActiveOrders (OrderNKitchenMS-API) in 4.9867ms
+2026-06-26 17:42:20.573 +05:30 [INF] Executed endpoint 'OrderNKitchenMS_API.Controllers.OrderController.GetActiveOrders (OrderNKitchenMS-API)'
+2026-06-26 17:42:20.573 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:5182/api/orders/active - 200 null application/json; charset=utf-8 5.1592ms
+2026-06-26 17:42:20.574 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5182/restaurantHub?id=Fcqk2AyQUPnL3eCsihGeuQ&access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0YWJsZUlkIjoiMiIsIlNlc3Npb25UeXBlIjoiR3Vlc3QiLCJleHAiOjE3ODI0NzcwNTQsImlzcyI6IkFtYnJvc2lhT3JkZXJTeXN0ZW1zIiwiYXVkIjoiQW1icm9zaWFPcmRlclN5c3RlbXNVc2VycyJ9.jmpQPEoRoqHjQv07h0jdnl2p4PqwPulGlSc_5A9FEeE - null null
+2026-06-26 17:42:20.574 +05:30 [INF] CORS policy execution successful.
+2026-06-26 17:42:20.574 +05:30 [INF] Executing endpoint '/restaurantHub'
+2026-06-26 17:42:20.577 +05:30 [INF] SignalR client connecting. ConnectionId: R3eG85obGvRsQnErPAmjgQ
+2026-06-26 17:42:20.577 +05:30 [INF] Client authenticated. SessionType: Guest, ConnectionId: R3eG85obGvRsQnErPAmjgQ
+2026-06-26 17:42:20.577 +05:30 [INF] Guest client assigned to group: table-2 (ConnectionId: R3eG85obGvRsQnErPAmjgQ)
+2026-06-26 17:42:20.648 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5182/restaurantHub?id=wEchoLx2w_1jL6B5GVQn8Q&access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0YWJsZUlkIjoiMyIsIlNlc3Npb25UeXBlIjoiR3Vlc3QiLCJleHAiOjE3ODI0NzcxNjAsImlzcyI6IkFtYnJvc2lhT3JkZXJTeXN0ZW1zIiwiYXVkIjoiQW1icm9zaWFPcmRlclN5c3RlbXNVc2VycyJ9.ctK6EQlAEF4o51QhOiqRV6_4tio_TQpwwNq7vAP0L8A - null null
+2026-06-26 17:42:20.648 +05:30 [INF] CORS policy execution successful.
+2026-06-26 17:42:20.648 +05:30 [INF] Executing endpoint '/restaurantHub'
+2026-06-26 17:42:20.651 +05:30 [INF] SignalR client connecting. ConnectionId: vUUy851pQUcJiA1Km7iApQ
+2026-06-26 17:42:20.651 +05:30 [INF] Client authenticated. SessionType: Guest, ConnectionId: vUUy851pQUcJiA1Km7iApQ
+2026-06-26 17:42:20.651 +05:30 [INF] Guest client assigned to group: table-3 (ConnectionId: vUUy851pQUcJiA1Km7iApQ)

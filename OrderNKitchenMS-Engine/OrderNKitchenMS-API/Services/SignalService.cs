@@ -42,4 +42,17 @@ public class SignalService : ISignalService
         await _hubContext.Clients.All.SendAsync("ReceiveTableStateUpdate");
     }
 
+    public async Task NotifyBillGeneratedAsync(int tableId, BillDto billDto)
+    {
+        _logger.LogInformation("Notifying table-{TableId} about bill generated: {BillId}", tableId, billDto.Id);
+        await _hubContext.Clients.Group($"table-{tableId}")
+            .SendAsync("bill_generated", billDto);
+    }
+
+    public async Task NotifyBillPaidAsync(int tableId, BillDto billDto)
+    {
+        _logger.LogInformation("Notifying table-{TableId} about bill paid: {BillId}", tableId, billDto.Id);
+        await _hubContext.Clients.Group($"table-{tableId}")
+            .SendAsync("bill_paid", billDto);
+    }
 }

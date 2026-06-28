@@ -12,6 +12,9 @@ using QuestPDF.Infrastructure;
 using Scalar.AspNetCore;
 using Serilog;
 using OrderNKitchenMS_API.Hubs;
+using DotNetEnv;
+
+Env.Load();
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -106,8 +109,11 @@ builder.Services.AddAuthorization(options =>
         ));
 });
 
+var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING") 
+                       ?? builder.Configuration.GetConnectionString("DefaultConnection");
+
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(connectionString));
 
 builder.Services.AddScoped<ITableRepository, TableRepository>();
 builder.Services.AddScoped<ITableService, TableService>();
@@ -139,6 +145,8 @@ builder.Services.AddScoped<IReportRepository, ReportRepository>();
 builder.Services.AddScoped<IReportService, ReportService>();
 
 builder.Services.AddScoped<ISignalService, SignalService>();
+
+builder.Services.AddScoped<GenAIService>();
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
