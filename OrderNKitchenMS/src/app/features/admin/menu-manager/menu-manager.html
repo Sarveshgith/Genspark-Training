@@ -1,0 +1,363 @@
+<div class="min-h-screen bg-[#F8FAFC] text-[#1E293B] font-sans antialiased p-6 md:p-8 flex flex-col space-y-8">
+
+  <!-- Header Title Section -->
+  <header class="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0 pb-6 border-b border-slate-200">
+    <div class="space-y-1">
+      <h1 class="text-3xl font-extrabold font-syne tracking-tight text-[#0F172A]">Menu Administration</h1>
+      <p class="text-sm text-slate-500 font-space leading-relaxed">
+        Configure restaurant menu items, set pricing and prep times, allocate categories, and override availability status.
+      </p>
+    </div>
+
+    <button 
+      (click)="openAddModal(addEditDialog)"
+      class="inline-flex items-center justify-center space-x-2 px-5 py-2.5 rounded-xl bg-[#F28500] hover:bg-[#D97200] text-white font-semibold text-sm transition-all duration-200 shadow-md shadow-orange-500/10 cursor-pointer active:scale-[0.98]">
+      <span>➕</span>
+      <span>Add Menu Item</span>
+    </button>
+  </header>
+
+  <!-- KPI Overview Ribbon -->
+  <section class="grid grid-cols-2 md:grid-cols-5 gap-4">
+    <div class="bg-white border border-slate-150 rounded-2xl p-5 shadow-sm flex flex-col justify-between space-y-2">
+      <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Items</span>
+      <div class="flex items-baseline space-x-1.5">
+        <span class="text-2xl font-bold font-syne text-slate-800">{{ totalItemsCount() }}</span>
+        <span class="text-xs text-slate-400">dishes</span>
+      </div>
+    </div>
+    <div class="bg-white border border-slate-150 rounded-2xl p-5 shadow-sm flex flex-col justify-between space-y-2">
+      <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Active Available</span>
+      <div class="flex items-baseline space-x-1.5">
+        <span class="text-2xl font-bold font-syne text-emerald-600">{{ availableCount() }}</span>
+        <span class="text-xs text-slate-400">live</span>
+      </div>
+    </div>
+    <div class="bg-white border border-slate-150 rounded-2xl p-5 shadow-sm flex flex-col justify-between space-y-2">
+      <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Disabled</span>
+      <div class="flex items-baseline space-x-1.5">
+        <span class="text-2xl font-bold font-syne text-red-500">{{ disabledCount() }}</span>
+        <span class="text-xs text-slate-400">inactive</span>
+      </div>
+    </div>
+    <div class="bg-white border border-slate-150 rounded-2xl p-5 shadow-sm flex flex-col justify-between space-y-2">
+      <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Vegetarian Options</span>
+      <div class="flex items-baseline space-x-1.5">
+        <span class="text-2xl font-bold font-syne text-emerald-700">{{ vegCount() }}</span>
+        <span class="text-xs text-slate-400">veg</span>
+      </div>
+    </div>
+    <div class="col-span-2 md:col-span-1 bg-white border border-slate-150 rounded-2xl p-5 shadow-sm flex flex-col justify-between space-y-2">
+      <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Non-Veg Options</span>
+      <div class="flex items-baseline space-x-1.5">
+        <span class="text-2xl font-bold font-syne text-red-750">{{ nonVegCount() }}</span>
+        <span class="text-xs text-slate-400">non-veg</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Toolbar Filters Section -->
+  <section class="bg-white border border-slate-150 rounded-2xl p-4 shadow-sm flex flex-col md:flex-row md:items-center gap-4 justify-between">
+    <!-- Search -->
+    <div class="relative flex-1 max-w-md">
+      <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 text-sm">🔍</span>
+      <input 
+        type="text" 
+        [value]="searchQuery()"
+        (input)="searchQuery.set($any($event.target).value)"
+        placeholder="Search menu items..." 
+        class="w-full pl-9 pr-4 py-2.5 text-sm rounded-xl border border-slate-200 focus:outline-none focus:border-[#F28500] focus:ring-1 focus:ring-[#F28500] transition duration-150 bg-slate-50/50" />
+    </div>
+
+    <!-- Dropdowns Filter Panel -->
+    <div class="flex flex-wrap items-center gap-3">
+      <!-- Category Filter -->
+      <div class="flex items-center space-x-2">
+        <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider font-space">Category:</label>
+        <select 
+          [value]="categoryFilter()"
+          (change)="categoryFilter.set($any($event.target).value)"
+          class="text-xs font-medium bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:border-[#F28500] transition duration-150 cursor-pointer">
+          <option value="all">All Categories</option>
+          @for (cat of categories(); track cat.id) {
+            <option [value]="cat.id">{{ cat.name }} ({{ cat.isNonVeg ? 'Non-Veg' : 'Veg' }})</option>
+          }
+        </select>
+      </div>
+
+      <!-- Availability Filter -->
+      <div class="flex items-center space-x-2">
+        <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider font-space">Availability:</label>
+        <select 
+          [value]="availabilityFilter()"
+          (change)="availabilityFilter.set($any($event.target).value)"
+          class="text-xs font-medium bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:border-[#F28500] transition duration-150 cursor-pointer">
+          <option value="all">All States</option>
+          <option value="available">Available / In Stock</option>
+          <option value="disabled">Disabled / Manually Off</option>
+        </select>
+      </div>
+    </div>
+  </section>
+
+  <!-- Error Alerts Block (e.g. business rule stock warnings) -->
+  @if (errorMessage()) {
+    <div class="bg-red-50 border border-red-200 rounded-2xl p-4 flex items-start space-x-3 text-red-800 text-sm animate-fade-in shadow-sm">
+      <span class="text-base select-none mt-0.5">⚠️</span>
+      <div class="flex-1 font-space">
+        <h4 class="font-bold">Administration Warning</h4>
+        <p class="mt-0.5 text-red-700/90">{{ errorMessage() }}</p>
+      </div>
+      <button (click)="errorMessage.set('')" class="text-red-500 hover:text-red-700 font-bold px-1 select-none cursor-pointer">×</button>
+    </div>
+  }
+
+  @if (successMessage()) {
+    <div class="bg-emerald-50 border border-emerald-250 rounded-2xl p-4 flex items-start space-x-3 text-emerald-800 text-sm animate-fade-in shadow-sm">
+      <span class="text-base select-none mt-0.5">✅</span>
+      <div class="flex-1 font-space">
+        <h4 class="font-bold">Success</h4>
+        <p class="mt-0.5 text-emerald-700/90">{{ successMessage() }}</p>
+      </div>
+      <button (click)="successMessage.set('')" class="text-emerald-500 hover:text-emerald-700 font-bold px-1 select-none cursor-pointer">×</button>
+    </div>
+  }
+
+  <!-- Visual Grid of Menu Items -->
+  <main class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    @for (item of filteredMenuItems(); track item.id) {
+      <div class="group relative bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between">
+        
+        <!-- Image & Badges Banner -->
+        <div class="relative h-44 bg-slate-100 overflow-hidden shrink-0">
+          @if (item.imageUrl) {
+            <img [src]="item.imageUrl" class="w-full h-full object-cover group-hover:scale-102 transition-transform duration-300" alt="{{ item.name }}" />
+          } @else {
+            <div class="w-full h-full flex flex-col items-center justify-center text-slate-350 bg-slate-50 space-y-1">
+              <span class="text-3xl">🍔</span>
+              <span class="text-[10px] uppercase font-bold tracking-wider font-space">No Image Mapped</span>
+            </div>
+          }
+
+          <!-- Category classification Tag -->
+          <span 
+            [ngClass]="{
+              'bg-emerald-100 text-emerald-800 border-emerald-200': categories().find(c => c.id === item.categoryId)?.isNonVeg === false,
+              'bg-red-100 text-red-800 border-red-200': categories().find(c => c.id === item.categoryId)?.isNonVeg === true,
+              'bg-slate-100 text-slate-700 border-slate-200': !categories().find(c => c.id === item.categoryId)
+            }"
+            class="absolute top-3 left-3 text-[9px] font-extrabold uppercase px-2.5 py-0.5 rounded-full border shadow-sm font-space">
+            {{ item.categoryName || 'General' }}
+          </span>
+
+          <!-- Price overlay tag -->
+          <span class="absolute bottom-3 right-3 bg-[#0F172A] text-white text-xs font-mono font-bold px-2.5 py-1 rounded-lg shadow-sm">
+            ${{ item.price | number:'1.2-2' }}
+          </span>
+        </div>
+
+        <!-- Details Info -->
+        <div class="p-5 flex-grow flex flex-col justify-between space-y-4">
+          <div class="space-y-1.5">
+            <h3 class="font-extrabold text-[#0F172A] text-lg font-syne tracking-tight group-hover:text-[#4F46E5] transition-colors leading-tight">
+              {{ item.name }}
+            </h3>
+            <p class="text-xs text-slate-500 font-space line-clamp-2 leading-relaxed">
+              {{ item.description || 'No description provided.' }}
+            </p>
+          </div>
+
+          <!-- Preparation & Toggle Switch -->
+          <div class="flex items-center justify-between pt-3 border-t border-slate-100 select-none">
+            <!-- Prep time -->
+            <div class="flex items-center space-x-1 text-slate-500 font-space font-medium text-xs">
+              <span>⏱️</span>
+              <span>{{ item.preparationTime }} mins</span>
+            </div>
+
+            <!-- Manual Availability Toggle -->
+            <div class="flex items-center space-x-2">
+              <span class="text-[9px] uppercase tracking-wider font-extrabold text-slate-400 font-space">Available:</span>
+              <label class="relative inline-flex items-center cursor-pointer select-none">
+                <input 
+                  type="checkbox" 
+                  [checked]="item.isAvailable" 
+                  (change)="toggleAvailability(item)" 
+                  class="sr-only peer" />
+                <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-500"></div>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modification buttons footer -->
+        <div class="p-5 pt-0 flex items-center space-x-2 shrink-0">
+          <button 
+            (click)="openEditModal(item, addEditDialog)"
+            class="flex-1 py-2 rounded-xl bg-slate-50 border border-slate-200 hover:bg-slate-100 text-slate-750 font-bold text-xs uppercase tracking-wide cursor-pointer transition flex items-center justify-center space-x-1">
+            <span>✏️</span>
+            <span>Edit</span>
+          </button>
+          
+          <button 
+            (click)="deleteMenuItem(item)"
+            class="p-2 bg-red-50 hover:bg-red-100 border border-red-150 text-red-650 rounded-xl cursor-pointer transition">
+            <span>🗑️</span>
+          </button>
+        </div>
+
+      </div>
+    } @empty {
+      <div class="col-span-full bg-white border border-slate-150 rounded-3xl p-12 text-center flex flex-col items-center justify-center space-y-4 shadow-sm select-none">
+        <span class="text-4xl">🍳</span>
+        <div class="space-y-1">
+          <h3 class="text-base font-bold font-syne text-[#0F172A]">No Menu Items Mapped</h3>
+          <p class="text-xs text-slate-400 font-space">We couldn't find any dishes matching the filters or active selections.</p>
+        </div>
+        <button 
+          (click)="searchQuery.set(''); categoryFilter.set('all'); availabilityFilter.set('all');"
+          class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold uppercase tracking-wide transition duration-150 cursor-pointer">
+          Reset Filters
+        </button>
+      </div>
+    }
+  </main>
+
+  <!-- ADD / EDIT MENU ITEM DIALOG MODAL -->
+  <dialog 
+    #addEditDialog 
+    closedby="any" 
+    (click)="onDialogClick($event, addEditDialog)"
+    class="rounded-3xl border border-slate-200 shadow-2xl p-7 bg-white max-w-lg w-full focus:outline-none relative">
+    
+    <!-- Header -->
+    <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-5">
+      <h3 class="text-lg font-bold font-syne text-[#0F172A]">
+        {{ isEditMode() ? 'Modify Menu Item' : 'Register Menu Item' }}
+      </h3>
+      <button 
+        (click)="closeModal(addEditDialog)" 
+        class="p-1 hover:bg-slate-100 text-slate-400 hover:text-slate-650 rounded-full transition cursor-pointer border-none outline-none text-lg leading-none">
+        ×
+      </button>
+    </div>
+
+    <!-- Form Body -->
+    <form (submit)="onFormSubmit(addEditDialog)" class="space-y-4 font-space text-sm">
+      
+      <!-- Split Row for Name & Category -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Item Name</label>
+          <input 
+            type="text" 
+            [(ngModel)]="formName"
+            name="formName"
+            required
+            class="w-full rounded-xl border border-slate-200 px-3.5 py-2 focus:outline-none focus:border-[#F28500] focus:ring-1 focus:ring-[#F28500] bg-slate-50/50" 
+            placeholder="e.g. Truffle Pasta" />
+        </div>
+
+        <div>
+          <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Category</label>
+          <select 
+            [(ngModel)]="formCategoryId" 
+            name="formCategoryId"
+            required
+            class="w-full rounded-xl border border-slate-200 px-3.5 py-2 focus:outline-none focus:border-[#F28500] focus:ring-1 focus:ring-[#F28500] bg-slate-50/50 cursor-pointer">
+            @for (cat of categories(); track cat.id) {
+              <option [value]="cat.id">{{ cat.name }} ({{ cat.isNonVeg ? 'Non-Veg' : 'Veg' }})</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div>
+        <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Description</label>
+        <textarea 
+          [(ngModel)]="formDescription"
+          name="formDescription"
+          rows="3"
+          class="w-full rounded-xl border border-slate-200 px-3.5 py-2 focus:outline-none focus:border-[#F28500] focus:ring-1 focus:ring-[#F28500] bg-slate-50/50" 
+          placeholder="Describe ingredients, tastes, allergens, and details..."></textarea>
+      </div>
+
+      <!-- Split Row for Price & Prep Time -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Price ($USD)</label>
+          <input 
+            type="number" 
+            [(ngModel)]="formPrice"
+            name="formPrice"
+            step="0.01"
+            min="0"
+            required
+            class="w-full rounded-xl border border-slate-200 px-3.5 py-2 focus:outline-none focus:border-[#F28500] focus:ring-1 focus:ring-[#F28500] bg-slate-50/50" 
+            placeholder="e.g. 14.50" />
+        </div>
+
+        <div>
+          <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Prep Time (Minutes)</label>
+          <input 
+            type="number" 
+            [(ngModel)]="formPrepTime"
+            name="formPrepTime"
+            min="1"
+            required
+            class="w-full rounded-xl border border-slate-200 px-3.5 py-2 focus:outline-none focus:border-[#F28500] focus:ring-1 focus:ring-[#F28500] bg-slate-50/50" 
+            placeholder="e.g. 15" />
+        </div>
+      </div>
+
+      <!-- Image URL & Preview Workflow -->
+      <div class="space-y-2">
+        <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Image URL</label>
+        <input 
+          type="text" 
+          [(ngModel)]="formImageUrl"
+          name="formImageUrl"
+          class="w-full rounded-xl border border-slate-200 px-3.5 py-2 focus:outline-none focus:border-[#F28500] focus:ring-1 focus:ring-[#F28500] bg-slate-50/50" 
+          placeholder="Paste menu item picture URL..." />
+
+        <!-- Live Preview Block -->
+        @if (formImageUrl.trim()) {
+          <div class="border border-slate-150 rounded-2xl overflow-hidden h-32 bg-slate-50 flex items-center justify-center relative shadow-sm">
+            <img [src]="formImageUrl" class="w-full h-full object-cover" alt="Image preview" />
+            <span class="absolute bottom-2 left-2 bg-[#0f172ab4] text-white text-[8px] uppercase tracking-wider font-bold px-2 py-0.5 rounded backdrop-blur-sm">Image Preview</span>
+          </div>
+        }
+      </div>
+
+      <!-- Initial Availability Toggle -->
+      <div class="pt-2 flex items-center justify-between">
+        <span class="text-xs font-bold text-slate-600 block">Set item immediately active/available</span>
+        <label class="relative inline-flex items-center cursor-pointer select-none">
+          <input 
+            type="checkbox" 
+            [(ngModel)]="formIsAvailable" 
+            name="formIsAvailable"
+            class="sr-only peer" />
+          <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+        </label>
+      </div>
+
+      <!-- Save and Cancel Footer Panel -->
+      <div class="flex items-center space-x-3 pt-5 border-t border-slate-100">
+        <button 
+          type="button" 
+          (click)="closeModal(addEditDialog)"
+          class="flex-1 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-655 font-bold text-xs uppercase tracking-wide transition duration-150 cursor-pointer text-center">
+          Cancel
+        </button>
+        <button 
+          type="submit" 
+          class="flex-1 py-2.5 rounded-xl bg-[#F28500] hover:bg-[#D97200] text-white font-bold text-xs uppercase tracking-wide transition duration-150 cursor-pointer text-center shadow-sm shadow-orange-500/10">
+          Save Changes
+        </button>
+      </div>
+    </form>
+  </dialog>
+
+</div>

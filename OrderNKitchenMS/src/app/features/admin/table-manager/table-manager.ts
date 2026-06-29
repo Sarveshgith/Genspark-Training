@@ -368,4 +368,29 @@ export class TableManager implements OnInit, OnDestroy {
       }
     });
   }
+
+  public getStatusName(status: number): string {
+    switch (status) {
+      case 1: return 'Available';
+      case 2: return 'Occupied';
+      case 3: return 'Reserved';
+      default: return 'Unknown';
+    }
+  }
+
+  public overrideStatus(tableId: number, statusVal: any): void {
+    const status = parseInt(statusVal, 10);
+    this.tableService.updateTableStatus(tableId, status).subscribe({
+      next: () => {
+        this.zone.run(() => {
+          this.fetchTables();
+        });
+      },
+      error: (err) => {
+        alert(err.error?.message || 'Failed to change table status.');
+        console.error('Failed to override status:', err);
+        this.fetchTables();
+      }
+    });
+  }
 }

@@ -1,0 +1,574 @@
+<div class="min-h-screen bg-[#F8FAFC] text-[#1E293B] font-sans antialiased p-6 md:p-8 flex flex-col space-y-8 relative overflow-x-hidden">
+
+  <!-- LOW-STOCK PERSISTENT WARNING BANNER STRIP -->
+  @if (lowStockItems().length > 0) {
+    <div class="bg-red-50 border border-red-200 rounded-2xl p-4 flex items-center justify-between space-x-4 animate-fade-in shadow-sm select-none">
+      <div class="flex items-center space-x-3 overflow-hidden">
+        <span class="text-lg flex-shrink-0 animate-bounce">🚨</span>
+        <div class="overflow-x-auto whitespace-nowrap scrollbar-thin flex-grow text-xs font-bold text-red-800 tracking-wide font-space py-1">
+          LOW STOCK ALERTS: 
+          @for (item of lowStockItems(); track item.id; let last = $last) {
+            <span class="bg-red-100 px-2 py-0.5 rounded-lg border border-red-150 mx-1.5 inline-flex items-center space-x-1">
+              <span>{{ item.name }}</span>
+              <span class="font-mono text-red-600 font-extrabold">({{ item.stockQuantity }} / {{ item.stockThreshold }} {{ item.unitName }})</span>
+            </span>
+            @if (!last) { <span class="text-red-300">|</span> }
+          }
+        </div>
+      </div>
+      <!-- Quick instructions -->
+      <span class="text-[10px] text-red-400 font-extrabold uppercase tracking-wider shrink-0 hidden md:inline">Restock Below</span>
+    </div>
+  }
+
+  <!-- Header Title Section -->
+  <header class="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0 pb-6 border-b border-slate-200">
+    <div class="space-y-1">
+      <h1 class="text-3xl font-extrabold font-syne tracking-tight text-[#0F172A]">Inventory & Recipe Constructor</h1>
+      <p class="text-sm text-slate-500 font-space leading-relaxed">
+        Track kitchen stock parameters, restock raw food materials, and define recipe configurations for menu dishes.
+      </p>
+    </div>
+
+    <!-- Actions block depending on Tab -->
+    <div class="flex items-center space-x-3">
+      @if (activeTab() === 'inventory') {
+        <button 
+          (click)="openAddModal(addEditDialog)"
+          class="inline-flex items-center justify-center space-x-2 px-5 py-2.5 rounded-xl bg-[#F28500] hover:bg-[#D97200] text-white font-semibold text-sm transition-all duration-200 shadow-md shadow-orange-500/10 cursor-pointer active:scale-[0.98]">
+          <span>➕</span>
+          <span>Add Ingredient</span>
+        </button>
+      }
+    </div>
+  </header>
+
+  <!-- KPI Summaries Banner (Admin layout) -->
+  <section class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="bg-white border border-slate-150 rounded-2xl p-5 shadow-sm flex flex-col justify-between space-y-2">
+      <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Ingredients</span>
+      <div class="flex items-baseline space-x-1.5">
+        <span class="text-2xl font-bold font-syne text-slate-800">{{ totalIngredientsCount() }}</span>
+        <span class="text-xs text-slate-400">items</span>
+      </div>
+    </div>
+    <div class="bg-white border border-slate-150 rounded-2xl p-5 shadow-sm flex flex-col justify-between space-y-2">
+      <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Active Items</span>
+      <div class="flex items-baseline space-x-1.5">
+        <span class="text-2xl font-bold font-syne text-emerald-600">{{ activeIngredientsCount() }}</span>
+        <span class="text-xs text-slate-400">monitored</span>
+      </div>
+    </div>
+    <div class="bg-white border border-slate-150 rounded-2xl p-5 shadow-sm flex flex-col justify-between space-y-2">
+      <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Low Stock Warning</span>
+      <div class="flex items-center space-x-2">
+        <span class="text-2xl font-bold font-syne" [ngClass]="lowStockCount() > 0 ? 'text-red-500' : 'text-slate-500'">{{ lowStockCount() }}</span>
+        @if (lowStockCount() > 0) {
+          <span class="inline-flex h-2.5 w-2.5 rounded-full bg-red-500 animate-ping"></span>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Prominent Card-Based Segment Selector -->
+  <section class="grid grid-cols-1 md:grid-cols-2 gap-6 select-none">
+    
+    <!-- Tab 1: Stock Registry -->
+    <div 
+      (click)="activeTab.set('inventory')"
+      [ngClass]="{
+        'border-[#F28500] ring-2 ring-[#F28500]/10 bg-gradient-to-br from-amber-50/40 via-white to-white': activeTab() === 'inventory',
+        'border-slate-200 hover:border-slate-350 hover:bg-slate-50/30 bg-white': activeTab() !== 'inventory'
+      }"
+      class="border-2 rounded-3xl p-6 shadow-sm flex items-start space-x-4 cursor-pointer transition-all duration-300">
+      
+      <!-- Icon Container -->
+      <div 
+        [ngClass]="activeTab() === 'inventory' ? 'bg-[#F28500] text-white shadow-sm shadow-orange-500/10' : 'bg-slate-100 text-slate-500'"
+        class="p-4 rounded-2xl text-2xl flex items-center justify-center shrink-0 transition">
+        📋
+      </div>
+      
+      <!-- Info Description -->
+      <div class="space-y-1">
+        <div class="flex items-center space-x-2">
+          <h3 class="font-extrabold font-syne text-slate-800 text-lg leading-tight">Stock Registry</h3>
+          @if (activeTab() === 'inventory') {
+            <span class="inline-flex h-2 w-2 rounded-full bg-[#F28500]"></span>
+          }
+        </div>
+        <p class="text-xs text-slate-500 font-space leading-relaxed">
+          Manage raw ingredients, safety thresholds, cost settings, and trigger stock restocking.
+        </p>
+      </div>
+    </div>
+
+    <!-- Tab 2: Recipe Constructor -->
+    <div 
+      (click)="activeTab.set('recipes')"
+      [ngClass]="{
+        'border-[#F28500] ring-2 ring-[#F28500]/10 bg-gradient-to-br from-amber-50/40 via-white to-white': activeTab() === 'recipes',
+        'border-slate-200 hover:border-slate-350 hover:bg-slate-50/30 bg-white': activeTab() !== 'recipes'
+      }"
+      class="border-2 rounded-3xl p-6 shadow-sm flex items-start space-x-4 cursor-pointer transition-all duration-300">
+      
+      <!-- Icon Container -->
+      <div 
+        [ngClass]="activeTab() === 'recipes' ? 'bg-[#F28500] text-white shadow-sm shadow-orange-500/10' : 'bg-slate-100 text-slate-500'"
+        class="p-4 rounded-2xl text-2xl flex items-center justify-center shrink-0 transition">
+        🧪
+      </div>
+      
+      <!-- Info Description -->
+      <div class="space-y-1">
+        <div class="flex items-center space-x-2">
+          <h3 class="font-extrabold font-syne text-slate-800 text-lg leading-tight">Recipe Constructor</h3>
+          @if (activeTab() === 'recipes') {
+            <span class="inline-flex h-2 w-2 rounded-full bg-[#F28500]"></span>
+          }
+        </div>
+        <p class="text-xs text-slate-500 font-space leading-relaxed">
+          Map raw ingredients to menu dishes, set proportion demands, and update recipe books.
+        </p>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- Error Alerts Block -->
+  @if (errorMessage()) {
+    <div class="bg-red-50 border border-red-200 rounded-2xl p-4 flex items-start space-x-3 text-red-800 text-sm animate-fade-in shadow-sm">
+      <span class="text-base select-none mt-0.5">⚠️</span>
+      <div class="flex-1 font-space">
+        <h4 class="font-bold">Administration Error</h4>
+        <p class="mt-0.5 text-red-700/90">{{ errorMessage() }}</p>
+      </div>
+      <button (click)="errorMessage.set('')" class="text-red-500 hover:text-red-700 font-bold px-1 select-none cursor-pointer">×</button>
+    </div>
+  }
+
+  @if (successMessage()) {
+    <div class="bg-emerald-50 border border-emerald-250 rounded-2xl p-4 flex items-start space-x-3 text-emerald-800 text-sm animate-fade-in shadow-sm">
+      <span class="text-base select-none mt-0.5">✅</span>
+      <div class="flex-1 font-space">
+        <h4 class="font-bold">Success</h4>
+        <p class="mt-0.5 text-emerald-700/90">{{ successMessage() }}</p>
+      </div>
+      <button (click)="successMessage.set('')" class="text-emerald-500 hover:text-emerald-700 font-bold px-1 select-none cursor-pointer">×</button>
+    </div>
+  }
+
+  <!-- TAB 1: STOCK REGISTRY INGREDIENT LIST -->
+  @if (activeTab() === 'inventory') {
+    <div class="space-y-6">
+      
+      <!-- Filters Toolbar -->
+      <section class="bg-white border border-slate-150 rounded-2xl p-4 shadow-sm flex flex-col md:flex-row md:items-center gap-4 justify-between">
+        <div class="relative flex-1 max-w-md">
+          <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 text-sm">🔍</span>
+          <input 
+            type="text" 
+            [value]="searchQuery()"
+            (input)="searchQuery.set($any($event.target).value)"
+            placeholder="Search ingredients..." 
+            class="w-full pl-9 pr-4 py-2.5 text-sm rounded-xl border border-slate-200 focus:outline-none focus:border-[#F28500] focus:ring-1 focus:ring-[#F28500] transition duration-150 bg-slate-50/50" />
+        </div>
+
+        <div class="flex items-center gap-3">
+          <div class="flex items-center space-x-2">
+            <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider font-space">Stock State:</label>
+            <select 
+              [value]="stockFilter()"
+              (change)="stockFilter.set($any($event.target).value)"
+              class="text-xs font-medium bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:border-[#F28500] transition duration-150 cursor-pointer">
+              <option value="all">All Items</option>
+              <option value="low-stock">Low Stock Warning</option>
+              <option value="active">Active Only</option>
+              <option value="inactive">Inactive Only</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <!-- Ingredients Table -->
+      <main class="bg-white border border-slate-150 rounded-3xl shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-slate-50 text-[10px] font-bold text-slate-400 uppercase tracking-wider font-space border-b border-slate-150">
+                <th class="py-4 px-6">Ingredient</th>
+                <th class="py-4 px-6 text-center">Stock Level</th>
+                <th class="py-4 px-6 text-center">Safety Threshold</th>
+                <th class="py-4 px-6 text-center text-slate-400">Unit Cost (Placeholder)</th>
+                <th class="py-4 px-6 text-center">Status</th>
+                <th class="py-4 px-6 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 text-sm font-space">
+              @for (item of filteredInventoryItems(); track item.id) {
+                <tr [ngClass]="{'bg-red-50/10': item.isActive && item.stockQuantity < item.stockThreshold}" class="hover:bg-slate-50/50 transition-colors duration-150">
+                  
+                  <!-- Name -->
+                  <td class="py-4 px-6 font-semibold text-slate-800">
+                    <div class="flex items-center space-x-2">
+                      @if (item.isActive && item.stockQuantity < item.stockThreshold) {
+                        <span class="text-xs text-red-550" title="Below Safety Safety Threshold">⚠️</span>
+                      }
+                      <span>{{ item.name }}</span>
+                    </div>
+                  </td>
+
+                  <!-- Stock Level / Quick Restock Inline Form -->
+                  <td class="py-4 px-6 text-center font-bold">
+                    @if (restockingItemId() === item.id) {
+                      <div class="inline-flex items-center space-x-2 animate-fade-in">
+                        <input 
+                          type="number" 
+                          [(ngModel)]="restockQtyInput" 
+                          class="w-16 text-center text-xs rounded-lg border border-[#F28500] py-1" />
+                        <button 
+                          (click)="saveRestock(item.id, $event)"
+                          class="p-1 text-xs bg-[#F28500] text-white rounded hover:bg-[#D97200] cursor-pointer">✔</button>
+                        <button 
+                          (click)="cancelRestock($event)"
+                          class="p-1 text-xs bg-slate-200 text-slate-600 rounded hover:bg-slate-300 cursor-pointer">×</button>
+                      </div>
+                    } @else {
+                      <div class="inline-flex items-center space-x-2">
+                        <span [ngClass]="item.stockQuantity < item.stockThreshold && item.isActive ? 'text-red-600' : 'text-slate-700'">
+                          {{ item.stockQuantity }} {{ item.unitName }}
+                        </span>
+                      </div>
+                    }
+                  </td>
+
+                  <!-- Threshold -->
+                  <td class="py-4 px-6 text-center text-slate-400 font-mono text-xs">
+                    Below {{ item.stockThreshold }} {{ item.unitName }}
+                  </td>
+
+                  <!-- Cost (Placeholder) -->
+                  <td class="py-4 px-6 text-center text-slate-350 italic text-xs">
+                    {{ item.costPerUnit ? '$' + (item.costPerUnit | number:'1.2-2') : 'Not Set' }}
+                  </td>
+
+                  <!-- Status Toggle -->
+                  <td class="py-4 px-6 text-center">
+                    <label class="relative inline-flex items-center cursor-pointer select-none">
+                      <input 
+                        type="checkbox" 
+                        [checked]="item.isActive" 
+                        (change)="toggleActive(item)" 
+                        class="sr-only peer" />
+                      <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#F28500]"></div>
+                    </label>
+                  </td>
+
+                  <!-- Actions -->
+                  <td class="py-4 px-6 text-right">
+                    <div class="inline-flex items-center space-x-2">
+                      @if (restockingItemId() !== item.id) {
+                        <button 
+                          (click)="startRestock(item, $event)"
+                          class="px-2.5 py-1.5 bg-orange-50 hover:bg-orange-100 text-[#F28500] rounded-xl font-bold text-xs uppercase tracking-wide cursor-pointer transition"
+                          title="Restock Quick">
+                          📦 Restock
+                        </button>
+                      }
+                      <button 
+                        (click)="openEditModal(item, addEditDialog)"
+                        class="px-2.5 py-1.5 border border-slate-200 hover:bg-slate-50 text-slate-655 hover:text-slate-900 rounded-xl font-bold text-xs uppercase tracking-wide cursor-pointer transition">
+                        ✏️ Edit
+                      </button>
+                      <button 
+                        (click)="deactivateItem(item)"
+                        class="p-1.5 bg-red-50 hover:bg-red-100 border border-red-150 text-red-650 rounded-xl cursor-pointer transition">
+                        🗑️
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="6" class="py-12 px-6 text-center text-slate-400 italic select-none">
+                    No ingredients found in kitchen inventory stock records.
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </main>
+
+    </div>
+  }
+
+  <!-- TAB 2: RECIPE CONSTRUCTOR MENU ITEM SELECTOR -->
+  @if (activeTab() === 'recipes') {
+    <div class="space-y-6">
+      <div class="space-y-1">
+        <h3 class="text-lg font-bold font-syne text-[#0F172A]">Recipe Constructor Mapping</h3>
+        <p class="text-xs text-slate-400 font-space">Select a dish from the menu list to configure its required raw ingredients.</p>
+      </div>
+
+      <!-- Dishes Grid -->
+      <main class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        @for (item of menuItems(); track item.id) {
+          <div 
+            (click)="openRecipeDrawer(item)"
+            class="group relative bg-white border border-slate-200 rounded-3xl p-5 shadow-sm hover:shadow-md hover:border-orange-400 hover:translate-y-[-2px] transition-all duration-300 cursor-pointer flex flex-col justify-between min-h-40">
+            
+            <div class="space-y-2">
+              <span class="text-[9px] font-extrabold uppercase px-2 py-0.5 bg-slate-50 border border-slate-150 rounded-full text-slate-500 font-space inline-block">
+                {{ item.categoryName || 'Dishes' }}
+              </span>
+              <h4 class="font-extrabold text-[#0F172A] text-base font-syne tracking-tight group-hover:text-[#F28500] transition-colors leading-tight">
+                {{ item.name }}
+              </h4>
+              <p class="text-[11px] text-slate-400 font-space line-clamp-2 leading-relaxed">
+                {{ item.description || 'No description provided.' }}
+              </p>
+            </div>
+
+            <!-- Action trigger arrow -->
+            <div class="flex items-center justify-between pt-3 border-t border-slate-100 mt-4 select-none">
+              <span class="text-[10px] font-bold text-slate-400 group-hover:text-[#F28500] transition-colors uppercase tracking-wider font-space">Configure Recipe</span>
+              <span class="text-slate-350 group-hover:text-[#D97200] transition-colors text-sm">➔</span>
+            </div>
+          </div>
+        }
+      </main>
+    </div>
+  }
+
+  <!-- ADD / EDIT INGREDIENT DIALOG MODAL -->
+  <dialog 
+    #addEditDialog 
+    closedby="any" 
+    (click)="onDialogClick($event, addEditDialog)"
+    class="rounded-3xl border border-slate-200 shadow-2xl p-7 bg-white max-w-md w-full focus:outline-none relative">
+    
+    <!-- Header -->
+    <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-5">
+      <h3 class="text-lg font-bold font-syne text-[#0F172A]">
+        {{ isEditMode() ? 'Modify Ingredient' : 'Register Ingredient' }}
+      </h3>
+      <button 
+        (click)="closeModal(addEditDialog)" 
+        class="p-1 hover:bg-slate-100 text-slate-400 hover:text-slate-[#D97200] rounded-full transition cursor-pointer border-none outline-none text-lg leading-none">
+        ×
+      </button>
+    </div>
+
+    <!-- Form Body -->
+    <form (submit)="onFormSubmit(addEditDialog)" class="space-y-4 font-space text-sm">
+      <div>
+        <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Ingredient Name</label>
+        <input 
+          type="text" 
+          [(ngModel)]="formName"
+          name="formName"
+          required
+          class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 focus:outline-none focus:border-[#F28500] focus:ring-1 focus:ring-[#F28500] bg-slate-50/50" 
+          placeholder="e.g. Tomato, Beef patty" />
+      </div>
+
+      <!-- Split Row for Unit & Stock -->
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Unit</label>
+          <select 
+            [(ngModel)]="formUnit"
+            name="formUnit"
+            required
+            class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 focus:outline-none focus:border-[#F28500] bg-slate-50/50 cursor-pointer">
+            <option [value]="1">Grams</option>
+            <option [value]="2">Milliliters</option>
+            <option [value]="3">Pieces</option>
+            <option [value]="4">Kilograms</option>
+            <option [value]="5">Liters</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Initial Stock</label>
+          <input 
+            type="number" 
+            [(ngModel)]="formQuantity"
+            name="formQuantity"
+            min="0"
+            required
+            class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 focus:outline-none focus:border-[#F28500] focus:ring-1 focus:ring-[#F28500] bg-slate-50/50" 
+            placeholder="e.g. 50" />
+        </div>
+      </div>
+
+      <!-- Split Row for Threshold & Cost -->
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Safety Threshold</label>
+          <input 
+            type="number" 
+            [(ngModel)]="formThreshold"
+            name="formThreshold"
+            min="0"
+            required
+            class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 focus:outline-none focus:border-[#F28500] focus:ring-1 focus:ring-[#F28500] bg-slate-50/50" 
+            placeholder="e.g. 10" />
+        </div>
+
+        <div>
+          <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1 text-slate-400">Unit Cost (Placeholder)</label>
+          <input 
+            type="number" 
+            [(ngModel)]="formCost"
+            name="formCost"
+            step="0.01"
+            min="0"
+            class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 focus:outline-none focus:border-[#F28500] focus:ring-1 focus:ring-[#F28500] bg-slate-50/50" 
+            placeholder="e.g. 1.25" />
+        </div>
+      </div>
+
+      <!-- Active Toggle -->
+      <div class="pt-2 flex items-center justify-between">
+        <span class="text-xs font-bold text-slate-600 block">Set item immediately active</span>
+        <label class="relative inline-flex items-center cursor-pointer select-none">
+          <input 
+            type="checkbox" 
+            [(ngModel)]="formIsActive" 
+            name="formIsActive"
+            class="sr-only peer" />
+          <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#F28500]"></div>
+        </label>
+      </div>
+
+      <!-- Save and Cancel Footer Panel -->
+      <div class="flex items-center space-x-3 pt-5 border-t border-slate-100">
+        <button 
+          type="button" 
+          (click)="closeModal(addEditDialog)"
+          class="flex-1 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-655 font-bold text-xs uppercase tracking-wide transition duration-150 cursor-pointer text-center">
+          Cancel
+        </button>
+        <button 
+          type="submit" 
+          class="flex-1 py-2.5 rounded-xl bg-[#F28500] hover:bg-[#D97200] text-white font-bold text-xs uppercase tracking-wide transition duration-150 cursor-pointer text-center shadow-sm shadow-orange-500/10">
+          Save Changes
+        </button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- SLIDE-OUT RECIPE CONFIGURATION DRAWER PANEL -->
+  <!-- Backdrop when drawer is open -->
+  @if (isRecipeDrawerOpen()) {
+    <div 
+      (click)="closeRecipeDrawer()"
+      class="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 transition-opacity duration-300"></div>
+  }
+
+  <div 
+    [class]="'recipe-drawer fixed top-0 right-0 h-full w-full max-w-md bg-white border-l border-slate-200 z-50 flex flex-col justify-between shadow-2xl transition-transform duration-300 ease-in-out ' + 
+             (isRecipeDrawerOpen() ? 'translate-x-0' : 'translate-x-full')">
+    
+    <!-- Drawer Header -->
+    <div class="p-6 border-b border-slate-100 flex items-center justify-between shrink-0">
+      <div class="space-y-0.5">
+        <h3 class="text-base font-extrabold font-syne text-[#0F172A] tracking-tight">Configure Recipe</h3>
+        <p class="text-[10px] text-[#F28500] font-extrabold uppercase tracking-wider font-space leading-none">{{ selectedRecipeMenuItemName() }}</p>
+      </div>
+      <button 
+        (click)="closeRecipeDrawer()"
+        class="p-1.5 hover:bg-slate-100 text-slate-400 hover:text-slate-655 rounded-full transition cursor-pointer border-none outline-none text-lg">
+        ×
+      </button>
+    </div>
+
+    <!-- Drawer Body -->
+    <div class="p-6 flex-grow overflow-y-auto space-y-6">
+      
+      <!-- Adding form mapping mapping -->
+      <div class="bg-slate-50 border border-slate-150 rounded-2xl p-4 space-y-3 font-space text-xs">
+        <h4 class="font-bold text-slate-600 uppercase tracking-wider">Add Ingredient Mapping</h4>
+        
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Select Ingredient</label>
+            <select 
+              [(ngModel)]="drawerAddIngredientId"
+              class="w-full text-xs rounded-xl border border-slate-200 px-3 py-2 bg-white focus:outline-none cursor-pointer">
+              @for (ing of activeInventoryItemsForRecipes(); track ing.id) {
+                <option [value]="ing.id">{{ ing.name }} (in {{ ing.unitName }})</option>
+              }
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Quantity Required</label>
+            <input 
+              type="number" 
+              [(ngModel)]="drawerAddQuantity"
+              min="0.01"
+              step="any"
+              class="w-full text-xs rounded-xl border border-slate-200 px-3 py-2 bg-white focus:outline-none" />
+          </div>
+        </div>
+
+        <button 
+          (click)="addIngredientToDraft()"
+          type="button"
+          class="w-full py-2 bg-[#F28500] hover:bg-[#D97200] text-white font-bold rounded-xl uppercase tracking-wider text-[10px] transition cursor-pointer">
+          Add To Recipe
+        </button>
+      </div>
+
+      <!-- Current mapped ingredients list -->
+      <div class="space-y-3">
+        <h4 class="text-xs font-bold text-[#0F172A] uppercase tracking-wider font-space">Mapped Ingredients</h4>
+        
+        <div class="space-y-2 max-h-60 overflow-y-auto pr-1">
+          @for (mapping of recipeDraft(); track mapping.itemId) {
+            <div class="bg-white border border-slate-200 rounded-xl p-3 flex items-center justify-between font-space text-xs shadow-sm hover:border-slate-300 transition">
+              <div class="space-y-0.5">
+                <p class="font-bold text-slate-800">{{ mapping.itemName }}</p>
+                <p class="text-[10px] text-slate-400">Required: <strong class="text-slate-600 font-mono">{{ mapping.quantityRequired }} {{ mapping.unitName }}</strong></p>
+              </div>
+              
+              <!-- remove trigger -->
+              <button 
+                (click)="removeIngredientFromDraft(mapping.itemId)"
+                class="p-1 hover:bg-red-50 text-red-500 rounded-lg transition cursor-pointer border-none outline-none"
+                title="Remove from Recipe">
+                🗑️
+              </button>
+            </div>
+          } @empty {
+            <div class="text-center py-10 border border-dashed border-slate-200 rounded-2xl text-slate-400 italic font-space text-xs">
+              No ingredients mapped yet. Use the constructor tool above to map raw materials to this dish.
+            </div>
+          }
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Drawer Footer Actions -->
+    <div class="p-6 border-t border-slate-100 flex items-center space-x-3 shrink-0">
+      <button 
+        type="button" 
+        (click)="closeRecipeDrawer()"
+        class="flex-1 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-655 font-bold text-xs uppercase tracking-wide transition duration-150 cursor-pointer text-center">
+        Cancel
+      </button>
+      <button 
+        (click)="saveRecipe()"
+        type="button" 
+        class="flex-1 py-2.5 rounded-xl bg-[#F28500] hover:bg-[#D97200] text-white font-bold text-xs uppercase tracking-wide transition duration-150 cursor-pointer text-center shadow-sm shadow-orange-500/10">
+        Save Recipe
+      </button>
+    </div>
+
+  </div>
+
+</div>

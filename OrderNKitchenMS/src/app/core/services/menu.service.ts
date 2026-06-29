@@ -51,4 +51,34 @@ export class MenuService {
         }
         return this.http.get<MenuItemModel[]>(url, { params });
     }
+
+    // Menu Item CRUD
+    createMenuItem(item: { name: string; description: string; price: number; categoryId: number; imageUrl: string; preparationTime: number; isAvailable: boolean }): Observable<MenuItemModel> {
+        return this.http.post<MenuItemModel>(menuUrl, item);
+    }
+
+    updateMenuItem(id: number, item: { name: string; description: string; price: number; categoryId: number; imageUrl: string; preparationTime: number; isAvailable: boolean }): Observable<MenuItemModel> {
+        return this.http.put<MenuItemModel>(`${menuUrl}${id}`, item);
+    }
+
+    toggleMenuItemAvailability(id: number, isAvailable: boolean): Observable<void> {
+        return this.http.patch<void>(`${menuUrl}${id}/availability`, { isAvailable });
+    }
+
+    deleteMenuItem(id: number): Observable<void> {
+        return this.http.delete<void>(`${menuUrl}${id}`);
+    }
+
+    // Category CRUD
+    createCategory(category: { name: string; isNonVeg: boolean }): Observable<CategoryModel> {
+        return this.http.post<CategoryModel>(categoryUrl, category);
+    }
+
+    updateCategory(id: number, category: { name: string; isNonVeg: boolean }): Observable<CategoryModel> {
+        return this.http.put<CategoryModel>(`${categoryUrl}${id}`, category);
+    }
+
+    deleteCategory(id: number): Observable<void> {
+        return this.http.delete<void>(`${categoryUrl}${id}`);
+    }
 }

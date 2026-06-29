@@ -11,7 +11,7 @@
     
     <button 
       (click)="openModal(addDialog)"
-      class="inline-flex items-center justify-center space-x-2 px-5 py-2.5 rounded-xl bg-[#4F46E5] hover:bg-[#4338CA] text-white font-semibold text-sm transition-all duration-200 shadow-md shadow-indigo-600/10 cursor-pointer active:scale-[0.98]">
+      class="inline-flex items-center justify-center space-x-2 px-5 py-2.5 rounded-xl bg-[#F28500] hover:bg-[#D97200] text-white font-semibold text-sm transition-all duration-200 shadow-md shadow-orange-500/10 cursor-pointer active:scale-[0.98]">
       <span>➕</span>
       <span>Add New Table</span>
     </button>
@@ -39,24 +39,23 @@
     <div class="bg-white border border-slate-150 rounded-2xl p-5 shadow-sm flex flex-col justify-between space-y-2">
       <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Occupancy Rate</span>
       <div class="flex items-center space-x-2">
-        <span class="text-2xl font-bold font-syne text-indigo-600">{{ occupancyRate() }}%</span>
+        <span class="text-2xl font-bold font-syne text-[#F28500]">{{ occupancyRate() }}%</span>
         <div class="w-12 bg-slate-100 rounded-full h-1.5 overflow-hidden">
-          <div class="bg-indigo-600 h-full rounded-full" [style.width.%]="occupancyRate()"></div>
+          <div class="bg-[#F28500] h-full rounded-full" [style.width.%]="occupancyRate()"></div>
         </div>
       </div>
     </div>
     <!-- Stat 4 -->
     <div class="bg-white border border-slate-150 rounded-2xl p-5 shadow-sm flex flex-col justify-between space-y-2">
       <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Available / Reserved</span>
-      <div class="flex items-baseline space-x-2">
-        <span class="text-xl font-bold text-emerald-600 font-syne">{{ availableCount() }}</span>
-        <span class="text-xs text-slate-300">/</span>
-        <span class="text-xl font-bold text-slate-500 font-syne">{{ reservedCount() }}</span>
+      <div class="flex items-baseline space-x-1.5">
+        <span class="text-2xl font-bold font-syne text-emerald-600">{{ availableCount() }}</span>
+        <span class="text-xs text-slate-400">/ {{ reservedCount() }}</span>
       </div>
     </div>
     <!-- Stat 5 -->
-    <div class="col-span-2 md:col-span-1 bg-white border border-slate-150 rounded-2xl p-5 shadow-sm flex flex-col justify-between space-y-2">
-      <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Occupied Tables</span>
+    <div class="bg-white border border-slate-150 rounded-2xl p-5 shadow-sm flex flex-col justify-between space-y-2">
+      <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Seated Tables</span>
       <div class="flex items-center space-x-2">
         <span class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
         <span class="text-2xl font-bold font-syne text-amber-600">{{ occupiedCount() }}</span>
@@ -74,7 +73,7 @@
         [value]="searchQuery()"
         (input)="searchQuery.set($any($event.target).value)"
         placeholder="Search by table number..." 
-        class="w-full pl-9 pr-4 py-2.5 text-sm rounded-xl border border-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition duration-150 bg-slate-50/50" />
+        class="w-full pl-9 pr-4 py-2.5 text-sm rounded-xl border border-slate-200 focus:outline-none focus:border-[#F28500] focus:ring-1 focus:ring-[#F28500] transition duration-150 bg-slate-50/50" />
     </div>
 
     <!-- Dropdowns Filter Panel -->
@@ -85,7 +84,7 @@
         <select 
           [value]="capacityFilter()"
           (change)="capacityFilter.set($any($event.target).value)"
-          class="text-xs font-medium bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:border-indigo-500 transition duration-150 cursor-pointer">
+          class="text-xs font-medium bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:border-[#F28500] transition duration-150 cursor-pointer">
           <option value="all">All Sizes</option>
           <option value="2">2 Guests</option>
           <option value="4">4 Guests</option>
@@ -99,7 +98,7 @@
         <select 
           [value]="statusFilter()"
           (change)="statusFilter.set($any($event.target).value)"
-          class="text-xs font-medium bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:border-indigo-500 transition duration-150 cursor-pointer">
+          class="text-xs font-medium bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:border-[#F28500] transition duration-150 cursor-pointer">
           <option value="all">All Statuses</option>
           <option value="1">Available</option>
           <option value="2">Occupied</option>
@@ -127,10 +126,10 @@
       
       <!-- INLINE EDITING STATE -->
       @if (editingTableId() === table.id) {
-        <div class="bg-white border-2 border-indigo-500 rounded-3xl p-6 shadow-md transition-all duration-300 flex flex-col justify-between min-h-60 relative animate-pulse-subtle">
+        <div class="bg-white border-2 border-[#F28500] rounded-3xl p-6 shadow-md transition-all duration-300 flex flex-col justify-between min-h-60 relative animate-pulse-subtle">
           
           <div class="space-y-4 flex-grow flex flex-col justify-center">
-            <h4 class="text-xs font-bold text-indigo-600 uppercase tracking-wider">Editing Table #{{ table.number }}</h4>
+            <h4 class="text-xs font-bold text-[#F28500] uppercase tracking-wider">Editing Table #{{ table.number }}</h4>
             
             <!-- Edit Inputs -->
             <div class="space-y-3">
@@ -139,7 +138,7 @@
                 <input 
                   type="number" 
                   [(ngModel)]="editNumber" 
-                  class="w-full text-sm rounded-xl border border-slate-200 px-3 py-2 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" 
+                  class="w-full text-sm rounded-xl border border-slate-200 px-3 py-2 focus:outline-none focus:border-[#F28500] focus:ring-1 focus:ring-[#F28500]" 
                   placeholder="e.g. 1" />
               </div>
               
@@ -148,7 +147,7 @@
                 <input 
                   type="number" 
                   [(ngModel)]="editCapacity" 
-                  class="w-full text-sm rounded-xl border border-slate-200 px-3 py-2 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" 
+                  class="w-full text-sm rounded-xl border border-slate-200 px-3 py-2 focus:outline-none focus:border-[#F28500] focus:ring-1 focus:ring-[#F28500]" 
                   placeholder="e.g. 4" />
               </div>
             </div>
@@ -158,105 +157,104 @@
           <div class="flex items-center space-x-2 mt-4 pt-4 border-t border-slate-100 shrink-0">
             <button 
               (click)="saveEdit(table.id)"
-              class="flex-1 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs uppercase tracking-wide transition duration-150 cursor-pointer">
+              class="flex-1 py-2 rounded-xl bg-[#F28500] hover:bg-[#D97200] text-white font-bold text-xs uppercase tracking-wide transition duration-150 cursor-pointer">
               Save
             </button>
             <button 
               (click)="cancelEdit()"
-              class="py-2 px-3.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs uppercase tracking-wide transition duration-150 cursor-pointer">
+              class="py-2 px-3.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-655 font-bold text-xs uppercase tracking-wide transition duration-150 cursor-pointer">
               Cancel
             </button>
           </div>
         </div>
-      }
-
-      <!-- DEFAULT CARD STATE -->
-      @else {
-        <div class="group relative bg-white border border-slate-200 rounded-3xl p-6 shadow-sm hover:shadow-md hover:border-slate-350 hover:translate-y-[-2px] transition-all duration-300 flex flex-col justify-between min-h-60">
+      } @else {
+        <!-- DEFAULT CARD STATE -->
+        <div class="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between min-h-60 relative group">
           
-          <!-- Top Row: Capacity & Status Select Override -->
-          <div class="flex justify-between items-center select-none space-x-2">
-            <!-- Capacity (Pill) -->
-            <div class="flex items-center space-x-1 text-xs text-slate-500 font-semibold font-space bg-slate-50 px-2.5 py-1 rounded-full border border-slate-150">
-              <span>👥</span>
-              <span>{{ table.capacity }} seats</span>
+          <!-- Card Body Details -->
+          <div class="space-y-4">
+            <div class="flex items-start justify-between">
+              <div class="space-y-0.5">
+                <span class="text-[10px] font-extrabold uppercase px-2 py-0.5 bg-slate-50 border border-slate-150 rounded-full text-slate-400 tracking-wider font-space">
+                  {{ table.capacity }} Seats
+                </span>
+                <h3 class="text-xl font-bold font-syne text-[#0F172A] tracking-tight group-hover:text-[#F28500] transition-colors mt-1.5">
+                  Table #{{ table.number }}
+                </h3>
+              </div>
+              
+              <!-- Clean Status Badge -->
+              <span 
+                [ngClass]="{
+                  'bg-emerald-50 text-emerald-700 border-emerald-200': table.status === 1,
+                  'bg-amber-50 text-amber-700 border-amber-200': table.status === 2,
+                  'bg-indigo-50 text-indigo-700 border-indigo-200': table.status === 3
+                }"
+                class="text-[9px] font-extrabold uppercase px-2.5 py-0.5 rounded-full border shadow-sm font-space">
+                {{ getStatusName(table.status) }}
+              </span>
             </div>
 
-            <!-- Status Override Dropdown Selector -->
-            <div class="relative shrink-0">
+            <!-- Seating Details & active order tag -->
+            <div class="space-y-2 font-space text-xs text-slate-500">
+              @if (table.status === 2 && table.activeOrderId) {
+                <div class="bg-amber-50/50 border border-amber-150 rounded-xl p-3 flex items-center space-x-2">
+                  <span class="animate-pulse h-1.5 w-1.5 rounded-full bg-amber-500"></span>
+                  <div class="flex-1 min-w-0">
+                    <p class="font-bold text-amber-900 leading-tight">Order #{{ table.activeOrderId }}</p>
+                    <p class="text-[10px] text-amber-700 leading-tight mt-0.5">Guests are currently dining</p>
+                  </div>
+                </div>
+              } @else if (table.status === 3) {
+                <p class="italic text-slate-400">Reserved for upcoming booking slot.</p>
+              } @else {
+                <p class="italic text-slate-400">Ready for guest seating walk-ins.</p>
+              }
+            </div>
+          </div>
+
+          <!-- Status Overriding drop-down & Action controls -->
+          <div class="space-y-3 mt-4 pt-4 border-t border-slate-100">
+            <!-- Selector override -->
+            <div class="flex items-center justify-between font-space text-xs">
+              <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Override Status:</span>
               <select 
                 [value]="table.status"
-                (change)="onStatusOverride(table.id, $event)"
-                [ngClass]="{
-                  'text-emerald-700 bg-emerald-50 border-emerald-200': table.status === 1,
-                  'text-amber-700 bg-amber-50 border-amber-200': table.status === 2,
-                  'text-slate-700 bg-slate-100 border-slate-250': table.status === 3
-                }"
-                class="text-[10px] uppercase tracking-wider font-extrabold rounded-full px-2.5 py-1 border focus:outline-none cursor-pointer pr-5 appearance-none shadow-sm relative z-10 transition duration-150">
+                (change)="overrideStatus(table.id, $any($event.target).value)"
+                class="text-[11px] font-semibold bg-slate-50 border border-slate-200 rounded-lg px-2 py-1 focus:outline-none transition cursor-pointer">
                 <option value="1">Available</option>
                 <option value="2">Occupied</option>
                 <option value="3">Reserved</option>
               </select>
-              <!-- custom arrow icon overlay -->
-              <span class="absolute right-2 top-1/2 -translate-y-1/2 z-20 pointer-events-none text-[8px] opacity-70"
-                    [ngClass]="{
-                      'text-emerald-700': table.status === 1,
-                      'text-amber-700': table.status === 2,
-                      'text-slate-700': table.status === 3
-                    }">▼</span>
             </div>
-          </div>
 
-          <!-- Middle Row: Table Number (Syne font, center of card) -->
-          <div class="flex flex-col items-center justify-center flex-grow py-3">
-            <span class="text-5xl font-extrabold font-syne text-[#0F172A] tracking-tight group-hover:scale-105 transition-transform duration-300">
-              {{ table.number }}
-            </span>
-            <span class="text-[9px] uppercase tracking-widest text-slate-400 font-bold mt-1.5 font-space">Dining Table</span>
-            
-            <!-- Active order tracker details if occupied -->
-            @if (table.status === 2 && table.activeOrderId) {
-              <div class="mt-3 inline-flex items-center space-x-1.5 text-[10px] text-amber-700 bg-amber-50 border border-amber-100 px-3 py-1 rounded-full font-space font-semibold animate-pulse-subtle">
-                <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-                <span>Active Order #{{ table.activeOrderId }}</span>
-                <span class="text-slate-350">|</span>
-                <span class="font-mono text-[9px]">{{ getElapsedTime(table.activeOrderCreatedAt) }}</span>
-              </div>
-            }
-          </div>
-
-          <!-- Bottom Row: Admin Modification Tools -->
-          <div class="flex items-center space-x-2 pt-4 border-t border-slate-100 mt-2 select-none">
-            <!-- Edit Button -->
-            <button 
-              (click)="startEdit(table)"
-              class="flex-1 inline-flex items-center justify-center space-x-1.5 py-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-650 hover:text-slate-900 border border-slate-200 font-bold text-xs uppercase tracking-wide transition duration-150 cursor-pointer"
-              title="Edit Inline">
-              <span>✏️</span>
-              <span>Edit</span>
-            </button>
-            
-            <!-- Delete Button -->
-            <button 
-              (click)="triggerDelete(table.id, deleteDialog)"
-              class="inline-flex items-center justify-center p-2 rounded-xl bg-red-50 hover:bg-red-100 text-red-650 hover:text-red-700 border border-red-150 transition duration-150 cursor-pointer"
-              title="Delete Table">
-              <span>🗑️</span>
-            </button>
+            <!-- Action buttons panel -->
+            <div class="flex items-center space-x-2 pt-1 select-none">
+              <button 
+                (click)="startEdit(table)"
+                class="flex-1 py-1.5 rounded-xl bg-slate-50 border border-slate-200 hover:bg-slate-100 text-slate-700 font-bold text-xs uppercase tracking-wide cursor-pointer transition">
+                ✏️ Edit
+              </button>
+              <button 
+                (click)="triggerDelete(table.id, deleteDialog)"
+                class="p-1.5 bg-red-50 hover:bg-red-100 border border-red-150 text-red-650 rounded-xl cursor-pointer transition">
+                🗑️
+              </button>
+            </div>
           </div>
 
         </div>
       }
+
     } @empty {
-      <!-- Empty State -->
       <div class="col-span-full bg-white border border-slate-150 rounded-3xl p-12 text-center flex flex-col items-center justify-center space-y-4 shadow-sm select-none">
         <span class="text-4xl">🍽️</span>
         <div class="space-y-1">
-          <h3 class="text-base font-bold font-syne text-[#0F172A]">No Matching Tables</h3>
-          <p class="text-xs text-slate-400 font-space">We couldn't find any dining tables matching the search query or active filter selections.</p>
+          <h3 class="text-base font-bold font-syne text-[#0F172A]">No Dining Tables Mapped</h3>
+          <p class="text-xs text-slate-400 font-space">We couldn't find any tables matching the selected filters.</p>
         </div>
         <button 
-          (click)="searchQuery.set(''); statusFilter.set('all'); capacityFilter.set('all');"
+          (click)="searchQuery.set(''); capacityFilter.set('all'); statusFilter.set('all')"
           class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold uppercase tracking-wide transition duration-150 cursor-pointer">
           Reset Filters
         </button>
@@ -269,11 +267,11 @@
     #addDialog 
     closedby="any" 
     (click)="onDialogClick($event, addDialog)"
-    class="rounded-3xl border border-slate-200 shadow-2xl p-7 bg-white max-w-md w-full focus:outline-none relative">
+    class="rounded-3xl border border-slate-200 shadow-2xl p-7 bg-white max-w-sm w-full focus:outline-none relative">
     
     <!-- Header -->
     <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-5">
-      <h3 class="text-lg font-bold font-syne text-[#0F172A]">Register New Table</h3>
+      <h3 class="text-lg font-bold font-syne text-[#0F172A]">Register Dining Table</h3>
       <button 
         (click)="closeModal(addDialog)" 
         class="p-1 hover:bg-slate-100 text-slate-400 hover:text-slate-650 rounded-full transition cursor-pointer border-none outline-none text-lg leading-none">
@@ -290,7 +288,7 @@
           [value]="addNumber()" 
           (input)="addNumber.set($any($event.target).valueAsNumber)" 
           required
-          class="w-full text-sm rounded-xl border border-slate-200 px-3.5 py-2.5 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 bg-slate-50/50" 
+          class="w-full text-sm rounded-xl border border-slate-200 px-3.5 py-2.5 focus:outline-none focus:border-[#F28500] focus:ring-1 focus:ring-[#F28500] bg-slate-50/50" 
           placeholder="e.g. 1" />
       </div>
 
@@ -301,7 +299,7 @@
           [value]="addCapacity()" 
           (input)="addCapacity.set($any($event.target).valueAsNumber)" 
           required
-          class="w-full text-sm rounded-xl border border-slate-200 px-3.5 py-2.5 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 bg-slate-50/50" 
+          class="w-full text-sm rounded-xl border border-slate-200 px-3.5 py-2.5 focus:outline-none focus:border-[#F28500] focus:ring-1 focus:ring-[#F28500] bg-slate-50/50" 
           placeholder="e.g. 4" />
       </div>
 
@@ -310,7 +308,7 @@
         <select 
           [value]="addStatus()" 
           (change)="addStatus.set($any($event.target).valueAsNumber)"
-          class="w-full text-sm rounded-xl border border-slate-200 px-3.5 py-2.5 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 bg-slate-50/50 cursor-pointer">
+          class="w-full text-sm rounded-xl border border-slate-200 px-3.5 py-2.5 focus:outline-none focus:border-[#F28500] focus:ring-1 focus:ring-[#F28500] bg-slate-50/50 cursor-pointer">
           <option [value]="1">Available</option>
           <option [value]="2">Occupied</option>
           <option [value]="3">Reserved</option>
@@ -322,12 +320,12 @@
         <button 
           type="button" 
           (click)="closeModal(addDialog)"
-          class="flex-1 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-650 font-bold text-xs uppercase tracking-wide transition duration-150 cursor-pointer text-center">
+          class="flex-1 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-655 font-bold text-xs uppercase tracking-wide transition duration-150 cursor-pointer text-center">
           Cancel
         </button>
         <button 
           type="submit" 
-          class="flex-1 py-2.5 rounded-xl bg-[#4F46E5] hover:bg-[#4338CA] text-white font-bold text-xs uppercase tracking-wide transition duration-150 cursor-pointer text-center shadow-sm shadow-indigo-650/10">
+          class="flex-1 py-2.5 rounded-xl bg-[#F28500] hover:bg-[#D97200] text-white font-bold text-xs uppercase tracking-wide transition duration-150 cursor-pointer text-center shadow-sm shadow-orange-500/10">
           Save Table
         </button>
       </div>
@@ -346,7 +344,7 @@
       <h3 class="text-lg font-bold font-syne text-red-650">Confirm Deletion</h3>
       <button 
         (click)="closeModal(deleteDialog)" 
-        class="p-1 hover:bg-slate-100 text-slate-400 hover:text-slate-650 rounded-full transition cursor-pointer border-none outline-none text-lg leading-none">
+        class="p-1 hover:bg-slate-100 text-slate-400 hover:text-slate-655 rounded-full transition cursor-pointer border-none outline-none text-lg leading-none">
         ×
       </button>
     </div>
@@ -359,30 +357,28 @@
 
       <!-- Danger banner warnings if table is currently active with occupied order -->
       @if (getConfirmDeleteTable()?.status === 2 && getConfirmDeleteTable()?.activeOrderId) {
-        <div class="bg-red-50 border border-red-150 rounded-2xl p-4 flex items-start space-x-3 text-red-800 text-xs shadow-sm">
-          <span class="text-lg mt-0.5 select-none">⚠️</span>
+        <div class="bg-red-50 border border-red-200 rounded-2xl p-4 flex items-start space-x-3 text-red-800 text-xs">
+          <span class="text-base select-none mt-0.5">⚠️</span>
           <div>
-            <h4 class="font-bold">Active Diner Warning</h4>
+            <h4 class="font-bold">Active Seated Session Warning</h4>
             <p class="mt-0.5 text-red-700/90 leading-relaxed">
-              This table is occupied and has an active <strong>Order #{{ getConfirmDeleteTable()?.activeOrderId }}</strong>. Deleting this table will remove it from dining room grids and affect active tracking.
+              This table currently has guests dining. Deleting it will detach order sessions and may affect service operations.
             </p>
           </div>
         </div>
       }
 
-      <!-- Action Panel -->
-      <div class="flex items-center space-x-3 pt-5 border-t border-slate-100">
+      <!-- Actions -->
+      <div class="flex items-center space-x-3 pt-5 border-t border-slate-100 text-xs">
         <button 
-          type="button" 
           (click)="closeModal(deleteDialog)"
-          class="flex-1 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-650 font-bold text-xs uppercase tracking-wide transition duration-150 cursor-pointer text-center">
-          Cancel
+          class="flex-1 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-655 font-bold uppercase tracking-wide transition duration-150 cursor-pointer">
+          No, Cancel
         </button>
         <button 
-          type="button" 
           (click)="confirmDelete(deleteDialog)"
-          class="flex-1 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs uppercase tracking-wide transition duration-150 cursor-pointer text-center shadow-sm shadow-red-600/10">
-          Delete Table
+          class="flex-1 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold uppercase tracking-wide transition duration-150 cursor-pointer">
+          Yes, Delete
         </button>
       </div>
     </div>

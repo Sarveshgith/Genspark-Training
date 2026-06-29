@@ -42,6 +42,27 @@ export const routes: Routes = [
 	},
 
 	{
+		path: 'inventory',
+		loadComponent: () => import('./features/admin/inventory-manager/inventory-manager').then(m => m.InventoryManager),
+		canActivate: [RoleGuard],
+		data: { roles: ['Admin'] }
+	},
+
+	{
+		path: 'menu-manager',
+		loadComponent: () => import('./features/admin/menu-manager/menu-manager').then(m => m.MenuManager),
+		canActivate: [RoleGuard],
+		data: { roles: ['Admin'] }
+	},
+
+	{
+		path: 'category-manager',
+		loadComponent: () => import('./features/admin/category-manager/category-manager').then(m => m.CategoryManager),
+		canActivate: [RoleGuard],
+		data: { roles: ['Admin'] }
+	},
+
+	{
 		path: 'waiter/active-order/:tableId',
 		loadComponent: () => import('./features/waiter/active-order/active-order').then(m => m.ActiveOrderComponent),
 		canActivate: [RoleGuard],
