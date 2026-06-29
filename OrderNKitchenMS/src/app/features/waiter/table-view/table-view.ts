@@ -1,3 +1,4 @@
+// @feature Waiter | Table View | Displays a visual grid of restaurant tables showing availability and current order state.
 import { Component, inject, OnInit, OnDestroy, signal, ChangeDetectorRef, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TableService } from '../../../core/services/table.service';

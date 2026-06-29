@@ -1,25 +1,39 @@
 <div class="flex-1 flex flex-col md:flex-row min-h-screen overflow-hidden">
   <!-- MAIN WORKSPACE CONTENT -->
   <div class="flex-1 flex flex-col overflow-y-auto">
-    <!-- TOP HEADER BAR -->
+    <!-- TOP HEADER BAR (Responsive & Role-adapted) -->
     <header
-      class="bg-[#FCFAF8] border-b border-[#EFECE9] sticky top-0 z-40 px-8 py-4 flex items-center justify-between font-syne">
-      <!-- Title (Offset left padding on mobile to accommodate floating hamburger) -->
-      <div class="flex items-baseline space-x-2 pl-12 md:pl-0 select-none">
-        <h2 class="text-2xl font-medium text-gray-800">Menu Guide</h2>
-        <span class="text-xs font-medium tracking-wider text-slate-400 uppercase">
-          @if (isWaiter()) {
-          (Waiter View)
+      class="bg-[#FCFAF8] border-b border-[#EFECE9] sticky top-0 z-40 px-4 sm:px-8 py-3.5 flex flex-col md:flex-row md:items-center justify-between gap-4 font-syne">
+      
+      <!-- Left Section: Back Button + Title/Logo -->
+      <div class="flex items-center flex-wrap gap-3">
+        <!-- Guest Back Button -->
+        @if (!isWaiter()) {
+        <a [routerLink]="['/guest/landing']" [queryParams]="{ tableId: selectedTableId() }"
+          class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#8C7A6B] hover:text-[#2C2117] transition duration-200 cursor-pointer bg-[#FAF4EC] px-3 py-1.5 rounded-full border border-[#8C5815]/10">
+          <span>←</span> <span>Back</span>
+        </a>
+        }
+
+        <!-- Logo & Brand for Guest OR Simple Title for Waiter -->
+        <div class="flex items-center gap-3 select-none">
+          @if (!isWaiter()) {
+          <img src="/logo.png" class="w-8 h-8 object-contain" alt="Ambrosia Logo" />
+          <div class="flex flex-col">
+            <h1 class="text-base font-bold tracking-widest text-[#8C5815] font-serif leading-none">AMBROSIA</h1>
+            <span class="text-[9px] tracking-[0.15em] text-[#8C7A6B] font-semibold mt-0.5 uppercase">Menu</span>
+          </div>
           } @else {
-          (Guest View)
+          <h2 class="text-xl font-medium text-gray-800">Menu Guide</h2>
+          <span class="text-[10px] tracking-wider text-slate-400 uppercase font-sans font-semibold bg-slate-100 px-2 py-0.5 rounded-md">Staff</span>
           }
-        </span>
+        </div>
       </div>
 
-      <!-- Search and Avatar panel -->
-      <div class="flex items-center space-x-4 md:space-x-6">
+      <!-- Right Section: Search & Actions -->
+      <div class="flex items-center justify-between md:justify-end gap-4 w-full md:w-auto">
         <!-- Search bar -->
-        <div class="relative w-40 sm:w-60 md:w-80">
+        <div class="relative flex-grow md:flex-initial w-full md:w-80">
           <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
             <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
               <path stroke-linecap="round" stroke-linejoin="round"
@@ -27,32 +41,33 @@
             </svg>
           </span>
           <input type="text" [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event); fetchMenuItems()"
-            placeholder="Search..."
-            class="w-full bg-[#EFECE9]/60 text-gray-800 placeholder-gray-400 pl-9 pr-3 py-1.5 rounded-full text-xs sm:text-sm border-0 focus:ring-1 focus:ring-[#8C5815]/30 focus:bg-white outline-none transition-all duration-200 shadow-inner" />
+            placeholder="Search menu items..."
+            class="w-full bg-[#EFECE9]/60 text-gray-800 placeholder-gray-400 pl-9 pr-3 py-2 rounded-full text-xs sm:text-sm border-0 focus:ring-1 focus:ring-[#8C5815]/30 focus:bg-white outline-none transition-all duration-200 shadow-inner" />
         </div>
 
-        <!-- Notification (hidden on extra small screens) -->
-        <button
-          class="hidden sm:block relative p-2 text-gray-500 hover:text-gray-700 bg-white rounded-full border border-gray-100 shadow-sm transition-all duration-200 hover:scale-105">
-          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-            <path stroke-linecap="round" stroke-linejoin="round"
-              d="M14.857 17.082a9.04 9.04 0 0 1-2.943 2.244A9.07 9.07 0 0 1 9 18.75m6-12v6a3 3 0 0 1-3 3H9a3 3 0 0 1-3-3v-6a3 3 0 0 1 3-3h3a3 3 0 0 1 3 3ZM9 10.5h.008v.008H9V10.5Zm3 0h.008v.008H12V10.5Z" />
-          </svg>
-          <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-[#8C5815] rounded-full"></span>
-        </button>
+        <!-- Waiter Only Actions -->
+        @if (isWaiter()) {
+        <div class="flex items-center space-x-4">
+          <!-- Notification -->
+          <button
+            class="hidden sm:block relative p-2 text-gray-500 hover:text-gray-700 bg-white rounded-full border border-gray-100 shadow-sm transition-all duration-200 hover:scale-105">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M14.857 17.082a9.04 9.04 0 0 1-2.943 2.244A9.07 9.07 0 0 1 9 18.75m6-12v6a3 3 0 0 1-3 3H9a3 3 0 0 1-3-3v-6a3 3 0 0 1 3-3h3a3 3 0 0 1 3 3ZM9 10.5h.008v.008H9V10.5Zm3 0h.008v.008H12V10.5Z" />
+            </svg>
+            <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-[#8C5815] rounded-full"></span>
+          </button>
 
-        <!-- Profile Avatar -->
-        <div class="flex items-center space-x-3 select-none">
-          <div
-            class="w-8 h-8 sm:w-10 sm:h-10 rounded-full overflow-hidden border-2 border-[#8C5815]/20 bg-[#FAF4EC] flex items-center justify-center font-syne text-xs sm:text-sm font-medium text-[#8C5815]">
-            @if (isWaiter()) {
-            <img src="https://images.unsplash.com/photo-1577219491135-ce391730fb2c?w=100&h=100&fit=crop&crop=face"
-              alt="Waiter Profile" class="w-full h-full object-cover">
-            } @else {
-            G
-            }
+          <!-- Profile Avatar -->
+          <div class="flex items-center select-none">
+            <div
+              class="w-8.5 h-8.5 rounded-full overflow-hidden border-2 border-[#8C5815]/20 bg-[#FAF4EC] flex items-center justify-center font-syne text-xs font-medium text-[#8C5815]">
+              <img src="https://images.unsplash.com/photo-1577219491135-ce391730fb2c?w=100&h=100&fit=crop&crop=face"
+                alt="Waiter Profile" class="w-full h-full object-cover">
+            </div>
           </div>
         </div>
+        }
       </div>
     </header>
 

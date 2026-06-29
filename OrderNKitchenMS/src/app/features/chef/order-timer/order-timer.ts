@@ -1,3 +1,4 @@
+// @feature Chef | Order Timer | Calculates and displays order preparation time dynamically in minutes and seconds.
 import { Component, input, computed } from '@angular/core';
 
 @Component({

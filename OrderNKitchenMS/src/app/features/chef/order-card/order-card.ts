@@ -1,3 +1,4 @@
+// @feature Chef | Order Card | A card component representing a single order, displaying line items, table info, and action buttons.
 import { Component, input, output, signal, computed, OnInit, OnDestroy } from '@angular/core';
 import { OrderModel } from '../../../core/models/order.model';
 import { CurrencyPipe, DatePipe, DecimalPipe } from '@angular/common';

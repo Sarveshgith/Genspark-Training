@@ -1,6 +1,7 @@
+// @feature Waiter | Menu Grid | Displays the food menu with categories, search capabilities, and cart sidebar management.
 import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { MenuService } from '../../../core/services/menu.service';
@@ -19,7 +20,7 @@ export interface CartItem {
 
 @Component({
   selector: 'app-menu-items',
-  imports: [FormsModule, CartSidebarComponent, FilterPanelComponent],
+  imports: [FormsModule, CartSidebarComponent, FilterPanelComponent, RouterLink],
   templateUrl: './menu-items.html',
   styleUrl: './menu-items.css',
 })
@@ -90,13 +91,13 @@ export class MenuItems implements OnInit {
     this.fetchCategories();
     if (this.isWaiter()) {
       this.fetchTables();
-      this.route.queryParams.subscribe(params => {
-        const tableId = params['tableId'];
-        if (tableId) {
-          this.selectedTableId.set(Number(tableId));
-        }
-      });
     }
+    this.route.queryParams.subscribe(params => {
+      const tableId = params['tableId'];
+      if (tableId) {
+        this.selectedTableId.set(Number(tableId));
+      }
+    });
   }
 
   fetchMenuItems(): void {

@@ -1,46 +1,56 @@
 import { Routes } from '@angular/router';
-import { Login } from './features/auth/login/login';
-import { Register } from './features/auth/register/register';
-import { KdsBoard } from './features/chef/kds-board/kds-board';
 import { RoleGuard } from './core/guards/role.guard';
-import { LandingComponent } from './features/guest/landing-component/landing-component';
-import { MenuItems } from './features/waiter/menu-items/menu-items';
-import { TableView } from './features/waiter/table-view/table-view';
-import { ActiveOrderComponent } from './features/waiter/active-order/active-order';
+import { GuestGuard } from './core/guards/guest.guard';
 
 export const routes: Routes = [
 	{ path: '', pathMatch: 'full', redirectTo: 'login' },
 
-	{ path: 'login', component: Login },
+	{ 
+		path: 'login', 
+		loadComponent: () => import('./features/auth/login/login').then(m => m.Login) 
+	},
 
-	{ path: 'register', component: Register },
+	{ 
+		path: 'register', 
+		loadComponent: () => import('./features/auth/register/register').then(m => m.Register) 
+	},
 	
 	{
 		path: 'kitchen',
-		component: KdsBoard,
+		loadComponent: () => import('./features/chef/kds-board/kds-board').then(m => m.KdsBoard),
 		canActivate: [RoleGuard],
 		data: { roles: ['Chef'] }
 	},
 
 	{
-		path: 'waiter/menu', component: MenuItems
+		path: 'waiter/menu', 
+		loadComponent: () => import('./features/waiter/menu-items/menu-items').then(m => m.MenuItems)
 	},
 
 	{
 		path: 'waiter/tables',
-		component: TableView,
+		loadComponent: () => import('./features/waiter/table-view/table-view').then(m => m.TableView),
 		canActivate: [RoleGuard],
 		data: { roles: ['Waiter'] }
 	},
 
 	{
 		path: 'waiter/active-order/:tableId',
-		component: ActiveOrderComponent,
+		loadComponent: () => import('./features/waiter/active-order/active-order').then(m => m.ActiveOrderComponent),
 		canActivate: [RoleGuard],
 		data: { roles: ['Waiter'] }
 	},
 
-	{ path: 'guest/landing', component: LandingComponent },
+	{ 
+		path: 'guest/landing', 
+		loadComponent: () => import('./features/guest/landing-component/landing-component').then(m => m.LandingComponent) 
+	},
+
+	{
+		path: 'guest/menu',
+		loadComponent: () => import('./features/waiter/menu-items/menu-items').then(m => m.MenuItems),
+		canActivate: [GuestGuard]
+	},
 
 	{ path: '**', redirectTo: 'login' },
 ];

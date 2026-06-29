@@ -1,3 +1,4 @@
+// @feature Chef | KDS Board | Kitchen Display System board tracking active orders in preparation stages (Pending, Prep, Ready).
 import { Component, inject, OnInit, signal, computed, OnDestroy } from '@angular/core';
 import { OrderService } from '../../../core/services/order.service';
 import { OrderModel } from '../../../core/models/order.model';

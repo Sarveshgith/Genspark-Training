@@ -1,3 +1,4 @@
+// @feature Waiter | Active Order | Allows waiters to view table details, manage order items, request the bill, and complete checkout.
 import { Component, inject, OnInit, OnDestroy, signal, ChangeDetectorRef, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';

@@ -1,3 +1,4 @@
+// @feature Authentication | Registration Page | Interface allowing creation of new staff or guest user accounts with role selection.
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth.service';

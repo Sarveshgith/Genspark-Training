@@ -49,8 +49,7 @@
         <div class="space-y-3">
           <h1 class="text-4xl font-semibold font-syne tracking-tight text-[#2C2117]">Welcome to Ambrosia</h1>
           <p class="text-base text-[#8C7A6B] max-w-md mx-auto leading-relaxed font-outfit font-normal">
-            Scan our tabletop QR code or ask your waiter to place an order. Once submitted, your real-time course
-            progression will appear right here.
+            Your waiter will be with you shortly to take your order. In the meantime, feel free to browse our menu.
           </p>
         </div>
         <div class="border-t border-[#F5EFE6] pt-6 flex flex-col items-center justify-center space-y-4">
@@ -59,10 +58,21 @@
             <span class="inline-block w-2.5 h-2.5 rounded-full bg-[#E8A54B] animate-pulse"></span>
             <span>Waiting for your order</span>
           </div>
-          <button (click)="fetchOrderTracking()"
-            class="px-8 py-3 bg-[#2C2117] text-white hover:bg-[#3d2f21] rounded-full transition duration-300 shadow-md shadow-[#2c21171c] font-medium font-outfit tracking-wide cursor-pointer">
-            Refresh Status
-          </button>
+          <div class="flex flex-col sm:flex-row items-center gap-3">
+            <button (click)="callWaiter()"
+              class="px-6 py-2.5 border border-[#C5A059] text-[#C5A059] hover:bg-[#C5A059] hover:text-white rounded-full transition duration-300 font-medium text-xs tracking-wide cursor-pointer flex items-center space-x-2">
+              <span>🔔</span>
+              <span>Call Waiter</span>
+            </button>
+            <button (click)="fetchOrderTracking()"
+              class="px-6 py-2.5 bg-[#2C2117] text-white hover:bg-[#3d2f21] rounded-full transition duration-300 shadow-md shadow-[#2c21171c] font-medium font-outfit tracking-wide cursor-pointer text-xs uppercase">
+              Refresh Status
+            </button>
+          </div>
+          <a routerLink="/guest/menu" [queryParams]="{ tableId: tableNumber }"
+            class="mt-2 text-xs font-semibold uppercase tracking-wider text-[#9C7A3C] hover:text-[#2C2117] border-b border-[#9C7A3C]/40 hover:border-[#2C2117] pb-0.5 transition duration-200 cursor-pointer">
+            Browse our menu
+          </a>
         </div>
       </div>
     </main>
@@ -232,4 +242,22 @@
   }
   }
 
+  @if (showWaiterModal()) {
+  <div (click)="closeWaiterModal()"
+    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm transition-all duration-300">
+    <div (click)="$event.stopPropagation()"
+      class="bg-white border border-[#EFE5D3] rounded-3xl p-6 max-w-sm w-full text-center shadow-2xl animate-fade-in space-y-4">
+      <div
+        class="w-12 h-12 rounded-full bg-[#FAF3E8] border border-[#EFE5D3] flex items-center justify-center text-2xl mx-auto text-[#E8A54B]">
+        🔔
+      </div>
+      <div class="space-y-1">
+        <h4 class="text-lg font-bold text-[#2C2117] font-serif">Assistance Requested</h4>
+        <p class="text-sm text-[#8C7A6B] leading-relaxed">
+          A waiter has been dispatched and will arrive at Table {{ tableNumber }} shortly.
+        </p>
+      </div>
+    </div>
+  </div>
+  }
 </div>

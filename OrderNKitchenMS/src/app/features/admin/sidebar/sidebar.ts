@@ -1,3 +1,4 @@
+// @feature Admin | Navigation Sidebar | Collapsible sidebar dashboard menu containing management routes for Admin functions.
 import { Component, inject, signal } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';

@@ -8,10 +8,15 @@ export const GuestGuard: CanActivateFn = (route, state) => {
 
     const token = authService.getToken();
 
-    if (!token) {
+    if (token) {
         return true;
     } else {
-        router.navigate(['/forbidden']);
+        const tableId = route.queryParams['tableId'];
+        if (tableId) {
+            router.navigate(['/guest/landing'], { queryParams: { tableId } });
+        } else {
+            router.navigate(['/login']);
+        }
         return false;
     }
 }

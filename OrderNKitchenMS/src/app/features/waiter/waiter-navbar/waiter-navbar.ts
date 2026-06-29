@@ -1,3 +1,4 @@
+// @feature Waiter | Navigation Bar | Standardized top navigation bar for the waiter portal featuring route links and logout.
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';

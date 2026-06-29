@@ -1,3 +1,4 @@
+// @feature Authentication | Login Portal | Form interface validating credentials and redirecting users to role-specific layouts.
 import { Component, inject, signal } from '@angular/core';
 import { AuthService } from '../../../core/services/auth.service';
 import { LoginModel } from '../../../core/models/auth.model';

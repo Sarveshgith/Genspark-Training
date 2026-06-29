@@ -1,6 +1,7 @@
+// @feature Guest | Landing Portal | Handles entry portal for guests via table codes and coordinates active order state.
 import { Component, inject, OnInit, OnDestroy, ChangeDetectorRef, NgZone, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../../../core/services/auth.service';
 import { OrderService } from '../../../core/services/order.service';
@@ -12,7 +13,7 @@ import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-landing-component',
-  imports: [CommonModule, OrderTracker],
+  imports: [CommonModule, OrderTracker, RouterLink],
   templateUrl: './landing-component.html',
   styleUrl: './landing-component.css',
 })
@@ -324,5 +325,27 @@ export class LandingComponent implements OnInit, OnDestroy {
         window.open(url, '_blank');
       }
     });
+  }
+
+  public showWaiterModal = signal<boolean>(false);
+  private waiterTimeoutId: any = null;
+
+  public callWaiter() {
+    if (this.waiterTimeoutId) {
+      clearTimeout(this.waiterTimeoutId);
+    }
+    this.showWaiterModal.set(true);
+    this.waiterTimeoutId = setTimeout(() => {
+      this.showWaiterModal.set(false);
+      this.waiterTimeoutId = null;
+    }, 4000);
+  }
+
+  public closeWaiterModal() {
+    this.showWaiterModal.set(false);
+    if (this.waiterTimeoutId) {
+      clearTimeout(this.waiterTimeoutId);
+      this.waiterTimeoutId = null;
+    }
   }
 }

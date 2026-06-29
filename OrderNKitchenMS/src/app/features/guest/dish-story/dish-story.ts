@@ -1,3 +1,4 @@
+// @feature Guest | Dish Story | Interactive AI component displaying trivia/stories about dishes in the order (Gemini Integration).
 import { Component, Input, OnInit, OnChanges, SimpleChanges, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
