@@ -1,3 +1,4 @@
+// @feature Backend API | Auth Endpoint | Handles JWT login, token validation, user registration, and password hashing logic.
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using OrderNKitchenMS_API.Models.DTOs;

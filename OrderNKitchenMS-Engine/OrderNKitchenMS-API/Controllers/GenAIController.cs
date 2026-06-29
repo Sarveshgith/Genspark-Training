@@ -1,3 +1,4 @@
+// @feature Backend API | GenAI Service Endpoint | Integrates with Gemini AI to generate stories, facts, and trivia regarding specific dishes.
 using Microsoft.AspNetCore.Mvc;
 using OrderNKitchenMS_API.Services;
 

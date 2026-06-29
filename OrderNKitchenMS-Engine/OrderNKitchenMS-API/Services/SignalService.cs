@@ -55,4 +55,21 @@ public class SignalService : ISignalService
         await _hubContext.Clients.Group($"table-{tableId}")
             .SendAsync("bill_paid", billDto);
     }
+
+    public async Task NotifyLowStockAlertAsync(string chefName, int itemId, string itemName, decimal currentStock, string unitName)
+    {
+        var message = $"[STOCK ALERT] Chef {chefName} flagged low stock for {itemName}: {currentStock} {unitName} remaining.";
+        _logger.LogInformation("Broadcasting stock warning to admin group for item: {ItemName}", itemName);
+
+        await _hubContext.Clients.Group("admins").SendAsync("ReceiveAdminAlert", new
+        {
+            itemId,
+            itemName,
+            stockQuantity = currentStock,
+            unitName,
+            message,
+            flaggedBy = chefName,
+            createdAt = DateTime.UtcNow
+        });
+    }
 }

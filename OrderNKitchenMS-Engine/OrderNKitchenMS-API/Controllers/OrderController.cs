@@ -1,3 +1,4 @@
+// @feature Backend API | Order Management | Handles creation of new orders, updating items, checkout billing, and preparation statuses.
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OrderNKitchenMS_API.Exceptions;

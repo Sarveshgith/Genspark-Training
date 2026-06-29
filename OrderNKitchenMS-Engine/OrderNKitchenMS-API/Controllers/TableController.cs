@@ -1,3 +1,4 @@
+// @feature Backend API | Table Administration | Manages restaurant table listings, dynamic capacity checks, and seat allocations.
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OrderNKitchenMS_API.Models.DTOs;

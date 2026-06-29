@@ -1,3 +1,4 @@
+// @feature Backend API | Sales & Prep Metrics | Generates structured statistics on sales, dish counts, and kitchen efficiency indicators.
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;

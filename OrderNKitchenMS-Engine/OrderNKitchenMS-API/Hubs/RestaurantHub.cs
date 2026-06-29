@@ -4,16 +4,19 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using OrderNKitchenMS_API.Utils;
 using Microsoft.Extensions.Logging;
+using OrderNKitchenMS_API.Services.Interfaces;
 
 namespace OrderNKitchenMS_API.Hubs;
 
 public class RestaurantHub : Hub
 {
     private readonly ILogger<RestaurantHub> _logger;
+    private readonly ISignalService _signalService;
 
-    public RestaurantHub(ILogger<RestaurantHub> logger)
+    public RestaurantHub(ILogger<RestaurantHub> logger, ISignalService signalService)
     {
         _logger = logger;
+        _signalService = signalService;
     }
 
     public override async Task OnConnectedAsync()
@@ -74,4 +77,11 @@ public class RestaurantHub : Hub
 
         await base.OnConnectedAsync();
     }
+
+    public async Task FlagLowStockToAdmin(int itemId, string itemName, decimal currentStock, string unitName)
+    {
+        var chefName = Context.User?.Identity?.Name ?? "Chef";
+        await _signalService.NotifyLowStockAlertAsync(chefName, itemId, itemName, currentStock, unitName);
+    }
 }
+
