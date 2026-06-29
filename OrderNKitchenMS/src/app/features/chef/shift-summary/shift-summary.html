@@ -1,0 +1,93 @@
+@if (isOpen) {
+<div class="fixed inset-0 z-50 flex items-end justify-center bg-black/60 backdrop-blur-sm animate-fade-in" (click)="handleClose()">
+  <div class="relative w-full max-w-2xl bg-[#111827]/95 border-t border-x border-slate-800 rounded-t-3xl p-6 sm:p-8 shadow-2xl flex flex-col space-y-6 transform transition-all duration-305 ease-out animate-slide-up" (click)="$event.stopPropagation()">
+    
+    <!-- Top Notch handle for drawer feel -->
+    <div class="w-12 h-1.5 bg-slate-850 rounded-full mx-auto mb-2 shrink-0 select-none"></div>
+
+    <!-- Header -->
+    <div class="flex items-center justify-between pb-4 border-b border-slate-800 shrink-0">
+      <div class="space-y-1">
+        <span class="text-[10px] font-bold text-[#F28500] uppercase tracking-widest font-sans">Kitchen Stats</span>
+        <h3 class="text-xl sm:text-2xl font-bold font-syne text-white tracking-tight leading-none">Today's Shift Summary</h3>
+      </div>
+      
+      <div class="flex items-center space-x-2">
+        <button (click)="loadShiftStats()" class="p-2 bg-slate-800/80 hover:bg-slate-700 text-slate-355 rounded-full transition duration-200 outline-none border border-slate-700 cursor-pointer" title="Refresh metrics">
+          <svg class="w-4 h-4" [class.animate-spin]="isLoading()" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+          </svg>
+        </button>
+        <button (click)="handleClose()" class="p-2 bg-slate-800/80 hover:bg-slate-700 text-slate-355 rounded-full transition duration-200 outline-none border border-slate-700 cursor-pointer">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Content Panel -->
+    @if (isLoading()) {
+    <div class="flex flex-col items-center justify-center py-16 space-y-3">
+      <div class="w-8 h-8 border-3 border-[#F28500] border-t-transparent rounded-full animate-spin"></div>
+      <p class="text-xs text-slate-500 font-semibold tracking-wider uppercase font-sans">Syncing KDS Metrics...</p>
+    </div>
+    } @else if (error()) {
+    <div class="text-center py-12 space-y-4">
+      <p class="text-sm text-red-400 font-medium font-space">{{ error() }}</p>
+      <button (click)="loadShiftStats()" class="px-4 py-2 bg-slate-800 text-white rounded-lg border border-slate-700 hover:bg-slate-700 transition duration-200 cursor-pointer">
+        Try Again
+      </button>
+    </div>
+    } @else {
+    <!-- Stats Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-5 pt-2">
+      
+      <!-- Completed Orders Card -->
+      <div class="bg-slate-900/50 border border-slate-800 rounded-2xl p-5 text-center space-y-2 relative overflow-hidden group">
+        <span class="absolute -right-3 -top-3 text-4xl opacity-5 rotate-12 select-none group-hover:scale-110 transition-transform">✓</span>
+        <span class="block text-[10px] uppercase tracking-widest text-slate-400 font-bold font-sans">Prepared Today</span>
+        <span class="block text-4xl font-extrabold font-syne text-[#F28500]">{{ completedCount() }}</span>
+        <span class="block text-[9px] text-slate-500 font-medium font-sans">Ready or Served orders</span>
+      </div>
+
+      <!-- Avg Prep Time Card -->
+      <div class="bg-slate-900/50 border border-slate-800 rounded-2xl p-5 text-center space-y-2 relative overflow-hidden group">
+        <span class="absolute -right-3 -top-3 text-4xl opacity-5 rotate-12 select-none group-hover:scale-110 transition-transform">⏱</span>
+        <span class="block text-[10px] uppercase tracking-widest text-slate-400 font-bold font-sans">Avg Prep Time</span>
+        <span class="block text-4xl font-extrabold font-syne text-white">{{ avgPrepTime() }}</span>
+        <span class="block text-[9px] text-slate-500 font-medium font-sans">Estimation comparison</span>
+      </div>
+
+      <!-- Overdue Orders Card -->
+      <div class="bg-slate-900/50 border border-slate-850 rounded-2xl p-5 text-center space-y-2 relative overflow-hidden group"
+           [class.border-red-950]="overdueCount() > 0">
+        <span class="absolute -right-3 -top-3 text-4xl opacity-5 rotate-12 select-none group-hover:scale-110 transition-transform">⚠️</span>
+        <span class="block text-[10px] uppercase tracking-widest text-slate-400 font-bold font-sans"
+              [class.text-red-400]="overdueCount() > 0">Currently Overdue</span>
+        <span class="block text-4xl font-extrabold font-syne"
+              [class.text-red-500]="overdueCount() > 0"
+              [class.text-white]="overdueCount() === 0">{{ overdueCount() }}</span>
+        <span class="block text-[9px] text-slate-500 font-medium font-sans">Active orders over limit</span>
+      </div>
+
+    </div>
+
+    <!-- Active Overview Banner -->
+    <div class="bg-slate-950/70 border border-slate-800 rounded-2xl p-4 flex items-center justify-between font-sans">
+      <div class="flex items-center space-x-3">
+        <span class="flex h-2.5 w-2.5 relative">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-450 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+        </span>
+        <span class="text-xs font-semibold text-slate-400">Total Active Shift Tickets</span>
+      </div>
+      <span class="font-mono-dm text-sm font-bold text-emerald-400 bg-emerald-950/50 border border-emerald-900/35 px-2.5 py-0.5 rounded">
+        {{ totalActiveCount() }}
+      </span>
+    </div>
+    }
+
+  </div>
+</div>
+}

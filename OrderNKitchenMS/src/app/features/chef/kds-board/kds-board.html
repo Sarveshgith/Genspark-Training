@@ -14,54 +14,51 @@
 
   <!-- TOP KDS HEADER BAR -->
   <header
-    class="bg-[#111827] border border-slate-800/80 rounded-2xl px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 shadow-2xl shrink-0">
+    class="bg-[#111827] border border-slate-800/80 rounded-2xl px-4 sm:px-6 py-3 flex items-center justify-between gap-4 mb-6 shadow-2xl shrink-0">
 
     <!-- Title & Brand -->
-    <div class="flex items-center space-x-3">
-      <span class="text-2xl font-serif text-[#F28500] font-medium tracking-wide italic">Ambrosia</span>
-      <span class="w-1.5 h-6 bg-slate-800 rounded-full"></span>
-      <h2 class="text-lg font-bold tracking-wider text-slate-300 font-syne uppercase">
+    <div class="flex items-center space-x-2 sm:space-x-3">
+      <span class="text-xl sm:text-2xl font-serif text-[#F28500] font-medium tracking-wide italic select-none">Ambrosia</span>
+      <span class="w-1 h-5 sm:h-6 bg-slate-800 rounded-full"></span>
+      <h2 class="text-xs sm:text-sm md:text-base font-bold tracking-wider text-slate-300 font-syne uppercase select-none">
         Kitchen Display
       </h2>
     </div>
 
-    <!-- Active Metrics & Live Dot -->
-    <div class="flex flex-wrap items-center gap-4 sm:gap-6">
+    <!-- Right Side Actions & Badges -->
+    <div class="flex items-center space-x-4">
+      
+      <!-- Desktop Only Badges (hidden on mobile/tablet) -->
+      <div class="hidden lg:flex items-center space-x-4">
+        <!-- Total Active Badge -->
+        <div class="bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 flex items-center space-x-3 shadow-inner">
+          <span class="text-[10px] font-extrabold text-slate-500 font-syne uppercase tracking-wider">ACTIVE ORDERS</span>
+          <span
+            class="bg-[#F28500]/15 text-[#F28500] border border-[#F28500]/25 font-bold font-mono-dm text-sm px-2.5 py-0.5 rounded-lg">
+            {{ totalActiveOrders() }}
+          </span>
+        </div>
 
-      <!-- Total Active Badge -->
-      <div class="bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 flex items-center space-x-3 shadow-inner">
-        <span class="text-[10px] font-extrabold text-slate-500 font-syne uppercase tracking-wider">ACTIVE ORDERS</span>
+        <!-- Avg cooking time badge -->
+        <div class="bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 flex items-center space-x-3 shadow-inner">
+          <span class="text-[10px] font-extrabold text-slate-500 font-syne uppercase tracking-wider">AVG IN-PREP TIME</span>
+          <span class="text-white font-bold font-mono-dm text-sm tracking-widest">
+            {{ avgInPrepTime() }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Chef Pill & Live Status (Visible on all screens) -->
+      <div class="bg-slate-900 border border-slate-800 rounded-full px-3.5 py-2 flex items-center space-x-2.5 shadow-inner select-none shrink-0">
         <span
-          class="bg-[#F28500]/15 text-[#F28500] border border-[#F28500]/25 font-bold font-mono-dm text-sm px-2.5 py-0.5 rounded-lg">
-          {{ totalActiveOrders() }}
+          [class]="'w-2 h-2 rounded-full shrink-0 ' + (signalRService.isConnected() ? 'bg-emerald-500 animate-pulse' : 'bg-red-500')"
+          id="connection-dot"
+          [title]="signalRService.isConnected() ? 'KDS Connected' : 'KDS Disconnected'"></span>
+        <span class="text-[11px] sm:text-xs font-semibold font-syne tracking-wide text-[#F28500] whitespace-nowrap">
+          👨‍🍳 {{ chefName() }}
         </span>
       </div>
 
-      <!-- Avg cooking time badge -->
-      <div class="bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 flex items-center space-x-3 shadow-inner">
-        <span class="text-[10px] font-extrabold text-slate-500 font-syne uppercase tracking-wider">AVG IN-PREP
-          TIME</span>
-        <span class="text-white font-bold font-mono-dm text-sm tracking-widest">
-          {{ avgInPrepTime() }}
-        </span>
-      </div>
-
-      <!-- Live Connection Dot -->
-      <div class="bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 flex items-center space-x-2.5 shadow-inner">
-        <span
-          [class]="'w-2 h-2 rounded-full ' + (signalRService.isConnected() ? 'bg-emerald-500 animate-pulse' : 'bg-red-500')"
-          id="connection-dot"></span>
-        <span class="text-[9px] font-extrabold text-slate-400 font-syne uppercase tracking-wider">
-          {{ signalRService.isConnected() ? 'CONNECTED' : 'DISCONNECTED' }}
-        </span>
-      </div>
-
-      <!-- Chef Identity Badge -->
-      <div class="bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 flex items-center space-x-2 shadow-inner">
-        <span class="text-xs font-semibold font-syne tracking-wide text-[#F28500]">
-          👨‍🍳 {{ chefName().toLowerCase().startsWith('chef') ? chefName() : 'Chef ' + chefName() }}
-        </span>
-      </div>
     </div>
   </header>
 
@@ -113,7 +110,6 @@
         <div class="flex-1 overflow-y-auto space-y-6 pr-1">
           @if (pendingOrders().length === 0) {
           <div class="flex flex-col items-center justify-center py-16 text-slate-600 select-none">
-            <!-- Empty state icon: Order checklist/ticket with low opacity -->
             <svg class="w-12 h-12 text-slate-700/35 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"
               stroke-width="1.2">
               <path stroke-linecap="round" stroke-linejoin="round"
@@ -150,7 +146,6 @@
         <div class="flex-1 overflow-y-auto space-y-6 pr-1">
           @if (inPrepOrders().length === 0) {
           <div class="flex flex-col items-center justify-center py-16 text-slate-600 select-none">
-            <!-- Empty state icon: Cooking flame with low opacity -->
             <svg class="w-12 h-12 text-slate-700/35 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"
               stroke-width="1.2">
               <path stroke-linecap="round" stroke-linejoin="round"
@@ -204,59 +199,45 @@
 
     </div>
 
-    <!-- RIGHT DRAWER: Collapsible Batch Prep Summary -->
-    @if (isSummaryOpen()) {
-    <aside
-      class="w-80 bg-[#111827] border border-slate-800 rounded-3xl p-6 shadow-2xl shrink-0 flex flex-col h-full animate-scale-in">
-      <div class="flex items-center justify-between pb-3 border-b border-slate-800 shrink-0">
-        <h3 class="text-sm font-extrabold text-white tracking-wider uppercase font-syne">Prep Summary</h3>
-        <span
-          class="text-[9px] font-extrabold text-slate-500 tracking-wider bg-slate-900 border border-slate-800 px-2 py-0.5 rounded uppercase">
-          BATCH COOKING
-        </span>
-      </div>
-
-      <!-- Summary Items List -->
-      <div class="flex-1 overflow-y-auto py-4 space-y-3.5 pr-1">
-        @if (activeItemSummary().length === 0) {
-        <p class="text-xs text-slate-500 italic py-6 text-center">No active items to prepare.</p>
-        } @else {
-        @for (item of activeItemSummary(); track item.name) {
-        <div class="flex items-start justify-between text-sm leading-snug">
-          <span class="text-slate-300 font-semibold font-space">{{ item.name }}</span>
-          <span
-            class="bg-[#F28500]/15 text-[#F28500] border border-[#F28500]/25 font-bold text-xs px-2.5 py-0.5 rounded-full shrink-0">
-            {{ item.qty }}x
-          </span>
-        </div>
-        }
-        }
-      </div>
-
-      <!-- Footer warnings -->
-      <div
-        class="bg-slate-900/60 rounded-xl p-3 border border-slate-800 text-[10px] text-slate-400 font-medium leading-relaxed shrink-0">
-        Sums active receipt quantities (Pending & In Prep). Prepare these in batches to optimize prep times.
-      </div>
-    </aside>
-    }
-
   </div>
 
-  <!-- FLOATING PREP SUMMARY TOGGLE BUTTON -->
-  <button (click)="toggleSummary()" title="Toggle Prep Summary Sidebar"
-    [class]="'fixed bottom-6 right-6 z-40 p-4 rounded-full shadow-2xl transition-all duration-300 transform active:scale-95 outline-none border ' + 
-             (isSummaryOpen() ? 'bg-slate-800 text-white border-slate-700' : 'bg-[#F28500] hover:bg-[#D47300] text-white border-[#D47300]/20 hover:scale-105')">
-    @if (isSummaryOpen()) {
-    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-      <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
-    </svg>
-    } @else {
-    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-      <path stroke-linecap="round" stroke-linejoin="round"
-        d="M14.857 17.082a9.04 9.04 0 0 1-2.943 2.244A9.07 9.07 0 0 1 9 18.75m6-12v6a3 3 0 0 1-3 3H9a3 3 0 0 1-3-3v-6a3 3 0 0 1 3-3h3a3 3 0 0 1 3 3ZM9 10.5h.008v.008H9V10.5Zm3 0h.008v.008H12V10.5Z" />
-    </svg>
-    }
-  </button>
+  <!-- FLOATING ACTION BUTTONS -->
+  <div class="fixed bottom-6 right-6 z-40 flex flex-col space-y-4 items-end">
+    <!-- Shift Summary Toggle Button (Secondary) -->
+    <button (click)="toggleSummary()" title="View Today's Shift Summary"
+      [class]="'p-3.5 rounded-full shadow-2xl transition-all duration-300 transform active:scale-95 outline-none border ' + 
+               (isSummaryOpen() ? 'bg-slate-800 text-white border-slate-700' : 'bg-slate-900 text-slate-400 hover:text-white border-slate-850 hover:scale-105')">
+      @if (isSummaryOpen()) {
+      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+      </svg>
+      } @else {
+      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+      </svg>
+      }
+    </button>
+
+    <!-- Inventory Sheet Toggle Button (Primary) -->
+    <button (click)="toggleInventory()" title="View Active Ingredients Inventory"
+      [class]="'p-4 rounded-full shadow-2xl transition-all duration-300 transform active:scale-95 outline-none border ' + 
+               (isInventoryOpen() ? 'bg-slate-800 text-white border-slate-700' : 'bg-[#F28500] hover:bg-[#D47300] text-white border-[#D47300]/20 hover:scale-105')">
+      @if (isInventoryOpen()) {
+      <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+      </svg>
+      } @else {
+      <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+      </svg>
+      }
+    </button>
+  </div>
+
+  <!-- SHIFT SUMMARY PANEL SHEET -->
+  <app-shift-summary [isOpen]="isSummaryOpen()" (close)="isSummaryOpen.set(false)"></app-shift-summary>
+
+  <!-- INVENTORY PANEL SHEET -->
+  <app-inventory-sheet [isOpen]="isInventoryOpen()" [activeOrders]="activeOrdersForInventory()" (close)="isInventoryOpen.set(false)"></app-inventory-sheet>
 
 </div>

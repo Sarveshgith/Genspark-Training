@@ -3,6 +3,8 @@ import { Component, inject, OnInit, signal, computed, OnDestroy } from '@angular
 import { OrderService } from '../../../core/services/order.service';
 import { OrderModel } from '../../../core/models/order.model';
 import { OrderCard } from '../order-card/order-card';
+import { ShiftSummary } from '../shift-summary/shift-summary';
+import { InventorySheet } from '../inventory-sheet/inventory-sheet';
 import { AuthService } from '../../../core/services/auth.service';
 import { SignalRService } from '../../../core/services/signalr.service';
 import { AudioService } from '../../../core/services/audio.service';
@@ -11,7 +13,7 @@ import { Subscription } from 'rxjs';
 @Component({
   selector: 'app-kds-board',
   standalone: true,
-  imports: [OrderCard],
+  imports: [OrderCard, ShiftSummary, InventorySheet],
   templateUrl: './kds-board.html',
   styleUrl: './kds-board.css',
 })
@@ -33,6 +35,8 @@ export class KdsBoard implements OnInit, OnDestroy {
   
   public currentTime = signal<Date>(new Date());
   public isSummaryOpen = signal<boolean>(false);
+  public isInventoryOpen = signal<boolean>(false);
+  public isStatsVisible = signal<boolean>(false);
   public chefName = signal<string>('Chef');
 
   private subscriptions = new Subscription();
@@ -41,6 +45,10 @@ export class KdsBoard implements OnInit, OnDestroy {
 
   public totalActiveOrders = computed(() => {
     return this.pendingOrders().length + this.inPrepOrders().length + this.readyOrders().length;
+  });
+
+  public activeOrdersForInventory = computed(() => {
+    return [...this.pendingOrders(), ...this.inPrepOrders(), ...this.readyOrders()];
   });
 
   public avgInPrepTime = computed(() => {
@@ -60,21 +68,6 @@ export class KdsBoard implements OnInit, OnDestroy {
     const mins = Math.floor(avgSeconds / 60);
     const secs = avgSeconds % 60;
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  });
-
-  public activeItemSummary = computed(() => {
-    const summary: { [key: string]: number } = {};
-    const activeList = [...this.pendingOrders(), ...this.inPrepOrders()];
-    
-    activeList.forEach(order => {
-      order.orderItems.forEach(item => {
-        summary[item.menuItemName] = (summary[item.menuItemName] || 0) + item.quantity;
-      });
-    });
-
-    return Object.entries(summary)
-      .map(([name, qty]) => ({ name, qty }))
-      .sort((a, b) => b.qty - a.qty);
   });
 
   ngOnInit(): void {
@@ -303,6 +296,16 @@ export class KdsBoard implements OnInit, OnDestroy {
 
   toggleSummary(): void {
     this.isSummaryOpen.update(val => !val);
+    if (this.isSummaryOpen()) {
+      this.isInventoryOpen.set(false);
+    }
+  }
+
+  toggleInventory(): void {
+    this.isInventoryOpen.update(val => !val);
+    if (this.isInventoryOpen()) {
+      this.isSummaryOpen.set(false);
+    }
   }
 
   private sortByAge(orders: OrderModel[]): OrderModel[] {

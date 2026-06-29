@@ -37,6 +37,11 @@ export class SignalRService {
         return this.billPaidSubject.asObservable();
     }
 
+    private adminAlertSubject = new Subject<any>();
+    public get adminAlert$(): Observable<any> {
+        return this.adminAlertSubject.asObservable();
+    }
+
     public async connect(token: string): Promise<void> {
         if (this.hubConnection && this.isConnected()) {
             console.log("SignalR connection already active. Skipping connect.");
@@ -93,6 +98,26 @@ export class SignalRService {
             console.log("Bill paid received:", bill);
             this.billPaidSubject.next(bill);
         });
+
+        this.hubConnection.on("ReceiveAdminAlert", (alert) => {
+            console.log("Admin alert received:", alert);
+            this.adminAlertSubject.next(alert);
+        });
+    }
+
+    public async flagLowStockToAdmin(itemId: number, itemName: string, currentStock: number, unitName: string): Promise<void> {
+        if (this.hubConnection && this.isConnected()) {
+            try {
+                await this.hubConnection.invoke("FlagLowStockToAdmin", itemId, itemName, currentStock, unitName);
+                console.log("Flagged low stock to admin:", itemName);
+            } catch (err) {
+                console.error("Error flagging stock to admin:", err);
+                throw err;
+            }
+        } else {
+            console.error("SignalR connection not active. Cannot flag to admin.");
+            throw new Error("SignalR connection not active.");
+        }
     }
 
     public async disconnect(): Promise<void> {

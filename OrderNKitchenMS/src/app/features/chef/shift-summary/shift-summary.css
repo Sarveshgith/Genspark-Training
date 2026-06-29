@@ -1,0 +1,53 @@
+@keyframes slide-up {
+  0% {
+    transform: translateY(100%);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.22s ease-out forwards;
+}
+
+.bg-slate-850 {
+  background-color: rgb(30, 41, 59);
+}
+
+.border-slate-850 {
+  border-color: rgba(30, 41, 59, 0.5);
+}
+
+.bg-emerald-950\/50 {
+  background-color: rgba(2, 44, 34, 0.5);
+}
+
+.border-emerald-900\/35 {
+  border-color: rgba(20, 184, 166, 0.35);
+}
+
+.text-emerald-450 {
+  color: rgb(52, 211, 153);
+}
+
+.bg-slate-750 {
+  background-color: rgb(30, 41, 59);
+}
+
+.text-slate-355 {
+  color: rgb(203, 213, 225);
+}
