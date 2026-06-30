@@ -1,0 +1,449 @@
+<div class="min-h-screen bg-[#F8FAFC] text-[#1E293B] font-sans antialiased p-6 md:p-8 flex flex-col space-y-8">
+
+  <!-- Header Title Section -->
+  <header class="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0 pb-6 border-b border-slate-200">
+    <div class="space-y-1">
+      <h1 class="text-3xl font-extrabold font-syne tracking-tight text-[#0F172A]">Administrative Control Panel</h1>
+      <p class="text-sm text-slate-500 font-space leading-relaxed">
+        Live operation metrics, dining floor layouts, system alert feeds, and critical inventory tracking.
+      </p>
+    </div>
+
+    <!-- SignalR Connection Status Pill -->
+    <div class="flex items-center space-x-2 bg-white px-4 py-2 border border-slate-200 rounded-full shadow-sm">
+      <span class="relative flex h-2.5 w-2.5">
+        <span [class]="'animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ' + (signalRService.isConnected() ? 'bg-emerald-400' : 'bg-red-400')"></span>
+        <span [class]="'relative inline-flex rounded-full h-2.5 w-2.5 ' + (signalRService.isConnected() ? 'bg-emerald-500' : 'bg-red-500')"></span>
+      </span>
+      <span class="text-xs font-bold font-space text-slate-655 tracking-wide">
+        {{ signalRService.isConnected() ? 'LIVE HUB CONNECTED' : 'OFFLINE - RECONNECTING' }}
+      </span>
+    </div>
+  </header>
+
+  <!-- Metric Overview summary blocks (KPI Cards) -->
+  <section class="grid grid-cols-2 lg:grid-cols-5 gap-5">
+    <!-- Stat 1: Available Tables -->
+    <div class="bg-white border border-slate-150 rounded-2xl p-5 shadow-sm flex items-center space-x-4">
+      <div class="p-3 bg-emerald-50 border border-emerald-100 text-emerald-600 rounded-xl text-xl select-none font-semibold">
+        🟢
+      </div>
+      <div class="space-y-0.5">
+        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block font-space">Available Tables</span>
+        <span class="text-2xl font-black font-syne text-slate-800">{{ availableTablesCount() }}</span>
+      </div>
+    </div>
+
+    <!-- Stat 2: Occupied Tables -->
+    <div class="bg-white border border-slate-150 rounded-2xl p-5 shadow-sm flex items-center space-x-4">
+      <div class="p-3 bg-amber-50 border border-amber-100 text-amber-600 rounded-xl text-xl select-none font-semibold">
+        🟡
+      </div>
+      <div class="space-y-0.5">
+        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block font-space">Occupied Tables</span>
+        <span class="text-2xl font-black font-syne text-slate-800">{{ occupiedTablesCount() }}</span>
+      </div>
+    </div>
+
+    <!-- Stat 3: Active Orders -->
+    <div class="bg-white border border-slate-150 rounded-2xl p-5 shadow-sm flex items-center space-x-4">
+      <div class="p-3 bg-orange-50 border border-orange-100 text-[#F28500] rounded-xl text-xl select-none font-semibold">
+        🍽️
+      </div>
+      <div class="space-y-0.5">
+        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block font-space">Active Orders</span>
+        <span class="text-2xl font-black font-syne text-slate-800">{{ activeOrdersCount() }}</span>
+      </div>
+    </div>
+
+    <!-- Stat 4: Pending Payments -->
+    <div class="bg-white border border-slate-150 rounded-2xl p-5 shadow-sm flex items-center space-x-4">
+      <div class="p-3 bg-red-50 border border-red-100 text-red-600 rounded-xl text-xl select-none font-semibold">
+        💵
+      </div>
+      <div class="space-y-0.5">
+        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block font-space">Pending Bills</span>
+        <span class="text-2xl font-black font-syne text-slate-800 block">{{ pendingBillsCount() }}</span>
+        @if (pendingBillsCount() === 0) {
+          <span class="text-[10px] text-emerald-600 font-bold block font-space leading-none mt-0.5">All settled ✓</span>
+        }
+      </div>
+    </div>
+
+    <!-- Stat 5: Revenue Today -->
+    <div class="bg-white border border-slate-150 rounded-2xl p-5 shadow-sm flex items-center space-x-4 col-span-2 lg:col-span-1">
+      <div class="p-3 bg-blue-50 border border-blue-100 text-blue-600 rounded-xl text-xl select-none font-semibold">
+        📈
+      </div>
+      <div class="space-y-0.5 min-w-0">
+        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block font-space">Today's Revenue</span>
+        <span class="text-xl sm:text-2xl font-black font-syne text-slate-800 truncate block" [title]="totalRevenueToday()">{{ formattedRevenue() }}</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Low stock horizontal alert strip (Sticky notice) -->
+  @if (lowStockItems().length > 0) {
+    <div class="bg-amber-50 border border-amber-250 rounded-2xl p-4 flex items-center justify-between text-amber-900 text-sm animate-fade-in shadow-sm">
+      <div class="flex items-center space-x-3">
+        <span class="text-xl select-none">⚠️</span>
+        <div class="font-space">
+          <p class="font-extrabold">Critical Low Stock Warning</p>
+          <p class="text-xs text-amber-700 mt-0.5">
+            There are <strong>{{ lowStockItems().length }} ingredients</strong> currently below their designated safety thresholds. Restock soon to prevent order service blocks.
+          </p>
+        </div>
+      </div>
+      <a routerLink="/inventory" class="text-xs font-bold text-[#F28500] hover:text-[#D97200] hover:underline uppercase tracking-wider shrink-0 ml-4">
+        Go to stock records ➔
+      </a>
+    </div>
+  }
+
+  <!-- Main Split columns section -->
+  <section class="grid grid-cols-1 xl:grid-cols-3 gap-8">
+    
+    <!-- LEFT & CENTER COLUMN: Live Table Map Layout Grid (70% width) -->
+    <div class="xl:col-span-2 space-y-6">
+      <div class="flex items-center justify-between">
+        <div class="space-y-0.5">
+          <h2 class="text-xl font-bold font-syne text-[#0F172A]">Dining Floor Table Map</h2>
+          <p class="text-xs text-slate-400 font-space">Click a table to inspect active order items, waiter logs, and receipts.</p>
+        </div>
+
+        <a routerLink="/tables" class="text-xs font-bold text-[#F28500] hover:underline uppercase tracking-wider font-space">
+          Manage Tables ➔
+        </a>
+      </div>
+
+      <!-- Tables Grid -->
+      <main class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+        @for (table of activeTablesSorted(); track table.id) {
+          <div 
+            (click)="openTableDetails(table.id)"
+            [class]="'relative bg-white border rounded-3xl p-5 shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer flex flex-col justify-between min-h-36 group ' + 
+                     (selectedTableId() === table.id ? 'border-[#F28500] ring-1 ring-[#F28500]/50' : 'border-slate-200 hover:border-orange-200')">
+            
+            <!-- Table Header -->
+            <div class="flex items-start justify-between">
+              <span class="text-[9px] font-extrabold uppercase px-2 py-0.5 bg-slate-50 border border-slate-150 rounded-full text-slate-400 tracking-wider font-space">
+                {{ table.capacity }} Seats
+              </span>
+
+              <!-- Status Indicator Dot -->
+              <span class="flex h-2.5 w-2.5 relative">
+                @if (table.status === 2) {
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#E8A54B] opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#E8A54B]"></span>
+                } @else if (table.status === 3) {
+                  <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-indigo-500"></span>
+                } @else {
+                  <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                }
+              </span>
+            </div>
+
+            <!-- Table Number -->
+            <div class="my-4">
+              <h3 class="text-2xl font-black font-syne text-[#0F172A] tracking-tight leading-none">
+                #{{ table.number }}
+              </h3>
+              <!-- Dynamic Status Text -->
+              <p class="text-[10px] font-extrabold uppercase mt-1 font-space tracking-wide leading-none"
+                 [ngClass]="{
+                   'text-emerald-600': table.status === 1,
+                   'text-[#B37822]': table.status === 2,
+                   'text-indigo-600': table.status === 3
+                 }">
+                {{ table.status === 1 ? 'Available' : table.status === 2 ? 'Occupied' : 'Reserved' }}
+              </p>
+            </div>
+
+            <!-- Table Footer Detail -->
+            <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-[10px] font-space text-slate-400">
+              @if (table.status === 2 && table.activeOrderId) {
+                <span class="font-bold text-amber-600 font-mono">Order #{{ table.activeOrderId }}</span>
+                <span class="font-medium text-slate-450">Inspect ➔</span>
+              } @else if (table.status === 3) {
+                <span class="italic text-indigo-400">Reserved</span>
+                <span>Details ➔</span>
+              } @else {
+                <span class="text-emerald-600">Vacant</span>
+                <span>Open ➔</span>
+              }
+            </div>
+
+          </div>
+        } @empty {
+          <div class="col-span-full py-16 text-center border border-dashed border-slate-200 rounded-3xl text-slate-400 italic font-space text-xs">
+            No dining tables registered. Visit Table manager to map layouts.
+          </div>
+        }
+      </main>
+    </div>
+
+    <!-- RIGHT COLUMN: Alert Feed & Low-Stock Alerts (30% width) -->
+    <div class="bg-white border border-slate-150 rounded-3xl shadow-sm p-6 flex flex-col justify-between min-h-[500px]">
+      
+      <div class="space-y-4 flex-grow flex flex-col">
+        <!-- Panel Tabs -->
+        <div class="grid grid-cols-2 gap-1.5 p-1 bg-slate-100 rounded-xl font-space text-xs font-bold text-slate-450 border border-slate-200 select-none">
+          <button 
+            (click)="activeFeedTab.set('alerts')"
+            [class]="'py-1.5 px-2.5 rounded-lg text-center transition cursor-pointer flex items-center justify-center space-x-1.5 ' + 
+                     (activeFeedTab() === 'alerts' ? 'bg-white text-slate-900 shadow-sm border border-slate-200' : 'hover:text-slate-700')">
+            <span>Live Feed</span>
+            <span [class]="'px-2 py-0.5 rounded-full text-[10px] font-extrabold ' + (activeFeedTab() === 'alerts' ? 'bg-orange-50 text-[#F28500] border border-orange-100' : 'bg-slate-200 text-slate-600')">
+              {{ alerts().length }}
+            </span>
+          </button>
+          <button 
+            (click)="activeFeedTab.set('stock')"
+            [class]="'py-1.5 px-2.5 rounded-lg text-center transition cursor-pointer flex items-center justify-center space-x-1.5 ' + 
+                     (activeFeedTab() === 'stock' ? 'bg-white text-slate-900 shadow-sm border border-slate-200' : 'hover:text-slate-700')">
+            <span>Low Stock</span>
+            <span [class]="'px-2 py-0.5 rounded-full text-[10px] font-extrabold ' + 
+                           (activeFeedTab() === 'stock' ? 'bg-red-50 text-red-650 border border-red-100' : 
+                            (lowStockItems().length > 0 ? 'bg-[#FFF9EB] text-[#B37822] border border-[#FFE8B3]' : 'bg-slate-200 text-slate-600'))">
+              {{ lowStockItems().length }}
+            </span>
+          </button>
+        </div>
+
+        <!-- Scrollable Feed Body -->
+        <div class="flex-grow overflow-y-auto max-h-[420px] scrollbar-thin pr-1 pt-2">
+          
+          <!-- TAB 1: LIVE ALERTS LOGS -->
+          @if (activeFeedTab() === 'alerts') {
+            <div class="space-y-3">
+              @for (alert of alerts(); track alert.id) {
+                <div class="border border-slate-150 rounded-xl p-3 flex items-start space-x-3 text-xs font-space hover:bg-slate-50/50 transition">
+                  <!-- Log Icon Indicator -->
+                  <span class="text-base select-none shrink-0 mt-0.5"
+                        [ngClass]="{
+                          'text-orange-500': alert.type === 'order',
+                          'text-emerald-500': alert.type === 'bill' && alert.message.includes('Received'),
+                          'text-[#F28500]': alert.type === 'bill' && alert.message.includes('Generated'),
+                          'text-indigo-500': alert.type === 'call',
+                          'text-red-500': alert.type === 'stock'
+                        }">
+                    {{ alert.type === 'order' ? '🍔' : alert.type === 'bill' ? '💵' : alert.type === 'stock' ? '⚠️' : '🔔' }}
+                  </span>
+
+                  <!-- Log Body -->
+                  <div class="flex-grow space-y-1">
+                    <p class="text-slate-700 leading-relaxed font-semibold">{{ alert.message }}</p>
+                    <div class="flex items-center justify-between text-[9px] text-slate-400">
+                      <span>{{ alert.flaggedBy ? 'Staff: ' + alert.flaggedBy : 'Auto broadcast' }}</span>
+                      <span class="font-mono text-slate-450">{{ getElapsedTime(alert.timestamp) }}</span>
+                    </div>
+                  </div>
+                </div>
+              } @empty {
+                <div class="text-center py-20 text-slate-400 italic font-space text-xs">
+                  Listening for real-time operations...
+                </div>
+              }
+            </div>
+          }
+
+          <!-- TAB 2: INVENTORY THRESHOLD WARNINGS -->
+          @if (activeFeedTab() === 'stock') {
+            <div class="space-y-3 font-space text-xs">
+              @for (ing of lowStockItems(); track ing.id) {
+                <div class="bg-white border border-slate-150 rounded-xl p-3 flex flex-col space-y-2 hover:border-orange-300 transition">
+                  <div class="flex items-start justify-between">
+                    <div>
+                      <p class="font-extrabold text-slate-800 text-sm">{{ ing.name }}</p>
+                      <p class="text-[10px] text-slate-400 uppercase mt-0.5 font-bold">
+                        Stock Unit: {{ ing.unitName }}
+                      </p>
+                    </div>
+                    <span class="px-2 py-0.5 bg-red-50 border border-red-150 rounded-full text-red-600 text-[9px] font-black uppercase">
+                      Low Stock
+                    </span>
+                  </div>
+
+                  <!-- Threshold meters -->
+                  <div class="space-y-1">
+                    <div class="flex justify-between text-[10px] font-mono">
+                      <span class="text-slate-450">Remaining: <strong class="text-red-600">{{ ing.stockQuantity }}</strong></span>
+                      <span class="text-slate-450">Safety Cap: <strong>{{ ing.stockThreshold }}</strong></span>
+                    </div>
+                    <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                      <div class="bg-red-500 h-full rounded-full" [style.width.%]="Math.min(100, (ing.stockQuantity / (ing.stockThreshold || 1)) * 100)"></div>
+                    </div>
+                  </div>
+                </div>
+              } @empty {
+                <div class="text-center py-20 text-slate-450 italic font-space text-xs">
+                  🥗 Kitchen stock is healthy. No items below threshold.
+                </div>
+              }
+            </div>
+          }
+
+        </div>
+      </div>
+
+      <!-- Feed Clean Button -->
+      @if (activeFeedTab() === 'alerts' && alerts().length > 0) {
+        <button 
+          (click)="clearAlerts()"
+          class="w-full mt-4 py-2 border border-slate-200 hover:bg-slate-50 text-slate-500 rounded-xl font-bold uppercase tracking-wider text-[10px] transition cursor-pointer font-space">
+          Clear alerts feed log
+        </button>
+      }
+
+    </div>
+
+  </section>
+
+  <!-- SLIDE-OUT SEATING DETAIL DRAWER PANEL (SignalR Detail inspector) -->
+  @if (selectedTableId()) {
+    <div 
+      (click)="closeDrawer()"
+      class="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 transition-opacity duration-300 animate-fade-in"></div>
+  }
+
+  <div 
+    [class]="'recipe-drawer fixed top-0 right-0 h-full w-full max-w-md bg-white border-l border-slate-200 z-50 flex flex-col justify-between shadow-2xl transition-transform duration-300 ease-in-out ' + 
+             (selectedTableId() ? 'translate-x-0' : 'translate-x-full')">
+    
+    <!-- Drawer Header -->
+    <div class="p-6 border-b border-slate-100 flex items-center justify-between shrink-0 font-space">
+      <div class="space-y-0.5">
+        <h3 class="text-base font-extrabold font-syne text-[#0F172A] tracking-tight">Table #{{ selectedTableDetails()?.number }} Detail Inspector</h3>
+        <p class="text-[10px] font-extrabold uppercase tracking-wider leading-none"
+           [ngClass]="{
+             'text-emerald-600': selectedTableDetails()?.status === 1,
+             'text-[#B37822]': selectedTableDetails()?.status === 2,
+             'text-indigo-600': selectedTableDetails()?.status === 3
+           }">
+          Session: {{ selectedTableDetails()?.status === 1 ? 'Available / vacant' : selectedTableDetails()?.status === 2 ? 'Active Dining Session' : 'Reserved Slot' }}
+        </p>
+      </div>
+      <button 
+        (click)="closeDrawer()"
+        class="p-1.5 hover:bg-slate-100 text-slate-400 hover:text-slate-655 rounded-full transition cursor-pointer border-none outline-none text-lg">
+        ×
+      </button>
+    </div>
+
+    <!-- Drawer Body -->
+    <div class="p-6 flex-grow overflow-y-auto space-y-6 scrollbar-thin">
+      
+      @if (isDrawerLoading()) {
+        <div class="flex flex-col items-center justify-center py-24 space-y-3 font-space text-xs text-slate-400">
+          <span class="animate-spin h-5 w-5 border-2 border-[#F28500] border-t-transparent rounded-full"></span>
+          <p>Retrieving active dining order details...</p>
+        </div>
+      } @else {
+        
+        @if (selectedTableDetails()?.status === 2 && selectedTableOrder()) {
+          <div class="space-y-6 font-space text-xs">
+            <!-- Order Header Info -->
+            <div class="bg-slate-50 border border-slate-150 rounded-2xl p-4 space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Active Order:</span>
+                <span class="font-mono font-bold text-slate-800">#{{ selectedTableOrder()?.id }}</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Waiter assigned:</span>
+                <span class="font-semibold text-slate-700">{{ selectedTableOrder()?.assignedWaiterName || 'Not Assigned' }}</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Elapsed duration:</span>
+                <span class="font-mono text-slate-700 font-bold">{{ getElapsedTime(selectedTableOrder()?.createdAt) }}</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Status:</span>
+                <span class="px-2 py-0.5 bg-amber-50 border border-amber-200 text-amber-700 font-extrabold uppercase rounded-full tracking-wide text-[9px]">
+                  {{ selectedTableOrder()?.statusName }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Order Items Grid -->
+            <div class="space-y-3">
+              <h4 class="text-xs font-bold text-[#0F172A] uppercase tracking-wider">Dishes Ordered</h4>
+              
+              <div class="space-y-2">
+                @for (item of selectedTableOrder()?.orderItems; track item.menuItemId) {
+                  <div class="bg-white border border-slate-150 rounded-xl p-3 flex items-center justify-between">
+                    <div>
+                      <p class="font-bold text-slate-800">{{ item.menuItemName }}</p>
+                      <p class="text-[10px] text-slate-400">Qty: <strong class="text-slate-600 font-mono">{{ item.quantity }}</strong> @ $<span>{{ (item.unitPrice || 0).toFixed(2) }}</span> each</p>
+                    </div>
+                    <span class="font-bold text-slate-700 font-mono">${{ ((item.unitPrice || 0) * item.quantity).toFixed(2) }}</span>
+                  </div>
+                }
+              </div>
+            </div>
+
+            <!-- Receipt Bill total details -->
+            @if (selectedTableBill()) {
+              <div class="space-y-3 pt-4 border-t border-slate-150">
+                <h4 class="text-xs font-bold text-[#0F172A] uppercase tracking-wider">Order Billing Summary</h4>
+                
+                <div class="bg-slate-50 border border-slate-150 rounded-2xl p-4 space-y-2 font-mono text-[11px] text-slate-600">
+                  <div class="flex justify-between">
+                    <span>Subtotal:</span>
+                    <span>${{ (selectedTableBill()?.subTotal || 0).toFixed(2) }}</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Tax ({{ ((selectedTableBill()?.taxRate || 0) * 100).toFixed(0) }}%):</span>
+                    <span>${{ ((((selectedTableBill()?.subTotal || 0) * (selectedTableBill()?.taxRate || 0))) || 0).toFixed(2) }}</span>
+                  </div>
+                  @if (selectedTableBill()?.discountAmount) {
+                    <div class="flex justify-between text-red-500">
+                      <span>Discount Applied:</span>
+                      <span>-${{ (selectedTableBill()?.discountAmount || 0).toFixed(2) }}</span>
+                    </div>
+                  }
+                  <div class="flex justify-between text-sm font-bold text-slate-800 pt-2 border-t border-slate-200">
+                    <span>Grand Total:</span>
+                    <span>${{ (selectedTableBill()?.totalAmount || 0).toFixed(2) }}</span>
+                  </div>
+                  <div class="flex justify-between pt-1 text-[9px] font-sans font-bold uppercase tracking-wider">
+                    <span>Bill Status:</span>
+                    <span [ngClass]="selectedTableBill()?.statusName === 'Paid' ? 'text-emerald-600' : 'text-red-500'">
+                      {{ selectedTableBill()?.statusName }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            } @else {
+              <div class="p-4 border border-dashed border-slate-200 rounded-2xl text-center text-slate-450 italic">
+                No billing invoice generated yet by waiter.
+              </div>
+            }
+
+          </div>
+        } @else if (selectedTableDetails()?.status === 3) {
+          <div class="text-center py-20 font-space text-slate-450 italic">
+            🗓️ This table is marked as Reserved. Currently waiting for reservation guest arrival.
+          </div>
+        } @else {
+          <div class="text-center py-20 font-space text-slate-450 italic">
+            🟢 Table is vacant and ready for walk-in guest dining seating.
+          </div>
+        }
+
+      }
+
+    </div>
+
+    <!-- Drawer Footer Actions -->
+    <div class="p-6 border-t border-slate-100 flex items-center space-x-3 shrink-0">
+      <button 
+        type="button" 
+        (click)="closeDrawer()"
+        class="w-full py-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-655 font-bold text-xs uppercase tracking-wide transition duration-150 cursor-pointer text-center font-space">
+        Close Inspector
+      </button>
+    </div>
+
+  </div>
+
+</div>

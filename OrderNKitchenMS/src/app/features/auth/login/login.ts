@@ -50,6 +50,8 @@ export class Login {
           this.router.navigate(['/waiter/tables']);
         } else if (role === 'Chef') {
           this.router.navigate(['/kitchen']);
+        } else if (role === 'Admin') {
+          this.router.navigate(['/dashboard']);
         } else {
           this.router.navigate(['/']);
         }

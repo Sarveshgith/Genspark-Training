@@ -35,6 +35,13 @@ export const routes: Routes = [
 	},
 
 	{
+		path: 'dashboard',
+		loadComponent: () => import('./features/admin/dashboard/dashboard').then(m => m.Dashboard),
+		canActivate: [RoleGuard],
+		data: { roles: ['Admin'] }
+	},
+
+	{
 		path: 'tables',
 		loadComponent: () => import('./features/admin/table-manager/table-manager').then(m => m.TableManager),
 		canActivate: [RoleGuard],

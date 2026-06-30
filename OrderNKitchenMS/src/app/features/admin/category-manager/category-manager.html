@@ -1,7 +1,8 @@
 <div class="min-h-screen bg-[#F8FAFC] text-[#1E293B] font-sans antialiased p-6 md:p-8 flex flex-col space-y-8">
 
   <!-- Header Title Section -->
-  <header class="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0 pb-6 border-b border-slate-200">
+  <header
+    class="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0 pb-6 border-b border-slate-200">
     <div class="space-y-1">
       <h1 class="text-3xl font-extrabold font-syne tracking-tight text-[#0F172A]">Category Administration</h1>
       <p class="text-sm text-slate-500 font-space leading-relaxed">
@@ -9,8 +10,7 @@
       </p>
     </div>
 
-    <button 
-      (click)="openModal(addDialog)"
+    <button (click)="openModal(addDialog)"
       class="inline-flex items-center justify-center space-x-2 px-5 py-2.5 rounded-xl bg-[#F28500] hover:bg-[#D97200] text-white font-semibold text-sm transition-all duration-200 shadow-md shadow-orange-500/10 cursor-pointer active:scale-[0.98]">
       <span>➕</span>
       <span>Add Category</span>
@@ -18,15 +18,14 @@
   </header>
 
   <!-- Toolbar Filters Section -->
-  <section class="bg-white border border-slate-150 rounded-2xl p-4 shadow-sm flex flex-col md:flex-row md:items-center gap-4 justify-between">
+  <section
+    class="bg-white border border-slate-150 rounded-2xl p-4 shadow-sm flex flex-col md:flex-row md:items-center gap-4 justify-between">
     <!-- Search -->
     <div class="relative flex-1 max-w-md">
-      <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 text-sm">🔍</span>
-      <input 
-        type="text" 
-        [value]="searchQuery()"
-        (input)="searchQuery.set($any($event.target).value)"
-        placeholder="Search categories by name..." 
+      <span
+        class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 text-sm">🔍</span>
+      <input type="text" [value]="searchQuery()" (input)="searchQuery.set($any($event.target).value)"
+        placeholder="Search categories by name..."
         class="w-full pl-9 pr-4 py-2.5 text-sm rounded-xl border border-slate-200 focus:outline-none focus:border-[#F28500] focus:ring-1 focus:ring-[#F28500] transition duration-150 bg-slate-50/50" />
     </div>
 
@@ -34,9 +33,7 @@
     <div class="flex items-center gap-3">
       <div class="flex items-center space-x-2">
         <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider font-space">Classification:</label>
-        <select 
-          [value]="typeFilter()"
-          (change)="typeFilter.set($any($event.target).value)"
+        <select [value]="typeFilter()" (change)="typeFilter.set($any($event.target).value)"
           class="text-xs font-medium bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:border-[#F28500] transition duration-150 cursor-pointer">
           <option value="all">All Types</option>
           <option value="veg">Veg Only</option>
@@ -48,14 +45,16 @@
 
   <!-- Error Alerts Block -->
   @if (errorMessage()) {
-    <div class="bg-red-50 border border-red-200 rounded-2xl p-4 flex items-start space-x-3 text-red-800 text-sm animate-fade-in shadow-sm">
-      <span class="text-base select-none mt-0.5">⚠️</span>
-      <div class="flex-1 font-space">
-        <h4 class="font-bold">Administration Error</h4>
-        <p class="mt-0.5 text-red-700/90">{{ errorMessage() }}</p>
-      </div>
-      <button (click)="errorMessage.set('')" class="text-red-500 hover:text-red-700 font-bold px-1 select-none cursor-pointer">×</button>
+  <div
+    class="bg-red-50 border border-red-200 rounded-2xl p-4 flex items-start space-x-3 text-red-800 text-sm animate-fade-in shadow-sm">
+    <span class="text-base select-none mt-0.5">⚠️</span>
+    <div class="flex-1 font-space">
+      <h4 class="font-bold">Administration Error</h4>
+      <p class="mt-0.5 text-red-700/90">{{ errorMessage() }}</p>
     </div>
+    <button (click)="errorMessage.set('')"
+      class="text-red-500 hover:text-red-700 font-bold px-1 select-none cursor-pointer">×</button>
+  </div>
   }
 
   <!-- Categories Table Grid Layout -->
@@ -63,7 +62,8 @@
     <div class="overflow-x-auto">
       <table class="w-full text-left border-collapse">
         <thead>
-          <tr class="bg-slate-50 text-[10px] font-bold text-slate-400 uppercase tracking-wider font-space border-b border-slate-150">
+          <tr
+            class="bg-slate-50 text-[10px] font-bold text-slate-400 uppercase tracking-wider font-space border-b border-slate-150">
             <th class="py-4 px-6">Category Name</th>
             <th class="py-4 px-6 text-center">Classification</th>
             <th class="py-4 px-6 text-right">Actions</th>
@@ -71,87 +71,80 @@
         </thead>
         <tbody class="divide-y divide-slate-100 text-sm font-space">
           @for (category of filteredCategories(); track category.id) {
-            <tr class="hover:bg-slate-50/50 transition-colors duration-150">
-              
-              <!-- Name / Inline Edit -->
-              <td class="py-4 px-6 font-semibold">
-                @if (editingCategoryId() === category.id) {
-                  <input 
-                    type="text" 
-                    [(ngModel)]="editName"
-                    class="text-sm rounded-xl border border-slate-200 px-3 py-1.5 focus:outline-none focus:border-[#F28500] focus:ring-1 focus:ring-[#F28500] w-full max-w-xs bg-slate-50" />
-                } @else {
-                  <span class="text-slate-800">{{ category.name }}</span>
-                }
-              </td>
+          <tr class="hover:bg-slate-50/50 transition-colors duration-150">
 
-              <!-- Classification (Veg / Non-Veg toggle) -->
-              <td class="py-4 px-6 text-center">
-                @if (editingCategoryId() === category.id) {
-                  <div class="inline-flex items-center space-x-2">
-                    <label class="relative inline-flex items-center cursor-pointer select-none">
-                      <input 
-                        type="checkbox" 
-                        [(ngModel)]="editIsNonVeg" 
-                        class="sr-only peer" />
-                      <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-500"></div>
-                      <span class="ml-2 text-xs font-bold" [ngClass]="editIsNonVeg ? 'text-red-650' : 'text-emerald-600'">
-                        {{ editIsNonVeg ? 'Non-Veg' : 'Veg' }}
-                      </span>
-                    </label>
-                  </div>
-                } @else {
-                  <!-- Interactive badge that toggles on click directly -->
-                  <button 
-                    (click)="toggleIsNonVeg(category)"
-                    [ngClass]="category.isNonVeg ? 'bg-red-55 text-red-700 border-red-200 hover:bg-red-100' : 'bg-emerald-55 text-emerald-700 border-emerald-200 hover:bg-emerald-100'"
-                    class="inline-flex items-center space-x-1.5 px-3 py-1 border rounded-full text-xs font-bold tracking-wide uppercase transition cursor-pointer select-none">
-                    <span class="w-1.5 h-1.5 rounded-full" [ngClass]="category.isNonVeg ? 'bg-red-500' : 'bg-emerald-500'"></span>
-                    <span>{{ category.isNonVeg ? 'Non-Veg 🥩' : 'Veg 🥗' }}</span>
-                  </button>
-                }
-              </td>
+            <!-- Name / Inline Edit -->
+            <td class="py-4 px-6 font-semibold">
+              @if (editingCategoryId() === category.id) {
+              <input type="text" [(ngModel)]="editName"
+                class="text-sm rounded-xl border border-slate-200 px-3 py-1.5 focus:outline-none focus:border-[#F28500] focus:ring-1 focus:ring-[#F28500] w-full max-w-xs bg-slate-50" />
+              } @else {
+              <span class="text-slate-800">{{ category.name }}</span>
+              }
+            </td>
 
-              <!-- Actions -->
-              <td class="py-4 px-6 text-right">
-                @if (editingCategoryId() === category.id) {
-                  <div class="inline-flex items-center space-x-2">
-                    <button 
-                      (click)="saveEdit(category.id)"
-                      class="px-3.5 py-1.5 rounded-xl bg-[#F28500] hover:bg-[#D97200] text-white font-bold text-xs uppercase tracking-wide cursor-pointer transition">
-                      Save
-                    </button>
-                    <button 
-                      (click)="cancelEdit()"
-                      class="px-3.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-650 font-bold text-xs uppercase tracking-wide cursor-pointer transition">
-                      Cancel
-                    </button>
+            <!-- Classification (Veg / Non-Veg toggle) -->
+            <td class="py-4 px-6 text-center">
+              @if (editingCategoryId() === category.id) {
+              <div class="inline-flex items-center space-x-2">
+                <label class="relative inline-flex items-center cursor-pointer select-none">
+                  <input type="checkbox" [(ngModel)]="editIsNonVeg" class="sr-only peer" />
+                  <div
+                    class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-500">
                   </div>
-                } @else {
-                  <div class="inline-flex items-center space-x-2">
-                    <button 
-                      (click)="startEdit(category)"
-                      class="px-3 py-1.5 border border-slate-200 hover:bg-slate-50 text-slate-650 hover:text-slate-900 rounded-xl font-bold text-xs uppercase tracking-wide cursor-pointer transition"
-                      title="Edit Category Name">
-                      ✏️ Edit
-                    </button>
-                    <button 
-                      (click)="deleteCategory(category.id)"
-                      class="p-1.5 bg-red-50 hover:bg-red-100 border border-red-150 text-red-650 rounded-xl cursor-pointer transition"
-                      title="Archive Category">
-                      🗑️
-                    </button>
-                  </div>
-                }
-              </td>
+                  <span class="ml-2 text-xs font-bold" [ngClass]="editIsNonVeg ? 'text-red-650' : 'text-emerald-600'">
+                    {{ editIsNonVeg ? 'Non-Veg' : 'Veg' }}
+                  </span>
+                </label>
+              </div>
+              } @else {
+              <!-- Interactive badge that toggles on click directly -->
+              <button
+                [ngClass]="category.isNonVeg ? 'bg-red-55 text-red-700 border-red-200 hover:bg-red-100' : 'bg-emerald-55 text-emerald-700 border-emerald-200 hover:bg-emerald-100'"
+                class="inline-flex items-center space-x-1.5 px-3 py-1 border rounded-full text-xs font-bold tracking-wide uppercase transition cursor-pointer select-none">
+                <span class="w-1.5 h-1.5 rounded-full"
+                  [ngClass]="category.isNonVeg ? 'bg-red-500' : 'bg-emerald-500'"></span>
+                <span>{{ category.isNonVeg ? 'Non-Veg 🥩' : 'Veg 🥗' }}</span>
+              </button>
+              }
+            </td>
 
-            </tr>
+            <!-- Actions -->
+            <td class="py-4 px-6 text-right">
+              @if (editingCategoryId() === category.id) {
+              <div class="inline-flex items-center space-x-2">
+                <button (click)="saveEdit(category.id)"
+                  class="px-3.5 py-1.5 rounded-xl bg-[#F28500] hover:bg-[#D97200] text-white font-bold text-xs uppercase tracking-wide cursor-pointer transition">
+                  Save
+                </button>
+                <button (click)="cancelEdit()"
+                  class="px-3.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-650 font-bold text-xs uppercase tracking-wide cursor-pointer transition">
+                  Cancel
+                </button>
+              </div>
+              } @else {
+              <div class="inline-flex items-center space-x-2">
+                <button (click)="startEdit(category)"
+                  class="px-3 py-1.5 border border-slate-200 hover:bg-slate-50 text-slate-650 hover:text-slate-900 rounded-xl font-bold text-xs uppercase tracking-wide cursor-pointer transition"
+                  title="Edit Category Name">
+                  ✏️ Edit
+                </button>
+                <button (click)="deleteCategory(category.id)"
+                  class="p-1.5 bg-red-50 hover:bg-red-100 border border-red-150 text-red-650 rounded-xl cursor-pointer transition"
+                  title="Archive Category">
+                  🗑️
+                </button>
+              </div>
+              }
+            </td>
+
+          </tr>
           } @empty {
-            <tr>
-              <td colspan="3" class="py-10 text-center text-slate-400 italic">
-                No active food categories mapped.
-              </td>
-            </tr>
+          <tr>
+            <td colspan="3" class="py-10 text-center text-slate-400 italic">
+              No active food categories mapped.
+            </td>
+          </tr>
           }
         </tbody>
       </table>
@@ -159,17 +152,13 @@
   </main>
 
   <!-- ADD DIALOG MODAL -->
-  <dialog 
-    #addDialog 
-    closedby="any" 
-    (click)="onDialogClick($event, addDialog)"
+  <dialog #addDialog closedby="any" (click)="onDialogClick($event, addDialog)"
     class="rounded-3xl border border-slate-200 shadow-2xl p-7 bg-white max-w-sm w-full focus:outline-none relative">
-    
+
     <!-- Header -->
     <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-5">
       <h3 class="text-lg font-bold font-syne text-[#0F172A]">Create Category</h3>
-      <button 
-        (click)="closeModal(addDialog)" 
+      <button (click)="closeModal(addDialog)"
         class="p-1 hover:bg-slate-100 text-slate-400 hover:text-slate-650 rounded-full transition cursor-pointer border-none outline-none text-lg leading-none">
         ×
       </button>
@@ -179,23 +168,17 @@
     <form (submit)="onAddCategorySubmit(addDialog)" class="space-y-4 font-space">
       <div>
         <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Category Name</label>
-        <input 
-          type="text" 
-          [(ngModel)]="addName"
-          name="addName"
-          required
-          class="w-full text-sm rounded-xl border border-slate-200 px-3.5 py-2.5 focus:outline-none focus:border-[#F28500] focus:ring-1 focus:ring-[#F28500] bg-slate-50/50" 
+        <input type="text" [(ngModel)]="addName" name="addName" required
+          class="w-full text-sm rounded-xl border border-slate-200 px-3.5 py-2.5 focus:outline-none focus:border-[#F28500] focus:ring-1 focus:ring-[#F28500] bg-slate-50/50"
           placeholder="e.g. Appetizers, Desserts" />
       </div>
 
       <div class="pt-2">
         <label class="relative inline-flex items-center cursor-pointer select-none">
-          <input 
-            type="checkbox" 
-            [(ngModel)]="addIsNonVeg" 
-            name="addIsNonVeg"
-            class="sr-only peer" />
-          <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-500"></div>
+          <input type="checkbox" [(ngModel)]="addIsNonVeg" name="addIsNonVeg" class="sr-only peer" />
+          <div
+            class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-500">
+          </div>
           <span class="ml-3 text-sm font-semibold text-slate-700">
             Classify as Non-Veg (Contains Meat/Poultry/Seafood)
           </span>
@@ -204,14 +187,11 @@
 
       <!-- Action Panel -->
       <div class="flex items-center space-x-3 pt-5 border-t border-slate-100">
-        <button 
-          type="button" 
-          (click)="closeModal(addDialog)"
+        <button type="button" (click)="closeModal(addDialog)"
           class="flex-1 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-655 font-bold text-xs uppercase tracking-wide transition duration-150 cursor-pointer text-center">
           Cancel
         </button>
-        <button 
-          type="submit" 
+        <button type="submit"
           class="flex-1 py-2.5 rounded-xl bg-[#F28500] hover:bg-[#D97200] text-white font-bold text-xs uppercase tracking-wide transition duration-150 cursor-pointer text-center shadow-sm shadow-orange-500/10">
           Save Category
         </button>

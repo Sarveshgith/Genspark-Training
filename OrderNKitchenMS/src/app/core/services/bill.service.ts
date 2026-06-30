@@ -41,6 +41,10 @@ export class BillService {
     return this.http.get<BillDto>(`${this.classUrl}/order/${orderId}`);
   }
 
+  public getAllBills(): Observable<BillDto[]> {
+    return this.http.get<BillDto[]>(this.classUrl);
+  }
+
   public updateBillStatus(billId: number, status: string): Observable<void> {
     return this.http.patch<void>(`${this.classUrl}/${billId}/status`, JSON.stringify(status), {
       headers: { 'Content-Type': 'application/json' }
