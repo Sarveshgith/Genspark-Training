@@ -11,6 +11,17 @@
   - [x] Create `order-list.ts` component controller
   - [x] Create `order-list.html` Visual layout template (showing read-only assigned staff names)
   - [x] Create `order-list.css` styles
+- [x] Create Universal Toast Notification Service & Component
+  - [x] Create `toast.service.ts` to manage overlay queues
+  - [x] Create `toast-container` component template and controller styles
+  - [x] Integrate global toast overlay inside root `app.html` / `app.ts`
+  - [x] Migrate all native alerts and success/error signals to ToastService in Category, Inventory, Menu, and Table managers
+  - [x] Resolve CSS compiler bugs and ensure responsive scaling on mobile views
+- [x] Create Custom Confirm Delete Modals
+  - [x] Implement `<dialog #deleteDialog>` modal markup in Category Manager view
+  - [x] Implement `<dialog #deleteDialog>` modal markup in Inventory Manager view
+  - [x] Implement `<dialog #deleteDialog>` modal markup in Menu Manager view
+  - [x] Wire trigger methods and track delete candidate signals in all controllers
 - [x] Apply Layout & Styling Specific Fixes
   - [x] Format revenue calculations with K abbreviations to prevent right-edge clipping
   - [x] Add settled helper label under Pending Bills stat card when zero

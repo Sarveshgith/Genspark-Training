@@ -5,6 +5,7 @@ import { OrderService } from '../../../core/services/order.service';
 import { TableService } from '../../../core/services/table.service';
 import { SignalRService } from '../../../core/services/signalr.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { ToastService } from '../../../core/services/toast.service';
 import { OrderModel, QueryOrderModel } from '../../../core/models/order.model';
 import { TableModel } from '../../../core/models/table.model';
 import { Subscription } from 'rxjs';
@@ -21,6 +22,7 @@ export class OrderList implements OnInit, OnDestroy {
   private tableService = inject(TableService);
   public signalRService = inject(SignalRService);
   private authService = inject(AuthService);
+  private toastService = inject(ToastService);
   private cdr = inject(ChangeDetectorRef);
   private zone = inject(NgZone);
 
@@ -167,11 +169,14 @@ export class OrderList implements OnInit, OnDestroy {
     this.orderService.updateOrderStatus(orderId, statusNum).subscribe({
       next: () => {
         this.zone.run(() => {
+          this.toastService.success(`Order #${orderId} status updated successfully to ${this.getStatusName(statusNum)}.`);
           this.fetchOrders();
         });
       },
       error: (err) => {
-        alert(err.error?.message || 'Failed to modify order status.');
+        this.zone.run(() => {
+          this.toastService.error(err.error?.message || `Failed to modify status for Order #${orderId}.`);
+        });
         console.error('Failed status update:', err);
       }
     });

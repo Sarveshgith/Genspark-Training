@@ -3,6 +3,7 @@ import { Component, inject, OnInit, signal, computed, ChangeDetectorRef, NgZone 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MenuService } from '../../../core/services/menu.service';
+import { ToastService } from '../../../core/services/toast.service';
 import { MenuItemModel, CategoryModel } from '../../../core/models/menu.model';
 
 @Component({
@@ -14,14 +15,13 @@ import { MenuItemModel, CategoryModel } from '../../../core/models/menu.model';
 })
 export class MenuManager implements OnInit {
   private menuService = inject(MenuService);
+  private toastService = inject(ToastService);
   private cdr = inject(ChangeDetectorRef);
   private zone = inject(NgZone);
 
   // Raw states
   public menuItems = signal<MenuItemModel[]>([]);
   public categories = signal<CategoryModel[]>([]);
-  public errorMessage = signal<string>('');
-  public successMessage = signal<string>('');
 
   // Filters
   public searchQuery = signal<string>('');
@@ -31,7 +31,8 @@ export class MenuManager implements OnInit {
   // Modal Form States
   public isEditMode = signal<boolean>(false);
   public selectedItemId = signal<number | null>(null);
-  
+  public deleteConfirmItemId = signal<number | null>(null);
+
   public formName: string = '';
   public formDescription: string = '';
   public formPrice: number = 0;
@@ -116,7 +117,9 @@ export class MenuManager implements OnInit {
         });
       },
       error: (err) => {
-        this.errorMessage.set('Failed to load menu items.');
+        this.zone.run(() => {
+          this.toastService.error('Failed to load menu items.');
+        });
         console.error('Failed to load menu items:', err);
       }
     });
@@ -125,21 +128,17 @@ export class MenuManager implements OnInit {
   // Toggling availability
   public toggleAvailability(item: MenuItemModel): void {
     const targetStatus = !item.isAvailable;
-    this.errorMessage.set('');
-    this.successMessage.set('');
 
     this.menuService.toggleMenuItemAvailability(item.id, targetStatus).subscribe({
       next: () => {
         this.zone.run(() => {
-          this.successMessage.set(`Successfully updated availability of "${item.name}".`);
+          this.toastService.success(`Successfully updated availability of "${item.name}".`);
           this.fetchData();
-          this.clearMessagesAfterDelay();
         });
       },
       error: (err) => {
         this.zone.run(() => {
-          this.errorMessage.set(err.error?.message || `Failed to change availability of "${item.name}".`);
-          this.clearMessagesAfterDelay();
+          this.toastService.error(err.error?.message || `Failed to change availability of "${item.name}".`);
         });
         console.error('Failed to toggle availability:', err);
       }
@@ -150,8 +149,6 @@ export class MenuManager implements OnInit {
   public openAddModal(dialog: HTMLDialogElement): void {
     this.isEditMode.set(false);
     this.selectedItemId.set(null);
-    this.errorMessage.set('');
-    this.successMessage.set('');
 
     // Set form defaults
     this.formName = '';
@@ -174,8 +171,6 @@ export class MenuManager implements OnInit {
   public openEditModal(item: MenuItemModel, dialog: HTMLDialogElement): void {
     this.isEditMode.set(true);
     this.selectedItemId.set(item.id);
-    this.errorMessage.set('');
-    this.successMessage.set('');
 
     this.formName = item.name;
     this.formDescription = item.description;
@@ -199,19 +194,19 @@ export class MenuManager implements OnInit {
     const isAvailable = this.formIsAvailable;
 
     if (!name) {
-      this.errorMessage.set('Menu item name is required.');
+      this.toastService.error('Menu item name is required.');
       return;
     }
     if (price < 0) {
-      this.errorMessage.set('Price cannot be negative.');
+      this.toastService.error('Price cannot be negative.');
       return;
     }
     if (categoryId <= 0) {
-      this.errorMessage.set('Please assign a valid category.');
+      this.toastService.error('Please assign a valid category.');
       return;
     }
     if (preparationTime <= 0) {
-      this.errorMessage.set('Preparation time must be greater than 0 minutes.');
+      this.toastService.error('Preparation time must be greater than 0 minutes.');
       return;
     }
 
@@ -232,45 +227,53 @@ export class MenuManager implements OnInit {
     request$.subscribe({
       next: () => {
         this.zone.run(() => {
+          this.toastService.success(this.isEditMode() ? `Menu item "${name}" updated successfully.` : `Menu item "${name}" created successfully.`);
           this.fetchData();
           dialog.close();
-          this.errorMessage.set('');
         });
       },
       error: (err) => {
-        this.errorMessage.set(err.error?.message || 'An error occurred while saving the menu item.');
+        this.zone.run(() => {
+          this.toastService.error(err.error?.message || 'An error occurred while saving the menu item.');
+        });
         console.error('Failed to save menu item:', err);
       }
     });
   }
 
   // Delete Menu Item
-  public deleteMenuItem(item: MenuItemModel): void {
-    if (!confirm(`Are you sure you want to delete/archive "${item.name}"? This will remove it from waiter and guest menus.`)) {
-      return;
-    }
+  public triggerDelete(id: number, deleteDialog: HTMLDialogElement): void {
+    this.deleteConfirmItemId.set(id);
+    deleteDialog.showModal();
+  }
 
-    this.menuService.deleteMenuItem(item.id).subscribe({
+  public getConfirmDeleteMenuItemName(): string {
+    const id = this.deleteConfirmItemId();
+    return this.menuItems().find(item => item.id === id)?.name || '';
+  }
+
+  public confirmDelete(deleteDialog: HTMLDialogElement): void {
+    const id = this.deleteConfirmItemId();
+    if (!id) return;
+    const item = this.menuItems().find(item => item.id === id);
+
+    this.menuService.deleteMenuItem(id).subscribe({
       next: () => {
         this.zone.run(() => {
+          this.toastService.success(`Menu item "${item?.name || 'Item'}" deleted successfully.`);
+          deleteDialog.close();
+          this.deleteConfirmItemId.set(null);
           this.fetchData();
         });
       },
       error: (err) => {
-        alert(err.error?.message || 'Failed to delete menu item.');
+        this.zone.run(() => {
+          this.toastService.error(err.error?.message || 'Failed to delete menu item.');
+        });
         console.error('Failed to delete menu item:', err);
+        deleteDialog.close();
       }
     });
-  }
-
-  // Helper: clear toast messages
-  private clearMessagesAfterDelay(): void {
-    setTimeout(() => {
-      this.zone.run(() => {
-        this.errorMessage.set('');
-        this.successMessage.set('');
-      });
-    }, 6000);
   }
 
   // Dialog backdrop close (light-dismiss)

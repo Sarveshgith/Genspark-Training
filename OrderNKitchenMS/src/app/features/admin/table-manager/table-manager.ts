@@ -7,6 +7,7 @@ import { TableModel } from '../../../core/models/table.model';
 import { SignalRService } from '../../../core/services/signalr.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { OrderService } from '../../../core/services/order.service';
+import { ToastService } from '../../../core/services/toast.service';
 import { OrderModel } from '../../../core/models/order.model';
 import { Subscription } from 'rxjs';
 
@@ -22,6 +23,7 @@ export class TableManager implements OnInit, OnDestroy {
   private authService = inject(AuthService);
   private orderService = inject(OrderService);
   public signalRService = inject(SignalRService);
+  private toastService = inject(ToastService);
   private cdr = inject(ChangeDetectorRef);
   private zone = inject(NgZone);
 
@@ -29,7 +31,6 @@ export class TableManager implements OnInit, OnDestroy {
   public tables = signal<TableModel[]>([]);
   public activeOrders = signal<OrderModel[]>([]);
   public timeTrigger = signal<number>(Date.now());
-  public errorMessage = signal<string>('');
 
   // Search & Filtering states
   public searchQuery = signal<string>('');
@@ -172,7 +173,9 @@ export class TableManager implements OnInit, OnDestroy {
         });
       },
       error: (err) => {
-        this.errorMessage.set('Failed to fetch tables. Please try again later.');
+        this.zone.run(() => {
+          this.toastService.error('Failed to fetch tables. Please try again later.');
+        });
         console.error('Failed to fetch tables:', err);
       }
     });
@@ -200,7 +203,6 @@ export class TableManager implements OnInit, OnDestroy {
 
   // CRUD: Open Dialogs
   public openModal(dialog: HTMLDialogElement): void {
-    this.errorMessage.set('');
     dialog.showModal();
   }
 
@@ -231,35 +233,37 @@ export class TableManager implements OnInit, OnDestroy {
     const status = this.addStatus();
 
     if (!tableNum || tableNum <= 0) {
-      this.errorMessage.set('Please provide a valid table number.');
+      this.toastService.error('Please provide a valid table number.');
       return;
     }
 
     if (!capacity || capacity <= 0) {
-      this.errorMessage.set('Table capacity must be at least 1 guest.');
+      this.toastService.error('Table capacity must be at least 1 guest.');
       return;
     }
 
     // Check if table number already exists
     if (this.tables().some(t => t.number === tableNum)) {
-      this.errorMessage.set(`Table number ${tableNum} already exists.`);
+      this.toastService.error(`Table number ${tableNum} already exists.`);
       return;
     }
 
     this.tableService.createTable({ number: tableNum, capacity, status }).subscribe({
       next: () => {
         this.zone.run(() => {
+          this.toastService.success(`Table #${tableNum} created successfully.`);
           this.fetchTables();
           dialog.close();
           // Reset form defaults
           this.addNumber.set(this.getSuggestedTableNumber());
           this.addCapacity.set(4);
           this.addStatus.set(1);
-          this.errorMessage.set('');
         });
       },
       error: (err) => {
-        this.errorMessage.set(err.error?.message || 'Error occurred while creating table.');
+        this.zone.run(() => {
+          this.toastService.error(err.error?.message || 'Error occurred while creating table.');
+        });
         console.error('Failed to create table:', err);
       }
     });
@@ -289,30 +293,33 @@ export class TableManager implements OnInit, OnDestroy {
     const cap = this.editCapacity();
 
     if (!num || num <= 0) {
-      alert('Table number must be positive.');
+      this.toastService.error('Table number must be positive.');
       return;
     }
 
     if (!cap || cap <= 0) {
-      alert('Table capacity must be at least 1 guest.');
+      this.toastService.error('Table capacity must be at least 1 guest.');
       return;
     }
 
     // Check conflict (exclude current table being edited)
     if (this.tables().some(t => t.number === num && t.id !== tableId)) {
-      alert(`Conflict: Table number ${num} already exists.`);
+      this.toastService.error(`Conflict: Table number ${num} already exists.`);
       return;
     }
 
     this.tableService.updateTable(tableId, { number: num, capacity: cap }).subscribe({
       next: () => {
         this.zone.run(() => {
+          this.toastService.success(`Table #${num} details updated successfully.`);
           this.editingTableId.set(null);
           this.fetchTables();
         });
       },
       error: (err) => {
-        alert(err.error?.message || 'Failed to update table details.');
+        this.zone.run(() => {
+          this.toastService.error(err.error?.message || 'Failed to update table details.');
+        });
         console.error('Failed to update table details:', err);
       }
     });
@@ -322,15 +329,19 @@ export class TableManager implements OnInit, OnDestroy {
   public onStatusOverride(tableId: number, event: Event): void {
     const selectEl = event.target as HTMLSelectElement;
     const statusVal = parseInt(selectEl.value, 10);
+    const tableNum = this.tables().find(t => t.id === tableId)?.number;
 
     this.tableService.updateTableStatus(tableId, statusVal).subscribe({
       next: () => {
         this.zone.run(() => {
+          this.toastService.success(`Table #${tableNum || tableId} status changed to ${this.getStatusName(statusVal)}.`);
           this.fetchTables();
         });
       },
       error: (err) => {
-        alert(err.error?.message || 'Failed to change table status.');
+        this.zone.run(() => {
+          this.toastService.error(err.error?.message || 'Failed to change table status.');
+        });
         console.error('Failed to override status:', err);
         // Refresh to revert select element selection to correct status
         this.fetchTables();
@@ -352,17 +363,21 @@ export class TableManager implements OnInit, OnDestroy {
   public confirmDelete(deleteDialog: HTMLDialogElement): void {
     const id = this.deleteConfirmTableId();
     if (!id) return;
+    const tableNum = this.tables().find(t => t.id === id)?.number;
 
     this.tableService.deleteTable(id).subscribe({
       next: () => {
         this.zone.run(() => {
+          this.toastService.success(`Table #${tableNum || id} archived successfully.`);
           deleteDialog.close();
           this.deleteConfirmTableId.set(null);
           this.fetchTables();
         });
       },
       error: (err) => {
-        alert(err.error?.message || 'Failed to delete table.');
+        this.zone.run(() => {
+          this.toastService.error(err.error?.message || 'Failed to delete table.');
+        });
         console.error('Failed to delete table:', err);
         deleteDialog.close();
       }
@@ -380,14 +395,18 @@ export class TableManager implements OnInit, OnDestroy {
 
   public overrideStatus(tableId: number, statusVal: any): void {
     const status = parseInt(statusVal, 10);
+    const tableNum = this.tables().find(t => t.id === tableId)?.number;
     this.tableService.updateTableStatus(tableId, status).subscribe({
       next: () => {
         this.zone.run(() => {
+          this.toastService.success(`Table #${tableNum || tableId} status updated to ${this.getStatusName(status)}.`);
           this.fetchTables();
         });
       },
       error: (err) => {
-        alert(err.error?.message || 'Failed to change table status.');
+        this.zone.run(() => {
+          this.toastService.error(err.error?.message || 'Failed to change table status.');
+        });
         console.error('Failed to override status:', err);
         this.fetchTables();
       }

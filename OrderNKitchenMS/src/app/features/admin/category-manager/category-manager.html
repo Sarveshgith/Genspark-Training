@@ -43,20 +43,6 @@
     </div>
   </section>
 
-  <!-- Error Alerts Block -->
-  @if (errorMessage()) {
-  <div
-    class="bg-red-50 border border-red-200 rounded-2xl p-4 flex items-start space-x-3 text-red-800 text-sm animate-fade-in shadow-sm">
-    <span class="text-base select-none mt-0.5">⚠️</span>
-    <div class="flex-1 font-space">
-      <h4 class="font-bold">Administration Error</h4>
-      <p class="mt-0.5 text-red-700/90">{{ errorMessage() }}</p>
-    </div>
-    <button (click)="errorMessage.set('')"
-      class="text-red-500 hover:text-red-700 font-bold px-1 select-none cursor-pointer">×</button>
-  </div>
-  }
-
   <!-- Categories Table Grid Layout -->
   <main class="bg-white border border-slate-150 rounded-3xl shadow-sm overflow-hidden">
     <div class="overflow-x-auto">
@@ -129,7 +115,7 @@
                   title="Edit Category Name">
                   ✏️ Edit
                 </button>
-                <button (click)="deleteCategory(category.id)"
+                <button (click)="triggerDelete(category.id, deleteDialog)"
                   class="p-1.5 bg-red-50 hover:bg-red-100 border border-red-150 text-red-650 rounded-xl cursor-pointer transition"
                   title="Archive Category">
                   🗑️
@@ -197,6 +183,31 @@
         </button>
       </div>
     </form>
+  </dialog>
+
+  <!-- Delete Confirmation Dialog -->
+  <dialog #deleteDialog
+    class="backdrop:bg-slate-900/60 p-6 rounded-3xl border border-slate-100 shadow-xl max-w-sm w-full font-space text-xs animate-scale-up outline-none"
+    (click)="onDialogClick($event, deleteDialog)">
+    <div class="space-y-4">
+      <div class="flex items-center space-x-3 text-red-600">
+        <span class="text-xl">⚠️</span>
+        <h3 class="text-base font-bold uppercase tracking-wider text-slate-800">Archive Category</h3>
+      </div>
+      <p class="text-slate-600 leading-relaxed font-medium">
+        Are you sure you want to archive the category <strong class="text-slate-800">"{{ getConfirmDeleteCategoryName() }}"</strong>? Existing menu items in this category will remain, but the category itself will be archived.
+      </p>
+      <div class="flex space-x-3 pt-3 border-t border-slate-100">
+        <button type="button" (click)="deleteDialog.close()"
+          class="flex-1 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-655 font-bold uppercase tracking-wide cursor-pointer transition">
+          Cancel
+        </button>
+        <button type="button" (click)="confirmDelete(deleteDialog)"
+          class="flex-1 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold uppercase tracking-wide cursor-pointer transition shadow-sm">
+          Archive
+        </button>
+      </div>
+    </div>
   </dialog>
 
 </div>

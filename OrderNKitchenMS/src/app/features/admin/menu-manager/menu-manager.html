@@ -100,28 +100,7 @@
     </div>
   </section>
 
-  <!-- Error Alerts Block (e.g. business rule stock warnings) -->
-  @if (errorMessage()) {
-    <div class="bg-red-50 border border-red-200 rounded-2xl p-4 flex items-start space-x-3 text-red-800 text-sm animate-fade-in shadow-sm">
-      <span class="text-base select-none mt-0.5">⚠️</span>
-      <div class="flex-1 font-space">
-        <h4 class="font-bold">Administration Warning</h4>
-        <p class="mt-0.5 text-red-700/90">{{ errorMessage() }}</p>
-      </div>
-      <button (click)="errorMessage.set('')" class="text-red-500 hover:text-red-700 font-bold px-1 select-none cursor-pointer">×</button>
-    </div>
-  }
 
-  @if (successMessage()) {
-    <div class="bg-emerald-50 border border-emerald-250 rounded-2xl p-4 flex items-start space-x-3 text-emerald-800 text-sm animate-fade-in shadow-sm">
-      <span class="text-base select-none mt-0.5">✅</span>
-      <div class="flex-1 font-space">
-        <h4 class="font-bold">Success</h4>
-        <p class="mt-0.5 text-emerald-700/90">{{ successMessage() }}</p>
-      </div>
-      <button (click)="successMessage.set('')" class="text-emerald-500 hover:text-emerald-700 font-bold px-1 select-none cursor-pointer">×</button>
-    </div>
-  }
 
   <!-- Visual Grid of Menu Items -->
   <main class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
@@ -200,7 +179,7 @@
           </button>
           
           <button 
-            (click)="deleteMenuItem(item)"
+            (click)="triggerDelete(item.id, deleteDialog)"
             class="p-2 bg-red-50 hover:bg-red-100 border border-red-150 text-red-650 rounded-xl cursor-pointer transition">
             <span>🗑️</span>
           </button>
@@ -358,6 +337,31 @@
         </button>
       </div>
     </form>
+  </dialog>
+
+  <!-- Delete Confirmation Dialog -->
+  <dialog #deleteDialog
+    class="backdrop:bg-slate-900/60 p-6 rounded-3xl border border-slate-100 shadow-xl max-w-sm w-full font-space text-xs animate-scale-up outline-none"
+    (click)="onDialogClick($event, deleteDialog)">
+    <div class="space-y-4">
+      <div class="flex items-center space-x-3 text-red-600">
+        <span class="text-xl">⚠️</span>
+        <h3 class="text-base font-bold uppercase tracking-wider text-slate-800">Archive Menu Item</h3>
+      </div>
+      <p class="text-slate-600 leading-relaxed font-medium">
+        Are you sure you want to delete/archive the menu item <strong class="text-slate-800">"{{ getConfirmDeleteMenuItemName() }}"</strong>? This will remove it from waiter and guest menus.
+      </p>
+      <div class="flex space-x-3 pt-3 border-t border-slate-100">
+        <button type="button" (click)="deleteDialog.close()"
+          class="flex-1 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-655 font-bold uppercase tracking-wide cursor-pointer transition">
+          Cancel
+        </button>
+        <button type="button" (click)="confirmDelete(deleteDialog)"
+          class="flex-1 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold uppercase tracking-wide cursor-pointer transition shadow-sm">
+          Archive
+        </button>
+      </div>
+    </div>
   </dialog>
 
 </div>

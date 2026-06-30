@@ -108,17 +108,7 @@
     </div>
   </section>
 
-  <!-- Error Alerts Block -->
-  @if (errorMessage()) {
-    <div class="bg-red-50 border border-red-200 rounded-2xl p-4 flex items-start space-x-3 text-red-800 text-sm animate-fade-in shadow-sm">
-      <span class="text-base select-none mt-0.5">⚠️</span>
-      <div class="flex-1">
-        <h4 class="font-bold">Administration Error</h4>
-        <p class="mt-0.5 text-red-700/90">{{ errorMessage() }}</p>
-      </div>
-      <button (click)="errorMessage.set('')" class="text-red-500 hover:text-red-700 font-bold px-1 select-none cursor-pointer">×</button>
-    </div>
-  }
+
 
   <!-- Grid of Admin Table Cards -->
   <section class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">

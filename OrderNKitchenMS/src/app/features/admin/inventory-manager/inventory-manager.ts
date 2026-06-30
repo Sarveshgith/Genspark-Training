@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { InventoryService } from '../../../core/services/inventory.service';
 import { MenuService } from '../../../core/services/menu.service';
+import { ToastService } from '../../../core/services/toast.service';
 import { InventoryItemModel, MenuItemIngredientModel } from '../../../core/models/inventory.model';
 import { MenuItemModel } from '../../../core/models/menu.model';
 
@@ -17,6 +18,7 @@ import { MenuItemModel } from '../../../core/models/menu.model';
 export class InventoryManager implements OnInit {
   private inventoryService = inject(InventoryService);
   private menuService = inject(MenuService);
+  private toastService = inject(ToastService);
   private cdr = inject(ChangeDetectorRef);
   private zone = inject(NgZone);
 
@@ -26,8 +28,6 @@ export class InventoryManager implements OnInit {
   // Raw states
   public inventoryItems = signal<InventoryItemModel[]>([]);
   public menuItems = signal<MenuItemModel[]>([]);
-  public errorMessage = signal<string>('');
-  public successMessage = signal<string>('');
 
   // Search & Filtering
   public searchQuery = signal<string>('');
@@ -36,6 +36,7 @@ export class InventoryManager implements OnInit {
   // Edit / Create Modals States
   public isEditMode = signal<boolean>(false);
   public selectedItemId = signal<number | null>(null);
+  public deleteConfirmItemId = signal<number | null>(null);
   public formName: string = '';
   public formUnit: number = 1;
   public formQuantity: number = 0;
@@ -122,7 +123,9 @@ export class InventoryManager implements OnInit {
         });
       },
       error: (err) => {
-        this.errorMessage.set('Failed to load inventory stock.');
+        this.zone.run(() => {
+          this.toastService.error('Failed to load inventory stock.');
+        });
         console.error('Failed to load inventory:', err);
       }
     });
@@ -157,7 +160,7 @@ export class InventoryManager implements OnInit {
     event.stopPropagation();
     const qty = this.restockQtyInput;
     if (qty <= 0) {
-      alert('Restock quantity must be positive.');
+      this.toastService.error('Restock quantity must be positive.');
       return;
     }
 
@@ -165,13 +168,14 @@ export class InventoryManager implements OnInit {
       next: () => {
         this.zone.run(() => {
           this.restockingItemId.set(null);
-          this.successMessage.set('Stock level updated successfully.');
+          this.toastService.success('Stock level updated successfully.');
           this.fetchData();
-          this.clearMessagesAfterDelay();
         });
       },
       error: (err) => {
-        alert(err.error?.message || 'Failed to restock item.');
+        this.zone.run(() => {
+          this.toastService.error(err.error?.message || 'Failed to restock item.');
+        });
         console.error('Failed to restock item:', err);
       }
     });
@@ -181,7 +185,6 @@ export class InventoryManager implements OnInit {
   public openAddModal(dialog: HTMLDialogElement): void {
     this.isEditMode.set(false);
     this.selectedItemId.set(null);
-    this.errorMessage.set('');
 
     this.formName = '';
     this.formUnit = 1;
@@ -196,7 +199,6 @@ export class InventoryManager implements OnInit {
   public openEditModal(item: InventoryItemModel, dialog: HTMLDialogElement): void {
     this.isEditMode.set(true);
     this.selectedItemId.set(item.id);
-    this.errorMessage.set('');
 
     this.formName = item.name;
     this.formUnit = item.unit;
@@ -218,19 +220,19 @@ export class InventoryManager implements OnInit {
     const isActive = this.formIsActive;
 
     if (!name) {
-      this.errorMessage.set('Name is required.');
+      this.toastService.error('Name is required.');
       return;
     }
     if (stockQuantity < 0) {
-      this.errorMessage.set('Stock quantity cannot be negative.');
+      this.toastService.error('Stock quantity cannot be negative.');
       return;
     }
     if (stockThreshold < 0) {
-      this.errorMessage.set('Safety threshold cannot be negative.');
+      this.toastService.error('Safety threshold cannot be negative.');
       return;
     }
     if (costPerUnit !== null && costPerUnit < 0) {
-      this.errorMessage.set('Unit cost cannot be negative.');
+      this.toastService.error('Unit cost cannot be negative.');
       return;
     }
 
@@ -243,13 +245,15 @@ export class InventoryManager implements OnInit {
     request$.subscribe({
       next: () => {
         this.zone.run(() => {
+          this.toastService.success(this.isEditMode() ? 'Inventory item updated successfully.' : 'New inventory ingredient created successfully.');
           this.fetchData();
           dialog.close();
-          this.errorMessage.set('');
         });
       },
       error: (err) => {
-        this.errorMessage.set(err.error?.message || 'Error occurred while saving item.');
+        this.zone.run(() => {
+          this.toastService.error(err.error?.message || 'Error occurred while saving item.');
+        });
         console.error('Failed to save item:', err);
       }
     });
@@ -270,31 +274,50 @@ export class InventoryManager implements OnInit {
     }).subscribe({
       next: () => {
         this.zone.run(() => {
+          this.toastService.success(`Ingredient "${item.name}" is now ${targetStatus ? 'Active' : 'Inactive'}.`);
           this.fetchData();
         });
       },
       error: (err) => {
-        alert(err.error?.message || 'Failed to toggle item status.');
+        this.zone.run(() => {
+          this.toastService.error(err.error?.message || 'Failed to toggle item status.');
+        });
         console.error('Failed to toggle active status:', err);
       }
     });
   }
 
   // CRUD: Deactivate directly (soft delete / active toggle to false)
-  public deactivateItem(item: InventoryItemModel): void {
-    if (!confirm(`Are you sure you want to deactivate "${item.name}"? It will not be selectable for recipes.`)) {
-      return;
-    }
+  public triggerDelete(id: number, deleteDialog: HTMLDialogElement): void {
+    this.deleteConfirmItemId.set(id);
+    deleteDialog.showModal();
+  }
 
-    this.inventoryService.deactivateInventoryItem(item.id).subscribe({
+  public getConfirmDeleteIngredientName(): string {
+    const id = this.deleteConfirmItemId();
+    return this.inventoryItems().find(inv => inv.id === id)?.name || '';
+  }
+
+  public confirmDelete(deleteDialog: HTMLDialogElement): void {
+    const id = this.deleteConfirmItemId();
+    if (!id) return;
+    const item = this.inventoryItems().find(inv => inv.id === id);
+
+    this.inventoryService.deactivateInventoryItem(id).subscribe({
       next: () => {
         this.zone.run(() => {
+          this.toastService.success(`Ingredient "${item?.name || 'Item'}" deactivated successfully.`);
+          deleteDialog.close();
+          this.deleteConfirmItemId.set(null);
           this.fetchData();
         });
       },
       error: (err) => {
-        alert(err.error?.message || 'Failed to deactivate ingredient.');
+        this.zone.run(() => {
+          this.toastService.error(err.error?.message || 'Failed to deactivate ingredient.');
+        });
         console.error('Failed to deactivate ingredient:', err);
+        deleteDialog.close();
       }
     });
   }
@@ -332,7 +355,9 @@ export class InventoryManager implements OnInit {
         });
       },
       error: (err) => {
-        alert('Failed to load recipe mapping.');
+        this.zone.run(() => {
+          this.toastService.error('Failed to load recipe mapping.');
+        });
         console.error('Failed to load recipe mapping:', err);
       }
     });
@@ -348,11 +373,11 @@ export class InventoryManager implements OnInit {
     const qty = this.drawerAddQuantity;
 
     if (!itemId) {
-      alert('Please select an ingredient.');
+      this.toastService.error('Please select an ingredient.');
       return;
     }
     if (qty <= 0) {
-      alert('Required quantity must be positive.');
+      this.toastService.error('Required quantity must be positive.');
       return;
     }
 
@@ -392,26 +417,18 @@ export class InventoryManager implements OnInit {
     this.inventoryService.updateMenuItemIngredients(id, payload).subscribe({
       next: () => {
         this.zone.run(() => {
-          this.successMessage.set(`Recipe for "${this.selectedRecipeMenuItemName()}" updated successfully.`);
+          this.toastService.success(`Recipe for "${this.selectedRecipeMenuItemName()}" updated successfully.`);
           this.closeRecipeDrawer();
           this.fetchData();
-          this.clearMessagesAfterDelay();
         });
       },
       error: (err) => {
-        alert(err.error?.message || 'Failed to save recipe updates.');
+        this.zone.run(() => {
+          this.toastService.error(err.error?.message || 'Failed to save recipe updates.');
+        });
         console.error('Failed to save recipe mappings:', err);
       }
     });
-  }
-
-  private clearMessagesAfterDelay(): void {
-    setTimeout(() => {
-      this.zone.run(() => {
-        this.successMessage.set('');
-        this.errorMessage.set('');
-      });
-    }, 5000);
   }
 
   // Dialog Helpers

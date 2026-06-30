@@ -1,0 +1,20 @@
+<div
+  class="toast-container fixed top-6 right-6 z-[99999] flex flex-col space-y-3 w-full max-w-sm pointer-events-none font-space text-xs select-none">
+  @for (toast of toastService.toasts(); track toast.id) {
+  <div
+    [class]="'toast-item border rounded-2xl p-4 flex items-start space-x-3 shadow-lg pointer-events-auto animate-toast-slide-in ' + getToastClasses(toast)">
+    <span class="text-base font-bold shrink-0 leading-none select-none">
+      {{ getIcon(toast.type) }}
+    </span>
+    <div class="flex-1 leading-relaxed break-words font-medium">
+      {{ toast.message }}
+    </div>
+
+    <button (click)="dismiss(toast.id)"
+      class="text-current hover:opacity-75 transition bg-none border-none cursor-pointer outline-none font-bold text-base leading-none p-0.5">
+      ×
+    </button>
+
+  </div>
+  }
+</div>

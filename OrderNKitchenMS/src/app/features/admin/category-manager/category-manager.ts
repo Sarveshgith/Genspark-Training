@@ -3,6 +3,7 @@ import { Component, inject, OnInit, signal, computed, ChangeDetectorRef, NgZone 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MenuService } from '../../../core/services/menu.service';
+import { ToastService } from '../../../core/services/toast.service';
 import { CategoryModel } from '../../../core/models/menu.model';
 
 @Component({
@@ -14,12 +15,12 @@ import { CategoryModel } from '../../../core/models/menu.model';
 })
 export class CategoryManager implements OnInit {
   private menuService = inject(MenuService);
+  private toastService = inject(ToastService);
   private cdr = inject(ChangeDetectorRef);
   private zone = inject(NgZone);
 
   // States
   public categories = signal<CategoryModel[]>([]);
-  public errorMessage = signal<string>('');
 
   // Search & Filtering
   public searchQuery = signal<string>('');
@@ -27,6 +28,7 @@ export class CategoryManager implements OnInit {
 
   // Inline editing states
   public editingCategoryId = signal<number | null>(null);
+  public deleteConfirmCategoryId = signal<number | null>(null);
   public editName: string = '';
   public editIsNonVeg: boolean = false;
 
@@ -66,7 +68,9 @@ export class CategoryManager implements OnInit {
         });
       },
       error: (err) => {
-        this.errorMessage.set('Failed to fetch categories. Please try again later.');
+        this.zone.run(() => {
+          this.toastService.error('Failed to fetch categories. Please try again later.');
+        });
         console.error('Failed to fetch categories:', err);
       }
     });
@@ -78,28 +82,30 @@ export class CategoryManager implements OnInit {
     const isNonVeg = this.addIsNonVeg;
 
     if (!name) {
-      this.errorMessage.set('Category name is required.');
+      this.toastService.error('Category name is required.');
       return;
     }
 
     // Check duplicate
     if (this.categories().some(c => c.name.toLowerCase() === name.toLowerCase() && c.isNonVeg === isNonVeg && !c.isDeleted)) {
-      this.errorMessage.set(`A ${isNonVeg ? 'Non-Veg' : 'Veg'} category with the name "${name}" already exists.`);
+      this.toastService.error(`A ${isNonVeg ? 'Non-Veg' : 'Veg'} category with the name "${name}" already exists.`);
       return;
     }
 
     this.menuService.createCategory({ name, isNonVeg }).subscribe({
       next: () => {
         this.zone.run(() => {
+          this.toastService.success(`Category "${name}" created successfully.`);
           this.fetchCategories();
           this.addName = '';
           this.addIsNonVeg = false;
-          this.errorMessage.set('');
           dialog.close();
         });
       },
       error: (err) => {
-        this.errorMessage.set(err.error?.message || 'Failed to create category.');
+        this.zone.run(() => {
+          this.toastService.error(err.error?.message || 'Failed to create category.');
+        });
         console.error('Failed to create category:', err);
       }
     });
@@ -121,25 +127,28 @@ export class CategoryManager implements OnInit {
     const isNonVeg = this.editIsNonVeg;
 
     if (!name) {
-      alert('Category name cannot be empty.');
+      this.toastService.error('Category name cannot be empty.');
       return;
     }
 
     // Check duplicate
     if (this.categories().some(c => c.name.toLowerCase() === name.toLowerCase() && c.isNonVeg === isNonVeg && c.id !== categoryId && !c.isDeleted)) {
-      alert(`Conflict: A ${isNonVeg ? 'Non-Veg' : 'Veg'} category with the name "${name}" already exists.`);
+      this.toastService.error(`Conflict: A ${isNonVeg ? 'Non-Veg' : 'Veg'} category with the name "${name}" already exists.`);
       return;
     }
 
     this.menuService.updateCategory(categoryId, { name, isNonVeg }).subscribe({
       next: () => {
         this.zone.run(() => {
+          this.toastService.success(`Category details updated successfully.`);
           this.editingCategoryId.set(null);
           this.fetchCategories();
         });
       },
       error: (err) => {
-        alert(err.error?.message || 'Failed to update category.');
+        this.zone.run(() => {
+          this.toastService.error(err.error?.message || 'Failed to update category.');
+        });
         console.error('Failed to update category:', err);
       }
     });
@@ -147,44 +156,63 @@ export class CategoryManager implements OnInit {
 
   // Toggle IsNonVeg directly
   public toggleIsNonVeg(category: CategoryModel): void {
+    const newIsNonVeg = !category.isNonVeg;
     this.menuService.updateCategory(category.id, {
       name: category.name,
-      isNonVeg: !category.isNonVeg
+      isNonVeg: newIsNonVeg
     }).subscribe({
       next: () => {
         this.zone.run(() => {
+          this.toastService.success(`Category "${category.name}" changed to ${newIsNonVeg ? 'Non-Veg' : 'Veg'}.`);
           this.fetchCategories();
         });
       },
       error: (err) => {
-        alert(err.error?.message || 'Failed to toggle category type.');
+        this.zone.run(() => {
+          this.toastService.error(err.error?.message || 'Failed to toggle category type.');
+        });
         console.error('Failed to toggle category type:', err);
       }
     });
   }
 
   // Delete Category
-  public deleteCategory(id: number): void {
-    if (!confirm('Are you sure you want to archive/delete this category? Existing menu items in this category will remain, but the category itself will be archived.')) {
-      return;
-    }
+  public triggerDelete(id: number, deleteDialog: HTMLDialogElement): void {
+    this.deleteConfirmCategoryId.set(id);
+    deleteDialog.showModal();
+  }
+
+  public getConfirmDeleteCategoryName(): string {
+    const id = this.deleteConfirmCategoryId();
+    return this.categories().find(c => c.id === id)?.name || '';
+  }
+
+  public confirmDelete(deleteDialog: HTMLDialogElement): void {
+    const id = this.deleteConfirmCategoryId();
+    if (!id) return;
+    const category = this.categories().find(c => c.id === id);
 
     this.menuService.deleteCategory(id).subscribe({
       next: () => {
         this.zone.run(() => {
+          this.toastService.success(`Category "${category?.name || 'Item'}" archived successfully.`);
+          deleteDialog.close();
+          this.deleteConfirmCategoryId.set(null);
           this.fetchCategories();
         });
       },
       error: (err) => {
-        alert(err.error?.message || 'Failed to delete category.');
+        this.zone.run(() => {
+          this.toastService.error(err.error?.message || 'Failed to delete category.');
+        });
         console.error('Failed to delete category:', err);
+        deleteDialog.close();
       }
     });
   }
 
   // Dialog management
   public openModal(dialog: HTMLDialogElement): void {
-    this.errorMessage.set('');
     dialog.showModal();
   }
 
