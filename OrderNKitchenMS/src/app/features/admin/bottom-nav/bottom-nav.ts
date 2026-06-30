@@ -1,4 +1,3 @@
-// @feature Admin | Navigation Sidebar | Collapsible sidebar dashboard menu containing management routes for Admin functions.
 import { Component, inject, signal, OnInit, OnDestroy } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
@@ -7,18 +6,21 @@ import { Subscription } from 'rxjs';
 import { CommonModule } from '@angular/common';
 
 @Component({
-  selector: 'app-sidebar',
+  selector: 'app-bottom-nav',
   standalone: true,
   imports: [RouterLink, RouterLinkActive, CommonModule],
-  templateUrl: './sidebar.html',
-  styleUrl: './sidebar.css'
+  templateUrl: './bottom-nav.html',
+  styleUrl: './bottom-nav.css'
 })
-export class SidebarComponent implements OnInit, OnDestroy {
+export class BottomNavComponent implements OnInit, OnDestroy {
   public authService = inject(AuthService);
   public router = inject(Router);
   private signalRService = inject(SignalRService);
 
-  // Alert feed state
+  // Bottom Sheet Visibility
+  public isBottomSheetOpen = signal<boolean>(false);
+
+  // Alert Feed Drawer Visibility (inside More sheet or bottom nav)
   public isAlertFeedOpen = signal<boolean>(false);
   public alerts = signal<any[]>([]);
 
@@ -27,10 +29,11 @@ export class SidebarComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     const role = this.authService.getRole()?.toLowerCase();
     const token = this.authService.getToken();
-    
+
     if (role === 'admin' && token) {
+      // Connect to Hub (idempotent in SignalRService)
       this.signalRService.connect(token);
-      
+
       this.sub.add(
         this.signalRService.adminAlert$.subscribe(alert => {
           this.alerts.update(list => [alert, ...list]);
@@ -39,19 +42,30 @@ export class SidebarComponent implements OnInit, OnDestroy {
     }
   }
 
+  toggleBottomSheet(): void {
+    this.isBottomSheetOpen.update(val => !val);
+  }
+
+  closeBottomSheet(): void {
+    this.isBottomSheetOpen.set(false);
+  }
+
   toggleAlertFeed(): void {
     this.isAlertFeedOpen.update(val => !val);
   }
 
-  dismissAlert(index: number): void {
+  dismissAlert(index: number, event: MouseEvent): void {
+    event.stopPropagation();
     this.alerts.update(list => list.filter((_, i) => i !== index));
   }
 
-  clearAllAlerts(): void {
+  clearAllAlerts(event: MouseEvent): void {
+    event.stopPropagation();
     this.alerts.set([]);
   }
 
   logout(): void {
+    this.closeBottomSheet();
     this.authService.logout();
     this.router.navigate(['/login']);
   }
@@ -60,4 +74,3 @@ export class SidebarComponent implements OnInit, OnDestroy {
     this.sub.unsubscribe();
   }
 }
-

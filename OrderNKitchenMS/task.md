@@ -1,38 +1,17 @@
-# Tasks for Admin Dashboard & Order Registry Refinements
+# Tasks for Responsive Navigation & Table Optimizations
 
-- [x] Create Admin Dashboard landing page
-  - [x] Create `dashboard.ts` component controller
-  - [x] Create `dashboard.html` visual layout template
-  - [x] Create `dashboard.css` animations and styles
-- [x] Refactor Routing and Navigation
-  - [x] Register `/dashboard` and `/orders` routes in `app.routes.ts`
-  - [x] Redirect Admin accounts from login directly to `/dashboard`
-- [x] Create Order Registry Feature (Admin all tables view)
-  - [x] Create `order-list.ts` component controller
-  - [x] Create `order-list.html` Visual layout template (showing read-only assigned staff names)
-  - [x] Create `order-list.css` styles
-- [x] Create Universal Toast Notification Service & Component
-  - [x] Create `toast.service.ts` to manage overlay queues
-  - [x] Create `toast-container` component template and controller styles
-  - [x] Integrate global toast overlay inside root `app.html` / `app.ts`
-  - [x] Migrate all native alerts and success/error signals to ToastService in Category, Inventory, Menu, and Table managers
-  - [x] Resolve CSS compiler bugs and ensure responsive scaling on mobile views
-- [x] Create Custom Confirm Delete Modals
-  - [x] Implement `<dialog #deleteDialog>` modal markup in Category Manager view
-  - [x] Implement `<dialog #deleteDialog>` modal markup in Inventory Manager view
-  - [x] Implement `<dialog #deleteDialog>` modal markup in Menu Manager view
-  - [x] Wire trigger methods and track delete candidate signals in all controllers
-- [x] Apply Layout & Styling Specific Fixes
-  - [x] Format revenue calculations with K abbreviations to prevent right-edge clipping
-  - [x] Add settled helper label under Pending Bills stat card when zero
-  - [x] Separate tab numbers into proper badge chips next to tab text in alerts feed
-  - [x] Rename section link header to "Manage Tables"
-  - [x] Unify occupied status dot colors to unified amber hex `#E8A54B`
-  - [x] Consolidate redundant MENU and MENU MANAGER entries in the admin sidebar
-- [x] Apply Rupee Currency, Highlighting & Responsiveness Fixes
-  - [x] Format all currency displays to Indian Rupee symbol (`₹`)
-  - [x] Highlight inventory items at or below safety threshold in red with alert border
-  - [x] Fix layout responsiveness of dashboard low-stock warning strip on mobile views
+- [x] Create Bottom Navigation Component
+  - [x] Create `bottom-nav.ts` component controller
+  - [x] Create `bottom-nav.html` visual layout template
+  - [x] Create `bottom-nav.css` animations and styles
+- [x] Refactor Sidebar Component
+  - [x] Remove mobile-specific properties from `sidebar.ts`
+  - [x] Restructure `sidebar.html` to be desktop-only (`hidden lg:flex`)
+- [x] Wire layout structure in root app template
+  - [x] Update `app.ts` imports
+  - [x] Update `app.html` grid and compensate bottom padding
+- [x] Optimize Table Layouts for Mobile
+  - [x] Hide optional columns (Chef, Waiter, Time) in Order Registry, fallback to expanded row view
+  - [x] Hide optional columns (Unit Cost, Status) in Inventory Manager stock list
 - [x] Verification
-  - [x] Run production build compile checks for C# backend and Angular frontend
-  - [x] Verify visual and functional refinements
+  - [x] Run production build compile checks

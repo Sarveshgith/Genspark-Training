@@ -105,9 +105,9 @@
             <th class="py-4 px-6">Order ID</th>
             <th class="py-4 px-6 text-center">Table</th>
             <th class="py-4 px-6 text-center">State Status</th>
-            <th class="py-4 px-6 text-center">Assigned Chef</th>
-            <th class="py-4 px-6 text-center">Assigned Waiter</th>
-            <th class="py-4 px-6 text-center">Created Time</th>
+            <th class="py-4 px-6 text-center hidden md:table-cell">Assigned Chef</th>
+            <th class="py-4 px-6 text-center hidden md:table-cell">Assigned Waiter</th>
+            <th class="py-4 px-6 text-center hidden sm:table-cell">Created Time</th>
             <th class="py-4 px-6 text-right">Invoice Total</th>
           </tr>
         </thead>
@@ -153,21 +153,21 @@
               </td>
 
               <!-- Assigned Chef Label -->
-              <td class="py-4 px-6 text-center">
+              <td class="py-4 px-6 text-center hidden md:table-cell">
                 <span [ngClass]="order.assignedChefName ? 'text-slate-700 font-semibold' : 'text-slate-400 italic'">
                   {{ order.assignedChefName || 'Unassigned' }}
                 </span>
               </td>
 
               <!-- Assigned Waiter Label -->
-              <td class="py-4 px-6 text-center">
+              <td class="py-4 px-6 text-center hidden md:table-cell">
                 <span [ngClass]="order.assignedWaiterName ? 'text-slate-700 font-semibold' : 'text-slate-400 italic'">
                   {{ order.assignedWaiterName || 'Unassigned' }}
                 </span>
               </td>
 
               <!-- Creation Time -->
-              <td class="py-4 px-6 text-center font-mono text-xs text-slate-450">
+              <td class="py-4 px-6 text-center hidden sm:table-cell font-mono text-xs text-slate-450">
                 {{ order.createdAt | date:'shortTime' }}
                 <span class="block text-[9px] text-slate-400 font-space mt-0.5">
                   {{ order.createdAt | date:'MMM dd' }}
@@ -184,8 +184,28 @@
             <!-- EXPANDED ROW (SHOW ORDER ITEMS) -->
             @if (expandedOrderId() === order.id) {
               <tr class="bg-slate-50/30">
-                <td colspan="8" class="p-6">
-                  <div class="bg-white border border-slate-150 rounded-2xl p-5 shadow-inner space-y-4 animate-fade-in font-space">
+                <td colspan="8" class="p-4 sm:p-6">
+                  <div class="bg-white border border-slate-150 rounded-2xl p-4 sm:p-5 shadow-inner space-y-4 animate-fade-in font-space">
+                    <!-- Mobile Fallback Metadata Block -->
+                    <div class="grid grid-cols-1 gap-2 border-b border-slate-100 pb-3 md:hidden text-xs">
+                      <div class="flex justify-between items-center py-1 sm:hidden">
+                        <span class="text-slate-400 font-medium">Created Time:</span>
+                        <span class="font-mono text-slate-700 font-semibold">{{ order.createdAt | date:'short' }}</span>
+                      </div>
+                      <div class="flex justify-between items-center py-1">
+                        <span class="text-slate-400 font-medium">Assigned Chef:</span>
+                        <span [class]="order.assignedChefName ? 'text-slate-700 font-semibold' : 'text-slate-400 italic'">
+                          {{ order.assignedChefName || 'Unassigned' }}
+                        </span>
+                      </div>
+                      <div class="flex justify-between items-center py-1">
+                        <span class="text-slate-400 font-medium">Assigned Waiter:</span>
+                        <span [class]="order.assignedWaiterName ? 'text-slate-700 font-semibold' : 'text-slate-400 italic'">
+                          {{ order.assignedWaiterName || 'Unassigned' }}
+                        </span>
+                      </div>
+                    </div>
+
                     <h4 class="text-xs font-bold text-slate-655 uppercase tracking-wider block">Dish items detail summary</h4>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">

@@ -1,13 +1,14 @@
 import { Component, inject, signal } from '@angular/core';
 import { RouterOutlet, Router } from '@angular/router';
 import { SidebarComponent } from './features/admin/sidebar/sidebar';
+import { BottomNavComponent } from './features/admin/bottom-nav/bottom-nav';
 import { WaiterNavbarComponent } from './features/waiter/waiter-navbar/waiter-navbar';
 import { ToastContainerComponent } from './core/components/toast-container/toast-container';
 import { AuthService } from './core/services/auth.service';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, SidebarComponent, WaiterNavbarComponent, ToastContainerComponent],
+  imports: [RouterOutlet, SidebarComponent, BottomNavComponent, WaiterNavbarComponent, ToastContainerComponent],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })

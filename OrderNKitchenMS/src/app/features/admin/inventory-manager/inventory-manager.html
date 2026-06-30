@@ -178,8 +178,8 @@
                 <th class="py-4 px-6">Ingredient</th>
                 <th class="py-4 px-6 text-center">Stock Level</th>
                 <th class="py-4 px-6 text-center">Safety Threshold</th>
-                <th class="py-4 px-6 text-center text-slate-400">Unit Cost (Placeholder)</th>
-                <th class="py-4 px-6 text-center">Status</th>
+                <th class="py-4 px-6 text-center text-slate-400 hidden sm:table-cell">Unit Cost (Placeholder)</th>
+                <th class="py-4 px-6 text-center hidden md:table-cell">Status</th>
                 <th class="py-4 px-6 text-right">Actions</th>
               </tr>
             </thead>
@@ -227,12 +227,12 @@
                   </td>
 
                   <!-- Cost (Placeholder) -->
-                  <td class="py-4 px-6 text-center text-slate-350 italic text-xs">
+                  <td class="py-4 px-6 text-center text-slate-350 italic text-xs hidden sm:table-cell">
                     {{ item.costPerUnit ? '₹' + (item.costPerUnit | number:'1.2-2') : 'Not Set' }}
                   </td>
 
                   <!-- Status Toggle -->
-                  <td class="py-4 px-6 text-center">
+                  <td class="py-4 px-6 text-center hidden md:table-cell">
                     <label class="relative inline-flex items-center cursor-pointer select-none">
                       <input 
                         type="checkbox" 
