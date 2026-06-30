@@ -1,0 +1,27 @@
+# Tasks for Admin Dashboard & Order Registry Refinements
+
+- [x] Create Admin Dashboard landing page
+  - [x] Create `dashboard.ts` component controller
+  - [x] Create `dashboard.html` visual layout template
+  - [x] Create `dashboard.css` animations and styles
+- [x] Refactor Routing and Navigation
+  - [x] Register `/dashboard` and `/orders` routes in `app.routes.ts`
+  - [x] Redirect Admin accounts from login directly to `/dashboard`
+- [x] Create Order Registry Feature (Admin all tables view)
+  - [x] Create `order-list.ts` component controller
+  - [x] Create `order-list.html` Visual layout template (showing read-only assigned staff names)
+  - [x] Create `order-list.css` styles
+- [x] Apply Layout & Styling Specific Fixes
+  - [x] Format revenue calculations with K abbreviations to prevent right-edge clipping
+  - [x] Add settled helper label under Pending Bills stat card when zero
+  - [x] Separate tab numbers into proper badge chips next to tab text in alerts feed
+  - [x] Rename section link header to "Manage Tables"
+  - [x] Unify occupied status dot colors to unified amber hex `#E8A54B`
+  - [x] Consolidate redundant MENU and MENU MANAGER entries in the admin sidebar
+- [x] Apply Rupee Currency, Highlighting & Responsiveness Fixes
+  - [x] Format all currency displays to Indian Rupee symbol (`₹`)
+  - [x] Highlight inventory items at or below safety threshold in red with alert border
+  - [x] Fix layout responsiveness of dashboard low-stock warning strip on mobile views
+- [x] Verification
+  - [x] Run production build compile checks for C# backend and Angular frontend
+  - [x] Verify visual and functional refinements

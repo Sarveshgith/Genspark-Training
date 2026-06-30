@@ -84,17 +84,17 @@
 
   <!-- Low stock horizontal alert strip (Sticky notice) -->
   @if (lowStockItems().length > 0) {
-    <div class="bg-amber-50 border border-amber-250 rounded-2xl p-4 flex items-center justify-between text-amber-900 text-sm animate-fade-in shadow-sm">
-      <div class="flex items-center space-x-3">
-        <span class="text-xl select-none">⚠️</span>
+    <div class="bg-amber-50 border border-amber-250 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-amber-900 text-sm animate-fade-in shadow-sm">
+      <div class="flex items-start sm:items-center space-x-3">
+        <span class="text-xl select-none shrink-0 mt-0.5 sm:mt-0">⚠️</span>
         <div class="font-space">
-          <p class="font-extrabold">Critical Low Stock Warning</p>
-          <p class="text-xs text-amber-700 mt-0.5">
+          <p class="font-extrabold leading-tight">Critical Low Stock Warning</p>
+          <p class="text-xs text-amber-700 mt-1 sm:mt-0.5 leading-relaxed">
             There are <strong>{{ lowStockItems().length }} ingredients</strong> currently below their designated safety thresholds. Restock soon to prevent order service blocks.
           </p>
         </div>
       </div>
-      <a routerLink="/inventory" class="text-xs font-bold text-[#F28500] hover:text-[#D97200] hover:underline uppercase tracking-wider shrink-0 ml-4">
+      <a routerLink="/inventory" class="text-xs font-bold text-[#F28500] hover:text-[#D97200] hover:underline uppercase tracking-wider whitespace-nowrap self-start sm:self-auto">
         Go to stock records ➔
       </a>
     </div>
@@ -373,9 +373,9 @@
                   <div class="bg-white border border-slate-150 rounded-xl p-3 flex items-center justify-between">
                     <div>
                       <p class="font-bold text-slate-800">{{ item.menuItemName }}</p>
-                      <p class="text-[10px] text-slate-400">Qty: <strong class="text-slate-600 font-mono">{{ item.quantity }}</strong> @ $<span>{{ (item.unitPrice || 0).toFixed(2) }}</span> each</p>
+                      <p class="text-[10px] text-slate-400">Qty: <strong class="text-slate-600 font-mono">{{ item.quantity }}</strong> @ ₹<span>{{ (item.unitPrice || 0).toFixed(2) }}</span> each</p>
                     </div>
-                    <span class="font-bold text-slate-700 font-mono">${{ ((item.unitPrice || 0) * item.quantity).toFixed(2) }}</span>
+                    <span class="font-bold text-slate-700 font-mono">₹{{ ((item.unitPrice || 0) * item.quantity).toFixed(2) }}</span>
                   </div>
                 }
               </div>
@@ -389,21 +389,21 @@
                 <div class="bg-slate-50 border border-slate-150 rounded-2xl p-4 space-y-2 font-mono text-[11px] text-slate-600">
                   <div class="flex justify-between">
                     <span>Subtotal:</span>
-                    <span>${{ (selectedTableBill()?.subTotal || 0).toFixed(2) }}</span>
+                    <span>₹{{ (selectedTableBill()?.subTotal || 0).toFixed(2) }}</span>
                   </div>
                   <div class="flex justify-between">
                     <span>Tax ({{ ((selectedTableBill()?.taxRate || 0) * 100).toFixed(0) }}%):</span>
-                    <span>${{ ((((selectedTableBill()?.subTotal || 0) * (selectedTableBill()?.taxRate || 0))) || 0).toFixed(2) }}</span>
+                    <span>₹{{ ((((selectedTableBill()?.subTotal || 0) * (selectedTableBill()?.taxRate || 0))) || 0).toFixed(2) }}</span>
                   </div>
                   @if (selectedTableBill()?.discountAmount) {
                     <div class="flex justify-between text-red-500">
                       <span>Discount Applied:</span>
-                      <span>-${{ (selectedTableBill()?.discountAmount || 0).toFixed(2) }}</span>
+                      <span>-₹{{ (selectedTableBill()?.discountAmount || 0).toFixed(2) }}</span>
                     </div>
                   }
                   <div class="flex justify-between text-sm font-bold text-slate-800 pt-2 border-t border-slate-200">
                     <span>Grand Total:</span>
-                    <span>${{ (selectedTableBill()?.totalAmount || 0).toFixed(2) }}</span>
+                    <span>₹{{ (selectedTableBill()?.totalAmount || 0).toFixed(2) }}</span>
                   </div>
                   <div class="flex justify-between pt-1 text-[9px] font-sans font-bold uppercase tracking-wider">
                     <span>Bill Status:</span>

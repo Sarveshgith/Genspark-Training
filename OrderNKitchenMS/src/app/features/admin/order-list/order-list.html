@@ -1,0 +1,258 @@
+<div class="min-h-screen bg-[#F8FAFC] text-[#1E293B] font-sans antialiased p-6 md:p-8 flex flex-col space-y-8">
+
+  <!-- Header Title Section -->
+  <header class="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0 pb-6 border-b border-slate-200">
+    <div class="space-y-1">
+      <h1 class="text-3xl font-extrabold font-syne tracking-tight text-[#0F172A]">Order Registry</h1>
+      <p class="text-sm text-slate-500 font-space leading-relaxed">
+        Monitor all restaurant tables simultaneously. Assign preparation/waiter staff, update active statuses, or audit historical transactions.
+      </p>
+    </div>
+  </header>
+
+  <!-- Filter Operations Toolbar Panel -->
+  <section class="bg-white border border-slate-150 rounded-3xl p-6 shadow-sm space-y-5 font-space text-xs">
+    <h3 class="font-bold text-[#0F172A] uppercase tracking-wider text-xs">Query Filters</h3>
+    
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <!-- Status Filter -->
+      <div>
+        <label class="block text-[10px] font-bold text-slate-450 uppercase mb-1.5 tracking-wider">Order Status</label>
+        <select 
+          [ngModel]="statusFilter()"
+          (ngModelChange)="statusFilter.set($event)"
+          class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 bg-slate-50/50 focus:outline-none focus:border-[#F28500] cursor-pointer">
+          <option [ngValue]="null">All Statuses</option>
+          <option [ngValue]="1">Pending</option>
+          <option [ngValue]="2">InPrep</option>
+          <option [ngValue]="3">Ready</option>
+          <option [ngValue]="4">Served</option>
+          <option [ngValue]="5">Completed</option>
+          <option [ngValue]="6">Cancelled</option>
+        </select>
+      </div>
+
+      <!-- Table Filter -->
+      <div>
+        <label class="block text-[10px] font-bold text-slate-450 uppercase mb-1.5 tracking-wider">Dining Table</label>
+        <select 
+          [ngModel]="tableFilter()"
+          (ngModelChange)="tableFilter.set($event)"
+          class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 bg-slate-50/50 focus:outline-none focus:border-[#F28500] cursor-pointer">
+          <option [ngValue]="null">All Tables</option>
+          @for (table of tables(); track table.id) {
+            <option [ngValue]="table.id">Table #{{ table.number }}</option>
+          }
+        </select>
+      </div>
+
+      <!-- Date From -->
+      <div>
+        <label class="block text-[10px] font-bold text-slate-450 uppercase mb-1.5 tracking-wider">Created From</label>
+        <input 
+          type="date" 
+          [(ngModel)]="fromDateFilter"
+          class="w-full rounded-xl border border-slate-200 px-3.5 py-2 focus:outline-none focus:border-[#F28500] bg-slate-50/50 font-space" />
+      </div>
+
+      <!-- Date To -->
+      <div>
+        <label class="block text-[10px] font-bold text-slate-450 uppercase mb-1.5 tracking-wider">Created To</label>
+        <input 
+          type="date" 
+          [(ngModel)]="toDateFilter"
+          class="w-full rounded-xl border border-slate-200 px-3.5 py-2 focus:outline-none focus:border-[#F28500] bg-slate-50/50 font-space" />
+      </div>
+    </div>
+
+    <!-- Filter Buttons Action Grid -->
+    <div class="flex items-center space-x-3 pt-3 border-t border-slate-100 justify-end">
+      <button 
+        (click)="resetFilters()"
+        type="button"
+        class="px-5 py-2.5 border border-slate-200 hover:bg-slate-50 text-slate-655 font-bold uppercase tracking-wider rounded-xl transition cursor-pointer">
+        Reset filters
+      </button>
+      <button 
+        (click)="applyFilters()"
+        type="button"
+        class="px-5 py-2.5 bg-[#F28500] hover:bg-[#D97200] text-white font-bold uppercase tracking-wider rounded-xl transition shadow-sm shadow-orange-500/10 cursor-pointer">
+        Apply Filters
+      </button>
+    </div>
+  </section>
+
+  <!-- Error Alerts Block -->
+  @if (errorMessage()) {
+    <div class="bg-red-50 border border-red-200 rounded-2xl p-4 flex items-start space-x-3 text-red-800 text-sm animate-fade-in shadow-sm font-space">
+      <span class="text-base select-none mt-0.5">⚠️</span>
+      <div class="flex-1">
+        <h4 class="font-bold">Administrative Query Error</h4>
+        <p class="mt-0.5 text-red-700/90 leading-relaxed">{{ errorMessage() }}</p>
+      </div>
+      <button (click)="errorMessage.set('')" class="text-red-500 hover:text-red-700 font-bold px-1 select-none cursor-pointer">×</button>
+    </div>
+  }
+
+  <!-- Orders paginated table grid -->
+  <main class="bg-white border border-slate-150 rounded-3xl shadow-sm overflow-hidden flex flex-col justify-between min-h-96">
+    
+    <div class="overflow-x-auto flex-grow">
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr class="bg-slate-50 text-[10px] font-bold text-slate-400 uppercase tracking-wider font-space border-b border-slate-150 select-none">
+            <th class="py-4 px-6 w-12 text-center"></th>
+            <th class="py-4 px-6">Order ID</th>
+            <th class="py-4 px-6 text-center">Table</th>
+            <th class="py-4 px-6 text-center">State Status</th>
+            <th class="py-4 px-6 text-center">Assigned Chef</th>
+            <th class="py-4 px-6 text-center">Assigned Waiter</th>
+            <th class="py-4 px-6 text-center">Created Time</th>
+            <th class="py-4 px-6 text-right">Invoice Total</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100 text-sm font-space">
+          @for (order of orders(); track order.id) {
+            <!-- MAIN ORDER ROW -->
+            <tr 
+              [class.bg-slate-50/30]="expandedOrderId() === order.id"
+              class="hover:bg-slate-50/50 transition-colors duration-150">
+              
+              <!-- Expand row trigger chevron -->
+              <td class="py-4 px-6 text-center">
+                <button 
+                  (click)="toggleExpandOrder(order.id)"
+                  class="p-1 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-[#F28500] transition cursor-pointer select-none border-none outline-none font-bold">
+                  {{ expandedOrderId() === order.id ? '▼' : '▶' }}
+                </button>
+              </td>
+
+              <!-- Order ID -->
+              <td class="py-4 px-6 font-bold text-slate-800">
+                #{{ order.id }}
+              </td>
+
+              <!-- Table Number -->
+              <td class="py-4 px-6 text-center font-semibold text-slate-700">
+                Table #{{ order.tableNumber }}
+              </td>
+
+              <!-- Manual status update dropdown picker -->
+              <td class="py-4 px-6 text-center">
+                <select 
+                  [value]="order.status"
+                  (change)="updateStatus(order.id, $any($event.target).value)"
+                  class="text-[11px] font-semibold bg-slate-50 border border-slate-200 rounded-lg px-2 py-1.5 focus:outline-none transition cursor-pointer">
+                  <option value="1">Pending</option>
+                  <option value="2">InPrep</option>
+                  <option value="3">Ready</option>
+                  <option value="4">Served</option>
+                  <option value="5">Completed</option>
+                  <option value="6">Cancelled</option>
+                </select>
+              </td>
+
+              <!-- Assigned Chef Label -->
+              <td class="py-4 px-6 text-center">
+                <span [ngClass]="order.assignedChefName ? 'text-slate-700 font-semibold' : 'text-slate-400 italic'">
+                  {{ order.assignedChefName || 'Unassigned' }}
+                </span>
+              </td>
+
+              <!-- Assigned Waiter Label -->
+              <td class="py-4 px-6 text-center">
+                <span [ngClass]="order.assignedWaiterName ? 'text-slate-700 font-semibold' : 'text-slate-400 italic'">
+                  {{ order.assignedWaiterName || 'Unassigned' }}
+                </span>
+              </td>
+
+              <!-- Creation Time -->
+              <td class="py-4 px-6 text-center font-mono text-xs text-slate-450">
+                {{ order.createdAt | date:'shortTime' }}
+                <span class="block text-[9px] text-slate-400 font-space mt-0.5">
+                  {{ order.createdAt | date:'MMM dd' }}
+                </span>
+              </td>
+
+              <!-- Invoice Total -->
+              <td class="py-4 px-6 text-right font-bold font-mono text-slate-800">
+                ₹{{ order.totalAmount.toFixed(2) }}
+              </td>
+
+            </tr>
+
+            <!-- EXPANDED ROW (SHOW ORDER ITEMS) -->
+            @if (expandedOrderId() === order.id) {
+              <tr class="bg-slate-50/30">
+                <td colspan="8" class="p-6">
+                  <div class="bg-white border border-slate-150 rounded-2xl p-5 shadow-inner space-y-4 animate-fade-in font-space">
+                    <h4 class="text-xs font-bold text-slate-655 uppercase tracking-wider block">Dish items detail summary</h4>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      @for (item of order.orderItems; track item.id) {
+                        <div class="border border-slate-100 rounded-xl p-3 flex justify-between items-center text-xs">
+                          <div class="space-y-1">
+                            <p class="font-bold text-slate-800">{{ item.menuItemName }}</p>
+                            @if (item.notes) {
+                              <p class="text-[10px] text-red-500 italic">Note: "{{ item.notes }}"</p>
+                            }
+                          </div>
+                          
+                          <div class="text-right text-[11px] font-mono text-slate-500">
+                            <span>{{ item.quantity }} × ₹{{ item.unitPrice.toFixed(2) }}</span>
+                            <strong class="block text-slate-800 font-bold mt-0.5">₹{{ (item.quantity * item.unitPrice).toFixed(2) }}</strong>
+                          </div>
+                        </div>
+                      }
+                    </div>
+
+                    @if (order.orderItems.length === 0) {
+                      <p class="text-center py-6 text-slate-400 italic text-xs">No active items ordered in this cart yet.</p>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
+          } @empty {
+            <tr>
+              <td colspan="8" class="py-20 text-center text-slate-400 italic">
+                @if (isLoading()) {
+                  <div class="flex flex-col items-center justify-center space-y-3 font-space text-xs">
+                    <span class="animate-spin h-5 w-5 border-2 border-[#F28500] border-t-transparent rounded-full"></span>
+                    <p>Fetching order data records...</p>
+                  </div>
+                } @else {
+                  No order sessions matches query filters.
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination Footer Panel -->
+    <footer class="p-5 border-t border-slate-100 flex items-center justify-between shrink-0 bg-slate-50 font-space text-xs select-none">
+      <div class="text-slate-450 font-semibold">
+        Page <span class="text-slate-800">{{ pageNumber() }}</span>
+      </div>
+
+      <div class="flex items-center space-x-2">
+        <button 
+          (click)="prevPage()"
+          [disabled]="pageNumber() === 1 || isLoading()"
+          class="px-4 py-2 border border-slate-200 hover:bg-slate-100 bg-white text-slate-655 font-bold uppercase rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition cursor-pointer">
+          Previous
+        </button>
+        <button 
+          (click)="nextPage()"
+          [disabled]="!hasMore() || isLoading()"
+          class="px-4 py-2 border border-slate-200 hover:bg-slate-100 bg-white text-slate-655 font-bold uppercase rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition cursor-pointer">
+          Next
+        </button>
+      </div>
+    </footer>
+
+  </main>
+
+</div>

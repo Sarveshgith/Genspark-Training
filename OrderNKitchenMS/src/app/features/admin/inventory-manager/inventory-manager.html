@@ -206,13 +206,13 @@
             </thead>
             <tbody class="divide-y divide-slate-100 text-sm font-space">
               @for (item of filteredInventoryItems(); track item.id) {
-                <tr [ngClass]="{'bg-red-50/10': item.isActive && item.stockQuantity < item.stockThreshold}" class="hover:bg-slate-50/50 transition-colors duration-150">
+                <tr [ngClass]="{'bg-red-50 border-l-4 border-red-500': item.isActive && item.stockQuantity <= item.stockThreshold}" class="hover:bg-slate-50/50 transition-colors duration-150">
                   
                   <!-- Name -->
-                  <td class="py-4 px-6 font-semibold text-slate-800">
+                  <td class="py-4 px-6 font-semibold" [ngClass]="item.isActive && item.stockQuantity <= item.stockThreshold ? 'text-red-900' : 'text-slate-800'">
                     <div class="flex items-center space-x-2">
-                      @if (item.isActive && item.stockQuantity < item.stockThreshold) {
-                        <span class="text-xs text-red-550" title="Below Safety Safety Threshold">⚠️</span>
+                      @if (item.isActive && item.stockQuantity <= item.stockThreshold) {
+                        <span class="text-xs text-red-600" title="Low Stock Warning">⚠️</span>
                       }
                       <span>{{ item.name }}</span>
                     </div>
@@ -235,7 +235,7 @@
                       </div>
                     } @else {
                       <div class="inline-flex items-center space-x-2">
-                        <span [ngClass]="item.stockQuantity < item.stockThreshold && item.isActive ? 'text-red-600' : 'text-slate-700'">
+                        <span [ngClass]="item.stockQuantity <= item.stockThreshold && item.isActive ? 'text-red-600 font-bold' : 'text-slate-700'">
                           {{ item.stockQuantity }} {{ item.unitName }}
                         </span>
                       </div>
@@ -249,7 +249,7 @@
 
                   <!-- Cost (Placeholder) -->
                   <td class="py-4 px-6 text-center text-slate-350 italic text-xs">
-                    {{ item.costPerUnit ? '$' + (item.costPerUnit | number:'1.2-2') : 'Not Set' }}
+                    {{ item.costPerUnit ? '₹' + (item.costPerUnit | number:'1.2-2') : 'Not Set' }}
                   </td>
 
                   <!-- Status Toggle -->

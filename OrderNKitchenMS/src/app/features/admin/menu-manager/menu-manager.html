@@ -152,7 +152,7 @@
 
           <!-- Price overlay tag -->
           <span class="absolute bottom-3 right-3 bg-[#0F172A] text-white text-xs font-mono font-bold px-2.5 py-1 rounded-lg shadow-sm">
-            ${{ item.price | number:'1.2-2' }}
+            ₹{{ item.price | number:'1.2-2' }}
           </span>
         </div>
 
@@ -286,7 +286,7 @@
       <!-- Split Row for Price & Prep Time -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Price ($USD)</label>
+          <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Price (₹ INR)</label>
           <input 
             type="number" 
             [(ngModel)]="formPrice"

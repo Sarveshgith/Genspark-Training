@@ -94,9 +94,9 @@ export class Dashboard implements OnInit, OnDestroy {
   public formattedRevenue = computed(() => {
     const rev = this.totalRevenueToday();
     if (rev >= 1000) {
-      return `$${(rev / 1000).toFixed(1)}K`;
+      return `₹${(rev / 1000).toFixed(1)}K`;
     }
-    return `$${rev.toFixed(2)}`;
+    return `₹${rev.toFixed(2)}`;
   });
 
   // Table Seating Map layout categorization
