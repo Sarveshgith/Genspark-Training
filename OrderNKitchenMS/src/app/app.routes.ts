@@ -77,6 +77,13 @@ export const routes: Routes = [
 	},
 
 	{
+		path: 'users',
+		loadComponent: () => import('./features/admin/user-manager/user-manager').then(m => m.UserManager),
+		canActivate: [RoleGuard],
+		data: { roles: ['Admin'] }
+	},
+
+	{
 		path: 'waiter/active-order/:tableId',
 		loadComponent: () => import('./features/waiter/active-order/active-order').then(m => m.ActiveOrderComponent),
 		canActivate: [RoleGuard],

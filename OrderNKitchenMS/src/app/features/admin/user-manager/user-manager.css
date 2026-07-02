@@ -1,0 +1,43 @@
+/* Native Dialog Positioning & Backdrop Blur */
+dialog {
+  border: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  margin: 0;
+}
+
+dialog::backdrop {
+  background-color: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(4px);
+}
+
+/* Dialog Animation on Open */
+@keyframes modal-scale-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -48%) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+dialog[open] {
+  animation: modal-scale-in 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Transitions */
+input, select, textarea, button, tr {
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Custom class colors (fallback for tailwind-like configs) */
+.bg-red-550 {
+  background-color: #dc2626;
+}
+.bg-red-550:hover {
+  background-color: #b91c1c;
+}
