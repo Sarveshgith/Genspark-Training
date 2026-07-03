@@ -147,7 +147,6 @@
                 <option [ngValue]="null" disabled>Select Role</option>
                 <option [ngValue]="5">Waiter</option>
                 <option [ngValue]="3">Chef</option>
-                <option [ngValue]="1">Admin</option>
               </select>
               <span class="absolute inset-y-0 right-0 flex items-center pr-3.5 pointer-events-none text-gray-400">
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -208,6 +207,11 @@
           <span>CREATE ACCOUNT</span>
           }
         </button>
+
+        <!-- Informational pending approval note -->
+        <p class="text-[11px] text-gray-500 text-center font-medium italic mt-2.5">
+          Your account will be reviewed before you can access the system.
+        </p>
 
       </form>
 

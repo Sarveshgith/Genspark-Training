@@ -10,6 +10,25 @@
     </div>
   </header>
 
+  <!-- Tabs Navigation -->
+  <div class="flex border-b border-slate-200 gap-6 select-none shrink-0 font-space">
+    <button (click)="setActiveTab('approved')"
+            [class]="'pb-3 font-semibold text-sm transition-all outline-none cursor-pointer border-none bg-transparent ' + 
+                     (activeTab() === 'approved' ? 'text-[#8C5815] border-b-2 border-[#8C5815] font-bold' : 'text-slate-500 hover:text-slate-800')">
+      Approved Users
+    </button>
+    <button (click)="setActiveTab('pending')"
+            [class]="'pb-3 font-semibold text-sm transition-all outline-none cursor-pointer border-none bg-transparent flex items-center gap-2 ' + 
+                     (activeTab() === 'pending' ? 'text-[#8C5815] border-b-2 border-[#8C5815] font-bold' : 'text-slate-500 hover:text-slate-800')">
+      Pending Approval
+      @if (userService.pendingUsersCount() > 0) {
+        <span class="bg-[#8C5815] text-white text-[10px] font-bold px-2 py-0.5 rounded-full font-mono">
+          {{ userService.pendingUsersCount() }}
+        </span>
+      }
+    </button>
+  </div>
+
   <!-- Toolbar Filters Section -->
   <section class="bg-white border border-slate-150 rounded-2xl p-4 shadow-sm flex flex-col md:flex-row md:items-center gap-4 justify-between">
     <!-- Search -->
@@ -75,22 +94,53 @@
                 <td class="py-4 px-6 text-slate-500">{{ user.phoneNumber || 'N/A' }}</td>
                 <td class="py-4 px-6 text-slate-500 max-w-xs truncate" [title]="user.address || ''">{{ user.address || 'N/A' }}</td>
                 <td class="py-4 px-6 text-center">
-                  <span class="inline-block px-3 py-1 text-xs font-bold rounded-full uppercase tracking-wider border"
-                        [ngClass]="getRoleBadgeClass(user.roleName)">
-                    {{ user.roleName }}
-                  </span>
+                  @if (activeTab() === 'approved') {
+                    <div class="relative inline-block text-left">
+                      @if (user.id === authService.getCurrentUserId()) {
+                        <span class="inline-block px-3 py-1 text-xs font-bold rounded-full uppercase tracking-wider border bg-amber-100 text-amber-800 border-amber-200" title="You cannot change your own role.">
+                          {{ user.roleName }} (You)
+                        </span>
+                      } @else {
+                        <select [value]="getRoleIdFromRoleName(user.roleName)"
+                                (change)="onRoleSelect(user, $event, roleConfirmDialog)"
+                                class="text-xs font-semibold bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1 focus:outline-none focus:border-[#F28500] cursor-pointer">
+                          <option [value]="5">Waiter</option>
+                          <option [value]="3">Chef</option>
+                          <option [value]="1">Admin</option>
+                        </select>
+                      }
+                    </div>
+                  } @else {
+                    <span class="inline-block px-3 py-1 text-xs font-bold rounded-full uppercase tracking-wider border"
+                          [ngClass]="getRoleBadgeClass(user.roleName)">
+                      {{ user.roleName }}
+                    </span>
+                  }
                 </td>
                 <td class="py-4 px-6 text-right space-x-2">
-                  <button (click)="openEditModal(user, editDialog)"
-                          class="p-2 rounded-lg bg-slate-50 hover:bg-amber-50 text-slate-600 hover:text-amber-700 border border-slate-200 hover:border-amber-250 transition duration-150 cursor-pointer"
-                          title="Edit User">
-                    ✏️
-                  </button>
-                  <button (click)="triggerDelete(user, deleteDialog)"
-                          class="p-2 rounded-lg bg-slate-50 hover:bg-red-50 text-slate-600 hover:text-red-700 border border-slate-200 hover:border-red-250 transition duration-150 cursor-pointer"
-                          title="Delete User">
-                    🗑️
-                  </button>
+                  @if (activeTab() === 'approved') {
+                    <button (click)="openEditModal(user, editDialog)"
+                            class="p-2 rounded-lg bg-slate-50 hover:bg-amber-50 text-slate-600 hover:text-amber-700 border border-slate-200 hover:border-amber-250 transition duration-150 cursor-pointer"
+                            title="Edit User">
+                      ✏️
+                    </button>
+                    <button (click)="triggerDelete(user, deleteDialog)"
+                            class="p-2 rounded-lg bg-slate-50 hover:bg-red-50 text-slate-600 hover:text-red-700 border border-slate-200 hover:border-red-250 transition duration-150 cursor-pointer"
+                            title="Delete User">
+                      🗑️
+                    </button>
+                  } @else {
+                    <button (click)="approveUser(user)"
+                            class="px-3 py-1.5 text-xs font-bold rounded-xl bg-slate-50 hover:bg-emerald-50 text-emerald-600 hover:text-emerald-700 border border-slate-200 hover:border-emerald-250 transition duration-150 cursor-pointer"
+                            title="Approve User">
+                      ✅ Approve
+                    </button>
+                    <button (click)="triggerReject(user, rejectDialog)"
+                            class="px-3 py-1.5 text-xs font-bold rounded-xl bg-slate-50 hover:bg-red-50 text-red-650 hover:text-red-700 border border-slate-200 hover:border-red-250 transition duration-150 cursor-pointer"
+                            title="Reject User">
+                      ❌ Reject
+                    </button>
+                  }
                 </td>
               </tr>
             }
@@ -118,13 +168,31 @@
                 <h4 class="font-bold text-slate-800 text-base">{{ user.name }}</h4>
                 <p class="text-xs text-slate-500 font-mono">{{ user.email }}</p>
               </div>
-              <span class="inline-block px-2.5 py-0.5 text-[10px] font-bold rounded-full uppercase tracking-wider border"
-                    [ngClass]="getRoleBadgeClass(user.roleName)">
-                {{ user.roleName }}
-              </span>
+              @if (activeTab() === 'approved') {
+                @if (user.id === authService.getCurrentUserId()) {
+                  <span class="inline-block px-2.5 py-0.5 text-[10px] font-bold rounded-full uppercase tracking-wider border bg-amber-100 text-amber-800 border-amber-200">
+                    {{ user.roleName }} (You)
+                  </span>
+                } @else {
+                  <div class="relative inline-block">
+                    <select [value]="getRoleIdFromRoleName(user.roleName)"
+                            (change)="onRoleSelect(user, $event, roleConfirmDialog)"
+                            class="text-xs font-semibold bg-white border border-slate-200 rounded-xl px-2.5 py-0.5 focus:outline-none focus:border-[#F28500] cursor-pointer">
+                      <option [value]="5">Waiter</option>
+                      <option [value]="3">Chef</option>
+                      <option [value]="1">Admin</option>
+                    </select>
+                  </div>
+                }
+              } @else {
+                <span class="inline-block px-2.5 py-0.5 text-[10px] font-bold rounded-full uppercase tracking-wider border"
+                      [ngClass]="getRoleBadgeClass(user.roleName)">
+                  {{ user.roleName }}
+                </span>
+              }
             </div>
 
-            <div class="text-xs text-slate-600 space-y-1.5 pt-2 border-t border-slate-200/50">
+            <div class="text-xs text-slate-600 space-y-1.5 pt-2 border-t border-slate-200/50 font-sans">
               <div class="flex items-center space-x-2">
                 <span class="text-slate-400">📞</span>
                 <span>{{ user.phoneNumber || 'N/A' }}</span>
@@ -135,15 +203,26 @@
               </div>
             </div>
 
-            <div class="flex items-center justify-end space-x-2 pt-2 border-t border-slate-200/50">
-              <button (click)="openEditModal(user, editDialog)"
-                      class="px-3 py-1.5 text-xs font-bold rounded-xl bg-white border border-slate-200 text-slate-600 hover:bg-amber-50 hover:text-amber-700 hover:border-amber-250 transition cursor-pointer flex items-center gap-1">
-                <span>✏️</span> <span>Edit</span>
-              </button>
-              <button (click)="triggerDelete(user, deleteDialog)"
-                      class="px-3 py-1.5 text-xs font-bold rounded-xl bg-white border border-slate-200 text-slate-600 hover:bg-red-50 hover:text-red-700 hover:border-red-250 transition cursor-pointer flex items-center gap-1">
-                <span>🗑️</span> <span>Delete</span>
-              </button>
+            <div class="flex items-center justify-end space-x-2 pt-2 border-t border-slate-200/50 font-sans">
+              @if (activeTab() === 'approved') {
+                <button (click)="openEditModal(user, editDialog)"
+                        class="px-3 py-1.5 text-xs font-bold rounded-xl bg-white border border-slate-200 text-slate-600 hover:bg-amber-50 hover:text-amber-700 hover:border-amber-250 transition cursor-pointer flex items-center gap-1">
+                  <span>✏️</span> <span>Edit</span>
+                </button>
+                <button (click)="triggerDelete(user, deleteDialog)"
+                        class="px-3 py-1.5 text-xs font-bold rounded-xl bg-white border border-slate-200 text-slate-600 hover:bg-red-50 hover:text-red-700 hover:border-red-250 transition cursor-pointer flex items-center gap-1">
+                  <span>🗑️</span> <span>Delete</span>
+                </button>
+              } @else {
+                <button (click)="approveUser(user)"
+                        class="px-3 py-1.5 text-xs font-bold rounded-xl bg-white border border-slate-200 text-emerald-600 hover:bg-emerald-50 hover:text-emerald-705 border-emerald-200 transition cursor-pointer flex items-center gap-1">
+                  <span>✅</span> <span>Approve</span>
+                </button>
+                <button (click)="triggerReject(user, rejectDialog)"
+                        class="px-3 py-1.5 text-xs font-bold rounded-xl bg-white border border-slate-200 text-red-650 hover:bg-red-50 hover:text-red-700 hover:border-red-250 transition cursor-pointer flex items-center gap-1">
+                  <span>❌</span> <span>Reject</span>
+                </button>
+              }
             </div>
           </div>
         }
@@ -208,16 +287,6 @@
                   class="w-full px-3 py-2 text-sm rounded-xl border border-slate-200 focus:outline-none focus:border-[#F28500] focus:ring-1 focus:ring-[#F28500] resize-none"></textarea>
       </div>
 
-      <div>
-        <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">System Role</label>
-        <select [(ngModel)]="editRoleId" name="roleId"
-                class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#F28500] cursor-pointer">
-          @for (role of roles(); track role.id) {
-            <option [value]="role.id">{{ role.name }}</option>
-          }
-        </select>
-      </div>
-
       <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
         <button type="button" (click)="closeModal(editDialog)"
                 class="px-4 py-2 text-xs font-bold text-slate-400 hover:text-slate-600 bg-white border border-slate-200 rounded-xl transition cursor-pointer">
@@ -254,6 +323,62 @@
         <button type="button" (click)="confirmDelete(deleteDialog)"
                 class="flex-1 py-2.5 text-xs font-bold text-white bg-red-550 hover:bg-red-600 rounded-xl transition cursor-pointer shadow-md shadow-red-500/15">
           Confirm Delete
+        </button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- CONFIRM REJECT DIALOG -->
+  <dialog #rejectDialog closedby="any" (click)="onDialogClick($event, rejectDialog)"
+          class="rounded-3xl border border-slate-100 shadow-2xl p-6 w-[90vw] sm:w-full max-w-sm bg-white backdrop:bg-black/40 backdrop:backdrop-blur-xs select-none">
+    <div class="flex flex-col items-center text-center space-y-4 font-space">
+      <div class="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center text-red-500 text-xl border border-red-100">
+        ⚠️
+      </div>
+      <div>
+        <h3 class="text-base font-bold text-slate-800">Reject User Account?</h3>
+        <p class="text-xs text-slate-450 mt-1 leading-relaxed">
+          Are you sure you want to reject and soft-delete <strong class="text-slate-800">{{ userToReject()?.name }}</strong>? 
+          This will reject their registration request.
+        </p>
+      </div>
+
+      <div class="flex items-center gap-3 w-full pt-2">
+        <button type="button" (click)="closeModal(rejectDialog)"
+                class="flex-1 py-2.5 text-xs font-bold text-slate-400 hover:text-slate-600 bg-white border border-slate-200 rounded-xl transition cursor-pointer">
+          Cancel
+        </button>
+        <button type="button" (click)="confirmReject(rejectDialog)"
+                class="flex-1 py-2.5 text-xs font-bold text-white bg-red-550 hover:bg-red-600 rounded-xl transition cursor-pointer shadow-md shadow-red-500/15">
+          Reject
+        </button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- ROLE CHANGE CONFIRMATION DIALOG -->
+  <dialog #roleConfirmDialog closedby="any" (click)="onDialogClick($event, roleConfirmDialog)"
+          class="rounded-3xl border border-slate-100 shadow-2xl p-6 w-[90vw] sm:w-full max-w-sm bg-white backdrop:bg-black/40 backdrop:backdrop-blur-xs select-none">
+    <div class="flex flex-col items-center text-center space-y-4 font-space">
+      <div class="w-12 h-12 rounded-full bg-amber-50 flex items-center justify-center text-amber-600 text-xl border border-amber-100">
+        🛡️
+      </div>
+      <div>
+        <h3 class="text-base font-bold text-slate-800">Confirm Role Change</h3>
+        <p class="text-xs text-slate-450 mt-1 leading-relaxed">
+          Are you sure you want to promote/demote <strong class="text-slate-800">{{ roleChangeUser()?.name }}</strong> to <strong class="text-[#8C5815] font-bold">{{ roleChangeTargetRoleName() }}</strong>? 
+          This is a sensitive operation affecting permissions.
+        </p>
+      </div>
+
+      <div class="flex items-center gap-3 w-full pt-2">
+        <button type="button" (click)="cancelRoleChange(roleConfirmDialog)"
+                class="flex-1 py-2.5 text-xs font-bold text-slate-400 hover:text-slate-600 bg-white border border-slate-200 rounded-xl transition cursor-pointer">
+          Cancel
+        </button>
+        <button type="button" (click)="confirmRoleChange(roleConfirmDialog)"
+                class="flex-1 py-2.5 text-xs font-bold text-white bg-[#8C5815] hover:bg-[#72450F] rounded-xl transition cursor-pointer shadow-md shadow-orange-500/10">
+          Confirm Change
         </button>
       </div>
     </div>

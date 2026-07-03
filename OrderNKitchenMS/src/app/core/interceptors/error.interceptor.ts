@@ -20,6 +20,11 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
                     return throwError(() => err);
                 }
                 else {
+                    if (!authService.getRefreshToken() && authService.getToken()) {
+                        authService.logout();
+                        return throwError(() => err);
+                    }
+
                     return authService.refreshToken().pipe(
                         switchMap((res: any) => {
                             const newRequest = req.clone({
@@ -39,7 +44,12 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
             }
 
             if (err.status === 403) {
-                router.navigate(['/forbidden']);
+                const errorMessage = err.error?.detail || err.error?.Detail || '';
+                if (errorMessage.toLowerCase().includes('pending approval')) {
+                    router.navigate(['/pending-approval']);
+                } else {
+                    router.navigate(['/forbidden']);
+                }
                 return throwError(() => err);
             }
 

@@ -15,6 +15,11 @@ export const routes: Routes = [
 		loadComponent: () => import('./features/auth/register/register').then(m => m.Register) 
 	},
 	
+	{ 
+		path: 'pending-approval', 
+		loadComponent: () => import('./features/auth/pending-approval/pending-approval').then(m => m.PendingApproval) 
+	},
+	
 	{
 		path: 'kitchen',
 		loadComponent: () => import('./features/chef/kds-board/kds-board').then(m => m.KdsBoard),
@@ -84,6 +89,13 @@ export const routes: Routes = [
 	},
 
 	{
+		path: 'reports',
+		loadComponent: () => import('./features/admin/reports/reports').then(m => m.ReportsComponent),
+		canActivate: [RoleGuard],
+		data: { roles: ['Admin'] }
+	},
+
+	{
 		path: 'waiter/active-order/:tableId',
 		loadComponent: () => import('./features/waiter/active-order/active-order').then(m => m.ActiveOrderComponent),
 		canActivate: [RoleGuard],
@@ -99,6 +111,11 @@ export const routes: Routes = [
 		path: 'guest/menu',
 		loadComponent: () => import('./features/waiter/menu-items/menu-items').then(m => m.MenuItems),
 		canActivate: [GuestGuard]
+	},
+
+	{ 
+		path: 'guest/:secret', 
+		loadComponent: () => import('./features/guest/landing-component/landing-component').then(m => m.LandingComponent) 
 	},
 
 	{ path: '**', redirectTo: 'login' },

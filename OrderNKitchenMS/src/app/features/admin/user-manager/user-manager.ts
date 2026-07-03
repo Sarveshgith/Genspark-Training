@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UserService, UserModel, RoleModel } from '../../../core/services/user.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-user-manager',
@@ -13,14 +14,18 @@ import { ToastService } from '../../../core/services/toast.service';
   styleUrl: './user-manager.css'
 })
 export class UserManager implements OnInit {
-  private userService = inject(UserService);
+  public userService = inject(UserService);
   private toastService = inject(ToastService);
+  public authService = inject(AuthService);
   private cdr = inject(ChangeDetectorRef);
   private zone = inject(NgZone);
 
   // Lists
   public users = signal<UserModel[]>([]);
   public roles = signal<RoleModel[]>([]);
+
+  // Tabs State
+  public activeTab = signal<'approved' | 'pending'>('approved');
 
   // Search & Filtering State
   public searchQuery = signal<string>('');
@@ -36,12 +41,17 @@ export class UserManager implements OnInit {
   public selectedUser = signal<UserModel | null>(null);
   public editName: string = '';
   public editEmail: string = '';
-  public editRoleId: number = 0;
   public editPhoneNumber: string = '';
   public editAddress: string = '';
 
   // Delete State
   public userToDelete = signal<UserModel | null>(null);
+  public userToReject = signal<UserModel | null>(null);
+
+  // Role Change Confirmation State
+  public roleChangeUser = signal<UserModel | null>(null);
+  public roleChangeTargetRoleId = signal<number>(0);
+  public roleChangeTargetRoleName = signal<string>('');
 
   ngOnInit(): void {
     this.fetchRoles();
@@ -65,10 +75,12 @@ export class UserManager implements OnInit {
   public fetchUsers(): void {
     this.isLoading.set(true);
     const filterRoleId = this.roleFilter();
+    const isPendingValue = this.activeTab() === 'pending';
     
     const query = {
       search: this.searchQuery().trim(),
       roleId: filterRoleId !== null ? filterRoleId : undefined,
+      isPending: isPendingValue,
       pageNumber: this.pageNumber(),
       pageSize: this.pageSize()
     };
@@ -76,7 +88,6 @@ export class UserManager implements OnInit {
     this.userService.getUsers(query).subscribe({
       next: (response: UserModel[]) => {
         this.zone.run(() => {
-          // The backend marks soft deleted users. We filter active ones.
           const activeUsers = response.filter(u => u.isDeleted !== 'True' && u.isDeleted !== 'true');
           this.users.set(activeUsers);
           this.hasMore.set(response.length === this.pageSize());
@@ -129,11 +140,6 @@ export class UserManager implements OnInit {
     this.editEmail = user.email;
     this.editPhoneNumber = user.phoneNumber || '';
     this.editAddress = user.address || '';
-    
-    // Find matching role ID on the frontend roles list
-    const userRole = this.roles().find(r => r.name.toLowerCase() === user.roleName.toLowerCase());
-    this.editRoleId = userRole ? userRole.id : 0;
-
     dialog.showModal();
   }
 
@@ -154,7 +160,6 @@ export class UserManager implements OnInit {
     const payload = {
       name: this.editName.trim(),
       email: this.editEmail.trim(),
-      roleId: this.editRoleId,
       phoneNumber: this.editPhoneNumber.trim() || undefined,
       address: this.editAddress.trim() || undefined
     };
@@ -191,6 +196,7 @@ export class UserManager implements OnInit {
           this.toastService.success('User deleted successfully.');
           dialog.close();
           this.fetchUsers();
+          this.userService.updatePendingCount();
         });
       },
       error: (err) => {
@@ -198,6 +204,109 @@ export class UserManager implements OnInit {
           this.toastService.error('Failed to delete user.');
         });
         console.error('Failed to delete user:', err);
+      }
+    });
+  }
+
+  public setActiveTab(tab: 'approved' | 'pending'): void {
+    this.activeTab.set(tab);
+    this.pageNumber.set(1);
+    this.fetchUsers();
+  }
+
+  public approveUser(user: UserModel): void {
+    this.userService.approveUser(user.id).subscribe({
+      next: () => {
+        this.zone.run(() => {
+          this.toastService.success(`${user.name} approved successfully.`);
+          this.fetchUsers();
+          this.userService.updatePendingCount();
+        });
+      },
+      error: (err) => {
+        this.zone.run(() => {
+          this.toastService.error('Failed to approve user.');
+        });
+        console.error('Failed to approve user:', err);
+      }
+    });
+  }
+
+  public triggerReject(user: UserModel, dialog: HTMLDialogElement): void {
+    this.userToReject.set(user);
+    dialog.showModal();
+  }
+
+  public confirmReject(dialog: HTMLDialogElement): void {
+    const user = this.userToReject();
+    if (!user) return;
+
+    this.userService.deleteUser(user.id).subscribe({
+      next: () => {
+        this.zone.run(() => {
+          this.toastService.success(`${user.name} rejected successfully.`);
+          dialog.close();
+          this.fetchUsers();
+          this.userService.updatePendingCount();
+        });
+      },
+      error: (err) => {
+        this.zone.run(() => {
+          this.toastService.error('Failed to reject user.');
+        });
+        console.error('Failed to reject user:', err);
+      }
+    });
+  }
+
+  public getRoleIdFromRoleName(roleName: string): number {
+    const role = this.roles().find(r => r.name.toLowerCase() === roleName.toLowerCase());
+    return role ? role.id : 0;
+  }
+
+  public onRoleSelect(user: UserModel, event: Event, dialog: HTMLDialogElement): void {
+    const selectElement = event.target as HTMLSelectElement;
+    const newRoleId = Number(selectElement.value);
+
+    const currentRoleId = this.getRoleIdFromRoleName(user.roleName);
+    if (newRoleId === currentRoleId) return;
+
+    const targetRole = this.roles().find(r => r.id === newRoleId);
+    if (!targetRole) return;
+
+    this.roleChangeUser.set(user);
+    this.roleChangeTargetRoleId.set(newRoleId);
+    this.roleChangeTargetRoleName.set(targetRole.name);
+
+    dialog.showModal();
+  }
+
+  public cancelRoleChange(dialog: HTMLDialogElement): void {
+    dialog.close();
+    this.fetchUsers();
+  }
+
+  public confirmRoleChange(dialog: HTMLDialogElement): void {
+    const user = this.roleChangeUser();
+    const roleId = this.roleChangeTargetRoleId();
+    if (!user || !roleId) return;
+
+    this.userService.updateUserRole(user.id, roleId).subscribe({
+      next: () => {
+        this.zone.run(() => {
+          this.toastService.success(`Role for ${user.name} updated to ${this.roleChangeTargetRoleName()}.`);
+          dialog.close();
+          this.fetchUsers();
+        });
+      },
+      error: (err) => {
+        this.zone.run(() => {
+          const errMsg = err.error?.detail || err.error?.Detail || 'Failed to update user role.';
+          this.toastService.error(errMsg);
+          dialog.close();
+          this.fetchUsers();
+        });
+        console.error('Failed to update role:', err);
       }
     });
   }
@@ -239,3 +348,4 @@ export class UserManager implements OnInit {
     }
   }
 }
+

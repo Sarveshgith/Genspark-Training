@@ -46,7 +46,7 @@
       <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
         <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12h16.5m-16.5 5.25h16.5m-16.5-10.5h16.5" />
       </svg>
-      @if (alerts().length > 0) {
+      @if (alerts().length > 0 || userService.pendingUsersCount() > 0) {
         <span class="absolute -top-1 -right-1 flex h-3 w-3">
           <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
           <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
@@ -118,9 +118,25 @@
       <a routerLink="/users"
          (click)="closeBottomSheet()"
          routerLinkActive="bg-[#FAF4EC] text-[#8C5815] font-semibold border-l-2 border-[#8C5815]"
+         class="flex items-center justify-between p-3 rounded-xl bg-[#FAF9F7] text-gray-600 hover:text-gray-900 border border-transparent transition cursor-pointer">
+        <div class="flex items-center space-x-3 font-sans">
+          <span class="text-base select-none">👥</span>
+          <span class="text-xs font-semibold uppercase font-sans">Users</span>
+        </div>
+        @if (userService.pendingUsersCount() > 0) {
+          <span class="bg-[#8C5815] text-white text-[10px] font-bold px-2 py-0.5 rounded-full font-mono shrink-0">
+            {{ userService.pendingUsersCount() }}
+          </span>
+        }
+      </a>
+
+      <!-- Reports -->
+      <a routerLink="/reports"
+         (click)="closeBottomSheet()"
+         routerLinkActive="bg-[#FAF4EC] text-[#8C5815] font-semibold border-l-2 border-[#8C5815]"
          class="flex items-center space-x-3 p-3 rounded-xl bg-[#FAF9F7] text-gray-600 hover:text-gray-900 border border-transparent transition cursor-pointer">
-        <span class="text-base select-none">👥</span>
-        <span class="text-xs font-semibold uppercase font-sans">Users</span>
+        <span class="text-base select-none">📊</span>
+        <span class="text-xs font-semibold uppercase font-sans">Reports</span>
       </a>
 
       <!-- Alert Feed -->

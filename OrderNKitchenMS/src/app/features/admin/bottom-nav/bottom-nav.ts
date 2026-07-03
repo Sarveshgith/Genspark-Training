@@ -2,6 +2,7 @@ import { Component, inject, signal, OnInit, OnDestroy } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { SignalRService } from '../../../core/services/signalr.service';
+import { UserService } from '../../../core/services/user.service';
 import { Subscription } from 'rxjs';
 import { CommonModule } from '@angular/common';
 
@@ -16,6 +17,7 @@ export class BottomNavComponent implements OnInit, OnDestroy {
   public authService = inject(AuthService);
   public router = inject(Router);
   private signalRService = inject(SignalRService);
+  public userService = inject(UserService);
 
   // Bottom Sheet Visibility
   public isBottomSheetOpen = signal<boolean>(false);
@@ -31,6 +33,7 @@ export class BottomNavComponent implements OnInit, OnDestroy {
     const token = this.authService.getToken();
 
     if (role === 'admin' && token) {
+      this.userService.updatePendingCount();
       // Connect to Hub (idempotent in SignalRService)
       this.signalRService.connect(token);
 

@@ -46,24 +46,21 @@ export class LandingComponent implements OnInit, OnDestroy {
   private subscriptions: Subscription = new Subscription();
 
   ngOnInit() {
-    this.route.queryParams.subscribe(params => {
-      const tableIdParam = params['tableId'];
-      if (!tableIdParam) {
-        this.errorMessage = "Table Number is required to track orders.";
-        this.isLoading = false;
-        this.cdr.detectChanges();
-        return;
+    // Read route parameters (for secret) and query parameters (fallback)
+    this.route.params.subscribe(routeParams => {
+      const secret = routeParams['secret'];
+      if (secret) {
+        this.initializeSession(secret);
+      } else {
+        this.route.queryParams.subscribe(queryParams => {
+          const qSecret = queryParams['secret'];
+          if (qSecret) {
+            this.initializeSession(qSecret);
+          } else {
+            this.initializeSession();
+          }
+        });
       }
-
-      this.tableNumber = parseInt(tableIdParam, 10);
-      if (isNaN(this.tableNumber) || this.tableNumber <= 0) {
-        this.errorMessage = "Invalid Table Number.";
-        this.isLoading = false;
-        this.cdr.detectChanges();
-        return;
-      }
-
-      this.initializeSession();
     });
   }
 
@@ -72,22 +69,33 @@ export class LandingComponent implements OnInit, OnDestroy {
     this.signalRService.disconnect();
   }
 
-  private initializeSession() {
+  private initializeSession(secret?: string) {
     const existingToken = this.authService.getToken();
 
-    if (!existingToken) {
-      this.authService.guestLogin({ tableId: this.tableNumber }).subscribe({
+    if (secret) {
+      this.authService.guestLogin({ secret }).subscribe({
         next: () => {
+          const token = this.authService.getToken();
+          if (token) {
+            this.tableNumber = this.authService.getTableIdFromToken(token);
+          }
           this.loadMenuAndTrackOrder();
         },
         error: (err: any) => {
-          this.errorMessage = "Failed to create a guest session. Please scan the QR code again.";
+          this.errorMessage = "Session Expired. Please scan the QR code again.";
           this.isLoading = false;
           this.cdr.detectChanges();
         }
       });
     } else {
-      this.loadMenuAndTrackOrder();
+      if (existingToken) {
+        this.tableNumber = this.authService.getTableIdFromToken(existingToken);
+        this.loadMenuAndTrackOrder();
+      } else {
+        this.errorMessage = "Session Expired. Please scan the QR code again.";
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      }
     }
   }
 
@@ -200,7 +208,10 @@ export class LandingComponent implements OnInit, OnDestroy {
       error: (err) => {
         this.zone.run(() => {
           console.error('Order tracking fetch error:', err);
-          if (err.status === 404) {
+          if (err.status === 401) {
+            this.errorMessage = "Session Expired. Please scan the QR code again.";
+            this.orderDetails = null;
+          } else if (err.status === 404) {
             this.orderDetails = null;
             this.guestState.set('waiting');
           } else {
@@ -283,8 +294,11 @@ export class LandingComponent implements OnInit, OnDestroy {
           this.cdr.detectChanges();
         });
       },
-      error: () => {
+      error: (err) => {
         this.zone.run(() => {
+          if (err?.status === 401) {
+            this.errorMessage = "Session Expired. Please scan the QR code again.";
+          }
           this.billDetails.set(null);
           this.guestState.set('tracking');
           this.cdr.detectChanges();

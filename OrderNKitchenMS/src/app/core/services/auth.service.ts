@@ -42,6 +42,11 @@ export class AuthService {
         return user ? user.roleName : null; 
     }
 
+    public getCurrentUserId(): number | null {
+        const user = this.userSubject.value;
+        return user ? user.id : null;
+    }
+
     public login(loginModel: LoginModel) {
         let url = classUrl + "login";
         return this.http.post<LoginResponseModel>(url, loginModel, {
@@ -58,7 +63,8 @@ export class AuthService {
                 }),
                 catchError(error => {
                     console.error('Login failed:', error);
-                    return throwError(() => new Error('Login failed. Please check your credentials and try again.'));
+                    const msg = error.error?.detail || error.error?.Detail || 'Login failed. Please check your credentials and try again.';
+                    return throwError(() => new Error(msg));
                 })
             );
     }
@@ -101,11 +107,9 @@ export class AuthService {
             );
     }
 
-    public guestLogin(query: any): any {
+    public guestLogin(query: { secret: string }): any {
         let url = classUrl + "guest-login";
-        let params = new HttpParams().set('tableId', query.tableId.toString());
-        return this.http.post(url, null, {
-            params,
+        return this.http.post(url, { secret: query.secret }, {
             context: new HttpContext().set(IS_PUBLIC_API, true)
         }).pipe(tap((response: any) => {
             if (typeof window !== 'undefined' && window.sessionStorage) {
@@ -117,6 +121,15 @@ export class AuthService {
                 return throwError(() => new Error('Guest login failed. Please try again.'));
             })
         );
+    }
+
+    public getTableIdFromToken(token: string): number {
+        try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            return parseInt(payload.tableId, 10);
+        } catch {
+            return 0;
+        }
     }
 
     public logout() {
