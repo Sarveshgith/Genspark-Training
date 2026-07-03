@@ -32,6 +32,12 @@ public class TableRepository : ITableRepository
             .FirstOrDefaultAsync(table => table.Id == id && !table.IsDeleted);
     }
 
+    public async Task<Table?> GetBySecretAsync(string secret)
+    {
+        return await _tables
+            .FirstOrDefaultAsync(table => table.Secret == secret && !table.IsDeleted);
+    }
+
     public async Task<Table?> GetByNumberAsync(int number, int? excludeId = null)
     {
         return await _tables.FirstOrDefaultAsync(table =>
@@ -84,6 +90,19 @@ public class TableRepository : ITableRepository
         }
 
         table.IsDeleted = true;
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
+    public async Task<bool> UpdateSecretAsync(int id, string secret)
+    {
+        var existingTable = await GetByIdAsync(id);
+        if (existingTable == null)
+        {
+            return false;
+        }
+
+        existingTable.Secret = secret;
         await _context.SaveChangesAsync();
         return true;
     }

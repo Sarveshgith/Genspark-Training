@@ -27,4 +27,5 @@ public class User : BaseEntity
     public Role? Role {get; set;}
 
     public bool IsDeleted {get; set;}
+    public bool IsPending {get; set;} = true;
 }

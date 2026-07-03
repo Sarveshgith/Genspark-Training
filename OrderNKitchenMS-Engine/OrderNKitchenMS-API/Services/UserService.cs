@@ -24,17 +24,24 @@ public class UserService : IUserService
     // Retrieves a filtered, paginated list of all users.
     public async Task<IEnumerable<UserDto>> GetAllAsync(QueryUserDto query)
     {
-        _logger.LogInformation("GetAllAsync called for users. Search: '{Search}', RoleId: {RoleId}", query?.Search, query?.RoleId);
+        query ??= new QueryUserDto();
+        _logger.LogInformation("GetAllAsync called for users.");
         var users = await _userRepository.GetAll();
 
-        if (Validation.IsNonEmptyString(query?.Search ?? string.Empty))
+        if (Validation.IsNonEmptyString(query.Search ?? string.Empty))
         {
-            users = users.Where(user => user.Name.Contains(query.Search!) || user.Email.Contains(query.Search!));
+            var searchLower = query.Search!.ToLower();
+            users = users.Where(user => user.Name.ToLower().Contains(searchLower) || user.Email.ToLower().Contains(searchLower));
         }
 
         if (query.RoleId.HasValue)
         {
             users = users.Where(user => user.RoleId == query.RoleId.Value);
+        }
+
+        if (query.IsPending.HasValue)
+        {
+            users = users.Where(user => user.IsPending == query.IsPending.Value);
         }
 
         var pageNumber = query.PageNumber < 1 ? 1 : query.PageNumber;
@@ -89,6 +96,46 @@ public class UserService : IUserService
         return MapUserToDto(updatedUser);
     }
 
+    public async Task<UserDto> ApproveUserAsync(int id)
+    {
+        _logger.LogInformation("ApproveUserAsync started for User ID: {Id}", id);
+        var approvedUser = await _userRepository.ApproveAsync(id);
+        if (approvedUser == null)
+        {
+            _logger.LogWarning("ApproveUserAsync failed: User with ID {Id} was not found.", id);
+            throw new NotFoundException($"User with id {id} was not found.");
+        }
+        _logger.LogInformation("ApproveUserAsync succeeded for User ID: {Id}", id);
+        return MapUserToDto(approvedUser);
+    }
+
+    public async Task<UserDto> UpdateUserRoleAsync(int id, int roleId)
+    {
+        _logger.LogInformation("UpdateUserRoleAsync started for User ID: {Id} to Role ID: {RoleId}", id, roleId);
+
+        var user = await _userRepository.GetByIdAsync(id);
+        if (user == null)
+        {
+            _logger.LogWarning("UpdateUserRoleAsync failed: User with ID {Id} was not found.", id);
+            throw new NotFoundException($"User with id {id} was not found.");
+        }
+
+        if (roleId == 1 && user.IsPending)
+        {
+            _logger.LogWarning("UpdateUserRoleAsync failed: Cannot promote pending user ID {Id} to Admin.", id);
+            throw new BusinessRuleException("Only approved users can be promoted to Admin.");
+        }
+
+        var updatedUser = await _userRepository.UpdateRoleAsync(id, roleId);
+        if (updatedUser == null)
+        {
+            _logger.LogWarning("UpdateUserRoleAsync failed: User with ID {Id} was not found.", id);
+            throw new NotFoundException($"User with id {id} was not found.");
+        }
+        _logger.LogInformation("UpdateUserRoleAsync succeeded for User ID: {Id}", id);
+        return MapUserToDto(updatedUser);
+    }
+
     // Changes the password for a specific user.
     public async Task<bool> ChangePasswordAsync(int id, string hashedPassword)
     {
@@ -131,7 +178,8 @@ public class UserService : IUserService
             RoleName = user.Role?.Name.ToString() ?? string.Empty,
             PhoneNumber = user.PhoneNumber,
             Address = user.Address,
-            IsDeleted = user.IsDeleted.ToString()
+            IsDeleted = user.IsDeleted.ToString(),
+            IsPending = user.IsPending
         };
     }
 
@@ -143,8 +191,7 @@ public class UserService : IUserService
             Email = userUpdateDto.Email,
             PasswordHash = string.Empty,
             PhoneNumber = userUpdateDto.PhoneNumber,
-            Address = userUpdateDto.Address,
-            RoleId = userUpdateDto.RoleId
+            Address = userUpdateDto.Address
         };
     }
 

@@ -28,9 +28,46 @@ public class UserController : ControllerBase
     [HttpPut("{id:int}")]
     public async Task<ActionResult<UserDto>> UpdateUser(int id, [FromBody] UserUpdateDto userUpdateDto)
     {
+        if (userUpdateDto == null)
+        {
+            return BadRequest("User data is required.");
+        }
+
         _logger.LogInformation("UpdateUser requested for ID: {Id}", id);
         var updatedUser = await _userService.UpdateAsync(id, userUpdateDto);
         _logger.LogInformation("UpdateUser completed for ID: {Id}", id);
+        return Ok(updatedUser);
+    }
+
+    [Authorize(Policy = "AdminOnly")]
+    [HttpPatch("{id:int}/approve")]
+    public async Task<ActionResult<UserDto>> ApproveUser(int id)
+    {
+        _logger.LogInformation("ApproveUser requested for ID: {Id}", id);
+        var approvedUser = await _userService.ApproveUserAsync(id);
+        _logger.LogInformation("ApproveUser completed for ID: {Id}", id);
+        return Ok(approvedUser);
+    }
+
+    [Authorize(Policy = "AdminOnly")]
+    [HttpPatch("{id:int}/role")]
+    public async Task<ActionResult<UserDto>> UpdateUserRole(int id, [FromBody] UserRoleUpdateDto roleUpdateDto)
+    {
+        if (roleUpdateDto == null)
+        {
+            return BadRequest("Role update data is required.");
+        }
+
+        var currentUserId = User.GetUserId();
+        if (currentUserId == id)
+        {
+            _logger.LogWarning("UpdateUserRole forbidden: Admin ID {CurrentUserId} attempted to change their own role.", currentUserId);
+            throw new ForbiddenException("You cannot change your own role.");
+        }
+
+        _logger.LogInformation("UpdateUserRole requested for ID: {Id} to Role ID: {RoleId}", id, roleUpdateDto.RoleId);
+        var updatedUser = await _userService.UpdateUserRoleAsync(id, roleUpdateDto.RoleId);
+        _logger.LogInformation("UpdateUserRole completed for ID: {Id}", id);
         return Ok(updatedUser);
     }
 
@@ -75,10 +112,16 @@ public class UserController : ControllerBase
     }
 
     [HttpPatch("{id:int}/password")]
-    public async Task<ActionResult> ChangePassword(int id, [FromBody] string password)
+    public async Task<ActionResult> ChangePassword(int id, [FromBody] ChangePasswordDto request)
     {
+        if (request == null)
+        {
+            return BadRequest("Password payload is required.");
+        }
+
         _logger.LogInformation("ChangePassword requested for User ID: {Id}", id);
-        Validation.RequireNonEmptyString(password, nameof(password), "Password is required.");
+        Validation.RequireNonEmptyString(request.NewPassword, nameof(request.NewPassword), "Password is required.");
+        Validation.RequireStrongPassword(request.NewPassword, nameof(request.NewPassword));
 
         var currentUserId = User.GetUserId();
         if (currentUserId != id)
@@ -87,7 +130,7 @@ public class UserController : ControllerBase
             throw new ForbiddenException("You are not authorized to change another user's password.");
         }
 
-        var hashedPassword = _tokenService.HashPassword(password);
+        var hashedPassword = _tokenService.HashPassword(request.NewPassword);
         await _userService.ChangePasswordAsync(id, hashedPassword);
         _logger.LogInformation("ChangePassword succeeded for User ID: {Id}", id);
         return NoContent();

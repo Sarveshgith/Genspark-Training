@@ -42,7 +42,7 @@ public class ReportRepository : IReportRepository
     {
         const string query = @"
             SELECT ""TotalOrders"", ""TotalRevenue"", ""AvgOrderValue"", ""CancelledOrders""
-            FROM fn_daily_revenue(@date);";
+            FROM fn_daily_revenue(@date::DATE);";
 
         using var command = await CreateCommandAsync(query, new() { { "@date", date.Date } });
         using var reader = await command.ExecuteReaderAsync();
@@ -187,7 +187,7 @@ public class ReportRepository : IReportRepository
     {
         const string query = @"
             SELECT ""TableId"", ""TableNumber"", ""CompletedOrdersCount""
-            FROM fn_table_turnover(@date)
+            FROM fn_table_turnover(@date::DATE)
             ORDER BY ""CompletedOrdersCount"" DESC, ""TableNumber"" ASC;";
 
         var list = new List<TableTurnoverDto>();

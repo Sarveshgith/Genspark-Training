@@ -9,6 +9,8 @@ public interface ITableRepository
 
     public Task<Table?> GetByIdAsync(int id);
 
+    public Task<Table?> GetBySecretAsync(string secret);
+
     public Task<Table?> GetByNumberAsync(int number, int? excludeId = null);
 
     public Task<Table> CreateAsync(Table table);
@@ -18,4 +20,6 @@ public interface ITableRepository
     public Task<bool> ChangeStatusAsync(int id, TableStatus status);
 
     public Task<bool> DeleteAsync(int id);
+
+    public Task<bool> UpdateSecretAsync(int id, string secret);
 }

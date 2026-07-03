@@ -15,4 +15,8 @@ public interface ITableService
     public Task<bool> ChangeStatusAsync(int id, int status);
 
     public Task<bool> DeleteAsync(int id);
+
+    public Task<bool> RegenerateSecretAsync(int id);
+
+    public Task<string> GetTableSecretAsync(int id);
 }

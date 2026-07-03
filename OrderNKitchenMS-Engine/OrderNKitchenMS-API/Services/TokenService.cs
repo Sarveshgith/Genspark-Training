@@ -15,24 +15,26 @@ namespace OrderNKitchenMS_API.Services;
 public class TokenService : ITokenService
 {
     private readonly IConfiguration _configuration;
+    private readonly ILogger<TokenService> _logger;
     private readonly PasswordHasher<User> _passwordHasher = new();
 
-    public TokenService(IConfiguration configuration)
+    public TokenService(IConfiguration configuration, ILogger<TokenService> logger)
     {
         _configuration = configuration;
+        _logger = logger;
     }
 
     // Verifies if the password matches the stored hash.
     public bool VerifyPassword(string password, string storedHash)
     {
-        var result = _passwordHasher.VerifyHashedPassword(null, storedHash, password);
+        var result = _passwordHasher.VerifyHashedPassword(null!, storedHash, password);
         return result == PasswordVerificationResult.Success;
     }
 
     // Computes a hashed password.
     public string HashPassword(string password)
     {
-        return  _passwordHasher.HashPassword(null, password);
+        return _passwordHasher.HashPassword(null!, password);
     }
 
     // Creates a JWT access token for a user.
@@ -91,11 +93,18 @@ public class TokenService : ITokenService
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
+        var refreshExpiresInStr = jwtSettings["RefreshExpiresInDays"];
+        double refreshExpiresInDays = 7;
+        if (!string.IsNullOrEmpty(refreshExpiresInStr) && double.TryParse(refreshExpiresInStr, out var parsedRefreshExpires))
+        {
+            refreshExpiresInDays = parsedRefreshExpires;
+        }
+
         var token = new JwtSecurityToken(
             issuer: issuer,
             audience: audience,
             claims: claims,
-            expires: DateTime.UtcNow.AddDays(7),
+            expires: DateTime.UtcNow.AddDays(refreshExpiresInDays),
             signingCredentials: creds
         );
 
@@ -119,11 +128,18 @@ public class TokenService : ITokenService
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
+        var guestExpiresInStr = jwtSettings["GuestExpiresInHours"];
+        double guestExpiresInHours = 3;
+        if (!string.IsNullOrEmpty(guestExpiresInStr) && double.TryParse(guestExpiresInStr, out var parsedGuestExpires))
+        {
+            guestExpiresInHours = parsedGuestExpires;
+        }
+
         var token = new JwtSecurityToken(
             issuer: issuer,
             audience: audience,
             claims: claims,
-            expires: DateTime.UtcNow.AddHours(3),
+            expires: DateTime.UtcNow.AddHours(guestExpiresInHours),
             signingCredentials: creds
         );
 
@@ -167,7 +183,8 @@ public class TokenService : ITokenService
         }
         catch (Exception ex)
         {
-            throw new UnauthorizedException($"Invalid or expired refresh token. {ex.Message}");
+            _logger.LogError(ex, "Refresh token validation failed.");
+            throw new UnauthorizedException("Invalid or expired refresh token.");
         }
     }
 }

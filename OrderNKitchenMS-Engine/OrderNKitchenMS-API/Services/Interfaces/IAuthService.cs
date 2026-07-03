@@ -8,5 +8,5 @@ public interface IAuthService
 	public Task<UserDto> RegisterAsync(UserRegisterDto userRegisterDto);
 	public Task<UserLoginResponseDto> LoginAsync(UserLoginDto userLoginDto);
 	public Task<UserLoginResponseDto> RefreshTokenAsync(TokenRefreshDto tokenRefreshDto);
-	public Task<GuestLoginResponseDto> GuestLoginAsync(int tableId);
+	public Task<GuestLoginResponseDto> GuestLoginAsync(string secret);
 }

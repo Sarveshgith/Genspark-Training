@@ -152,7 +152,6 @@ public class OrderController : ControllerBase
             throw new BusinessRuleException("Table ID is required to track order.");
         }
         var trackingInfo = await _orderService.GetGuestOrderTrackingAsync(tableId.Value);
-        _logger.LogInformation("TrackMyOrder completed for TableId: {TableId}. Order ID: {OrderId}", tableId.Value, trackingInfo.OrderId);
         return Ok(trackingInfo);
     }
 

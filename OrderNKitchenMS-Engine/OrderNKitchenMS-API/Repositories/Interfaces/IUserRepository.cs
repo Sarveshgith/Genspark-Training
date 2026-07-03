@@ -13,6 +13,10 @@ public interface IUserRepository
 
     public Task<User?> UpdateAsync(int id, User user);
 
+    public Task<User?> ApproveAsync(int id);
+
+    public Task<User?> UpdateRoleAsync(int id, int roleId);
+
     public Task<IEnumerable<Role>> GetAllRolesAsync();
 
     public Task<bool> ChangePasswordAsync(int id, string hashedPassword);

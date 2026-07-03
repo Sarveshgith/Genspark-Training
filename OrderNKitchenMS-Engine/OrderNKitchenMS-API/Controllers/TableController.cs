@@ -5,6 +5,9 @@ using OrderNKitchenMS_API.Models.DTOs;
 using OrderNKitchenMS_API.Services.Interfaces;
 using Microsoft.Extensions.Configuration;
 using OrderNKitchenMS_API.Utils;
+using OrderNKitchenMS_API.Data;
+using OrderNKitchenMS_API.Exceptions;
+using Microsoft.EntityFrameworkCore;
 
 namespace OrderNKitchenMS_API.Controllers;
 
@@ -22,15 +25,20 @@ public class TableController : ControllerBase
         _configuration = configuration;
     }
 
-    [AllowAnonymous]
+    [Authorize(Policy = "AdminOrWaiter")]
     [HttpGet("qrcode")]
     public async Task<ActionResult> GetTableQRCode([FromQuery] int tableId)
     {
-        await _tableService.GetByIdAsync(tableId);
+        if (tableId <= 0)
+        {
+            return BadRequest("Table ID must be greater than zero.");
+        }
+
+        var secret = await _tableService.GetTableSecretAsync(tableId);
 
         var baseUrl = _configuration["QrSettings:BaseUrl"] ?? "http://localhost:4200";
         baseUrl = baseUrl.TrimEnd('/');
-        var qrUrl = $"{baseUrl}?tableId={tableId}";
+        var qrUrl = $"{baseUrl}/guest/{secret}";
         
         byte[] qrBytes = QRCodeHelper.GenerateQRCodeBytes(qrUrl);
         return File(qrBytes, "image/png");
@@ -80,6 +88,14 @@ public class TableController : ControllerBase
     public async Task<ActionResult> DeleteTable(int id)
     {
         await _tableService.DeleteAsync(id);
+        return NoContent();
+    }
+
+    [Authorize(Policy = "AdminOnly")]
+    [HttpPatch("{id:int}/regenerate-secret")]
+    public async Task<ActionResult> RegenerateSecret(int id)
+    {
+        await _tableService.RegenerateSecretAsync(id);
         return NoContent();
     }
 }

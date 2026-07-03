@@ -34,10 +34,12 @@ public class TableService : ITableService
     public async Task<IEnumerable<TableDto>> GetAllAsync()
     {
         _logger.LogInformation("GetAllAsync called for tables");
-        var tables = await _tableRepository.GetAllAsync();
+        var tables = (await _tableRepository.GetAllAsync()).ToList();
+
+        var tableIds = tables.Select(t => t.Id).ToList();
 
         var activeOrders = await _context.Orders
-            .Where(o => o.Status != OrderStatus.Completed && o.Status != OrderStatus.Cancelled)
+            .Where(o => tableIds.Contains(o.TableId) && o.Status != OrderStatus.Completed && o.Status != OrderStatus.Cancelled)
             .ToListAsync();
 
         var activeOrdersMap = activeOrders
@@ -82,6 +84,7 @@ public class TableService : ITableService
         ValidateCreateDto(tableCreateDto);
         await EnsureUniqueNumberAsync(tableCreateDto.Number);
         var tableEntity = MapCreateDtoToEntity(tableCreateDto);
+        tableEntity.Secret = GenerateTableSecret();
         var createdTable = await _tableRepository.CreateAsync(tableEntity);
         _logger.LogInformation("CreateAsync succeeded. Created Table ID: {Id} for Number: {Number}", createdTable.Id, createdTable.Number);
         return MapTableToDto(createdTable);
@@ -144,6 +147,37 @@ public class TableService : ITableService
 
         _logger.LogInformation("DeleteAsync succeeded for Table ID: {Id}", id);
         return true;
+    }
+
+    // Rotates the secret of an existing table.
+    public async Task<bool> RegenerateSecretAsync(int id)
+    {
+        _logger.LogInformation("RegenerateSecretAsync started for Table ID: {Id}", id);
+        var newSecret = GenerateTableSecret();
+        var isUpdated = await _tableRepository.UpdateSecretAsync(id, newSecret);
+        if (!isUpdated)
+        {
+            _logger.LogWarning("RegenerateSecretAsync failed: Table with ID {Id} was not found.", id);
+            throw new NotFoundException($"Table with id {id} was not found.");
+        }
+
+        _logger.LogInformation("RegenerateSecretAsync succeeded. Rotated secret for Table ID: {Id}", id);
+        return true;
+    }
+
+    private static string GenerateTableSecret()
+    {
+        return Guid.NewGuid().ToString("N");
+    }
+
+    public async Task<string> GetTableSecretAsync(int id)
+    {
+        var table = await _tableRepository.GetByIdAsync(id);
+        if (table == null)
+        {
+            throw new NotFoundException($"Table with id {id} was not found.");
+        }
+        return table.Secret;
     }
 
     private static void ValidateCreateDto(TableCreateDto tableCreateDto)

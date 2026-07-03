@@ -11,6 +11,7 @@ public class UserDto
     public string? PhoneNumber {get; set;}
     public string? Address {get; set;}
     public string IsDeleted {get; set;} = string.Empty;
+    public bool IsPending {get; set;}
 }
 
 public class UserRegisterDto
@@ -40,15 +41,20 @@ public class UserUpdateDto
 {
     public string Email { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
-    public int RoleId { get; set; }
     public string? PhoneNumber { get; set; }
     public string? Address { get; set; }
+}
+
+public class UserRoleUpdateDto
+{
+    public int RoleId { get; set; }
 }
 
 public class QueryUserDto
 {
     public string? Search { get; set; }
     public int? RoleId { get; set; }
+    public bool? IsPending { get; set; }
     public int PageNumber { get; set; } = 1;
     public int PageSize { get; set; } = 10;
 }
@@ -56,6 +62,16 @@ public class QueryUserDto
 public class TokenRefreshDto
 {
     public string RefreshToken { get; set; } = string.Empty;
+}
+
+public class ChangePasswordDto
+{
+    public string NewPassword { get; set; } = string.Empty;
+}
+
+public class GuestLoginRequestDto
+{
+    public string Secret { get; set; } = string.Empty;
 }
 
 public class GuestLoginResponseDto

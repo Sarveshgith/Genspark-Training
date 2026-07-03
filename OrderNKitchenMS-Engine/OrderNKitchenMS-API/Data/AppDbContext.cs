@@ -42,12 +42,19 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 new Role { Id = 4, Name = UserRole.Deliveryman, CreatedAt = new DateTime(2026, 5, 28, 11, 4, 45, 313, DateTimeKind.Utc).AddTicks(3780) },
                 new Role { Id = 5, Name = UserRole.Waiter, CreatedAt = new DateTime(2026, 5, 28, 11, 4, 45, 313, DateTimeKind.Utc).AddTicks(3780) }
             );
-
         modelBuilder.Entity<User>()
             .HasOne(u => u.Role)
             .WithMany(r => r.Users)
             .HasForeignKey(u => u.RoleId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<User>()
+            .Property(u => u.IsPending)
+            .HasDefaultValue(true);
+
+        modelBuilder.Entity<Table>()
+            .HasIndex(table => table.Secret)
+            .IsUnique();
 
         var isPostgres = Database.ProviderName == "Npgsql.EntityFrameworkCore.PostgreSQL";
 

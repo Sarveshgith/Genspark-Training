@@ -17,4 +17,7 @@ public class Table : BaseEntity
     public required int Capacity {get; set;}
 
     public bool IsDeleted {get; set;}
+
+    [Required]
+    public string Secret { get; set; } = Guid.NewGuid().ToString("N");
 }

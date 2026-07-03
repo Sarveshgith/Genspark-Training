@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using OrderNKitchenMS_API.Data;
 using OrderNKitchenMS_API.Models.Entities;
 using OrderNKitchenMS_API.Repositories.Interfaces;
+using OrderNKitchenMS_API.Exceptions;
 
 namespace OrderNKitchenMS_API.Repositories;
 
@@ -35,6 +36,7 @@ public class UserRepository : IUserRepository
 
     public async Task<User> CreateAsync(User user)
     {
+        user.Email = user.Email.ToLower();
         _users.Add(user);
         await _context.SaveChangesAsync();
         await _context.Entry(user).Reference(createdUser => createdUser.Role).LoadAsync();
@@ -50,12 +52,43 @@ public class UserRepository : IUserRepository
         }
 
         existingUser.Name = user.Name;
-        existingUser.Email = user.Email;
-        existingUser.RoleId = user.RoleId;
+        existingUser.Email = user.Email.ToLower();
         existingUser.PhoneNumber = user.PhoneNumber;
         existingUser.Address = user.Address;
         await _context.SaveChangesAsync();
         return existingUser;
+    }
+
+    public async Task<User?> ApproveAsync(int id)
+    {
+        var user = await GetByIdAsync(id);
+        if (user == null)
+        {
+            return null;
+        }
+        user.IsPending = false;
+        await _context.SaveChangesAsync();
+        return user;
+    }
+
+    public async Task<User?> UpdateRoleAsync(int id, int roleId)
+    {
+        var user = await GetByIdAsync(id);
+        if (user == null)
+        {
+            return null;
+        }
+
+        var roleExists = await _roles.AnyAsync(r => r.Id == roleId);
+        if (!roleExists)
+        {
+            throw new NotFoundException($"Role with ID {roleId} does not exist.");
+        }
+
+        user.RoleId = roleId;
+        await _context.SaveChangesAsync();
+        await _context.Entry(user).Reference(u => u.Role).LoadAsync();
+        return user;
     }
 
     public async Task<IEnumerable<Role>> GetAllRolesAsync()
@@ -82,7 +115,7 @@ public class UserRepository : IUserRepository
     {
         return await _users
             .Include(user => user.Role)
-            .FirstOrDefaultAsync(user => user.Email.ToLower() == email.ToLower() && !user.IsDeleted);
+            .FirstOrDefaultAsync(user => user.Email == email.ToLower() && !user.IsDeleted);
     }
 
     public async Task<bool> DeleteAsync(int id)

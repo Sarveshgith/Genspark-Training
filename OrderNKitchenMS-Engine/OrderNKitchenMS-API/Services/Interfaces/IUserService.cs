@@ -12,6 +12,10 @@ public interface IUserService
 
     public Task<UserDto> UpdateAsync(int id, UserUpdateDto userUpdateDto);
 
+    public Task<UserDto> ApproveUserAsync(int id);
+
+    public Task<UserDto> UpdateUserRoleAsync(int id, int roleId);
+
     public Task<bool> ChangePasswordAsync(int id, string hashedPassword);
 
     public Task<bool> DeleteAsync(int id);
