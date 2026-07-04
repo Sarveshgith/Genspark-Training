@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using OrderNKitchenMS_API.Models.DTOs;
 using OrderNKitchenMS_API.Services.Interfaces;
+using OrderNKitchenMS_API.Utils;
 
 namespace OrderNKitchenMS_API.Controllers;
 
@@ -36,6 +37,7 @@ public class ReportController : ControllerBase
     [HttpGet("revenue/range")]
     public async Task<ActionResult<IEnumerable<RangeRevenueDto>>> GetRangeRevenue([FromQuery] DateTime from, [FromQuery] DateTime to)
     {
+        Validation.Require(to >= from, "End date ('to') cannot be earlier than start date ('from').", nameof(to));
         _logger.LogInformation("GetRangeRevenue requested from {From} to {To}", from, to);
         var result = await _reportService.GetRangeRevenueReportAsync(from, to);
         return Ok(result);
@@ -44,6 +46,10 @@ public class ReportController : ControllerBase
     [HttpGet("orders/summary")]
     public async Task<ActionResult<OrderSummaryDto>> GetOrderSummary([FromQuery] DateTime? from, [FromQuery] DateTime? to)
     {
+        if (from.HasValue && to.HasValue)
+        {
+            Validation.Require(to.Value >= from.Value, "End date ('to') cannot be earlier than start date ('from').", nameof(to));
+        }
         _logger.LogInformation("GetOrderSummary requested from {From} to {To}", from, to);
         var result = await _reportService.GetOrderSummaryReportAsync(from, to);
         return Ok(result);
@@ -52,24 +58,33 @@ public class ReportController : ControllerBase
     [HttpGet("menu/top-items")]
     public async Task<ActionResult<IEnumerable<TopSellingItemDto>>> GetTopSellingItems([FromQuery] int limit = 5)
     {
+        Validation.ValidateId(limit, nameof(limit), "Limit must be greater than zero.");
         _logger.LogInformation("GetTopSellingItems requested with limit: {Limit}", limit);
         var result = await _reportService.GetTopSellingItemsReportAsync(limit);
         return Ok(result);
     }
 
     [HttpGet("menu/category-performance")]
-    public async Task<ActionResult<IEnumerable<CategoryPerformanceDto>>> GetCategoryPerformance()
+    public async Task<ActionResult<IEnumerable<CategoryPerformanceDto>>> GetCategoryPerformance([FromQuery] DateTime? from, [FromQuery] DateTime? to)
     {
-        _logger.LogInformation("GetCategoryPerformance requested");
-        var result = await _reportService.GetCategoryPerformanceReportAsync();
+        if (from.HasValue && to.HasValue)
+        {
+            Validation.Require(to.Value >= from.Value, "End date ('to') cannot be earlier than start date ('from').", nameof(to));
+        }
+        _logger.LogInformation("GetCategoryPerformance requested from {From} to {To}", from, to);
+        var result = await _reportService.GetCategoryPerformanceReportAsync(from, to);
         return Ok(result);
     }
 
     [HttpGet("kitchen/sla")]
-    public async Task<ActionResult<KitchenSlaDto>> GetKitchenSla()
+    public async Task<ActionResult<KitchenSlaDto>> GetKitchenSla([FromQuery] DateTime? from, [FromQuery] DateTime? to)
     {
-        _logger.LogInformation("GetKitchenSla requested");
-        var result = await _reportService.GetKitchenSlaReportAsync();
+        if (from.HasValue && to.HasValue)
+        {
+            Validation.Require(to.Value >= from.Value, "End date ('to') cannot be earlier than start date ('from').", nameof(to));
+        }
+        _logger.LogInformation("GetKitchenSla requested from {From} to {To}", from, to);
+        var result = await _reportService.GetKitchenSlaReportAsync(from, to);
         return Ok(result);
     }
 

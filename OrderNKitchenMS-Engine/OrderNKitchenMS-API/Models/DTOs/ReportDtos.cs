@@ -47,6 +47,7 @@ public class KitchenSlaDto
     public int WithinSLA { get; set; }
     public int BreachedSLA { get; set; }
     public decimal SLAPercentage { get; set; }
+    public decimal AvgPrepTimeMinutes { get; set; }
 }
 
 public class TableTurnoverDto

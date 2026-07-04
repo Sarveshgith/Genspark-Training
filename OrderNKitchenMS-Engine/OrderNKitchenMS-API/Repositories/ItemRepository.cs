@@ -45,10 +45,23 @@ public class ItemRepository : IItemRepository
         return item;
     }
 
-    public Task UpdateAsync(Item item)
+    public async Task<Item?> UpdateAsync(int id, Item item)
     {
-        _context.Entry(item).State = EntityState.Modified;
-        return Task.CompletedTask;
+        var existingItem = await GetByIdAsync(id);
+        if (existingItem == null)
+        {
+            return null;
+        }
+
+        existingItem.Name = item.Name;
+        existingItem.Unit = item.Unit;
+        existingItem.StockQuantity = item.StockQuantity;
+        existingItem.StockThreshold = item.StockThreshold;
+        existingItem.CostPerUnit = item.CostPerUnit;
+        existingItem.IsActive = item.IsActive;
+
+        await _context.SaveChangesAsync();
+        return existingItem;
     }
 
     public async Task DeleteAsync(int id)
@@ -57,7 +70,7 @@ public class ItemRepository : IItemRepository
         if (item != null)
         {
             item.IsActive = false;
-            await UpdateAsync(item);
+            await _context.SaveChangesAsync();
         }
     }
 

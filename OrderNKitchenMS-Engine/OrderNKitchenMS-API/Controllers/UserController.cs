@@ -28,11 +28,7 @@ public class UserController : ControllerBase
     [HttpPut("{id:int}")]
     public async Task<ActionResult<UserDto>> UpdateUser(int id, [FromBody] UserUpdateDto userUpdateDto)
     {
-        if (userUpdateDto == null)
-        {
-            return BadRequest("User data is required.");
-        }
-
+        Validation.ValidateRequest(id, userUpdateDto);
         _logger.LogInformation("UpdateUser requested for ID: {Id}", id);
         var updatedUser = await _userService.UpdateAsync(id, userUpdateDto);
         _logger.LogInformation("UpdateUser completed for ID: {Id}", id);
@@ -43,6 +39,7 @@ public class UserController : ControllerBase
     [HttpPatch("{id:int}/approve")]
     public async Task<ActionResult<UserDto>> ApproveUser(int id)
     {
+        Validation.ValidateId(id);
         _logger.LogInformation("ApproveUser requested for ID: {Id}", id);
         var approvedUser = await _userService.ApproveUserAsync(id);
         _logger.LogInformation("ApproveUser completed for ID: {Id}", id);
@@ -53,11 +50,7 @@ public class UserController : ControllerBase
     [HttpPatch("{id:int}/role")]
     public async Task<ActionResult<UserDto>> UpdateUserRole(int id, [FromBody] UserRoleUpdateDto roleUpdateDto)
     {
-        if (roleUpdateDto == null)
-        {
-            return BadRequest("Role update data is required.");
-        }
-
+        Validation.ValidateRequest(id, roleUpdateDto);
         var currentUserId = User.GetUserId();
         if (currentUserId == id)
         {
@@ -95,6 +88,7 @@ public class UserController : ControllerBase
     [HttpGet("{id:int}")]
     public async Task<ActionResult<UserDto>> GetUserById(int id)
     {
+        Validation.ValidateId(id);
         _logger.LogInformation("GetUserById requested for ID: {Id}", id);
         var user = await _userService.GetByIdAsync(id);
         _logger.LogInformation("GetUserById completed for ID: {Id}", id);
@@ -114,11 +108,7 @@ public class UserController : ControllerBase
     [HttpPatch("{id:int}/password")]
     public async Task<ActionResult> ChangePassword(int id, [FromBody] ChangePasswordDto request)
     {
-        if (request == null)
-        {
-            return BadRequest("Password payload is required.");
-        }
-
+        Validation.ValidateRequest(id, request);
         _logger.LogInformation("ChangePassword requested for User ID: {Id}", id);
         Validation.RequireNonEmptyString(request.NewPassword, nameof(request.NewPassword), "Password is required.");
         Validation.RequireStrongPassword(request.NewPassword, nameof(request.NewPassword));
@@ -140,6 +130,7 @@ public class UserController : ControllerBase
     [HttpDelete("{id:int}")]
     public async Task<ActionResult> DeleteUser(int id)
     {
+        Validation.ValidateId(id);
         _logger.LogInformation("DeleteUser requested for ID: {Id}", id);
         await _userService.DeleteAsync(id);
         _logger.LogInformation("DeleteUser completed for ID: {Id}", id);

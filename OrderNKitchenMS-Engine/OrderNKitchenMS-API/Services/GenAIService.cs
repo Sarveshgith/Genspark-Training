@@ -1,14 +1,15 @@
 using Google.GenAI;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using OrderNKitchenMS_API.Services.Interfaces;
 
 namespace OrderNKitchenMS_API.Services;
 
-public class GenAIService
+public class GenAIService : IGenAIService
 {
     private readonly IConfiguration _configuration;
     private readonly ILogger<GenAIService> _logger;
-    private readonly string _apiKey = Environment.GetEnvironmentVariable("GEMINI_API_KEY") ?? throw new InvalidOperationException("GEMINI_API_KEY environment variable is not set.");
+    private readonly string? _apiKey = Environment.GetEnvironmentVariable("GEMINI_API_KEY");
 
     public GenAIService(IConfiguration configuration, ILogger<GenAIService> logger)
     {
@@ -18,6 +19,12 @@ public class GenAIService
 
     public async Task<string> GetDishStoryAsync(string dishName)
     {
+        if (string.IsNullOrWhiteSpace(_apiKey))
+        {
+            _logger.LogWarning("GEMINI_API_KEY environment variable is not set. Utilizing local fallback story for '{DishName}'.", dishName);
+            return GetLocalFallbackStory(dishName);
+        }
+
         try
         {
             using var client = new Client(apiKey: _apiKey);

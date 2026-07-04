@@ -90,6 +90,18 @@ public static class Validation
         }
     }
 
+    public static void ValidateId(int id, string paramName = "id", string message = "Invalid ID. Must be greater than zero.")
+    {
+        if (id <= 0)
+            throw new ArgumentException(message, paramName);
+    }
+
+    public static void ValidateRequest<TDto>(int id, TDto? dto, string idParamName = "id", string dtoParamName = "dto") where TDto : class
+    {
+        ValidateId(id, idParamName, $"Invalid {idParamName}. Must be greater than zero.");
+        RequireNotNull(dto, dtoParamName, $"{dtoParamName} payload is required.");
+    }
+
     public static void RequireValidEnum<TEnum>(int value, string paramName, string message = "Invalid enum value.") where TEnum : struct, Enum
     {
         if (!Enum.IsDefined(typeof(TEnum), value))

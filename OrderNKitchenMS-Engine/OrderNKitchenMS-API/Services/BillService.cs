@@ -109,15 +109,25 @@ public class BillService : IBillService
 
         var subTotal = order.OrderItems.Sum(oi => oi.UnitPrice * oi.Quantity);
 
-        var updatedBill = MapBillCreateDtoToEntity(order, billCreateDto, subTotal);
-        var bill = await _billRepository.UpdateBillAsync(id, updatedBill);
-        if (bill == null)
+        var billEntity = new Bill
+        {
+            OrderId = billCreateDto.OrderId,
+            SubTotal = subTotal,
+            TaxRate = billCreateDto.TaxRate,
+            DiscountAmount = billCreateDto.DiscountAmount,
+            TotalAmount = subTotal + (subTotal * billCreateDto.TaxRate / 100m) - billCreateDto.DiscountAmount,
+            Status = BillStatus.Pending
+        };
+
+        var updatedBill = await _billRepository.UpdateBillAsync(id, billEntity);
+        if (updatedBill == null)
         {
             _logger.LogWarning("UpdateBillAsync failed: Bill with ID {Id} not found.", id);
             throw new NotFoundException($"Bill with ID {id} not found.");
         }
+
         _logger.LogInformation("UpdateBillAsync succeeded for Bill ID: {Id}", id);
-        return MapBillToDto(bill);
+        return MapBillToDto(updatedBill);
     }
 
     // Updates the status of a specific bill (e.g., Pending to Paid or Failed).
@@ -150,31 +160,29 @@ public class BillService : IBillService
             throw new BusinessRuleException($"Invalid status transition. A pending bill can only transition to 'Paid' or 'Failed'.");
         }
 
-        if(parsedStatus == BillStatus.Paid)
+        var isChanged = await _billRepository.UpdateStatusAsync(billId, parsedStatus);
+        if (!isChanged)
+        {
+            _logger.LogWarning("UpdateBillStatusAsync failed: Bill with ID {BillId} not found during update status.", billId);
+            throw new NotFoundException($"Bill with ID {billId} not found.");
+        }
+
+        if (parsedStatus == BillStatus.Paid)
         {
             _logger.LogInformation("Bill ID {BillId} is paid. Updating Order ID {OrderId} status to Completed.", billId, bill.OrderId);
             // When a bill is marked as Paid, we can also update the associated order status to Completed.
             await _orderService.UpdateOrderStatusAsync(bill.OrderId, (int)OrderStatus.Completed);
-        }
 
-        var result = await _billRepository.UpdateStatusAsync(billId, parsedStatus);
-        _logger.LogInformation("UpdateBillStatusAsync completed for Bill ID {BillId}. Success: {Result}", billId, result);
-
-        if (result && parsedStatus == BillStatus.Paid)
-        {
-            var updatedBill = await _billRepository.GetByIdAsync(billId);
-            if (updatedBill != null)
+            var order = await _orderService.GetOrderByIdAsync(bill.OrderId);
+            if (order != null)
             {
-                var order = await _orderService.GetOrderByIdAsync(updatedBill.OrderId);
-                if (order != null)
-                {
-                    var billDto = MapBillToDto(updatedBill);
-                    await _signalService.NotifyBillPaidAsync(order.TableId, billDto);
-                }
+                var billDto = MapBillToDto(bill);
+                await _signalService.NotifyBillPaidAsync(order.TableId, billDto);
             }
         }
 
-        return result;
+        _logger.LogInformation("UpdateBillStatusAsync completed for Bill ID {BillId}.", billId);
+        return true;
     }
 
     // Generates a PDF document for a bill.

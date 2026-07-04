@@ -1,6 +1,6 @@
 // @feature Backend API | GenAI Service Endpoint | Integrates with Gemini AI to generate stories, facts, and trivia regarding specific dishes.
 using Microsoft.AspNetCore.Mvc;
-using OrderNKitchenMS_API.Services;
+using OrderNKitchenMS_API.Services.Interfaces;
 
 namespace OrderNKitchenMS_API.Controllers;
 
@@ -8,9 +8,9 @@ namespace OrderNKitchenMS_API.Controllers;
 [Route("api/genai")]
 public class GenAIController : ControllerBase
 {
-    private readonly GenAIService _genAIService;
+    private readonly IGenAIService _genAIService;
 
-    public GenAIController(GenAIService genAIService)
+    public GenAIController(IGenAIService genAIService)
     {
         _genAIService = genAIService;
     }

@@ -5,6 +5,7 @@ using OrderNKitchenMS_API.Exceptions;
 using OrderNKitchenMS_API.Models.DTOs;
 using OrderNKitchenMS_API.Repositories.Interfaces;
 using OrderNKitchenMS_API.Services.Interfaces;
+using OrderNKitchenMS_API.Utils;
 
 namespace OrderNKitchenMS_API.Services;
 
@@ -24,39 +25,33 @@ public class ReportService : IReportService
 
     public async Task<IEnumerable<RangeRevenueDto>> GetRangeRevenueReportAsync(DateTime fromDate, DateTime toDate)
     {
-        if (fromDate > toDate)
-        {
-            throw new BusinessRuleException("From date cannot be after To date.");
-        }
+        Validation.Require(toDate >= fromDate, "From date cannot be after To date.", nameof(fromDate));
         return await _reportRepository.GetRangeRevenueAsync(fromDate, toDate);
     }
 
     public async Task<OrderSummaryDto> GetOrderSummaryReportAsync(DateTime? fromDate, DateTime? toDate)
     {
-        if (fromDate.HasValue && toDate.HasValue && fromDate.Value > toDate.Value)
+        if (fromDate.HasValue && toDate.HasValue)
         {
-            throw new BusinessRuleException("From date cannot be after To date.");
+            Validation.Require(toDate.Value >= fromDate.Value, "From date cannot be after To date.", nameof(fromDate));
         }
         return await _reportRepository.GetOrderSummaryAsync(fromDate, toDate);
     }
 
     public async Task<IEnumerable<TopSellingItemDto>> GetTopSellingItemsReportAsync(int limit)
     {
-        if (limit <= 0)
-        {
-            throw new BusinessRuleException("Limit must be greater than zero.");
-        }
+        Validation.ValidateId(limit, nameof(limit), "Limit must be greater than zero.");
         return await _reportRepository.GetTopSellingItemsAsync(limit);
     }
 
-    public async Task<IEnumerable<CategoryPerformanceDto>> GetCategoryPerformanceReportAsync()
+    public async Task<IEnumerable<CategoryPerformanceDto>> GetCategoryPerformanceReportAsync(DateTime? fromDate, DateTime? toDate)
     {
-        return await _reportRepository.GetCategoryPerformanceAsync();
+        return await _reportRepository.GetCategoryPerformanceAsync(fromDate, toDate);
     }
 
-    public async Task<KitchenSlaDto> GetKitchenSlaReportAsync()
+    public async Task<KitchenSlaDto> GetKitchenSlaReportAsync(DateTime? fromDate, DateTime? toDate)
     {
-        return await _reportRepository.GetKitchenSlaAsync();
+        return await _reportRepository.GetKitchenSlaAsync(fromDate, toDate);
     }
 
     public async Task<IEnumerable<TableTurnoverDto>> GetTableTurnoverReportAsync(DateTime date)

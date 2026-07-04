@@ -7,6 +7,8 @@ using OrderNKitchenMS_API.Services.Interfaces;
 using OrderNKitchenMS_API.Utils;
 using Microsoft.Extensions.Logging;
 
+using OrderNKitchenMS_API.Data;
+
 namespace OrderNKitchenMS_API.Services;
 
 public class MenuService : IMenuService
@@ -15,17 +17,20 @@ public class MenuService : IMenuService
     private readonly ICategoryRepository _categoryRepository;
     private readonly IItemService _itemService;
     private readonly ILogger<MenuService> _logger;
+    private readonly AppDbContext _context;
 
     public MenuService(
         IMenuItemRepository menuItemRepository, 
         ICategoryRepository categoryRepository, 
         IItemService itemService,
-        ILogger<MenuService> logger)
+        ILogger<MenuService> logger,
+        AppDbContext context)
     {
         _menuItemRepository = menuItemRepository;
         _categoryRepository = categoryRepository;
         _itemService = itemService;
         _logger = logger;
+        _context = context;
     }
 
     // Retrieves a filtered, paginated list of menu items.
@@ -116,22 +121,29 @@ public class MenuService : IMenuService
         await EnsureCategoryExists(menuItemUpdateDto.CategoryId);
         await EnsureUniqueNameAsync(menuItemUpdateDto.Name, id);
 
-        var menuItemEntity = MapUpdateDtoToEntity(menuItemUpdateDto);
-        var updatedMenuItem = await _menuItemRepository.UpdateAsync(id, menuItemEntity);
-        if (updatedMenuItem == null)
+        var existingMenuItem = await _menuItemRepository.GetByIdAsync(id);
+        if (existingMenuItem == null)
         {
             _logger.LogWarning("UpdateAsync failed: Menu Item with ID {Id} was not found.", id);
             throw new NotFoundException($"Menu item with id {id} was not found.");
         }
 
+        existingMenuItem.Name = menuItemUpdateDto.Name;
+        existingMenuItem.Description = menuItemUpdateDto.Description;
+        existingMenuItem.Price = menuItemUpdateDto.Price;
+        existingMenuItem.CategoryId = menuItemUpdateDto.CategoryId;
+        existingMenuItem.ImageUrl = menuItemUpdateDto.ImageUrl;
+        existingMenuItem.PreparationTime = menuItemUpdateDto.PreparationTime;
+        existingMenuItem.IsAvailable = menuItemUpdateDto.IsAvailable;
+
+        await _menuItemRepository.UpdateAsync(id, existingMenuItem);
         _logger.LogInformation("UpdateAsync succeeded for Menu Item ID: {Id}", id);
-        return MapMenuItemToDto(updatedMenuItem);
+        return MapMenuItemToDto(existingMenuItem);
     }
 
     private async Task EnsureUniqueNameAsync(string name, int? excludeId = null)
     {
-        var menuItems = await _menuItemRepository.GetAllAsync();
-        var exists = await menuItems.AnyAsync(m => m.Name == name && (!excludeId.HasValue || m.Id != excludeId.Value));
+        var exists = await _context.MenuItems.AnyAsync(m => !m.IsDeleted && m.Name == name && (!excludeId.HasValue || m.Id != excludeId.Value));
         if (exists)
         {
             throw new ConflictException($"Menu item with name '{name}' already exists.");
@@ -165,7 +177,10 @@ public class MenuService : IMenuService
             menuItem.IsManuallyDisabled = true;
         }
 
+        await _menuItemRepository.ToggleAvailabilityAsync(id, isAvailable);
+        // Force the DB tracked entity changes (like IsManuallyDisabled) to save as well
         await _menuItemRepository.UpdateAsync(id, menuItem);
+
         _logger.LogInformation("ToggleAvailabilityAsync succeeded for Menu Item ID: {Id}", id);
         return true;
     }
@@ -174,17 +189,12 @@ public class MenuService : IMenuService
     public async Task<bool> DeleteAsync(int id)
     {
         _logger.LogInformation("DeleteAsync started for Menu Item ID: {Id}", id);
-        var menuItem = await _menuItemRepository.GetByIdAsync(id);
-        if (menuItem == null)
+        var isDeleted = await _menuItemRepository.DeleteAsync(id);
+        if (!isDeleted)
         {
             _logger.LogWarning("DeleteAsync failed: Menu Item with ID {Id} was not found.", id);
             throw new NotFoundException($"Menu item with id {id} was not found.");
         }
-
-        menuItem.IsAvailable = false;
-        menuItem.IsManuallyDisabled = true;
-        menuItem.IsDeleted = true;
-        await _menuItemRepository.UpdateAsync(id, menuItem);
 
         _logger.LogInformation("DeleteAsync succeeded for Menu Item ID: {Id}", id);
         return true;

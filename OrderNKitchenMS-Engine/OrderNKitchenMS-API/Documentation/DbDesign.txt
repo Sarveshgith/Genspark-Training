@@ -6,7 +6,7 @@ Roles Table
     [ENUM: Admin = 1, Customer = 2, Chef = 3, Deliveryman = 4, Waiter = 5]
 
 Tables Table
-    Id (PK), Number (Unique), Status, Capacity, IsDeleted, CreatedAt, UpdatedAt
+    Id (PK), Number (Unique), Status, Capacity, Secret, IsDeleted, CreatedAt, UpdatedAt
     [ENUM: Available = 1, Occupied = 2, Reserved = 3]
 
 Categories Table

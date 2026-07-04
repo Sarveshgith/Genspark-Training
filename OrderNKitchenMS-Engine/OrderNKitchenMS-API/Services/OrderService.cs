@@ -66,7 +66,7 @@ public class OrderService : IOrderService
 
         const int averagePrepTimePerOrder = 10;
 
-        return DateTime.UtcNow.AddMinutes((activeOrdersAheadCount * averagePrepTimePerOrder) + currentOrderPrepTime);
+        return createdAt.AddMinutes((activeOrdersAheadCount * averagePrepTimePerOrder) + currentOrderPrepTime);
     }
 
     // Creates a new order for a table with the specified items.
@@ -278,8 +278,11 @@ public class OrderService : IOrderService
             await _itemService.UpdateStockByMenuItemIdAsync(orderItem.MenuItemId, orderItem.Quantity, true);
 
             // Delete order item
-            await _orderItemRepository.DeleteAsync(orderItemId);
-            await _context.SaveChangesAsync();
+            var isDeleted = await _orderItemRepository.DeleteAsync(orderItemId);
+            if (!isDeleted)
+            {
+                throw new NotFoundException($"Order item with id {orderItemId} was not found.");
+            }
 
             await transaction.CommitAsync();
 
@@ -369,7 +372,7 @@ public class OrderService : IOrderService
                         Notes = orderItemCreateDto.Notes?.Trim() ?? string.Empty
                     };
 
-                    await _orderItemRepository.AddAsync(orderItemEntity);
+                    await _orderRepository.AddMenuItemAsync(orderId, orderItemEntity);
                 }
 
                 order.TotalAmount += totalPrice;
@@ -426,15 +429,25 @@ public class OrderService : IOrderService
         }
 
         var isChanged = await _orderRepository.UpdateStatusAsync(orderId, newStatus);
-        _logger.LogInformation("UpdateOrderStatusAsync succeeded. OrderId: {OrderId} status changed to: {Status}", orderId, newStatus);
-
-        var trackingInfo = newStatus switch
+        if (!isChanged)
         {
-            OrderStatus.Cancelled => MapToGuestOrderTrackingDto(order, "Cancelled"),
-            OrderStatus.Completed => MapToGuestOrderTrackingDto(order, "Completed"),
-            _ => await GetGuestOrderTrackingAsync(order.TableId)
-        };
-        await SafeNotifyOrderUpdateAsync(order, "status update", trackingInfo);
+            _logger.LogWarning("UpdateOrderStatusAsync failed: Order with ID {OrderId} not found during status update.", orderId);
+            throw new NotFoundException($"Order with id {orderId} was not found.");
+        }
+
+        var updatedOrder = await _orderRepository.GetByIdAsync(orderId);
+        if (updatedOrder != null)
+        {
+            _logger.LogInformation("UpdateOrderStatusAsync succeeded. OrderId: {OrderId} status changed to: {Status}", orderId, newStatus);
+
+            var trackingInfo = newStatus switch
+            {
+                OrderStatus.Cancelled => MapToGuestOrderTrackingDto(updatedOrder, "Cancelled"),
+                OrderStatus.Completed => MapToGuestOrderTrackingDto(updatedOrder, "Completed"),
+                _ => await GetGuestOrderTrackingAsync(updatedOrder.TableId)
+            };
+            await SafeNotifyOrderUpdateAsync(updatedOrder, "status update", trackingInfo);
+        }
 
         return true;
     }

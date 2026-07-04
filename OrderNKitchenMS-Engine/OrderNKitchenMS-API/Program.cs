@@ -146,7 +146,7 @@ builder.Services.AddScoped<IReportService, ReportService>();
 
 builder.Services.AddScoped<ISignalService, SignalService>();
 
-builder.Services.AddScoped<GenAIService>();
+builder.Services.AddScoped<IGenAIService, GenAIService>();
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();

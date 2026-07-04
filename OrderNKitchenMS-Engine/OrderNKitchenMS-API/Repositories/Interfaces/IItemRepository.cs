@@ -10,7 +10,7 @@ public interface IItemRepository
     Task<Item?> GetByIdAsync(int id);
     Task<IEnumerable<Item>> GetLowStockItemsAsync();
     Task<Item> CreateAsync(Item item);
-    Task UpdateAsync(Item item);
+    Task<Item?> UpdateAsync(int id, Item item);
     Task DeleteAsync(int id);
     Task SaveChangesAsync();
 }

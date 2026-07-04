@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OrderNKitchenMS_API.Models.DTOs;
 using OrderNKitchenMS_API.Services.Interfaces;
+using Microsoft.Extensions.Logging;
+using OrderNKitchenMS_API.Utils;
 
 namespace OrderNKitchenMS_API.Controllers;
 
@@ -11,15 +13,20 @@ namespace OrderNKitchenMS_API.Controllers;
 public class BillController : ControllerBase
 {
     private readonly IBillService _billService;
-    public BillController(IBillService billService)
+    private readonly ILogger<BillController> _logger;
+
+    public BillController(IBillService billService, ILogger<BillController> logger)
     {
         _billService = billService;
+        _logger = logger;
     }
 
     [Authorize(Policy = "AdminOrWaiter")]
     [HttpPost]
     public async Task<ActionResult<BillDto>> CreateBill([FromBody] BillCreateDto billCreateDto)
     {
+        Validation.RequireNotNull(billCreateDto, nameof(billCreateDto));
+        _logger.LogInformation("CreateBill requested for Order ID: {OrderId}", billCreateDto.OrderId);
         var billDto = await _billService.CreateBillAsync(billCreateDto);
         return Ok(billDto);
     }
@@ -28,6 +35,7 @@ public class BillController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<BillDto>>> GetAllBills()
     {
+        _logger.LogInformation("GetAllBills requested.");
         var bills = await _billService.GetAllBillsAsync();
         return Ok(bills);
     }
@@ -36,6 +44,8 @@ public class BillController : ControllerBase
     [HttpGet("order/{orderId:int}")]
     public async Task<ActionResult<BillDto>> GetBillByOrderId(int orderId)
     {
+        Validation.ValidateId(orderId, nameof(orderId));
+        _logger.LogInformation("GetBillByOrderId requested for Order ID: {OrderId}", orderId);
         var bill = await _billService.GetBillByOrderIdAsync(orderId);
         return Ok(bill);
     }
@@ -44,6 +54,8 @@ public class BillController : ControllerBase
     [HttpPut("{id:int}")]
     public async Task<ActionResult<BillDto>> UpdateBill(int id, [FromBody] BillCreateDto billCreateDto)
     {
+        Validation.ValidateRequest(id, billCreateDto);
+        _logger.LogInformation("UpdateBill requested for Bill ID: {Id}", id);
         var updatedBill = await _billService.UpdateBillAsync(id, billCreateDto);
         return Ok(updatedBill);
     }
@@ -52,6 +64,9 @@ public class BillController : ControllerBase
     [HttpPatch("{id:int}/status")]
     public async Task<IActionResult> UpdateBillStatus(int id, [FromBody] string status)
     {
+        Validation.ValidateId(id);
+        Validation.RequireNonEmptyString(status, nameof(status), "Status cannot be empty.");
+        _logger.LogInformation("UpdateBillStatus requested for Bill ID: {Id}, Status: '{Status}'", id, status);
         await _billService.UpdateBillStatusAsync(id, status);
         return NoContent();
     }
@@ -60,6 +75,8 @@ public class BillController : ControllerBase
     [HttpGet("order/{orderid:int}/pdf")]
     public async Task<IActionResult> GenerateBillPdf(int orderid)
     {
+        Validation.ValidateId(orderid, nameof(orderid));
+        _logger.LogInformation("GenerateBillPdf requested for Order ID: {OrderId}", orderid);
         var pdfBytes = await _billService.GenerateBillPdfAsync(orderid);
         return File(pdfBytes, "application/pdf", $"Bill_Order_{orderid}.pdf");
     }

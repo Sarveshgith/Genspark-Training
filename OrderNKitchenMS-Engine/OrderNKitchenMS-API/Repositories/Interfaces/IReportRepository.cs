@@ -11,7 +11,7 @@ public interface IReportRepository
     Task<IEnumerable<RangeRevenueDto>> GetRangeRevenueAsync(DateTime fromDate, DateTime toDate);
     Task<OrderSummaryDto> GetOrderSummaryAsync(DateTime? fromDate, DateTime? toDate);
     Task<IEnumerable<TopSellingItemDto>> GetTopSellingItemsAsync(int limit);
-    Task<IEnumerable<CategoryPerformanceDto>> GetCategoryPerformanceAsync();
-    Task<KitchenSlaDto> GetKitchenSlaAsync();
+    Task<IEnumerable<CategoryPerformanceDto>> GetCategoryPerformanceAsync(DateTime? fromDate, DateTime? toDate);
+    Task<KitchenSlaDto> GetKitchenSlaAsync(DateTime? fromDate, DateTime? toDate);
     Task<IEnumerable<TableTurnoverDto>> GetTableTurnoverAsync(DateTime date);
 }

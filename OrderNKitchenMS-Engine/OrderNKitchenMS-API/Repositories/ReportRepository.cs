@@ -141,15 +141,18 @@ public class ReportRepository : IReportRepository
         return list;
     }
 
-    public async Task<IEnumerable<CategoryPerformanceDto>> GetCategoryPerformanceAsync()
+    public async Task<IEnumerable<CategoryPerformanceDto>> GetCategoryPerformanceAsync(DateTime? fromDate, DateTime? toDate)
     {
         const string query = @"
             SELECT ""CategoryName"", ""OrderCount"", ""TotalRevenue""
-            FROM vw_category_performance
-            ORDER BY ""TotalRevenue"" DESC;";
+            FROM fn_category_performance(@fromDate::DATE, @toDate::DATE);";
 
         var list = new List<CategoryPerformanceDto>();
-        using var command = await CreateCommandAsync(query, new());
+        using var command = await CreateCommandAsync(query, new()
+        {
+            { "@fromDate", (object?)fromDate?.Date ?? DBNull.Value },
+            { "@toDate", (object?)toDate?.Date ?? DBNull.Value }
+        });
         using var reader = await command.ExecuteReaderAsync();
         while (await reader.ReadAsync())
         {
@@ -163,13 +166,17 @@ public class ReportRepository : IReportRepository
         return list;
     }
 
-    public async Task<KitchenSlaDto> GetKitchenSlaAsync()
+    public async Task<KitchenSlaDto> GetKitchenSlaAsync(DateTime? fromDate, DateTime? toDate)
     {
         const string query = @"
-            SELECT ""WithinSLA"", ""BreachedSLA"", ""SLAPercentage""
-            FROM vw_kitchen_sla;";
+            SELECT ""WithinSLA"", ""BreachedSLA"", ""SLAPercentage"", ""AvgPrepTimeMinutes""
+            FROM fn_kitchen_sla(@fromDate::DATE, @toDate::DATE);";
 
-        using var command = await CreateCommandAsync(query, new());
+        using var command = await CreateCommandAsync(query, new()
+        {
+            { "@fromDate", (object?)fromDate?.Date ?? DBNull.Value },
+            { "@toDate", (object?)toDate?.Date ?? DBNull.Value }
+        });
         using var reader = await command.ExecuteReaderAsync();
         if (await reader.ReadAsync())
         {
@@ -177,7 +184,8 @@ public class ReportRepository : IReportRepository
             {
                 WithinSLA = reader.GetInt32(0),
                 BreachedSLA = reader.GetInt32(1),
-                SLAPercentage = reader.GetDecimal(2)
+                SLAPercentage = reader.GetDecimal(2),
+                AvgPrepTimeMinutes = reader.GetDecimal(3)
             };
         }
         return new KitchenSlaDto();

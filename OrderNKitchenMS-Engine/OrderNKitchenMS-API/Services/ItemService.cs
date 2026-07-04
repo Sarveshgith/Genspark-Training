@@ -107,39 +107,35 @@ public class ItemService : IItemService
             Validation.Require(dto.CostPerUnit.Value >= 0, "Cost per unit must be greater than or equal to 0.", nameof(dto.CostPerUnit));
         }
 
-        var item = await _itemRepository.GetByIdAsync(id);
-        if (item == null)
-        {
-            throw new NotFoundException($"Item with ID {id} was not found.");
-        }
-
         var trimmedName = dto.Name.Trim();
         await EnsureUniqueNameAsync(trimmedName, id);
 
-        item.Name = trimmedName;
-        item.Unit = dto.Unit;
-        item.StockQuantity = dto.StockQuantity;
-        if (dto.StockThreshold.HasValue)
+        var itemEntity = new Item
         {
-            item.StockThreshold = dto.StockThreshold.Value;
-        }
-        item.CostPerUnit = dto.CostPerUnit;
-        item.IsActive = dto.IsActive;
+            Name = trimmedName,
+            Unit = dto.Unit,
+            StockQuantity = dto.StockQuantity,
+            StockThreshold = dto.StockThreshold ?? 0,
+            CostPerUnit = dto.CostPerUnit,
+            IsActive = dto.IsActive
+        };
 
-        await _itemRepository.UpdateAsync(item);
-        await _itemRepository.SaveChangesAsync();
+        var updated = await _itemRepository.UpdateAsync(id, itemEntity);
+        if (updated == null)
+        {
+            throw new NotFoundException($"Item with ID {id} was not found.");
+        }
 
         // Stock quantity could have changed, re-evaluate all menu items using this item
         await ReevaluateAffectedMenuItemsAsync(id);
 
         _logger.LogInformation("UpdateItemAsync succeeded for Item ID: {Id}", id);
-        return MapToDto(item);
+        return MapToDto(updated);
     }
 
     private async Task EnsureUniqueNameAsync(string name, int? excludeId = null)
     {
-        var items = await _itemRepository.GetAllAsync();
-        var exists = items.Any(i => i.IsActive && i.Name == name && (!excludeId.HasValue || i.Id != excludeId.Value));
+        var exists = await _context.Items.AnyAsync(i => i.IsActive && i.Name == name && (!excludeId.HasValue || i.Id != excludeId.Value));
         if (exists)
         {
             throw new ConflictException($"Inventory item with name '{name}' already exists.");
@@ -159,8 +155,7 @@ public class ItemService : IItemService
         }
 
         item.StockQuantity += dto.Quantity;
-        await _itemRepository.UpdateAsync(item);
-        await _itemRepository.SaveChangesAsync();
+        await _itemRepository.UpdateAsync(id, item);
 
         // Re-evaluate affected menu items
         await ReevaluateAffectedMenuItemsAsync(id);
@@ -172,15 +167,20 @@ public class ItemService : IItemService
     public async Task ChangeItemStatusAsync(int id, bool isActive)
     {
         _logger.LogInformation("ChangeItemStatusAsync started for Item ID: {Id}, IsActive: {IsActive}", id, isActive);
-        var item = await _itemRepository.GetByIdAsync(id);
-        if (item == null)
+        if (!isActive)
         {
-            throw new NotFoundException($"Item with ID {id} was not found.");
+            await _itemRepository.DeleteAsync(id);
         }
-
-        item.IsActive = isActive;
-        await _itemRepository.UpdateAsync(item);
-        await _itemRepository.SaveChangesAsync();
+        else
+        {
+            var item = await _itemRepository.GetByIdAsync(id);
+            if (item == null)
+            {
+                throw new NotFoundException($"Item with ID {id} was not found.");
+            }
+            item.IsActive = true;
+            await _itemRepository.UpdateAsync(id, item);
+        }
 
         // Re-evaluate affected menu items
         await ReevaluateAffectedMenuItemsAsync(id);
@@ -214,14 +214,18 @@ public class ItemService : IItemService
         // Validate items exist and no duplicate in database or input list
         var existingIngredients = await _ingredientRepository.GetByMenuItemIdAsync(menuItemId);
         var existingItemIds = existingIngredients.Select(i => i.ItemId).ToHashSet();
-        var inputItemIds = new HashSet<int>();
+        
+        var itemIds = dtos.Select(dto => dto.ItemId).Distinct().ToList();
+        var items = await _context.Items
+            .Where(i => itemIds.Contains(i.Id) && i.IsActive)
+            .ToDictionaryAsync(i => i.Id);
 
+        var inputItemIds = new HashSet<int>();
         var newMappings = new List<MenuItemIngredient>();
 
         foreach (var dto in dtos)
         {
-            var item = await _itemRepository.GetByIdAsync(dto.ItemId);
-            if (item == null)
+            if (!items.TryGetValue(dto.ItemId, out var item))
             {
                 throw new NotFoundException($"Ingredient item with ID {dto.ItemId} was not found.");
             }
@@ -264,14 +268,18 @@ public class ItemService : IItemService
             throw new NotFoundException($"Menu item with ID {menuItemId} was not found.");
         }
 
+        var itemIds = dtos.Select(dto => dto.ItemId).Distinct().ToList();
+        var items = await _context.Items
+            .Where(i => itemIds.Contains(i.Id) && i.IsActive)
+            .ToDictionaryAsync(i => i.Id);
+
         // Validate input items exist and no duplicate in input list
         var inputItemIds = new HashSet<int>();
         var itemsMap = new Dictionary<int, Item>();
 
         foreach (var dto in dtos)
         {
-            var item = await _itemRepository.GetByIdAsync(dto.ItemId);
-            if (item == null)
+            if (!items.TryGetValue(dto.ItemId, out var item))
             {
                 throw new NotFoundException($"Ingredient item with ID {dto.ItemId} was not found.");
             }
@@ -397,30 +405,23 @@ public class ItemService : IItemService
                 var affected = await _context.Database.ExecuteSqlInterpolatedAsync(
                     $"UPDATE \"Items\" SET \"StockQuantity\" = \"StockQuantity\" + {requiredQuantity}, \"UpdatedAt\" = {DateTime.UtcNow} WHERE \"Id\" = {ingredient.ItemId}");
                 if (affected == 0)
-                {
                     throw new BusinessRuleException($"Item not found: {ingredient.Item.Name}");
-                }
             }
             else
             {
                 var affected = await _context.Database.ExecuteSqlInterpolatedAsync(
                     $"UPDATE \"Items\" SET \"StockQuantity\" = \"StockQuantity\" - {requiredQuantity}, \"UpdatedAt\" = {DateTime.UtcNow} WHERE \"Id\" = {ingredient.ItemId} AND CAST(\"StockQuantity\" AS NUMERIC) >= {requiredQuantity}");
                 if (affected == 0)
-                {
                     throw new BusinessRuleException($"Insufficient stock for item: {ingredient.Item.Name}");
-                }
             }
         }
 
         // Re-evaluate affected menu items. Since we updated the stock of these ingredients,
         // we must re-evaluate all menu items that depend on any of these ingredient items.
         var affectedItemIds = mappedList.Select(m => m.ItemId).Distinct().ToList();
-        var allAffectedMappings = new List<MenuItemIngredient>();
-        foreach (var itemId in affectedItemIds)
-        {
-            var mappings = await _ingredientRepository.GetByItemIdAsync(itemId);
-            allAffectedMappings.AddRange(mappings);
-        }
+        var allAffectedMappings = await _context.MenuItemIngredients
+            .Where(mi => affectedItemIds.Contains(mi.ItemId))
+            .ToListAsync();
 
         var uniqueMenuItemIds = allAffectedMappings.Select(m => m.MenuItemId).Distinct().ToList();
         foreach (var affectedMenuItemId in uniqueMenuItemIds)
@@ -462,7 +463,7 @@ public class ItemService : IItemService
             menuItem.IsAvailable = false;
         }
 
-        await _menuItemRepository.UpdateAsync(menuItemId, menuItem);
+        await _menuItemRepository.UpdateAsync(menuItem.Id, menuItem);
     }
 
     private async Task ReevaluateAffectedMenuItemsAsync(int itemId)

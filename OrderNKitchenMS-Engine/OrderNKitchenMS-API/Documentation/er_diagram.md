@@ -31,7 +31,7 @@ erDiagram
 
     ROLES {
         int Id PK
-        int Name "UserRole Enum (Admin=1, Customer=2, Chef=3, Deliveryman=4)"
+        int Name "UserRole Enum (Admin=1, Customer=2, Chef=3, Deliveryman=4, Waiter=5)"
         DateTime CreatedAt
         DateTime UpdatedAt
     }
@@ -41,6 +41,7 @@ erDiagram
         int Number "Unique Table Number"
         int Status "TableStatus Enum (Available=1, Occupied=2, Reserved=3)"
         int Capacity
+        string Secret "Unique QR Secret Code"
         bool IsDeleted
         DateTime CreatedAt
         DateTime UpdatedAt
@@ -130,7 +131,7 @@ erDiagram
 
 ### 1. Roles
 Defines the authorization role levels inside the system.
-* **Id**: Primary Key (1 = Admin, 2 = Customer, 3 = Chef, 4 = Deliveryman).
+* **Id**: Primary Key (1 = Admin, 2 = Customer, 3 = Chef, 4 = Deliveryman, 5 = Waiter).
 * **Name**: `UserRole` enum representing the name of the role.
 
 ### 2. Users
@@ -142,6 +143,7 @@ User accounts for customers, admins, chefs, and delivery personnel.
 Physical dining tables available in the restaurant.
 * **Number**: Unique number assigned to the table.
 * **Status**: `TableStatus` enum indicating whether the table is Available (1), Occupied (2), or Reserved (3).
+* **Secret**: Unique security string used to generate table-bound QR codes and guest session tokens.
 
 ### 4. Categories
 Food/drink classification categories (e.g., Starters, Main Course, Beverages).

@@ -88,9 +88,8 @@ public class CategoryService : ICategoryService
 
     private async Task EnsureUniqueNameAsync(string name, bool isNonVeg, int? excludeId = null)
     {
-        var categories = await _categoryRepository.GetAllAsync();
+        var categories = await _categoryRepository.GetAllAsync(isNonVeg);
         var exists = categories.Any(c => c.Name.Equals(name.Trim(), StringComparison.OrdinalIgnoreCase) 
-                                         && c.IsNonVeg == isNonVeg 
                                          && (!excludeId.HasValue || c.Id != excludeId.Value));
         if (exists)
         {

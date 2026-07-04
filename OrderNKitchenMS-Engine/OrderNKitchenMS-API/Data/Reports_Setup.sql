@@ -55,6 +55,8 @@ $$ LANGUAGE plpgsql;
 
 
 -- 4. Top Selling Items View (vw_top_selling_items)
+-- Used as a master lookup for category names across all time.
+-- Date-filtered top-selling computation is done in the frontend from raw orders.
 -- GET /api/reports/menu/top-items?limit=N
 CREATE OR REPLACE VIEW vw_top_selling_items AS
 SELECT 
@@ -70,52 +72,90 @@ WHERE o."Status" = 5 -- Completed
 GROUP BY mi."Name", c."Name";
 
 
--- 5. Category Performance View (vw_category_performance)
--- GET /api/reports/menu/category-performance
-CREATE OR REPLACE VIEW vw_category_performance AS
-SELECT 
-    c."Name" AS "CategoryName",
-    COUNT(DISTINCT o."Id")::INT AS "OrderCount",
-    COALESCE(SUM(oi."Quantity" * oi."UnitPrice"), 0.0)::DECIMAL(18,2) AS "TotalRevenue"
-FROM "Categories" c
-LEFT JOIN "MenuItems" mi ON mi."CategoryId" = c."Id"
-LEFT JOIN "OrderItems" oi ON oi."MenuItemId" = mi."Id"
-LEFT JOIN "Orders" o ON oi."OrderId" = o."Id" AND o."Status" = 5
-GROUP BY c."Name";
+-- 5. Category Performance Function (fn_category_performance)
+-- Date-filtered category breakdown used for the Category Sales card.
+-- Replaces the former vw_category_performance view.
+-- GET /api/reports/menu/category-performance?from=YYYY-MM-DD&to=YYYY-MM-DD
+CREATE OR REPLACE FUNCTION fn_category_performance(p_from DATE DEFAULT NULL, p_to DATE DEFAULT NULL)
+RETURNS TABLE (
+    "CategoryName" TEXT,
+    "OrderCount" INT,
+    "TotalRevenue" DECIMAL(18,2)
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT 
+        c."Name"::TEXT AS "CategoryName",
+        COUNT(DISTINCT o."Id")::INT AS "OrderCount",
+        COALESCE(SUM(oi."Quantity" * oi."UnitPrice"), 0.0)::DECIMAL(18,2) AS "TotalRevenue"
+    FROM "Categories" c
+    LEFT JOIN "MenuItems" mi ON mi."CategoryId" = c."Id" AND mi."IsDeleted" = false
+    LEFT JOIN "OrderItems" oi ON oi."MenuItemId" = mi."Id"
+    LEFT JOIN "Orders" o ON oi."OrderId" = o."Id"
+        AND o."Status" = 5
+        AND (p_from IS NULL OR (o."CreatedAt" AT TIME ZONE 'UTC')::DATE >= p_from)
+        AND (p_to IS NULL OR (o."CreatedAt" AT TIME ZONE 'UTC')::DATE <= p_to)
+    GROUP BY c."Name"
+    ORDER BY COALESCE(SUM(oi."Quantity" * oi."UnitPrice"), 0.0) DESC;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Drop old view (replaced by function above)
+DROP VIEW IF EXISTS vw_category_performance;
 
 
--- 6. Kitchen SLA View (vw_kitchen_sla)
--- GET /api/reports/kitchen/sla
-CREATE OR REPLACE VIEW vw_kitchen_sla AS
-WITH OrderPrepTimes AS (
+-- 6. Kitchen SLA Function (fn_kitchen_sla)
+-- Date-filtered kitchen performance stats with avg prep time.
+-- Replaces the former vw_kitchen_sla view.
+-- GET /api/reports/kitchen/sla?from=YYYY-MM-DD&to=YYYY-MM-DD
+CREATE OR REPLACE FUNCTION fn_kitchen_sla(p_from DATE DEFAULT NULL, p_to DATE DEFAULT NULL)
+RETURNS TABLE (
+    "WithinSLA" INT,
+    "BreachedSLA" INT,
+    "SLAPercentage" DECIMAL(18,2),
+    "AvgPrepTimeMinutes" DECIMAL(10,2)
+) AS $$
+BEGIN
+    RETURN QUERY
+    WITH OrderPrepTimes AS (
+        SELECT 
+            o."Id" AS "OrderId",
+            o."CreatedAt",
+            o."CompletedAt",
+            MAX(mi."PreparationTime") AS "MaxPrepTimeMinutes",
+            EXTRACT(EPOCH FROM (o."CompletedAt" - o."CreatedAt")) / 60.0 AS "ActualMinutes"
+        FROM "Orders" o
+        JOIN "OrderItems" oi ON oi."OrderId" = o."Id"
+        JOIN "MenuItems" mi ON oi."MenuItemId" = mi."Id"
+        WHERE o."Status" = 5 
+          AND o."CompletedAt" IS NOT NULL
+          AND (p_from IS NULL OR (o."CompletedAt" AT TIME ZONE 'UTC')::DATE >= p_from)
+          AND (p_to IS NULL OR (o."CompletedAt" AT TIME ZONE 'UTC')::DATE <= p_to)
+        GROUP BY o."Id", o."CreatedAt", o."CompletedAt"
+    ),
+    SLACalc AS (
+        SELECT 
+            "ActualMinutes",
+            CASE 
+                WHEN "ActualMinutes" <= "MaxPrepTimeMinutes" THEN 1
+                ELSE 0
+            END AS "IsWithinSLA"
+        FROM OrderPrepTimes
+    )
     SELECT 
-        o."Id" AS "OrderId",
-        o."CreatedAt",
-        o."CompletedAt",
-        MAX(mi."PreparationTime") AS "MaxPrepTimeMinutes"
-    FROM "Orders" o
-    JOIN "OrderItems" oi ON oi."OrderId" = o."Id"
-    JOIN "MenuItems" mi ON oi."MenuItemId" = mi."Id"
-    WHERE o."Status" = 5 AND o."CompletedAt" IS NOT NULL
-    GROUP BY o."Id", o."CreatedAt", o."CompletedAt"
-),
-SLACalculation AS (
-    SELECT 
-        "OrderId",
+        COALESCE(SUM(CASE WHEN "IsWithinSLA" = 1 THEN 1 ELSE 0 END)::INT, 0) AS "WithinSLA",
+        COALESCE(SUM(CASE WHEN "IsWithinSLA" = 0 THEN 1 ELSE 0 END)::INT, 0) AS "BreachedSLA",
         CASE 
-            WHEN EXTRACT(EPOCH FROM ("CompletedAt" - "CreatedAt")) / 60.0 <= "MaxPrepTimeMinutes" THEN 1
-            ELSE 0
-        END AS "WithinSLA"
-    FROM OrderPrepTimes
-)
-SELECT 
-    COALESCE(COUNT(CASE WHEN "WithinSLA" = 1 THEN 1 END)::INT, 0) AS "WithinSLA",
-    COALESCE(COUNT(CASE WHEN "WithinSLA" = 0 THEN 1 END)::INT, 0) AS "BreachedSLA",
-    CASE 
-        WHEN COUNT(*) = 0 THEN 0.0::DECIMAL(18,2)
-        ELSE (COUNT(CASE WHEN "WithinSLA" = 1 THEN 1 END)::DECIMAL * 100.0 / COUNT(*))::DECIMAL(18,2)
-    END AS "SLAPercentage"
-FROM SLACalculation;
+            WHEN COUNT(*) = 0 THEN 0.0::DECIMAL(18,2)
+            ELSE (SUM(CASE WHEN "IsWithinSLA" = 1 THEN 1 ELSE 0 END)::DECIMAL * 100.0 / COUNT(*))::DECIMAL(18,2)
+        END AS "SLAPercentage",
+        COALESCE(AVG("ActualMinutes"), 0.0)::DECIMAL(10,2) AS "AvgPrepTimeMinutes"
+    FROM SLACalc;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Drop old view (replaced by function above)
+DROP VIEW IF EXISTS vw_kitchen_sla;
 
 
 -- 7. Table Turnover Function (fn_table_turnover)

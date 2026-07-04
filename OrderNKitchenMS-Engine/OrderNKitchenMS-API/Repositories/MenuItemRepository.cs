@@ -67,6 +67,8 @@ public class MenuItemRepository : IMenuItemRepository
         }
 
         menuItem.IsDeleted = true;
+        menuItem.IsAvailable = false;
+        menuItem.IsManuallyDisabled = true;
         await _context.SaveChangesAsync();
         return true;
     }

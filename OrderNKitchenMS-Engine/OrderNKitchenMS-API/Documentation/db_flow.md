@@ -98,4 +98,4 @@ For local testing and InMemory tests (where raw SQL triggers do not exist):
 * If running on the InMemory provider, it mirrors the trigger logic in C# code:
   1. Runs `CanPrepareMenuItemAsync(menuItemId, 1)`.
   2. Updates `IsAvailable` accordingly.
-  3. Saves changes using `_menuItemRepository.UpdateAsync(...)`.
+  3. Saves changes using `_menuItemRepository.UpdateAsync(menuItemId, menuItem)`.

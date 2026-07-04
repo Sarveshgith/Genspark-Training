@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OrderNKitchenMS_API.Exceptions;
 using OrderNKitchenMS_API.Models.DTOs;
+using OrderNKitchenMS_API.Models.Enums;
 using OrderNKitchenMS_API.Services.Interfaces;
 using OrderNKitchenMS_API.Utils;
 using Microsoft.Extensions.Logging;
@@ -46,6 +47,7 @@ public class OrderController : ControllerBase
     [HttpGet("{id:int}")]
     public async Task<ActionResult<OrderDto>> GetOrderById(int id)
     {
+        Validation.ValidateId(id);
         _logger.LogInformation("GetOrderById requested for ID: {Id}", id);
         var order = await _orderService.GetOrderByIdAsync(id);
         _logger.LogInformation("GetOrderById completed for ID: {Id}", id);
@@ -72,6 +74,7 @@ public class OrderController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<OrderDto>> CreateOrder([FromBody] OrderCreateDto orderCreateDto)
     {
+        Validation.RequireNotNull(orderCreateDto, nameof(orderCreateDto));
         var waiterId = User.GetUserId();
         var tableId = orderCreateDto.TableId;
         _logger.LogInformation("CreateOrder requested for TableId: {TableId} by WaiterId: {WaiterId}", tableId, waiterId);
@@ -86,22 +89,25 @@ public class OrderController : ControllerBase
     }
 
     [Authorize(Policy = "CanPlaceOrder")]
-    [HttpPost("{orderId}/items")]
+    [HttpPost("{orderId:int}/items")]
     public async Task<ActionResult<OrderDto>> AddOrderItems(int orderId, [FromBody] List<OrderItemCreateDto> orderItemCreateDtos)
     {
-        _logger.LogInformation("AddOrderItems requested for OrderId: {OrderId}, adding {Count} items.", orderId, orderItemCreateDtos.Count);
-        Validation.RequireNotNull(orderItemCreateDtos, nameof(orderItemCreateDtos), "Order item data is required.");
+        Validation.ValidateRequest(orderId, orderItemCreateDtos, nameof(orderId), nameof(orderItemCreateDtos));
         Validation.Require(orderItemCreateDtos.Any(), "Order item data is required.", nameof(orderItemCreateDtos));
 
+        _logger.LogInformation("AddOrderItems requested for OrderId: {OrderId}, adding {Count} items.", orderId, orderItemCreateDtos.Count);
         var updatedOrder = await _orderService.AddOrderItemsAsync(orderId, orderItemCreateDtos);
         _logger.LogInformation("AddOrderItems completed for OrderId: {OrderId}. Updated total amount: {TotalAmount}", orderId, updatedOrder.TotalAmount);
         return Ok(updatedOrder);
     }
 
     [Authorize(Policy = "CanPlaceOrder")]
-    [HttpDelete("{orderId}/items/{itemId}")]
+    [HttpDelete("{orderId:int}/items/{itemId:int}")]
     public async Task<ActionResult> RemoveOrderItem(int orderId, int itemId)
     {
+        Validation.ValidateId(orderId, nameof(orderId));
+        Validation.ValidateId(itemId, nameof(itemId));
+
         _logger.LogInformation("RemoveOrderItem requested for OrderId: {OrderId}, ItemId: {ItemId}", orderId, itemId);
         await _orderService.RemoveOrderItemAsync(orderId, itemId);
         _logger.LogInformation("RemoveOrderItem completed for OrderId: {OrderId}, ItemId: {ItemId}", orderId, itemId);
@@ -109,9 +115,12 @@ public class OrderController : ControllerBase
     }
 
     [Authorize(Policy = "AllStaff")]
-    [HttpPatch("{orderId}/status")]
+    [HttpPatch("{orderId:int}/status")]
     public async Task<ActionResult> UpdateOrderStatus(int orderId, [FromBody] int status)
     {
+        Validation.ValidateId(orderId, nameof(orderId));
+        Validation.RequireValidEnum<OrderStatus>(status, nameof(status));
+
         _logger.LogInformation("UpdateOrderStatus requested for OrderId: {OrderId}, new status: {Status}", orderId, status);
         await _orderService.UpdateOrderStatusAsync(orderId, status);
         _logger.LogInformation("UpdateOrderStatus completed for OrderId: {OrderId}", orderId);
@@ -119,9 +128,10 @@ public class OrderController : ControllerBase
     }
 
     [Authorize(Policy = "AdminOrChef")]
-    [HttpPatch("{orderId}/assign-chef")]
+    [HttpPatch("{orderId:int}/assign-chef")]
     public async Task<ActionResult> AssignChef(int orderId)
     {
+        Validation.ValidateId(orderId, nameof(orderId));
         var chefId = User.GetUserId();
         _logger.LogInformation("AssignChef requested for OrderId: {OrderId} by ChefId: {ChefId}", orderId, chefId);
         await _orderService.AssignChefToOrderAsync(orderId, chefId);
@@ -130,9 +140,10 @@ public class OrderController : ControllerBase
     }
 
     [Authorize(Policy = "CanPlaceOrder")]
-    [HttpPatch("{orderId}/assign-waiter")]
+    [HttpPatch("{orderId:int}/assign-waiter")]
     public async Task<ActionResult> AssignWaiter(int orderId)
     {
+        Validation.ValidateId(orderId, nameof(orderId));
         var waiterId = User.GetUserId();
         _logger.LogInformation("AssignWaiter requested for OrderId: {OrderId} by WaiterId: {WaiterId}", orderId, waiterId);
         await _orderService.AssignWaiterToOrderAsync(orderId, waiterId);
@@ -159,6 +170,7 @@ public class OrderController : ControllerBase
     [HttpGet("table/{tableId:int}/active")]
     public async Task<ActionResult<OrderDto>> GetActiveOrderByTableId(int tableId)
     {
+        Validation.ValidateId(tableId, nameof(tableId));
         _logger.LogInformation("GetActiveOrderByTableId requested for TableId: {TableId}", tableId);
         var order = await _orderService.GetActiveOrderByTableIdAsync(tableId);
         _logger.LogInformation("GetActiveOrderByTableId completed for TableId: {TableId}. Order ID: {OrderId}", tableId, order.Id);

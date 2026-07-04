@@ -13,7 +13,7 @@ public interface IBillRepository
 
     public Task<Bill?> UpdateBillAsync(int id, Bill updatedBill);
 
-    public Task<Bill?> GetByIdAsync(int id);
+    public Task<bool> UpdateStatusAsync(int id, BillStatus newStatus);
 
-    public Task<bool> UpdateStatusAsync(int billId, BillStatus newStatus);
+    public Task<Bill?> GetByIdAsync(int id);
 }
