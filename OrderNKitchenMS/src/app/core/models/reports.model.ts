@@ -30,6 +30,7 @@ export interface KitchenSlaModel {
     withinSLA: number;
     breachedSLA: number;
     slaPercentage: number;
+    avgPrepTimeMinutes: number;
 }
 
 export interface TableTurnoverModel {

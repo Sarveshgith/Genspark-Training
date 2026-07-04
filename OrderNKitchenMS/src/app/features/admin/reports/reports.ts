@@ -1,7 +1,9 @@
 // @feature Admin | Reports & Analytics | Dashboard component summarizing daily sales, category performance, kitchen SLAs, item preparation durations, and hourly transaction loads.
-import { Component, inject, OnInit, signal, computed, ChangeDetectorRef, NgZone } from '@angular/core';
+import { Component, inject, OnInit, signal, computed, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Subject, forkJoin, switchMap } from 'rxjs';
 import { OrderService } from '../../../core/services/order.service';
 import { OrderModel } from '../../../core/models/order.model';
 import { CategoryPerformanceModel, DailyRevenueModel, KitchenSlaModel, RangeRevenueModel, TopSellingItemModel } from '../../../core/models/reports.model';
@@ -39,8 +41,10 @@ export class ReportsComponent implements OnInit {
   private reportService = inject(ReportService);
   private orderService = inject(OrderService);
   private billService = inject(BillService);
-  private cdr = inject(ChangeDetectorRef);
-  private zone = inject(NgZone);
+  private destroyRef = inject(DestroyRef);
+
+  // Fetch trigger — switchMap ensures in-flight requests are cancelled on rapid re-trigger
+  private readonly fetchTrigger$ = new Subject<void>();
 
   // Filter States (Interactive Date Range)
   public fromDate = signal<string>(new Date(Date.now() - 6 * 24 * 3600 * 1000).toISOString().substring(0, 10));
@@ -56,8 +60,10 @@ export class ReportsComponent implements OnInit {
   public rawOrders = signal<OrderModel[]>([]);
   public rawBills = signal<BillDto[]>([]);
   public isLoading = signal<boolean>(false);
+  public errorMessage = signal<string | null>(null);
 
-  // Computations
+  // ─── Computed Derivations ────────────────────────────────────────────────────
+
   // Filter raw orders by the selected date range
   public filteredOrders = computed<OrderModel[]>(() => {
     const list = this.rawOrders();
@@ -77,28 +83,34 @@ export class ReportsComponent implements OnInit {
     });
   });
 
-  // Filter raw bills by the target end date for the summary card
+  // Filter raw bills by the full selected date range
   public filteredBills = computed<BillDto[]>(() => {
     const list = this.rawBills();
-    const targetDateStr = this.toDate();
-    if (!targetDateStr) return [];
-    
-    const targetDate = new Date(targetDateStr).toDateString();
+    const fromStr = this.fromDate();
+    const toStr = this.toDate();
+    if (!fromStr || !toStr) return [];
+
+    const start = new Date(fromStr);
+    start.setHours(0, 0, 0, 0);
+    const end = new Date(toStr);
+    end.setHours(23, 59, 59, 999);
+
     return list.filter(bill => {
       if (!bill.createdAt) return false;
-      return new Date(bill.createdAt).toDateString() === targetDate;
+      const time = new Date(bill.createdAt).getTime();
+      return time >= start.getTime() && time <= end.getTime();
     });
   });
 
   public billsGeneratedCount = computed(() => this.filteredBills().length);
-  public billsPaidCount = computed(() => 
+  public billsPaidCount = computed(() =>
     this.filteredBills().filter(b => b.statusName?.toLowerCase() === 'paid').length
   );
-  public billsFailedCount = computed(() => 
+  public billsFailedCount = computed(() =>
     this.filteredBills().filter(b => b.statusName?.toLowerCase() === 'failed').length
   );
 
-  // 1. Average prep time by item (from filtered orders)
+  // 1. Average prep time by item (from filtered orders — order lifecycle approximation)
   public avgPrepTimesByItem = computed<ItemPrepTime[]>(() => {
     const list = this.filteredOrders();
     const map = new Map<string, { totalTime: number; count: number }>();
@@ -109,7 +121,7 @@ export class ReportsComponent implements OnInit {
         const end = new Date(order.completedAt).getTime();
         const durationMinutes = (end - start) / (1000 * 60);
 
-        if (durationMinutes > 0) {
+        if (durationMinutes > 0 && durationMinutes < 480) { // Guard: cap at 8h to filter stale sessions
           order.orderItems.forEach(item => {
             const name = item.menuItemName;
             const current = map.get(name) || { totalTime: 0, count: 0 };
@@ -191,7 +203,7 @@ export class ReportsComponent implements OnInit {
     return result.sort((a, b) => b.count - a.count);
   });
 
-  // 4. Dynamic Top Selling Items (from filtered orders)
+  // 4. Dynamic Top Selling Items (from filtered orders — date-range-aware)
   public topSellingItems = computed<TopSellingItemModel[]>(() => {
     const list = this.filteredOrders();
     const map = new Map<string, { qty: number; revenue: number }>();
@@ -209,7 +221,7 @@ export class ReportsComponent implements OnInit {
       }
     });
 
-    // Match categories from master list lookup
+    // Use master list for category lookup
     const catMap = new Map<string, string>();
     this.topSellingItemsMaster().forEach(item => {
       catMap.set(item.itemName, item.category);
@@ -228,17 +240,17 @@ export class ReportsComponent implements OnInit {
     return result.sort((a, b) => b.totalQtySold - a.totalQtySold).slice(0, 8);
   });
 
-  // 5. SVG Points for 7-Day Sales Trend Line
+  // 5. SVG Points for Sales Trend Line
   public salesTrendPoints = computed(() => {
     const data = this.rangeRevenue();
     if (data.length === 0) return [];
-    
+
     const maxRev = Math.max(...data.map(d => Number(d.totalRevenue)), 1);
     const width = 500;
     const height = 160;
     const paddingX = 40;
     const paddingY = 20;
-    
+
     return data.map((item, idx) => {
       const x = paddingX + idx * ((width - paddingX * 2) / Math.max(data.length - 1, 1));
       const y = (height - paddingY) - (Number(item.totalRevenue) / maxRev) * (height - paddingY * 2);
@@ -253,9 +265,9 @@ export class ReportsComponent implements OnInit {
     });
   });
 
-  public salesLinePointsString = computed(() => {
-    return this.salesTrendPoints().map(p => `${p.x},${p.y}`).join(' ');
-  });
+  public salesLinePointsString = computed(() =>
+    this.salesTrendPoints().map(p => `${p.x},${p.y}`).join(' ')
+  );
 
   public salesAreaPathString = computed(() => {
     const pts = this.salesTrendPoints();
@@ -280,18 +292,13 @@ export class ReportsComponent implements OnInit {
     return bars.map((bar, idx) => {
       const x = paddingX + idx * ((width - paddingX * 2) / Math.max(bars.length - 1, 1));
       const y = (height - paddingY) - (bar.count / maxCount) * (height - paddingY * 2);
-      return {
-        x,
-        y,
-        label: bar.hourLabel,
-        count: bar.count
-      };
+      return { x, y, label: bar.hourLabel, count: bar.count };
     });
   });
 
-  public hourlyLinePointsString = computed(() => {
-    return this.hourlyChartPoints().map(p => `${p.x},${p.y}`).join(' ');
-  });
+  public hourlyLinePointsString = computed(() =>
+    this.hourlyChartPoints().map(p => `${p.x},${p.y}`).join(' ')
+  );
 
   public hourlyAreaPathString = computed(() => {
     const pts = this.hourlyChartPoints();
@@ -302,119 +309,93 @@ export class ReportsComponent implements OnInit {
     return `${linePath} L ${last.x} 140 L ${first.x} 140 Z`;
   });
 
+  // 7. Kitchen SLA SVG ring values
+  public readonly SLA_RING_CIRCUMFERENCE = 2 * Math.PI * 44; // r=44
+
+  public slaRingOffset = computed(() => {
+    const pct = this.kitchenSla()?.slaPercentage ?? 0;
+    return this.SLA_RING_CIRCUMFERENCE * (1 - Math.min(pct, 100) / 100);
+  });
+
+  public slaRingColor = computed(() => {
+    const pct = this.kitchenSla()?.slaPercentage ?? 0;
+    if (pct >= 80) return '#22c55e';   // green
+    if (pct >= 60) return '#f59e0b';   // amber
+    return '#ef4444';                   // red
+  });
+
+  // ─── Lifecycle ───────────────────────────────────────────────────────────────
+
   ngOnInit(): void {
-    this.fetchReportData();
-  }
+    // Wire the trigger through switchMap: cancels any previous in-flight forkJoin
+    this.fetchTrigger$.pipe(
+      switchMap(() => {
+        const fromStr = this.fromDate();
+        const toStr = this.toDate();
+        this.isLoading.set(true);
+        this.errorMessage.set(null);
 
-  public onRangeChange(fromVal: string, toVal: string): void {
-    this.fromDate.set(fromVal);
-    this.toDate.set(toVal);
-    this.fetchReportData();
-  }
-
-  public fetchReportData(): void {
-    this.isLoading.set(true);
-    const fromStr = this.fromDate();
-    const toStr = this.toDate();
-
-    // Call Endpoints in Parallel
-    this.reportService.getDailyRevenue(toStr).subscribe({
-      next: (data) => {
-        this.zone.run(() => {
-          this.dailyRevenue.set(data);
-          this.cdr.detectChanges();
+        return forkJoin({
+          daily: this.reportService.getDailyRevenue(toStr),
+          range: this.reportService.getRangeRevenue(fromStr, toStr),
+          topItems: this.reportService.getTopSellingItems(20),
+          category: this.reportService.getCategoryPerformance(fromStr, toStr),
+          sla: this.reportService.getKitchenSla(fromStr, toStr),
+          orders: this.orderService.getOrders({ pageNumber: 1, pageSize: 2000 }),
+          bills: this.billService.getAllBills()
         });
-      },
-      error: (err) => console.error('Daily revenue fetch error:', err)
-    });
-
-    this.reportService.getRangeRevenue(fromStr, toStr).subscribe({
-      next: (data) => {
-        this.zone.run(() => {
-          this.rangeRevenue.set(data);
-          this.cdr.detectChanges();
-        });
-      },
-      error: (err) => console.error('Range revenue fetch error:', err)
-    });
-
-    this.reportService.getTopSellingItems(20).subscribe({
-      next: (data) => {
-        this.zone.run(() => {
-          this.topSellingItemsMaster.set(data);
-          this.cdr.detectChanges();
-        });
-      },
-      error: (err) => console.error('Top selling items fetch error:', err)
-    });
-
-    this.reportService.getCategoryPerformance().subscribe({
-      next: (data) => {
-        this.zone.run(() => {
-          this.categoryPerformance.set(data);
-          this.cdr.detectChanges();
-        });
-      },
-      error: (err) => console.error('Category performance fetch error:', err)
-    });
-
-    this.reportService.getKitchenSla().subscribe({
-      next: (data) => {
-        this.zone.run(() => {
-          this.kitchenSla.set(data);
-          this.cdr.detectChanges();
-        });
-      },
-      error: (err) => console.error('Kitchen SLA fetch error:', err)
-    });
-
-    // Fetch order history to compute prep times and hourly charts (pageSize: 2000 is plenty)
-    this.orderService.getOrders({ pageNumber: 1, pageSize: 2000 }).subscribe({
-      next: (data) => {
-        this.zone.run(() => {
-          this.rawOrders.set(data);
-          this.isLoading.set(false);
-          this.cdr.detectChanges();
-        });
+      }),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
+      next: (results) => {
+        this.dailyRevenue.set(results.daily);
+        this.rangeRevenue.set(results.range);
+        this.topSellingItemsMaster.set(results.topItems);
+        this.categoryPerformance.set(results.category);
+        this.kitchenSla.set(results.sla);
+        this.rawOrders.set(results.orders);
+        this.rawBills.set(results.bills);
+        this.isLoading.set(false);
       },
       error: (err) => {
-        this.zone.run(() => {
-          this.isLoading.set(false);
-          this.cdr.detectChanges();
-        });
-        console.error('Orders history fetch error:', err);
+        console.error('Reports fetch error:', err);
+        this.isLoading.set(false);
+        this.errorMessage.set('Failed to load report data. Please check the date range and try again.');
       }
     });
 
-    // Fetch bills history to calculate Paid vs Failed metrics
-    this.billService.getAllBills().subscribe({
-      next: (data) => {
-        this.zone.run(() => {
-          this.rawBills.set(data);
-          this.cdr.detectChanges();
-        });
-      },
-      error: (err) => console.error('Bills history fetch error:', err)
-    });
+    this.fetchTrigger$.next();
   }
 
-  // Export methods
+  public onRangeChange(fromVal: string, toVal: string): void {
+    // Guard: prevent fetching when range is invalid
+    if (fromVal && toVal && new Date(fromVal) > new Date(toVal)) {
+      this.errorMessage.set('Start date cannot be after end date.');
+      return;
+    }
+    this.errorMessage.set(null);
+    this.fromDate.set(fromVal);
+    this.toDate.set(toVal);
+    this.fetchTrigger$.next();
+  }
+
+  // Export top selling items as CSV
   public exportCsv(): void {
     const data = this.topSellingItems();
     if (data.length === 0) return;
-    
-    let csvContent = "data:text/csv;charset=utf-8,";
-    csvContent += "Item Name,Category,Qty Sold,Total Revenue\r\n";
-    
+
+    let csvContent = 'data:text/csv;charset=utf-8,';
+    csvContent += 'Item Name,Category,Qty Sold,Total Revenue\r\n';
+
     data.forEach(item => {
       const row = `"${item.itemName.replace(/"/g, '""')}","${item.category}",${item.totalQtySold},${item.totalRevenue}`;
-      csvContent += row + "\r\n";
+      csvContent += row + '\r\n';
     });
-    
+
     const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `Ambrosia_Top_Selling_Items_${this.toDate()}.csv`);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `Ambrosia_Top_Selling_Items_${this.fromDate()}_to_${this.toDate()}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

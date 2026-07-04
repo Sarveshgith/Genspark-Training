@@ -30,12 +30,18 @@ export class ReportService {
     return this.http.get<TopSellingItemModel[]>(`${this.classUrl}/menu/top-items`, { params });
   }
 
-  public getCategoryPerformance(): Observable<CategoryPerformanceModel[]> {
-    return this.http.get<CategoryPerformanceModel[]>(`${this.classUrl}/menu/category-performance`);
+  public getCategoryPerformance(from?: string, to?: string): Observable<CategoryPerformanceModel[]> {
+    let params = new HttpParams();
+    if (from) params = params.set('from', from);
+    if (to) params = params.set('to', to);
+    return this.http.get<CategoryPerformanceModel[]>(`${this.classUrl}/menu/category-performance`, { params });
   }
 
-  public getKitchenSla(): Observable<KitchenSlaModel> {
-    return this.http.get<KitchenSlaModel>(`${this.classUrl}/kitchen/sla`);
+  public getKitchenSla(from?: string, to?: string): Observable<KitchenSlaModel> {
+    let params = new HttpParams();
+    if (from) params = params.set('from', from);
+    if (to) params = params.set('to', to);
+    return this.http.get<KitchenSlaModel>(`${this.classUrl}/kitchen/sla`, { params });
   }
 
   public getTableTurnover(date?: string): Observable<TableTurnoverModel[]> {
