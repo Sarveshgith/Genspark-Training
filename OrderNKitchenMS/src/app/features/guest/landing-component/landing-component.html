@@ -233,7 +233,41 @@
         </div>
         <div class="w-full h-1 bg-gray-100 rounded-full overflow-hidden max-w-[200px]">
           <div class="h-full bg-gradient-to-r from-amber-500 to-[#E8A54B] transition-all duration-1000 ease-linear"
-            [style.width.%]="(countdownSeconds() / 5) * 100"></div>
+            [style.width.%]="(countdownSeconds() / 10) * 100"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  }
+
+  @if (guestState() === 'session-ending') {
+  <div class="min-h-screen flex items-center justify-center p-6 bg-[#FDFBF7]">
+    <div
+      class="max-w-md w-full bg-white border border-[#EFE5D3] rounded-3xl p-8 text-center shadow-2xl space-y-8 animate-fade-in">
+
+      <div
+        class="w-20 h-20 bg-amber-50 border border-amber-100 rounded-full flex items-center justify-center text-4xl mx-auto text-amber-500 animate-bounce-subtle">
+        ⌛
+      </div>
+
+      <div class="space-y-3">
+        <span class="text-xs uppercase tracking-widest text-[#E8A54B] font-extrabold font-outfit">Session Ending</span>
+        <h1 class="text-3xl font-semibold font-syne text-[#2C2117]">Session Ending</h1>
+        <p class="text-sm text-[#8C7A6B] leading-relaxed font-outfit">
+          Your table session is ending. Thank you for visiting Ambrosia!
+        </p>
+      </div>
+
+      <div class="border-t border-[#F5EFE6] pt-6 flex flex-col items-center justify-center space-y-2">
+        <div
+          class="flex items-center space-x-2 text-xxs font-extrabold uppercase tracking-widest text-[#8C7A6B] font-outfit">
+          <span class="inline-block w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>
+          <span>Redirecting in {{ countdownSeconds() }} seconds</span>
+        </div>
+        <div class="w-full h-1 bg-gray-100 rounded-full overflow-hidden max-w-[200px]">
+          <div class="h-full bg-gradient-to-r from-amber-500 to-[#E8A54B] transition-all duration-1000 ease-linear"
+            [style.width.%]="(countdownSeconds() / 10) * 100"></div>
         </div>
       </div>
 

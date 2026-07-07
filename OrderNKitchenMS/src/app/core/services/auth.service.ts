@@ -114,6 +114,7 @@ export class AuthService {
         }).pipe(tap((response: any) => {
             if (typeof window !== 'undefined' && window.sessionStorage) {
                 sessionStorage.setItem('token', response.token);
+                sessionStorage.setItem('tableSecret', query.secret);
             }
             }),
             catchError(error => {
@@ -132,11 +133,23 @@ export class AuthService {
         }
     }
 
+    public isTokenExpired(token: string): boolean {
+        try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            if (!payload.exp) return true;
+            const expiry = payload.exp * 1000;
+            return Date.now() >= expiry;
+        } catch {
+            return true;
+        }
+    }
+
     public logout() {
         if (typeof window !== 'undefined' && window.sessionStorage) {
             sessionStorage.removeItem('user');
             sessionStorage.removeItem('token');
             sessionStorage.removeItem('refreshToken');
+            sessionStorage.removeItem('tableSecret');
         }
         this.userSubject.next(null);
     }

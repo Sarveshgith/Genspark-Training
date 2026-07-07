@@ -1,25 +1,26 @@
 import { Routes } from '@angular/router';
 import { RoleGuard } from './core/guards/role.guard';
 import { GuestGuard } from './core/guards/guest.guard';
+import { SessionEndedGuard } from './core/guards/session-ended.guard';
 
 export const routes: Routes = [
 	{ path: '', pathMatch: 'full', redirectTo: 'login' },
 
-	{ 
-		path: 'login', 
-		loadComponent: () => import('./features/auth/login/login').then(m => m.Login) 
+	{
+		path: 'login',
+		loadComponent: () => import('./features/auth/login/login').then(m => m.Login)
 	},
 
-	{ 
-		path: 'register', 
-		loadComponent: () => import('./features/auth/register/register').then(m => m.Register) 
+	{
+		path: 'register',
+		loadComponent: () => import('./features/auth/register/register').then(m => m.Register)
 	},
-	
-	{ 
-		path: 'pending-approval', 
-		loadComponent: () => import('./features/auth/pending-approval/pending-approval').then(m => m.PendingApproval) 
+
+	{
+		path: 'pending-approval',
+		loadComponent: () => import('./features/auth/pending-approval/pending-approval').then(m => m.PendingApproval)
 	},
-	
+
 	{
 		path: 'kitchen',
 		loadComponent: () => import('./features/chef/kds-board/kds-board').then(m => m.KdsBoard),
@@ -28,8 +29,10 @@ export const routes: Routes = [
 	},
 
 	{
-		path: 'waiter/menu', 
-		loadComponent: () => import('./features/waiter/menu-items/menu-items').then(m => m.MenuItems)
+		path: 'waiter/menu',
+		loadComponent: () => import('./features/waiter/menu-items/menu-items').then(m => m.MenuItems),
+		canActivate: [RoleGuard],
+		data: { roles: ['Waiter'] }
 	},
 
 	{
@@ -102,9 +105,10 @@ export const routes: Routes = [
 		data: { roles: ['Waiter'] }
 	},
 
-	{ 
-		path: 'guest/landing', 
-		loadComponent: () => import('./features/guest/landing-component/landing-component').then(m => m.LandingComponent) 
+	{
+		path: 'guest/landing',
+		loadComponent: () => import('./features/guest/landing-component/landing-component').then(m => m.LandingComponent),
+		canActivate: [GuestGuard]
 	},
 
 	{
@@ -113,11 +117,16 @@ export const routes: Routes = [
 		canActivate: [GuestGuard]
 	},
 
-	{ 
-		path: 'guest/:secret', 
-		loadComponent: () => import('./features/guest/landing-component/landing-component').then(m => m.LandingComponent) 
+	{
+		path: 'guest/:secret',
+		loadComponent: () => import('./features/guest/landing-component/landing-component').then(m => m.LandingComponent)
+	},
+
+	{
+		path: 'session-ended',
+		loadComponent: () => import('./features/guest/session-ended/session-ended').then(m => m.SessionEndedComponent),
+		canActivate: [SessionEndedGuard]
 	},
 
 	{ path: '**', redirectTo: 'login' },
 ];
-

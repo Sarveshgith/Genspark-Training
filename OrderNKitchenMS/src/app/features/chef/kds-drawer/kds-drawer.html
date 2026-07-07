@@ -1,0 +1,71 @@
+@if (content) {
+  <!-- BACKDROP OVERLAY -->
+  <div class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs animate-fade-in" (click)="handleClose()"></div>
+
+  <!-- RIGHT SIDE DRAWER CONTAINER -->
+  <div class="fixed top-0 right-0 h-screen w-full sm:w-[360px] bg-[#0E1322] border-l border-slate-800/80 shadow-2xl flex flex-col z-50 animate-slide-in font-sans">
+    
+    <!-- HEADER -->
+    <header class="h-16 border-b border-slate-800/80 px-4 sm:px-6 flex items-center justify-between shrink-0 bg-[#111827]">
+      <div class="flex items-center space-x-2">
+        <h3 class="text-sm sm:text-base font-bold font-syne text-white uppercase tracking-wider">{{ getTitle() }}</h3>
+      </div>
+      
+      <button (click)="handleClose()" class="p-1.5 hover:bg-slate-800/80 text-slate-400 hover:text-white rounded-lg transition duration-150 outline-none border border-transparent hover:border-slate-700 cursor-pointer" title="Close panel">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </header>
+
+    <!-- DRAWER BODY -->
+    <div class="flex-1 flex flex-col min-h-0 overflow-hidden bg-[#0B0F19]">
+      @switch (content) {
+        @case ('inventory') {
+          <app-inventory-sheet [isOpen]="content === 'inventory'" [isInline]="true" [activeOrders]="activeOrders" (close)="handleClose()"></app-inventory-sheet>
+        }
+        @case ('summary') {
+          <app-shift-summary [isOpen]="content === 'summary'" [isInline]="true" (close)="handleClose()"></app-shift-summary>
+        }
+        @case ('messages') {
+          <div class="flex-1 flex flex-col min-h-0 p-4 space-y-4">
+            @if (messages.length > 0) {
+              <div class="flex justify-between items-center shrink-0">
+                <span class="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Alert Feed</span>
+                <button (click)="markAllRead.emit()" class="text-[11px] text-[#F28500] hover:text-[#D47300] transition font-semibold cursor-pointer">
+                  Mark all read
+                </button>
+              </div>
+              
+              <div class="flex-1 overflow-y-auto pr-1 space-y-3 min-h-0">
+                @for (msg of messages; track msg.id) {
+                  <div class="bg-slate-900/40 border border-slate-800 rounded-xl p-3 flex flex-col gap-1.5 transition hover:bg-slate-900/60 font-sans relative overflow-hidden group">
+                    <!-- Subtle left status border for unread alerts -->
+                    @if (!msg.read) {
+                      <div class="absolute left-0 top-0 bottom-0 w-1 bg-blue-500"></div>
+                    }
+                    <div class="flex items-start justify-between gap-3 pl-1">
+                      <span class="text-xs font-semibold text-slate-200 leading-normal">{{ msg.text }}</span>
+                      @if (!msg.read) {
+                        <span class="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0 mt-1" title="Unread alert"></span>
+                      }
+                    </div>
+                    <span class="text-[9px] text-slate-500 font-mono-dm self-end">{{ msg.timestamp | date:'shortTime' }}</span>
+                  </div>
+                }
+              </div>
+            } @else {
+              <div class="flex-1 flex flex-col items-center justify-center text-slate-500 select-none space-y-3 py-12">
+                <svg class="w-12 h-12 text-slate-800/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                </svg>
+                <span class="font-sans text-xs italic text-center px-4">No active system alerts or admin messages.</span>
+              </div>
+            }
+          </div>
+        }
+      }
+    </div>
+
+  </div>
+}

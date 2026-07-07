@@ -14,6 +14,7 @@ export class ShiftSummary implements OnInit, OnChanges {
   private orderService = inject(OrderService);
 
   @Input() isOpen = false;
+  @Input() isInline = false;
   @Output() close = new EventEmitter<void>();
 
   public isLoading = signal<boolean>(false);

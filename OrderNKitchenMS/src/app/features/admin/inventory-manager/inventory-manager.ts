@@ -369,7 +369,7 @@ export class InventoryManager implements OnInit {
   }
 
   public addIngredientToDraft(): void {
-    const itemId = this.drawerAddIngredientId;
+    const itemId = Number(this.drawerAddIngredientId);
     const qty = this.drawerAddQuantity;
 
     if (!itemId) {
@@ -405,9 +405,36 @@ export class InventoryManager implements OnInit {
     this.recipeDraft.update(draft => draft.filter(d => d.itemId !== itemId));
   }
 
+  private getStepByUnit(unitName: string): number {
+    const unit = (unitName || '').toLowerCase();
+    if (unit.includes('piece')) return 1;
+    if (unit.includes('gram') || unit.includes('milliliter')) return 10;
+    if (unit.includes('kilogram') || unit.includes('liter')) return 0.1;
+    return 1;
+  }
+
+  public adjustIngredientQuantity(itemId: number, direction: 'plus' | 'minus'): void {
+    this.recipeDraft.update(draft => {
+      return draft.map(d => {
+        if (d.itemId === itemId) {
+          const step = this.getStepByUnit(d.unitName);
+          const delta = direction === 'plus' ? step : -step;
+          const newQty = Math.max(0.01, parseFloat((d.quantityRequired + delta).toFixed(4)));
+          return { ...d, quantityRequired: newQty };
+        }
+        return d;
+      });
+    });
+  }
+
   public saveRecipe(): void {
     const id = this.selectedRecipeMenuItemId();
     if (!id) return;
+
+    if (this.recipeDraft().length === 0) {
+      this.toastService.error('Recipe must contain at least one ingredient mapping.');
+      return;
+    }
 
     const payload = this.recipeDraft().map(d => ({
       itemId: d.itemId,

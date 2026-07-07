@@ -36,8 +36,9 @@ export class LandingComponent implements OnInit, OnDestroy {
   public billDetails = signal<any | null>(null);
   public taxPercent: string = 'X';
 
-  public guestState = signal<'waiting' | 'tracking' | 'bill' | 'paid'>('waiting');
-  public countdownSeconds = signal<number>(5);
+  public guestState = signal<'waiting' | 'tracking' | 'bill' | 'paid' | 'session-ending'>('waiting');
+  public countdownSeconds = signal<number>(10);
+  public sessionEnding = signal<boolean>(false);
   private countdownInterval: any;
 
   private menuPriceMap: { [name: string]: number } = {};
@@ -71,24 +72,36 @@ export class LandingComponent implements OnInit, OnDestroy {
 
   private initializeSession(secret?: string) {
     const existingToken = this.authService.getToken();
+    const storedSecret = typeof window !== 'undefined' ? sessionStorage.getItem('tableSecret') : null;
 
     if (secret) {
-      this.authService.guestLogin({ secret }).subscribe({
-        next: () => {
-          const token = this.authService.getToken();
-          if (token) {
-            this.tableNumber = this.authService.getTableIdFromToken(token);
+      const isTokenValid = existingToken && !this.authService.isTokenExpired(existingToken);
+      const secretMatches = storedSecret === secret;
+
+      if (isTokenValid && secretMatches) {
+        console.log("Token is valid and secret matches. Reusing existing token.");
+        this.tableNumber = this.authService.getTableIdFromToken(existingToken!);
+        this.loadMenuAndTrackOrder();
+      } else {
+        console.log("Token invalid or secret mismatch. Discarding old token and logging in.");
+        this.authService.logout();
+        this.authService.guestLogin({ secret }).subscribe({
+          next: () => {
+            const token = this.authService.getToken();
+            if (token) {
+              this.tableNumber = this.authService.getTableIdFromToken(token);
+            }
+            this.loadMenuAndTrackOrder();
+          },
+          error: (err: any) => {
+            this.errorMessage = "Session Expired. Please scan the QR code again.";
+            this.isLoading = false;
+            this.cdr.detectChanges();
           }
-          this.loadMenuAndTrackOrder();
-        },
-        error: (err: any) => {
-          this.errorMessage = "Session Expired. Please scan the QR code again.";
-          this.isLoading = false;
-          this.cdr.detectChanges();
-        }
-      });
+        });
+      }
     } else {
-      if (existingToken) {
+      if (existingToken && !this.authService.isTokenExpired(existingToken)) {
         this.tableNumber = this.authService.getTableIdFromToken(existingToken);
         this.loadMenuAndTrackOrder();
       } else {
@@ -153,12 +166,21 @@ export class LandingComponent implements OnInit, OnDestroy {
                   console.log('Real-time bill paid event received:', bill);
                   this.billDetails.set(bill);
                   this.guestState.set('paid');
-                  this.startPaymentCountdown();
                   this.cdr.detectChanges();
                 });
               }
             });
             this.subscriptions.add(billPaidSub);
+
+            const sessionEndedSub = this.signalRService.guestSessionEnded$.subscribe({
+              next: () => {
+                this.zone.run(() => {
+                  console.log('Guest session ended SignalR event received.');
+                  this.startSessionEndGracePeriod();
+                });
+              }
+            });
+            this.subscriptions.add(sessionEndedSub);
           });
         }
 
@@ -282,7 +304,6 @@ export class LandingComponent implements OnInit, OnDestroy {
           if (bill) {
             if (bill.statusName === 'Paid') {
               this.guestState.set('paid');
-              this.startPaymentCountdown();
             } else if (bill.statusName === 'Pending') {
               this.guestState.set('bill');
             } else {
@@ -307,8 +328,19 @@ export class LandingComponent implements OnInit, OnDestroy {
     });
   }
 
-  public startPaymentCountdown() {
-    this.countdownSeconds.set(5);
+  public startSessionEndGracePeriod() {
+    if (this.sessionEnding()) {
+      return;
+    }
+    this.sessionEnding.set(true);
+
+    if (this.billDetails() && this.billDetails().statusName === 'Paid') {
+      this.guestState.set('paid');
+    } else {
+      this.guestState.set('session-ending');
+    }
+
+    this.countdownSeconds.set(10);
     if (this.countdownInterval) {
       clearInterval(this.countdownInterval);
     }
@@ -316,8 +348,9 @@ export class LandingComponent implements OnInit, OnDestroy {
       this.countdownSeconds.update(s => s - 1);
       if (this.countdownSeconds() <= 0) {
         clearInterval(this.countdownInterval);
+        this.signalRService.disconnect();
         this.authService.logout();
-        this.router.navigate(['/guest/landing'], { queryParams: { tableId: this.tableNumber } });
+        this.router.navigate(['/session-ended'], { state: { endedBySession: true, tableNumber: this.tableNumber } });
       }
       this.cdr.detectChanges();
     }, 1000);

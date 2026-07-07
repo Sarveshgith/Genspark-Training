@@ -42,6 +42,11 @@ export class SignalRService {
         return this.adminAlertSubject.asObservable();
     }
 
+    private guestSessionEndedSubject = new Subject<void>();
+    public get guestSessionEnded$(): Observable<void> {
+        return this.guestSessionEndedSubject.asObservable();
+    }
+
     public async connect(token: string): Promise<void> {
         if (this.hubConnection && this.isConnected()) {
             console.log("SignalR connection already active. Skipping connect.");
@@ -50,11 +55,11 @@ export class SignalRService {
         try {
 
             this.hubConnection = new signalR.HubConnectionBuilder()
-            .withUrl(signalrUrl, {
-                accessTokenFactory: () => token
-            })
-            .withAutomaticReconnect()
-            .build();
+                .withUrl(signalrUrl, {
+                    accessTokenFactory: () => token
+                })
+                .withAutomaticReconnect()
+                .build();
 
             this.registerSignalREvents();
 
@@ -102,6 +107,11 @@ export class SignalRService {
         this.hubConnection.on("ReceiveAdminAlert", (alert) => {
             console.log("Admin alert received:", alert);
             this.adminAlertSubject.next(alert);
+        });
+
+        this.hubConnection.on("GuestSessionEnded", () => {
+            console.log("Guest session ended received");
+            this.guestSessionEndedSubject.next();
         });
     }
 

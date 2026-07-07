@@ -19,6 +19,7 @@ export class InventorySheet implements OnChanges {
   private signalRService = inject(SignalRService);
 
   @Input() isOpen = false;
+  @Input() isInline = false;
   @Input() activeOrders: OrderModel[] = [];
   @Output() close = new EventEmitter<void>();
 

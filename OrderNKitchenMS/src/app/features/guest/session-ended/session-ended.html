@@ -1,0 +1,57 @@
+<div class="min-h-screen bg-[#FDFBF7] text-[#2C2117] font-sans antialiased flex items-center justify-center p-6">
+  
+  @if (isDirectAccess) {
+    <!-- Direct Access / Generic View -->
+    <div class="max-w-md w-full bg-white border border-[#EFE5D3] rounded-3xl p-8 text-center shadow-xl space-y-8 animate-fade-in">
+      <div class="w-20 h-20 bg-[#FAF3E8] border border-[#EFE5D3] rounded-full flex items-center justify-center text-4xl mx-auto text-[#9C7A3C]">
+        📱
+      </div>
+      <div class="space-y-3">
+        <span class="text-xs uppercase tracking-widest text-[#9C7A3C] font-extrabold font-outfit">Welcome to Ambrosia</span>
+        <h1 class="text-3xl font-semibold font-syne text-[#2C2117]">Scan QR Code</h1>
+        <p class="text-sm text-[#8C7A6B] leading-relaxed font-outfit max-w-sm mx-auto">
+          Please scan the QR code located on your table to verify your location and start ordering delicious meals.
+        </p>
+      </div>
+      <div class="border-t border-[#F5EFE6] pt-6">
+        <p class="text-xs text-[#8C7A6B] italic font-outfit">
+          Need help? Please ask one of our staff members for assistance.
+        </p>
+      </div>
+    </div>
+  } @else {
+    <!-- Redirected post logout / Table Specific View -->
+    <div class="max-w-md w-full bg-white border border-[#EFE5D3] rounded-3xl p-8 text-center shadow-xl space-y-8 animate-fade-in">
+      <div class="w-20 h-20 bg-[#E8F5E9] border border-[#C8E6C9] rounded-full flex items-center justify-center text-4xl mx-auto text-[#2E7D32]">
+        ✓
+      </div>
+      <div class="space-y-3">
+        <span class="text-xs uppercase tracking-widest text-[#2E7D32] font-extrabold font-outfit">Dining Session Ended</span>
+        <h1 class="text-3xl font-semibold font-syne text-[#2C2117]">Session Closed</h1>
+        <p class="text-sm text-[#8C7A6B] leading-relaxed font-outfit">
+          Your dining session at <span class="font-bold text-[#2C2117]">Table {{ tableNumber }}</span> has ended successfully.
+        </p>
+        <p class="text-sm text-[#8C7A6B] leading-relaxed font-outfit">
+          All temporary credentials and active connection states have been cleared for your security.
+        </p>
+      </div>
+
+      <div class="bg-[#F4F9F4] border border-[#D0E7D2] rounded-2xl py-4 px-6 max-w-xs mx-auto flex items-center justify-between font-outfit">
+        <span class="text-xs uppercase font-bold tracking-wider text-[#2E7D32]">Location Status</span>
+        <span class="text-xs uppercase font-bold tracking-wider text-[#2E7D32] bg-[#E8F5E9] px-2 py-0.5 rounded-full">Available</span>
+      </div>
+
+      <div class="border-t border-[#F5EFE6] pt-6 space-y-4">
+        <div class="text-xs text-[#8C7A6B] leading-relaxed font-outfit">
+          Thank you for dining with us at <span class="font-semibold text-[#2C2117]">Ambrosia</span>. We hope to see you again soon!
+        </div>
+        <div>
+          <a routerLink="/login" class="px-6 py-2.5 bg-[#2C2117] text-white hover:bg-[#3d2f21] rounded-full transition duration-300 shadow-md shadow-[#2c21171c] font-medium font-outfit tracking-wide cursor-pointer text-xs uppercase inline-block">
+            Staff Portal
+          </a>
+        </div>
+      </div>
+    </div>
+  }
+
+</div>

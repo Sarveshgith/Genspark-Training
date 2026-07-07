@@ -1,19 +1,19 @@
-// @feature Chef | KDS Board | Kitchen Display System board tracking active orders in preparation stages (Pending, Prep, Ready).
 import { Component, inject, OnInit, signal, computed, OnDestroy } from '@angular/core';
 import { OrderService } from '../../../core/services/order.service';
 import { OrderModel } from '../../../core/models/order.model';
 import { OrderCard } from '../order-card/order-card';
-import { ShiftSummary } from '../shift-summary/shift-summary';
-import { InventorySheet } from '../inventory-sheet/inventory-sheet';
 import { AuthService } from '../../../core/services/auth.service';
 import { SignalRService } from '../../../core/services/signalr.service';
 import { AudioService } from '../../../core/services/audio.service';
+import { InventoryService } from '../../../core/services/inventory.service';
+import { Router } from '@angular/router';
+import { KdsDrawer, KdsMessage } from '../kds-drawer/kds-drawer';
 import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-kds-board',
   standalone: true,
-  imports: [OrderCard, ShiftSummary, InventorySheet],
+  imports: [OrderCard, KdsDrawer],
   templateUrl: './kds-board.html',
   styleUrl: './kds-board.css',
 })
@@ -22,6 +22,8 @@ export class KdsBoard implements OnInit, OnDestroy {
   private authService = inject(AuthService);
   public signalRService = inject(SignalRService);
   private audioService = inject(AudioService);
+  private inventoryService = inject(InventoryService);
+  private router = inject(Router);
 
   public pendingOrders = signal<OrderModel[]>([]);
   public inPrepOrders = signal<OrderModel[]>([]);
@@ -34,10 +36,23 @@ export class KdsBoard implements OnInit, OnDestroy {
   public errorMessage = signal<string>('');
   
   public currentTime = signal<Date>(new Date());
-  public isSummaryOpen = signal<boolean>(false);
-  public isInventoryOpen = signal<boolean>(false);
+  public drawerContent = signal<'inventory' | 'messages' | 'summary' | null>(null);
+  public showLogoutConfirm = signal<boolean>(false);
   public isStatsVisible = signal<boolean>(false);
   public chefName = signal<string>('Chef');
+
+  public messages = signal<KdsMessage[]>([
+    {
+      id: 1,
+      text: "Welcome to Ambrosia KDS. Live connection active.",
+      timestamp: new Date(),
+      read: true
+    }
+  ]);
+  public unreadMessageCount = signal<number>(0);
+  public lowStockCount = signal<number>(0);
+
+  private logoutTimeoutId: any;
 
   private subscriptions = new Subscription();
   private clockIntervalId: any;
@@ -72,6 +87,7 @@ export class KdsBoard implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.fetchActiveOrders();
+    this.fetchLowStockCount();
 
     const token = this.authService.getToken() ?? '';
     this.signalRService.connect(token);
@@ -192,6 +208,28 @@ export class KdsBoard implements OnInit, OnDestroy {
       })
     );
 
+    this.subscriptions.add(
+      this.signalRService.adminAlert$.subscribe({
+        next: (alert) => {
+          const text = alert.message || `Alert: ${alert.itemName || 'item'} is low on stock!`;
+          this.messages.update(msgs => [
+            {
+              id: Date.now() + Math.random(),
+              text: text,
+              timestamp: new Date(),
+              read: this.drawerContent() === 'messages'
+            },
+            ...msgs
+          ]);
+          if (this.drawerContent() !== 'messages') {
+            this.unreadMessageCount.update(c => c + 1);
+          }
+          this.audioService.playNewOrderChime();
+          this.fetchLowStockCount();
+        }
+      })
+    );
+
     // Start clock interval for ticking timers & average preparation computations
     this.clockIntervalId = setInterval(() => {
       this.currentTime.set(new Date());
@@ -294,24 +332,70 @@ export class KdsBoard implements OnInit, OnDestroy {
     this.unreadCount.set(0);
   }
 
-  toggleSummary(): void {
-    this.isSummaryOpen.update(val => !val);
-    if (this.isSummaryOpen()) {
-      this.isInventoryOpen.set(false);
+  fetchLowStockCount(): void {
+    this.inventoryService.getLowStockItems().subscribe({
+      next: (items) => {
+        this.lowStockCount.set(items.length);
+      },
+      error: (err) => {
+        console.error('Failed to load low stock count', err);
+      }
+    });
+  }
+
+  openDrawer(content: 'inventory' | 'messages' | 'summary'): void {
+    // If tapping the already open tab, close it
+    if (this.drawerContent() === content) {
+      this.closeDrawer();
+      return;
+    }
+    
+    this.drawerContent.set(content);
+    if (content === 'messages') {
+      this.markAllMessagesRead();
+    } else if (content === 'inventory') {
+      this.fetchLowStockCount();
     }
   }
 
-  toggleInventory(): void {
-    this.isInventoryOpen.update(val => !val);
-    if (this.isInventoryOpen()) {
-      this.isSummaryOpen.set(false);
+  closeDrawer(): void {
+    this.drawerContent.set(null);
+  }
+
+  markAllMessagesRead(): void {
+    this.messages.update(msgs => msgs.map(m => ({ ...m, read: true })));
+    this.unreadMessageCount.set(0);
+  }
+
+  triggerLogout(): void {
+    this.showLogoutConfirm.set(true);
+    if (this.logoutTimeoutId) {
+      clearTimeout(this.logoutTimeoutId);
     }
+    this.logoutTimeoutId = setTimeout(() => {
+      this.showLogoutConfirm.set(false);
+    }, 3000);
+  }
+
+  confirmLogout(): void {
+    if (this.logoutTimeoutId) {
+      clearTimeout(this.logoutTimeoutId);
+    }
+    this.showLogoutConfirm.set(false);
+    this.authService.logout();
+    this.router.navigate(['/login']);
+  }
+
+  cancelLogout(): void {
+    if (this.logoutTimeoutId) {
+      clearTimeout(this.logoutTimeoutId);
+    }
+    this.showLogoutConfirm.set(false);
   }
 
   private sortByAge(orders: OrderModel[]): OrderModel[] {
     return [...orders].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
   }
-
 
   private showToast(message: string): void {
     this.toastMessage.set(message);
@@ -330,6 +414,9 @@ export class KdsBoard implements OnInit, OnDestroy {
     }
     if (this.toastTimeoutId) {
       clearTimeout(this.toastTimeoutId);
+    }
+    if (this.logoutTimeoutId) {
+      clearTimeout(this.logoutTimeoutId);
     }
     this.signalRService.disconnect();
   }
