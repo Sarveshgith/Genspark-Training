@@ -85,7 +85,7 @@ public class OrderController : ControllerBase
         }
         var createdOrder = await _orderService.CreateOrderAsync(tableId, waiterId, orderCreateDto);
         _logger.LogInformation("CreateOrder completed. Created Order ID: {OrderId} for TableId: {TableId}", createdOrder.Id, tableId);
-        return Ok(createdOrder);
+        return CreatedAtAction(nameof(GetOrderById), new { id = createdOrder.Id }, createdOrder);
     }
 
     [Authorize(Policy = "CanPlaceOrder")]

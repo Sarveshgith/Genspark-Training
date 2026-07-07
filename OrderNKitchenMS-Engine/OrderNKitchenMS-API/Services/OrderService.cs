@@ -447,6 +447,18 @@ public class OrderService : IOrderService
                 _ => await GetGuestOrderTrackingAsync(updatedOrder.TableId)
             };
             await SafeNotifyOrderUpdateAsync(updatedOrder, "status update", trackingInfo);
+
+            if (newStatus == OrderStatus.Cancelled)
+            {
+                try
+                {
+                    await _signalService.NotifyGuestSessionEndedAsync(updatedOrder.TableId);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to send GuestSessionEnded SignalR notification for TableId: {TableId} on cancellation.", updatedOrder.TableId);
+                }
+            }
         }
 
         return true;

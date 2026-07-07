@@ -5,27 +5,50 @@ using OrderNKitchenMS_API.Repositories.Interfaces;
 using OrderNKitchenMS_API.Services.Interfaces;
 using OrderNKitchenMS_API.Utils;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace OrderNKitchenMS_API.Services;
 
 public class CategoryService : ICategoryService
 {
     private readonly ICategoryRepository _categoryRepository;
+    private readonly IMenuItemRepository _menuItemRepository;
     private readonly ILogger<CategoryService> _logger;
+    private readonly IMemoryCache _cache;
 
-    public CategoryService(ICategoryRepository categoryRepository, ILogger<CategoryService> logger)
+    public CategoryService(
+        ICategoryRepository categoryRepository, 
+        IMenuItemRepository menuItemRepository,
+        ILogger<CategoryService> logger,
+        IMemoryCache cache)
     {
         _categoryRepository = categoryRepository;
+        _menuItemRepository = menuItemRepository;
         _logger = logger;
+        _cache = cache;
     }
 
     // Retrieves all categories, optionally filtered by food type (veg/non-veg).
     public async Task<IEnumerable<CategoryDto>> GetAllAsync(bool? isNonVeg = null)
     {
         _logger.LogInformation("GetAllAsync called with isNonVeg: {IsNonVeg}", isNonVeg);
-        var categories = await _categoryRepository.GetAllAsync(isNonVeg);
-        _logger.LogInformation("GetAllAsync completed. Returned {Count} categories.", categories.Count());
-        return categories.Select(MapCategoryToDto);
+        
+        List<Category> allCategories;
+        if (!_cache.TryGetValue(CacheKeys.CategoriesAll, out allCategories))
+        {
+            var categoriesEnumerable = await _categoryRepository.GetAllAsync(null);
+            allCategories = categoriesEnumerable.ToList();
+            _cache.Set(CacheKeys.CategoriesAll, allCategories, TimeSpan.FromSeconds(60));
+        }
+
+        var result = allCategories.AsEnumerable();
+        if (isNonVeg.HasValue)
+        {
+            result = result.Where(category => category.IsNonVeg == isNonVeg.Value);
+        }
+
+        _logger.LogInformation("GetAllAsync completed. Returned {Count} categories.", result.Count());
+        return result.Select(MapCategoryToDto);
     }
 
     // Retrieves a specific category by its unique identifier.
@@ -57,6 +80,7 @@ public class CategoryService : ICategoryService
             IsNonVeg = categoryCreateDto.IsNonVeg
         });
 
+        _cache.Remove(CacheKeys.CategoriesAll);
         _logger.LogInformation("CreateAsync succeeded. Created Category ID: {Id}", createdCategory.Id);
         return MapCategoryToDto(createdCategory);
     }
@@ -82,6 +106,8 @@ public class CategoryService : ICategoryService
             throw new NotFoundException($"Category with id {id} was not found.");
         }
 
+        _cache.Remove(CacheKeys.CategoriesAll);
+        _cache.Remove(CacheKeys.MenuAll);
         _logger.LogInformation("UpdateAsync succeeded for Category ID: {Id}", id);
         return MapCategoryToDto(updatedCategory);
     }
@@ -102,6 +128,15 @@ public class CategoryService : ICategoryService
     public async Task<bool> DeleteAsync(int id)
     {
         _logger.LogInformation("DeleteAsync started for Category ID: {Id}", id);
+
+        var menuItems = await _menuItemRepository.GetAllAsync();
+        var hasActiveItems = menuItems.Any(item => item.CategoryId == id && !item.IsDeleted);
+        if (hasActiveItems)
+        {
+            _logger.LogWarning("DeleteAsync failed: Category ID {Id} has active menu items.", id);
+            throw new BusinessRuleException("Category cannot be deleted because it contains active menu items.");
+        }
+
         var isDeleted = await _categoryRepository.DeleteAsync(id);
         if (!isDeleted)
         {
@@ -109,6 +144,8 @@ public class CategoryService : ICategoryService
             throw new NotFoundException($"Category with id {id} was not found.");
         }
 
+        _cache.Remove(CacheKeys.CategoriesAll);
+        _cache.Remove(CacheKeys.MenuAll);
         _logger.LogInformation("DeleteAsync succeeded for Category ID: {Id}", id);
         return true;
     }

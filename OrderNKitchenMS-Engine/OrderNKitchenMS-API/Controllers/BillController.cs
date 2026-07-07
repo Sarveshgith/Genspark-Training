@@ -28,7 +28,7 @@ public class BillController : ControllerBase
         Validation.RequireNotNull(billCreateDto, nameof(billCreateDto));
         _logger.LogInformation("CreateBill requested for Order ID: {OrderId}", billCreateDto.OrderId);
         var billDto = await _billService.CreateBillAsync(billCreateDto);
-        return Ok(billDto);
+        return CreatedAtAction(nameof(GetBillByOrderId), new { orderId = billDto.OrderId }, billDto);
     }
 
     [Authorize(Policy = "AdminOnly")]

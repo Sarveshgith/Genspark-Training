@@ -7,6 +7,7 @@ using OrderNKitchenMS_API.Repositories.Interfaces;
 using OrderNKitchenMS_API.Services.Interfaces;
 using OrderNKitchenMS_API.Utils;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace OrderNKitchenMS_API.Services;
 
@@ -14,11 +15,13 @@ public class UserService : IUserService
 {
     private readonly IUserRepository _userRepository;
     private readonly ILogger<UserService> _logger;
+    private readonly IMemoryCache _cache;
 
-    public UserService(IUserRepository userRepository, ILogger<UserService> logger)
+    public UserService(IUserRepository userRepository, ILogger<UserService> logger, IMemoryCache cache)
     {
         _userRepository = userRepository;
         _logger = logger;
+        _cache = cache;
     }
 
     // Retrieves a filtered, paginated list of all users.
@@ -61,8 +64,16 @@ public class UserService : IUserService
     public async Task<IEnumerable<RoleDto>> GetAllRolesAsync()
     {
         _logger.LogInformation("GetAllRolesAsync called");
-        var roles = await _userRepository.GetAllRolesAsync();
-        return roles.Select(MapRoleToDto);
+        
+        List<RoleDto> cachedRoles;
+        if (!_cache.TryGetValue(CacheKeys.RolesAll, out cachedRoles))
+        {
+            var roles = await _userRepository.GetAllRolesAsync();
+            cachedRoles = roles.Select(MapRoleToDto).ToList();
+            _cache.Set(CacheKeys.RolesAll, cachedRoles, TimeSpan.FromHours(24));
+        }
+
+        return cachedRoles;
     }
 
     // Retrieves a specific user by their unique identifier.

@@ -6,6 +6,7 @@ using OrderNKitchenMS_API.Repositories.Interfaces;
 using OrderNKitchenMS_API.Services.Interfaces;
 using OrderNKitchenMS_API.Utils;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Caching.Memory;
 
 using OrderNKitchenMS_API.Data;
 
@@ -18,26 +19,38 @@ public class MenuService : IMenuService
     private readonly IItemService _itemService;
     private readonly ILogger<MenuService> _logger;
     private readonly AppDbContext _context;
+    private readonly IMemoryCache _cache;
 
     public MenuService(
         IMenuItemRepository menuItemRepository, 
         ICategoryRepository categoryRepository, 
         IItemService itemService,
         ILogger<MenuService> logger,
-        AppDbContext context)
+        AppDbContext context,
+        IMemoryCache cache)
     {
         _menuItemRepository = menuItemRepository;
         _categoryRepository = categoryRepository;
         _itemService = itemService;
         _logger = logger;
         _context = context;
+        _cache = cache;
     }
 
     // Retrieves a filtered, paginated list of menu items.
     public async Task<IEnumerable<MenuItemDto>> GetAllAsync(QueryMenuItemDto query)
     {
         _logger.LogInformation("GetAllAsync called for menu items. CategoryId: {CategoryId}, Search: '{Name}'", query?.CategoryId, query?.Name);
-        var menuItems = await _menuItemRepository.GetAllAsync();
+        
+        List<MenuItem> allItems;
+        if (!_cache.TryGetValue(CacheKeys.MenuAll, out allItems))
+        {
+            var queryable = await _menuItemRepository.GetAllAsync();
+            allItems = await queryable.ToListAsync();
+            _cache.Set(CacheKeys.MenuAll, allItems, TimeSpan.FromSeconds(60));
+        }
+
+        IEnumerable<MenuItem> menuItems = allItems;
 
         if (Validation.IsNonEmptyString(query.Name ?? string.Empty))
         {
@@ -72,11 +85,11 @@ public class MenuService : IMenuService
         var pageNumber = query.PageNumber < 1 ? 1 : query.PageNumber;
         var pageSize = query.PageSize < 1 ? 10 : query.PageSize;
 
-        var result = await menuItems
+        var result = menuItems
             .OrderBy(menuItem => menuItem.Name)
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
-            .ToListAsync();
+            .ToList();
 
         _logger.LogInformation("GetAllAsync completed. Returned {Count} menu items.", result.Count);
         return result.Select(MapMenuItemToDto);
@@ -109,6 +122,7 @@ public class MenuService : IMenuService
         menuItemEntity.IsManuallyDisabled = false;
 
         var createdMenuItem = await _menuItemRepository.CreateAsync(menuItemEntity);
+        _cache.Remove(CacheKeys.MenuAll);
         _logger.LogInformation("CreateAsync succeeded. Created Menu Item ID: {Id}", createdMenuItem.Id);
         return MapMenuItemToDto(createdMenuItem);
     }
@@ -137,6 +151,7 @@ public class MenuService : IMenuService
         existingMenuItem.IsAvailable = menuItemUpdateDto.IsAvailable;
 
         await _menuItemRepository.UpdateAsync(id, existingMenuItem);
+        _cache.Remove(CacheKeys.MenuAll);
         _logger.LogInformation("UpdateAsync succeeded for Menu Item ID: {Id}", id);
         return MapMenuItemToDto(existingMenuItem);
     }
@@ -180,6 +195,7 @@ public class MenuService : IMenuService
         await _menuItemRepository.ToggleAvailabilityAsync(id, isAvailable);
         // Force the DB tracked entity changes (like IsManuallyDisabled) to save as well
         await _menuItemRepository.UpdateAsync(id, menuItem);
+        _cache.Remove(CacheKeys.MenuAll);
 
         _logger.LogInformation("ToggleAvailabilityAsync succeeded for Menu Item ID: {Id}", id);
         return true;
@@ -196,6 +212,7 @@ public class MenuService : IMenuService
             throw new NotFoundException($"Menu item with id {id} was not found.");
         }
 
+        _cache.Remove(CacheKeys.MenuAll);
         _logger.LogInformation("DeleteAsync succeeded for Menu Item ID: {Id}", id);
         return true;
     }

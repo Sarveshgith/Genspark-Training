@@ -18,8 +18,13 @@ public interface ISignalService
     //Bill signals
     public Task NotifyBillGeneratedAsync(int tableId, BillDto billDto);
     public Task NotifyBillPaidAsync(int tableId, BillDto billDto);
+    public Task NotifyGuestSessionEndedAsync(int tableId);
 
-    //Alert signals
-    public Task NotifyLowStockAlertAsync(string chefName, int itemId, string itemName, decimal currentStock, string unitName);
+
+
+    // Unified Messaging Drawer signals
+    public Task SendKitchenMessageAsync(HubNotificationDto notification);
+    public Task SendFloorMessageAsync(HubNotificationDto notification);
+    public Task SendAdminAlertAsync(HubNotificationDto notification);
 }
 

@@ -56,20 +56,28 @@ public class SignalService : ISignalService
             .SendAsync("bill_paid", billDto);
     }
 
-    public async Task NotifyLowStockAlertAsync(string chefName, int itemId, string itemName, decimal currentStock, string unitName)
+    public async Task NotifyGuestSessionEndedAsync(int tableId)
     {
-        var message = $"[STOCK ALERT] Chef {chefName} flagged low stock for {itemName}: {currentStock} {unitName} remaining.";
-        _logger.LogInformation("Broadcasting stock warning to admin group for item: {ItemName}", itemName);
+        _logger.LogInformation("Notifying table-{TableId} that the guest session has ended.", tableId);
+        await _hubContext.Clients.Group($"table-{tableId}")
+            .SendAsync("GuestSessionEnded");
+    }
 
-        await _hubContext.Clients.Group("admins").SendAsync("ReceiveAdminAlert", new
-        {
-            itemId,
-            itemName,
-            stockQuantity = currentStock,
-            unitName,
-            message,
-            flaggedBy = chefName,
-            createdAt = DateTime.UtcNow
-        });
+    public async Task SendKitchenMessageAsync(HubNotificationDto notification)
+    {
+        _logger.LogInformation("Broadcasting kitchen message: {Title} - {Message}", notification.Title, notification.Message);
+        await _hubContext.Clients.Group("kitchen").SendAsync("ReceiveKitchenMessage", notification);
+    }
+
+    public async Task SendFloorMessageAsync(HubNotificationDto notification)
+    {
+        _logger.LogInformation("Broadcasting floor message to waiters: {Title} - {Message}", notification.Title, notification.Message);
+        await _hubContext.Clients.Group("waiters").SendAsync("ReceiveFloorMessage", notification);
+    }
+
+    public async Task SendAdminAlertAsync(HubNotificationDto notification)
+    {
+        _logger.LogInformation("Broadcasting admin alert: {Title} - {Message}", notification.Title, notification.Message);
+        await _hubContext.Clients.Group("admins").SendAsync("ReceiveAdminAlert", notification);
     }
 }

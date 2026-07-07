@@ -178,6 +178,7 @@ public class BillService : IBillService
             {
                 var billDto = MapBillToDto(bill);
                 await _signalService.NotifyBillPaidAsync(order.TableId, billDto);
+                await _signalService.NotifyGuestSessionEndedAsync(order.TableId);
             }
         }
 

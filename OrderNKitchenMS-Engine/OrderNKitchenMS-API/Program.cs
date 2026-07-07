@@ -20,38 +20,42 @@ var builder = WebApplication.CreateBuilder(args);
 
 //AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
+//Serilog Service
 builder.Logging.ClearProviders();
 builder.Host.UseSerilog((context, services, configuration) => configuration
     .ReadFrom.Configuration(context.Configuration)
     .ReadFrom.Services(services));
 
+//CORS Policy
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAngularApp", policy =>
     {
         policy.WithOrigins("http://localhost:4200") 
-              .AllowAnyHeader()
-              .AllowAnyMethod()
+              .WithHeaders("Content-Type", "Authorization", "Accept", "X-Requested-With", "x-signalr-user-agent")
+              .WithMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
               .AllowCredentials();
     });
 });
 
-
+//PdfGen Provider License
 QuestPDF.Settings.License = LicenseType.Community;
 
 builder.Services.AddOpenApi();
 builder.Services.AddControllers();
+builder.Services.AddMemoryCache();
 
 builder.Services.AddSignalR();
 
+//JWT Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
         {
-            ValidateIssuer = false,
+            ValidateIssuer = true,
             ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
-            ValidateAudience = false,
+            ValidateAudience = true,
             ValidAudience = builder.Configuration["JwtSettings:Audience"],
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
@@ -77,6 +81,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
+//Authorization Policies
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
@@ -154,6 +159,15 @@ builder.Services.AddProblemDetails();
 var app = builder.Build();
 
 app.UseExceptionHandler();
+
+//Strictly follow Content-Type, Avoid Clickjacking, Omit Referrer headers
+app.Use(async (context, next) =>
+{   
+    context.Response.Headers.Append("X-Content-Type-Options", "nosniff");
+    context.Response.Headers.Append("X-Frame-Options", "DENY");
+    context.Response.Headers.Append("Referrer-Policy", "no-referrer");
+    await next();
+});
 
 if (app.Environment.IsDevelopment())
 {
