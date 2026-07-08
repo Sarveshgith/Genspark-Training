@@ -3,7 +3,7 @@ import { Router } from "@angular/router";
 import { AuthService } from "../services/auth.service";
 import { inject } from "@angular/core";
 import { catchError, switchMap, throwError } from "rxjs";
-import { IS_PUBLIC_API } from "./public-api.token";
+import { IS_PUBLIC_API, SKIP_REFRESH } from "./public-api.token";
 
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
@@ -14,7 +14,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         catchError((err: HttpErrorResponse) => {
 
             if (err.status === 401) {
-                if (req.context.get(IS_PUBLIC_API)) {
+                if (req.context.get(SKIP_REFRESH) || req.context.get(IS_PUBLIC_API)) {
                     authService.logout();
                     router.navigate(['/login']);
                     return throwError(() => err);

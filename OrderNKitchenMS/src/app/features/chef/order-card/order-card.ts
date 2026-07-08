@@ -1,8 +1,8 @@
-// @feature Chef | Order Card | A card component representing a single order, displaying line items, table info, and action buttons.
-import { Component, input, output, signal, computed, OnInit, OnDestroy } from '@angular/core';
+import { Component, input, output, signal, computed, OnInit, OnDestroy, inject } from '@angular/core';
 import { OrderModel } from '../../../core/models/order.model';
 import { CurrencyPipe, DatePipe, DecimalPipe } from '@angular/common';
 import { OrderTimer } from '../order-timer/order-timer';
+import { SignalRService } from '../../../core/services/signalr.service';
 
 @Component({
   selector: 'app-order-card',
@@ -12,6 +12,8 @@ import { OrderTimer } from '../order-timer/order-timer';
   styleUrl: './order-card.css',
 })
 export class OrderCard implements OnInit, OnDestroy {
+  private signalRService = inject(SignalRService);
+
   public order = input.required<OrderModel>();
   public cookingStartTime = input<number | undefined>();
 
@@ -20,6 +22,14 @@ export class OrderCard implements OnInit, OnDestroy {
 
   public isModalOpen = signal<boolean>(false);
   public elapsedSeconds = signal<number>(0);
+  
+  // Composer state
+  public isComposerOpen = signal<boolean>(false);
+  public selectedMessageType = signal<'order_delayed' | 'item_substitution_needed' | 'low_stock_warning_floor'>('order_delayed');
+  public substituteItemInput = signal<string>('');
+  public composerNote = signal<string>('');
+  
+  private touchTimeoutId: any;
   private timerId: any;
 
   public ngOnInit(): void {
@@ -71,6 +81,67 @@ export class OrderCard implements OnInit, OnDestroy {
 
   public closeModal(): void {
     this.isModalOpen.set(false);
+  }
+
+  public openComposer(event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.isComposerOpen.set(true);
+  }
+
+  public closeComposer(): void {
+    this.isComposerOpen.set(false);
+    this.selectedMessageType.set('order_delayed');
+    this.substituteItemInput.set('');
+    this.composerNote.set('');
+  }
+
+  public onMessageTypeChange(event: any): void {
+    this.selectedMessageType.set(event.target.value);
+  }
+
+  public onSubstituteItemChange(event: any): void {
+    this.substituteItemInput.set(event.target.value);
+  }
+
+  public onNoteChange(event: any): void {
+    this.composerNote.set(event.target.value);
+  }
+
+  public sendComposerMessage(): void {
+    const type = this.selectedMessageType();
+    const tableId = this.order().tableId;
+    
+    const payload: any = {
+      orderId: this.order().id,
+      note: this.composerNote()
+    };
+
+    if (type === 'item_substitution_needed') {
+      payload.substituteItem = this.substituteItemInput();
+    }
+
+    this.signalRService.sendFloorMessage(type, tableId, payload)
+      .then(() => {
+        this.closeComposer();
+      })
+      .catch(err => {
+        console.error('Failed to send floor message:', err);
+      });
+  }
+
+  public onTouchStart(event: TouchEvent): void {
+    this.touchTimeoutId = setTimeout(() => {
+      this.openComposer();
+    }, 600);
+  }
+
+  public onTouchEnd(): void {
+    if (this.touchTimeoutId) {
+      clearTimeout(this.touchTimeoutId);
+      this.touchTimeoutId = null;
+    }
   }
 
   public onAction(event: MouseEvent): void {

@@ -1,1 +1,36 @@
 /* Scoped styling removed for plain HTML phase */
+
+.pulse-highlight {
+  animation: card-pulse 3s ease-in-out;
+}
+
+@keyframes card-pulse {
+  0% {
+    box-shadow: 0 0 0 0px rgba(242, 133, 0, 0);
+    border-color: rgba(242, 133, 0, 0.4);
+    transform: scale(1);
+  }
+  15% {
+    box-shadow: 0 0 0 8px rgba(242, 133, 0, 0.4);
+    border-color: rgba(242, 133, 0, 1);
+    transform: scale(1.02);
+  }
+  30% {
+    box-shadow: 0 0 0 15px rgba(242, 133, 0, 0);
+    border-color: rgba(242, 133, 0, 0.8);
+    transform: scale(1);
+  }
+  45% {
+    box-shadow: 0 0 0 8px rgba(242, 133, 0, 0.3);
+    border-color: rgba(242, 133, 0, 1);
+    transform: scale(1.01);
+  }
+  60% {
+    box-shadow: 0 0 0 0px rgba(242, 133, 0, 0);
+    border-color: rgba(242, 133, 0, 0.6);
+    transform: scale(1);
+  }
+  100% {
+    border-color: inherit;
+  }
+}

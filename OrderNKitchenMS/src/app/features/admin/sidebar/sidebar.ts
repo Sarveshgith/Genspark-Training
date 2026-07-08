@@ -55,6 +55,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
   }
 
   logout(): void {
+    this.signalRService.disconnect();
     this.authService.logout();
     this.router.navigate(['/login']);
   }

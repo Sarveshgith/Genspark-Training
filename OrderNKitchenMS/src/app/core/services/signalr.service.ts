@@ -1,15 +1,18 @@
-import { Injectable, signal } from "@angular/core";
+import { Injectable, inject, signal } from "@angular/core";
 import * as signalR from "@microsoft/signalr";
 import { signalrUrl } from "../enviroment";
-import { Observable, Subject } from "rxjs";
+import { Observable, Subject, firstValueFrom } from "rxjs";
 import { OrderModel } from "../models/order.model";
+import { AuthService } from "./auth.service";
 
 @Injectable({
     providedIn: "root"
 })
 export class SignalRService {
+    private authService = inject(AuthService);
 
     private hubConnection!: signalR.HubConnection;
+    private connectingPromise: Promise<void> | null = null;
     public isConnected = signal<boolean>(false);
 
     private newOrderSubject = new Subject<OrderModel>();
@@ -42,39 +45,73 @@ export class SignalRService {
         return this.adminAlertSubject.asObservable();
     }
 
+    private kitchenMessageSubject = new Subject<any>();
+    public get kitchenMessage$(): Observable<any> {
+        return this.kitchenMessageSubject.asObservable();
+    }
+
+    private floorMessageSubject = new Subject<any>();
+    public get floorMessage$(): Observable<any> {
+        return this.floorMessageSubject.asObservable();
+    }
+
     private guestSessionEndedSubject = new Subject<void>();
     public get guestSessionEnded$(): Observable<void> {
         return this.guestSessionEndedSubject.asObservable();
     }
 
     public async connect(token: string): Promise<void> {
-        if (this.hubConnection && this.isConnected()) {
+        if (this.isConnected()) {
             console.log("SignalR connection already active. Skipping connect.");
             return;
         }
-        try {
-
-            this.hubConnection = new signalR.HubConnectionBuilder()
-                .withUrl(signalrUrl, {
-                    accessTokenFactory: () => token
-                })
-                .withAutomaticReconnect()
-                .build();
-
-            this.registerSignalREvents();
-
-            await this.hubConnection.start();
-            console.log("SignalR Connected.");
-            this.isConnected.set(true);
-
-            this.hubConnection.onclose(() => this.isConnected.set(false));
-            this.hubConnection.onreconnecting(() => this.isConnected.set(false));
-            this.hubConnection.onreconnected(() => this.isConnected.set(true));
-
-        } catch (err) {
-            console.error("Error connecting to SignalR:", err);
-            this.isConnected.set(false);
+        if (this.connectingPromise) {
+            console.log("SignalR connection in progress. Returning existing connection promise.");
+            return this.connectingPromise;
         }
+        // Auto-refresh token if expired before starting the SignalR connection
+        let currentToken = this.authService.getToken() || token;
+        if (currentToken && this.authService.isTokenExpired(currentToken)) {
+            console.log("Token is expired. Attempting refresh before connecting to SignalR...");
+            try {
+                const res = await firstValueFrom(this.authService.refreshToken());
+                if (res && res.token) {
+                    token = res.token;
+                }
+            } catch (refreshErr) {
+                console.error("Failed to refresh token before connecting to SignalR:", refreshErr);
+            }
+        }
+
+        this.connectingPromise = (async () => {
+            try {
+                this.hubConnection = new signalR.HubConnectionBuilder()
+                    .withUrl(signalrUrl, {
+                        accessTokenFactory: () => this.authService.getToken() || token
+                    })
+                    .withAutomaticReconnect()
+                    .build();
+
+                this.registerSignalREvents();
+
+                await this.hubConnection.start();
+                console.log("SignalR Connected.");
+                this.isConnected.set(true);
+
+                this.hubConnection.onclose(() => this.isConnected.set(false));
+                this.hubConnection.onreconnecting(() => this.isConnected.set(false));
+                this.hubConnection.onreconnected(() => this.isConnected.set(true));
+
+            } catch (err) {
+                console.error("Error connecting to SignalR:", err);
+                this.isConnected.set(false);
+                throw err;
+            } finally {
+                this.connectingPromise = null;
+            }
+        })();
+
+        return this.connectingPromise;
     }
 
     private registerSignalREvents(): void {
@@ -113,19 +150,68 @@ export class SignalRService {
             console.log("Guest session ended received");
             this.guestSessionEndedSubject.next();
         });
+
+        this.hubConnection.on("ReceiveKitchenMessage", (notification) => {
+            console.log("Kitchen message received:", notification);
+            this.kitchenMessageSubject.next(notification);
+        });
+
+        this.hubConnection.on("ReceiveFloorMessage", (notification) => {
+            console.log("Floor message received:", notification);
+            this.floorMessageSubject.next(notification);
+        });
     }
 
-    public async flagLowStockToAdmin(itemId: number, itemName: string, currentStock: number, unitName: string): Promise<void> {
+    public async sendKitchenMessage(type: string, payload: any): Promise<void> {
         if (this.hubConnection && this.isConnected()) {
             try {
-                await this.hubConnection.invoke("FlagLowStockToAdmin", itemId, itemName, currentStock, unitName);
-                console.log("Flagged low stock to admin:", itemName);
+                await this.hubConnection.invoke("SendKitchenMessage", type, payload);
             } catch (err) {
-                console.error("Error flagging stock to admin:", err);
+                console.error("Error sending kitchen message:", err);
                 throw err;
             }
         } else {
-            console.error("SignalR connection not active. Cannot flag to admin.");
+            throw new Error("SignalR connection not active.");
+        }
+    }
+
+    public async sendFloorMessage(type: string, tableId: number, payload: any): Promise<void> {
+        if (this.hubConnection && this.isConnected()) {
+            try {
+                await this.hubConnection.invoke("SendFloorMessage", type, tableId, payload);
+            } catch (err) {
+                console.error("Error sending floor message:", err);
+                throw err;
+            }
+        } else {
+            throw new Error("SignalR connection not active.");
+        }
+    }
+
+    public async sendAdminAlert(type: string, payload: any): Promise<void> {
+        if (this.hubConnection && this.isConnected()) {
+            try {
+                await this.hubConnection.invoke("SendAdminAlert", type, payload);
+            } catch (err) {
+                console.error("Error sending admin alert:", err);
+                throw err;
+            }
+        } else {
+            throw new Error("SignalR connection not active.");
+        }
+    }
+
+
+
+    public async guestCallWaiter(type: string): Promise<void> {
+        if (this.hubConnection && this.isConnected()) {
+            try {
+                await this.hubConnection.invoke("GuestCallWaiter", type);
+            } catch (err) {
+                console.error("Error invoking GuestCallWaiter:", err);
+                throw err;
+            }
+        } else {
             throw new Error("SignalR connection not active.");
         }
     }

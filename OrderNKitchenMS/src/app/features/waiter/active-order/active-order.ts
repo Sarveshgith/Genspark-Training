@@ -7,6 +7,8 @@ import { OrderService } from '../../../core/services/order.service';
 import { SignalRService } from '../../../core/services/signalr.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { BillService } from '../../../core/services/bill.service';
+import { MenuService } from '../../../core/services/menu.service';
+import { MenuItemModel } from '../../../core/models/menu.model';
 import { BillDto } from '../../../core/models/bill.model';
 import { HttpClient } from '@angular/common/http';
 import { OrderModel } from '../../../core/models/order.model';
@@ -28,7 +30,16 @@ export class ActiveOrderComponent implements OnInit, OnDestroy {
   private billService = inject(BillService);
   private http = inject(HttpClient);
   private cdr = inject(ChangeDetectorRef);
+  private menuService = inject(MenuService);
   private zone = inject(NgZone);
+
+  // Edit / Add Items State
+  public showAddItemsModal: boolean = false;
+  public allItems: MenuItemModel[] = [];
+  public filteredItems: MenuItemModel[] = [];
+  public itemSearchQuery: string = '';
+  public selectedAddItems: { [itemId: number]: { quantity: number; notes: string } } = {};
+  public isAddingItemsSubmit: boolean = false;
 
   public tableId: number = 0;
   public isLoading: boolean = true;
@@ -50,6 +61,101 @@ export class ActiveOrderComponent implements OnInit, OnDestroy {
   public elapsedDisplay: string = '0s';
   private timerId: any;
   private subscriptions: Subscription = new Subscription();
+
+  public get lastReminderSentTime(): number | null {
+    if (typeof window !== 'undefined' && window.sessionStorage && this.order) {
+      const val = sessionStorage.getItem(`reminder-cooldown-${this.order.id}`);
+      return val ? parseInt(val, 10) : null;
+    }
+    return null;
+  }
+  
+  public set lastReminderSentTime(val: number | null) {
+    if (typeof window !== 'undefined' && window.sessionStorage && this.order) {
+      if (val) {
+        sessionStorage.setItem(`reminder-cooldown-${this.order.id}`, val.toString());
+      } else {
+        sessionStorage.removeItem(`reminder-cooldown-${this.order.id}`);
+      }
+    }
+  }
+
+  public isReminderCooldownActive(): boolean {
+    const lastSent = this.lastReminderSentTime;
+    if (!lastSent) return false;
+    return Date.now() - lastSent < 5 * 60 * 1000;
+  }
+
+  public get lastCookFastSentTime(): number | null {
+    if (typeof window !== 'undefined' && window.sessionStorage && this.order) {
+      const val = sessionStorage.getItem(`cookfast-cooldown-${this.order.id}`);
+      return val ? parseInt(val, 10) : null;
+    }
+    return null;
+  }
+  
+  public set lastCookFastSentTime(val: number | null) {
+    if (typeof window !== 'undefined' && window.sessionStorage && this.order) {
+      if (val) {
+        sessionStorage.setItem(`cookfast-cooldown-${this.order.id}`, val.toString());
+      } else {
+        sessionStorage.removeItem(`cookfast-cooldown-${this.order.id}`);
+      }
+    }
+  }
+
+  public isCookFastCooldownActive(): boolean {
+    const lastSent = this.lastCookFastSentTime;
+    if (!lastSent) return false;
+    return Date.now() - lastSent < 2 * 60 * 1000;
+  }
+
+  public sendCookFastAlert(): void {
+    if (!this.order || this.isCookFastCooldownActive()) return;
+    
+    this.signalRService.sendKitchenMessage("cook_fast", {
+      orderId: this.order.id,
+      tableId: this.tableId
+    })
+    .then(() => {
+      this.lastCookFastSentTime = Date.now();
+      this.cdr.detectChanges();
+    })
+    .catch(err => {
+      console.error("Failed to send cook fast alert:", err);
+    });
+  }
+
+  public isOverdueAndInPrep(): boolean {
+    if (!this.order || this.order.status !== 2) return false;
+    
+    const createdAtTime = new Date(this.order.createdAt).getTime();
+    const elapsedMins = (Date.now() - createdAtTime) / 60000;
+    
+    let prepTimeLimitMins = 15;
+    if (this.order.estimatedReadyAt) {
+      const limitMs = new Date(this.order.estimatedReadyAt).getTime() - createdAtTime;
+      prepTimeLimitMins = limitMs / 60000;
+    }
+    
+    return elapsedMins > (prepTimeLimitMins > 0 ? prepTimeLimitMins : 15);
+  }
+
+  public sendChefReminder(): void {
+    if (!this.order || this.isReminderCooldownActive()) return;
+    
+    this.signalRService.sendKitchenMessage("order_reminder", {
+      orderId: this.order.id,
+      tableId: this.tableId
+    })
+    .then(() => {
+      this.lastReminderSentTime = Date.now();
+      this.cdr.detectChanges();
+    })
+    .catch(err => {
+      console.error("Failed to remind chef:", err);
+    });
+  }
 
   ngOnInit() {
     this.route.params.subscribe(params => {
@@ -271,5 +377,151 @@ export class ActiveOrderComponent implements OnInit, OnDestroy {
 
   public get total(): number {
     return this.subtotal + this.tax;
+  }
+
+  // Modify / Add Items functions
+  public openAddItems(): void {
+    this.billError = null;
+    this.billSuccess = null;
+    this.menuService.getMenuItems({ pageSize: 100 }).subscribe({
+      next: (items) => {
+        this.zone.run(() => {
+          this.allItems = items.filter(item => item.isAvailable);
+          this.filteredItems = [...this.allItems];
+          this.itemSearchQuery = '';
+          this.selectedAddItems = {};
+          this.showAddItemsModal = true;
+          this.cdr.detectChanges();
+        });
+      },
+      error: (err) => {
+        console.error("Failed to load menu items for adding:", err);
+        this.billError = "Failed to load menu items.";
+      }
+    });
+  }
+
+  public filterAddItems(): void {
+    const q = this.itemSearchQuery.trim().toLowerCase();
+    if (q) {
+      this.filteredItems = this.allItems.filter(item => 
+        item.name.toLowerCase().includes(q) || 
+        item.description.toLowerCase().includes(q)
+      );
+    } else {
+      this.filteredItems = [...this.allItems];
+    }
+  }
+
+  public toggleItemSelection(item: MenuItemModel): void {
+    if (this.selectedAddItems[item.id]) {
+      delete this.selectedAddItems[item.id];
+    } else {
+      this.selectedAddItems[item.id] = { quantity: 1, notes: '' };
+    }
+  }
+
+  public incrementAddQty(itemId: number): void {
+    if (this.selectedAddItems[itemId]) {
+      this.selectedAddItems[itemId].quantity++;
+    }
+  }
+
+  public decrementAddQty(itemId: number): void {
+    if (this.selectedAddItems[itemId]) {
+      if (this.selectedAddItems[itemId].quantity > 1) {
+        this.selectedAddItems[itemId].quantity--;
+      } else {
+        delete this.selectedAddItems[itemId];
+      }
+    }
+  }
+
+  public submitAddItems(): void {
+    if (!this.order) return;
+    const itemIds = Object.keys(this.selectedAddItems).map(Number);
+    if (itemIds.length === 0) {
+      this.billError = "Please select at least one item to add.";
+      this.showAddItemsModal = false;
+      return;
+    }
+
+    const payload = itemIds.map(id => ({
+      menuItemId: id,
+      quantity: this.selectedAddItems[id].quantity,
+      notes: this.selectedAddItems[id].notes
+    }));
+
+    this.isAddingItemsSubmit = true;
+    this.billError = null;
+    this.billSuccess = null;
+
+    this.orderService.addOrderItems(this.order.id, payload).subscribe({
+      next: (updatedOrder) => {
+        this.zone.run(() => {
+          this.order = updatedOrder;
+          this.showAddItemsModal = false;
+          this.isAddingItemsSubmit = false;
+          this.billSuccess = "Items successfully added to the order.";
+          this.fetchActiveOrder();
+          this.cdr.detectChanges();
+        });
+      },
+      error: (err) => {
+        this.zone.run(() => {
+          this.isAddingItemsSubmit = false;
+          this.showAddItemsModal = false;
+          this.billError = err.error?.message || err.message || "Failed to add items to order.";
+          this.cdr.detectChanges();
+        });
+      }
+    });
+  }
+
+  public removeItem(orderItemId: number): void {
+    if (!this.order) return;
+    if (!confirm("Are you sure you want to remove this item from the order?")) return;
+
+    this.billError = null;
+    this.billSuccess = null;
+
+    this.orderService.removeOrderItem(this.order.id, orderItemId).subscribe({
+      next: () => {
+        this.zone.run(() => {
+          this.billSuccess = "Item successfully removed from the order.";
+          this.fetchActiveOrder();
+        });
+      },
+      error: (err) => {
+        this.zone.run(() => {
+          this.billError = err.error?.message || err.message || "Failed to remove item from order.";
+          this.cdr.detectChanges();
+        });
+      }
+    });
+  }
+
+  public cancelOrder(): void {
+    if (!this.order) return;
+    
+    if (confirm("Are you sure you want to cancel this order? This will release the table and return ingredients to stock.")) {
+      this.billError = null;
+      this.billSuccess = null;
+      this.orderService.updateOrderStatus(this.order.id, 6).subscribe({
+        next: () => {
+          this.zone.run(() => {
+            this.billSuccess = "Order has been cancelled.";
+            this.fetchActiveOrder();
+          });
+        },
+        error: (err) => {
+          this.zone.run(() => {
+            console.error("Failed to cancel order:", err);
+            this.billError = err.error?.message || err.message || "Failed to cancel order.";
+            this.cdr.detectChanges();
+          });
+        }
+      });
+    }
   }
 }

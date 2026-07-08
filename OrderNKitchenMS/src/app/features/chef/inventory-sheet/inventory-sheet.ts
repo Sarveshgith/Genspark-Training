@@ -122,7 +122,7 @@ export class InventorySheet implements OnChanges {
     // Set loading state
     this.flaggingStates.update(states => ({ ...states, [id]: true }));
 
-    this.signalRService.flagLowStockToAdmin(item.id, item.name, item.stockQuantity, item.unitName)
+    this.signalRService.sendAdminAlert("low_stock_critical", { itemId: item.id, itemName: item.name, currentQuantity: item.stockQuantity })
       .then(() => {
         this.flaggedItemIds.update(set => {
           const next = new Set(set);

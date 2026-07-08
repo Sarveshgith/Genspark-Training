@@ -18,7 +18,7 @@ export class Login {
 
   loginForm = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
-    password: ['', Validators.required],
+    password: ['', [Validators.required, Validators.minLength(8)]],
   });
 
   get email() { return this.loginForm.get('email'); }
@@ -43,7 +43,6 @@ export class Login {
 
     this.authService.login(loginData).subscribe({
       next: (response) => {
-        console.log('Login successful:', response);
         this.isLoading.set(false);
         const role = response.user.roleName;
         if (role === 'Waiter') {

@@ -4,6 +4,7 @@ import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Va
 import { AuthService } from '../../../core/services/auth.service';
 import { RegisterModel } from '../../../core/models/auth.model';
 import { Router, RouterLink } from '@angular/router';
+import { ToastService } from '../../../core/services/toast.service';
 
 const passwordMatchValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
   const password = control.get('password')?.value;
@@ -22,6 +23,7 @@ export class Register {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
   private router = inject(Router);
+  private toastService = inject(ToastService);
 
   registerForm = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
@@ -66,7 +68,7 @@ export class Register {
     this.authService.register(registerData).subscribe({
       next: (user) => {
         console.log('Registration successful:', user);
-        alert('Registration successful!');
+        this.toastService.success('Registration successful!');
         this.registerForm.reset({
           email: '',
           name: '',

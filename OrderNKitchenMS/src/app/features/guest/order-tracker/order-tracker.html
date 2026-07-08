@@ -169,8 +169,8 @@
               <span>Call Waiter</span>
             </button>
 
-            <button (click)="requestBill()"
-              class="flex-1 flex items-center justify-center space-x-2 px-6 py-3.5 bg-[#FAF3E8]/70 hover:bg-[#FAF3E8] border border-[#EFE5D3] text-[#8C663C] hover:text-[#704610] active:scale-98 rounded-2xl transition duration-200 font-bold tracking-wider text-xs uppercase shadow-xs cursor-pointer">
+            <button (click)="requestBill()" [disabled]="!isServed"
+              class="flex-1 flex items-center justify-center space-x-2 px-6 py-3.5 bg-[#FAF3E8]/70 hover:bg-[#FAF3E8] border border-[#EFE5D3] text-[#8C663C] hover:text-[#704610] active:scale-98 rounded-2xl transition duration-200 font-bold tracking-wider text-xs uppercase shadow-xs cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed">
               <span>📄</span>
               <span>Bill Soon</span>
             </button>

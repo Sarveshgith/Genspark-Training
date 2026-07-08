@@ -217,7 +217,9 @@ export class KdsBoard implements OnInit, OnDestroy {
               id: Date.now() + Math.random(),
               text: text,
               timestamp: new Date(),
-              read: this.drawerContent() === 'messages'
+              read: this.drawerContent() === 'messages',
+              orderId: alert.orderId || undefined,
+              tableId: alert.tableId || undefined
             },
             ...msgs
           ]);
@@ -226,6 +228,28 @@ export class KdsBoard implements OnInit, OnDestroy {
           }
           this.audioService.playNewOrderChime();
           this.fetchLowStockCount();
+        }
+      })
+    );
+
+    this.subscriptions.add(
+      this.signalRService.kitchenMessage$.subscribe({
+        next: (notif) => {
+          this.messages.update(msgs => [
+            {
+              id: Date.now() + Math.random(),
+              text: `${notif.title}: ${notif.message}`,
+              timestamp: new Date(notif.createdAt || Date.now()),
+              read: this.drawerContent() === 'messages',
+              orderId: notif.orderId || undefined,
+              tableId: notif.tableId || undefined
+            },
+            ...msgs
+          ]);
+          if (this.drawerContent() !== 'messages') {
+            this.unreadMessageCount.update(c => c + 1);
+          }
+          this.audioService.playNewOrderChime();
         }
       })
     );
@@ -261,8 +285,8 @@ export class KdsBoard implements OnInit, OnDestroy {
   }
 
   handleStartCooking(orderId: number): void {
-    // PATCH status=2
-    this.orderService.updateOrderStatus(orderId, 2).subscribe({
+    // Assign chef and transition status to InPrep (2)
+    this.orderService.assignChef(orderId).subscribe({
       next: () => {
         // Move from pending to inPrep immediately for instant local UI update!
         let foundOrder: OrderModel | undefined;
@@ -360,6 +384,23 @@ export class KdsBoard implements OnInit, OnDestroy {
 
   closeDrawer(): void {
     this.drawerContent.set(null);
+  }
+
+  openOrder(orderId: number): void {
+    this.closeDrawer();
+    
+    // Smooth scroll to the card element
+    setTimeout(() => {
+      const element = document.getElementById(`order-card-${orderId}`);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // Pulse the element by adding a class temporarily
+        element.classList.add('pulse-highlight');
+        setTimeout(() => {
+          element.classList.remove('pulse-highlight');
+        }, 3000);
+      }
+    }, 100);
   }
 
   markAllMessagesRead(): void {

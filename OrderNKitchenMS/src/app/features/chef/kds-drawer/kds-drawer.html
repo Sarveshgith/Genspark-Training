@@ -39,7 +39,11 @@
               
               <div class="flex-1 overflow-y-auto pr-1 space-y-3 min-h-0">
                 @for (msg of messages; track msg.id) {
-                  <div class="bg-slate-900/40 border border-slate-800 rounded-xl p-3 flex flex-col gap-1.5 transition hover:bg-slate-900/60 font-sans relative overflow-hidden group">
+                  <div 
+                    (click)="msg.orderId && openOrder.emit(msg.orderId)" 
+                    [class]="'border rounded-xl p-3 flex flex-col gap-1.5 transition font-sans relative overflow-hidden group ' + 
+                             (msg.orderId ? 'cursor-pointer hover:bg-slate-900/60' : 'bg-slate-900/20')"
+                  >
                     <!-- Subtle left status border for unread alerts -->
                     @if (!msg.read) {
                       <div class="absolute left-0 top-0 bottom-0 w-1 bg-blue-500"></div>
@@ -50,7 +54,14 @@
                         <span class="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0 mt-1" title="Unread alert"></span>
                       }
                     </div>
-                    <span class="text-[9px] text-slate-500 font-mono-dm self-end">{{ msg.timestamp | date:'shortTime' }}</span>
+                    <div class="flex justify-between items-center mt-1 pl-1">
+                      @if (msg.orderId) {
+                        <span class="text-[9px] text-[#F28500] font-semibold">T-{{ msg.tableId }} &bull; Order #{{ msg.orderId }}</span>
+                      } @else {
+                        <span></span>
+                      }
+                      <span class="text-[9px] text-slate-500 font-mono-dm">{{ msg.timestamp | date:'shortTime' }}</span>
+                    </div>
                   </div>
                 }
               </div>

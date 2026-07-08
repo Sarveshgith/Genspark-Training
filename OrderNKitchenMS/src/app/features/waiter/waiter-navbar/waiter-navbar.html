@@ -28,7 +28,7 @@
     </nav>
 
     <!-- Right Side Actions -->
-    <div class="flex items-center space-x-2 md:space-x-5 shrink-0">
+    <div class="flex items-center space-x-2 md:space-x-5 shrink-0 relative">
       <!-- Live Connected status (Icon + text on md/lg, just icon on sm/xs) -->
       <div
         class="flex items-center space-x-1.5 md:space-x-2 bg-[#FAF4EC] px-2.5 md:px-3 py-1 rounded-full border border-[#8C5815]/10">
@@ -39,12 +39,56 @@
 
       <!-- Notification Bell -->
       <button
-        class="p-1.5 text-gray-400 hover:text-gray-650 transition-colors duration-200 relative cursor-pointer focus:outline-none">
+        (click)="toggleNotificationDrawer()"
+        class="p-1.5 text-gray-400 hover:text-gray-600 transition-colors duration-200 relative cursor-pointer focus:outline-none"
+      >
         <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
           <path stroke-linecap="round" stroke-linejoin="round"
             d="M14.857 17.082a9.04 9.04 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0M3.124 7.5A8.969 8.969 0 0 1 5.292 3m13.416 4.5A8.969 8.969 0 0 0 18.708 3M9 1H1.5M12 2v20m-5-2h10" />
         </svg>
+        @if (unreadCount() > 0) {
+          <span class="absolute -top-0.5 -right-0.5 flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+          </span>
+        }
       </button>
+
+      <!-- Notification Drawer Dropdown -->
+      @if (isNotificationDrawerOpen()) {
+        <div class="fixed right-4 left-4 md:absolute md:left-auto md:right-0 md:w-80 top-16 md:top-12 bg-white border border-[#EFECE9] rounded-2xl shadow-xl flex flex-col z-[9999] animate-fade-in font-sans p-4 space-y-3">
+          <div class="flex items-center justify-between border-b border-[#F0EDE9] pb-2">
+            <span class="text-xs font-bold text-[#8C5815] uppercase tracking-wider">Waiter Alerts</span>
+            <button (click)="isNotificationDrawerOpen.set(false)" class="text-gray-400 hover:text-gray-600 transition outline-none cursor-pointer">
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          <div class="max-h-60 overflow-y-auto space-y-2.5 pr-1 text-xs">
+            @if (notifications().length > 0) {
+              @for (notif of notifications(); track notif.id) {
+                <div 
+                  (click)="handleNotificationClick(notif)"
+                  class="p-2.5 rounded-xl border border-[#F0EDE9] hover:bg-[#FAF4EC] hover:border-[#8C5815]/20 transition cursor-pointer flex flex-col gap-1 text-left"
+                >
+                  <div class="flex items-start justify-between gap-2">
+                    <span class="text-xs font-bold text-gray-800">{{ notif.title }}</span>
+                    <span class="text-[8px] font-mono-dm text-gray-450 mt-0.5">{{ notif.createdAt | date:'shortTime' }}</span>
+                  </div>
+                  <p class="text-[11px] text-gray-600 leading-snug">{{ notif.message }}</p>
+                  <span class="text-[9px] text-[#8C5815] font-semibold">Table T-{{ notif.tableId }} &bull; Order #{{ notif.orderId }}</span>
+                </div>
+              }
+            } @else {
+              <div class="text-center py-6 text-gray-450 italic">
+                No alerts received.
+              </div>
+            }
+          </div>
+        </div>
+      }
 
       <!-- Logout -->
       <button (click)="logout()"

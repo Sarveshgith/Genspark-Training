@@ -1,7 +1,9 @@
 <div 
-  [class]="'group bg-[#131B2E] rounded-2xl p-5 border-2 transition-all duration-300 cursor-pointer flex flex-col justify-between h-fit select-none ' +
+  [class]="'group bg-[#131B2E] rounded-2xl p-5 border-2 transition-all duration-300 cursor-pointer flex flex-col justify-between h-fit select-none relative ' +
            (isOverdue() ? 'border-[#F28500] shadow-[0_0_15px_rgba(242,133,0,0.15)] ring-1 ring-[#F28500]/30' : 'border-slate-800 hover:border-slate-700')"
   (click)="openModal($event)"
+  (touchstart)="onTouchStart($event)"
+  (touchend)="onTouchEnd()"
 >
   <div>
     <!-- Card Header: Order # & Table Badge -->
@@ -9,9 +11,17 @@
       <span class="text-lg font-bold text-white font-syne uppercase tracking-tight">
         Order #{{ order().id }}
       </span>
-      <span class="bg-slate-800 text-slate-300 text-xs font-semibold px-3 py-1 rounded-lg font-syne shadow-sm">
-        T-{{ order().tableNumber | number:'2.0-0' }}
-      </span>
+      <div class="flex items-center space-x-2">
+        <!-- Message Compose button (visible on hover) -->
+        <button (click)="openComposer($event)" class="opacity-0 group-hover:opacity-100 transition-opacity duration-200 p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-slate-100 rounded-lg border border-slate-700/30 outline-none select-none cursor-pointer" title="Send message to waiter">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+          </svg>
+        </button>
+        <span class="bg-slate-800 text-slate-300 text-xs font-semibold px-3 py-1 rounded-lg font-syne shadow-sm">
+          T-{{ order().tableNumber | number:'2.0-0' }}
+        </span>
+      </div>
     </div>
 
     <!-- Divider Line -->
@@ -139,6 +149,82 @@
       </div>
     }
   </div>
+
+  <!-- COMPACT INLINE MESSAGE COMPOSER OVERLAY -->
+  @if (isComposerOpen()) {
+    <div class="absolute inset-0 bg-[#0F172A] rounded-2xl p-4 flex flex-col justify-between z-15 font-sans border-2 border-slate-700 animate-fade-in" (click)="$event.stopPropagation()">
+      <div class="space-y-3 flex-1 flex flex-col justify-start min-h-0 overflow-y-auto">
+        <!-- Composer Header -->
+        <div class="flex items-center justify-between shrink-0">
+          <span class="text-[10px] font-bold text-[#F28500] uppercase tracking-wider font-syne truncate">Msg: Order #{{ order().id }} (T-{{ order().tableNumber }})</span>
+          <button (click)="closeComposer()" class="text-slate-400 hover:text-white p-1 rounded hover:bg-slate-800 transition outline-none cursor-pointer">
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <!-- Notification Type Selection -->
+        <div class="space-y-1 shrink-0">
+          <label class="text-[9px] font-extrabold text-slate-500 uppercase tracking-widest block font-syne">Type</label>
+          <select 
+            [value]="selectedMessageType()"
+            (change)="onMessageTypeChange($event)"
+            class="w-full bg-slate-900 border border-slate-800 text-slate-200 text-xs rounded-xl p-2 outline-none focus:border-[#F28500] transition cursor-pointer"
+          >
+            <option value="order_delayed">Order Delayed</option>
+            <option value="item_substitution_needed">Item Substitution Needed</option>
+            <option value="low_stock_warning_floor">Low Stock Warning</option>
+          </select>
+        </div>
+
+        <!-- Predefined inputs based on type -->
+        @if (selectedMessageType() === 'item_substitution_needed') {
+          <div class="space-y-1 shrink-0">
+            <label class="text-[9px] font-extrabold text-slate-500 uppercase tracking-widest block font-syne">Substitute Item</label>
+            <input 
+              type="text" 
+              [value]="substituteItemInput()"
+              (input)="onSubstituteItemChange($event)"
+              placeholder="e.g. Egg Fried Rice"
+              class="w-full bg-slate-900 border border-slate-800 text-slate-200 text-xs rounded-xl p-2 outline-none focus:border-[#F28500] transition"
+            />
+          </div>
+        }
+
+        <!-- Optional free text message -->
+        <div class="space-y-1 flex-1 flex flex-col justify-start">
+          <label class="text-[9px] font-extrabold text-slate-500 uppercase tracking-widest block font-syne shrink-0">Note (Optional)</label>
+          <textarea 
+            [value]="composerNote()"
+            (input)="onNoteChange($event)"
+            placeholder="Additional details..."
+            rows="2"
+            maxlength="200"
+            class="w-full bg-slate-900 border border-slate-800 text-slate-200 text-xs rounded-xl p-2 outline-none focus:border-[#F28500] transition resize-none flex-1"
+          ></textarea>
+          <div class="text-right text-[8px] text-slate-500 font-mono-dm shrink-0 mt-0.5">{{ composerNote().length }}/200</div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center space-x-2 shrink-0 pt-2 border-t border-slate-800/40">
+        <button 
+          (click)="sendComposerMessage()"
+          class="flex-1 py-1.5 bg-[#F28500] hover:bg-[#D47300] text-white text-xs font-bold rounded-xl transition cursor-pointer select-none outline-none active:scale-[0.98] uppercase tracking-wider font-syne"
+        >
+          Send
+        </button>
+        <button 
+          (click)="closeComposer()"
+          class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold rounded-xl transition cursor-pointer select-none outline-none active:scale-[0.98] uppercase tracking-wider font-syne"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  }
+
 </div>
 
 <!-- Details Modal Overlay -->

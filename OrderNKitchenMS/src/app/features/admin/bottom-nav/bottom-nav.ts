@@ -69,6 +69,7 @@ export class BottomNavComponent implements OnInit, OnDestroy {
 
   logout(): void {
     this.closeBottomSheet();
+    this.signalRService.disconnect();
     this.authService.logout();
     this.router.navigate(['/login']);
   }

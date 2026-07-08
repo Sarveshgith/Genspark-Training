@@ -9,6 +9,8 @@ export interface KdsMessage {
   text: string;
   timestamp: Date;
   read: boolean;
+  orderId?: number;
+  tableId?: number;
 }
 
 @Component({
@@ -24,6 +26,7 @@ export class KdsDrawer {
   @Input() messages: KdsMessage[] = [];
   @Output() close = new EventEmitter<void>();
   @Output() markAllRead = new EventEmitter<void>();
+  @Output() openOrder = new EventEmitter<number>();
 
   public handleClose(): void {
     this.close.emit();

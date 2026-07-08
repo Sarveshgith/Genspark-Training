@@ -112,9 +112,6 @@ export class Dashboard implements OnInit, OnDestroy {
     this.timeIntervalId = setInterval(() => {
       this.timeTrigger.set(Date.now());
     }, 10000);
-
-    // Simulate occasional random guest waiter calls (water, napkins, assistance) to make the dashboard feel active
-    this.startWaiterCallSimulation();
   }
 
   ngOnDestroy(): void {

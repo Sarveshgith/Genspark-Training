@@ -3,6 +3,7 @@ import { Component, Input, OnInit, OnDestroy, OnChanges, inject, signal, compute
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { DishStory } from '../dish-story/dish-story';
+import { SignalRService } from '../../../core/services/signalr.service';
 
 @Component({
   selector: 'app-order-tracker',
@@ -16,6 +17,7 @@ export class OrderTracker implements OnInit, OnDestroy, OnChanges {
   @Input() bill: any = null;
 
   private router = inject(Router);
+  private signalRService = inject(SignalRService);
 
   public showWaiterModal: boolean = false;
   public showBillModal: boolean = false;
@@ -144,14 +146,18 @@ export class OrderTracker implements OnInit, OnDestroy, OnChanges {
   private billTimeoutId: any;
 
   public callWaiter() {
-    if (this.waiterTimeoutId) {
-      clearTimeout(this.waiterTimeoutId);
-    }
-    this.showWaiterModal = true;
-    this.waiterTimeoutId = setTimeout(() => {
-      this.showWaiterModal = false;
-      this.waiterTimeoutId = null;
-    }, 4000);
+    this.signalRService.guestCallWaiter('ordering').then(() => {
+      if (this.waiterTimeoutId) {
+        clearTimeout(this.waiterTimeoutId);
+      }
+      this.showWaiterModal = true;
+      this.waiterTimeoutId = setTimeout(() => {
+        this.showWaiterModal = false;
+        this.waiterTimeoutId = null;
+      }, 4000);
+    }).catch(err => {
+      console.error('Failed to call waiter:', err);
+    });
   }
 
   public closeWaiterModal() {
@@ -163,14 +169,18 @@ export class OrderTracker implements OnInit, OnDestroy, OnChanges {
   }
 
   public requestBill() {
-    if (this.billTimeoutId) {
-      clearTimeout(this.billTimeoutId);
-    }
-    this.showBillModal = true;
-    this.billTimeoutId = setTimeout(() => {
-      this.showBillModal = false;
-      this.billTimeoutId = null;
-    }, 4000);
+    this.signalRService.guestCallWaiter('bill').then(() => {
+      if (this.billTimeoutId) {
+        clearTimeout(this.billTimeoutId);
+      }
+      this.showBillModal = true;
+      this.billTimeoutId = setTimeout(() => {
+        this.showBillModal = false;
+        this.billTimeoutId = null;
+      }, 4000);
+    }).catch(err => {
+      console.error('Failed to request bill:', err);
+    });
   }
 
   public closeBillModal() {

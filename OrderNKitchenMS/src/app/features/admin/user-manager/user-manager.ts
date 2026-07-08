@@ -62,7 +62,8 @@ export class UserManager implements OnInit {
     this.userService.getRoles().subscribe({
       next: (response: RoleModel[]) => {
         this.zone.run(() => {
-          this.roles.set(response);
+          const filtered = response.filter(r => r.name.toLowerCase() !== 'customer' && r.name.toLowerCase() !== 'deliveryman');
+          this.roles.set(filtered);
           this.cdr.detectChanges();
         });
       },

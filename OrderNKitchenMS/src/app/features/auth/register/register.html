@@ -145,6 +145,7 @@
                 [class]="'w-full bg-[#FCFAF8] text-gray-800 text-xs sm:text-sm font-medium py-2.5 px-3.5 rounded-xl border outline-none appearance-none transition-all duration-200 ' + 
                          (controls.roleId.invalid && (controls.roleId.touched || controls.roleId.dirty) ? 'border-red-300 focus:ring-1 focus:ring-red-300 focus:bg-white' : 'border-[#EFECE9] focus:ring-1 focus:ring-[#8C5815]/30 focus:border-[#8C5815]/30 focus:bg-white')">
                 <option [ngValue]="null" disabled>Select Role</option>
+                <option [ngValue]="1">Admin</option>
                 <option [ngValue]="5">Waiter</option>
                 <option [ngValue]="3">Chef</option>
               </select>

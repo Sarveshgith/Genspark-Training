@@ -69,4 +69,12 @@ export class OrderService {
         let url = `${classUrl}${orderId}/assign-chef`;
         return this.http.patch<void>(url, {});
     }
+
+    public addOrderItems(orderId: number, items: { menuItemId: number; quantity: number; notes: string }[]): Observable<OrderModel> {
+        return this.http.post<OrderModel>(`${classUrl}${orderId}/items`, items);
+    }
+
+    public removeOrderItem(orderId: number, orderItemId: number): Observable<void> {
+        return this.http.delete<void>(`${classUrl}${orderId}/items/${orderItemId}`);
+    }
 }

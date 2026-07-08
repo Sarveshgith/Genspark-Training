@@ -79,11 +79,9 @@ export class LandingComponent implements OnInit, OnDestroy {
       const secretMatches = storedSecret === secret;
 
       if (isTokenValid && secretMatches) {
-        console.log("Token is valid and secret matches. Reusing existing token.");
         this.tableNumber = this.authService.getTableIdFromToken(existingToken!);
         this.loadMenuAndTrackOrder();
       } else {
-        console.log("Token invalid or secret mismatch. Discarding old token and logging in.");
         this.authService.logout();
         this.authService.guestLogin({ secret }).subscribe({
           next: () => {
@@ -126,7 +124,6 @@ export class LandingComponent implements OnInit, OnDestroy {
             const signalSub = this.signalRService.orderUpdate$.subscribe({
               next: (updatedTrackingInfo) => {
                 this.zone.run(() => {
-                  console.log('Real-time order update received:', updatedTrackingInfo);
                   this.rawOrderDetails = updatedTrackingInfo;
                   this.enrichOrderDetails();
                   if (this.rawOrderDetails && this.rawOrderDetails.orderId) {
@@ -166,6 +163,7 @@ export class LandingComponent implements OnInit, OnDestroy {
                   console.log('Real-time bill paid event received:', bill);
                   this.billDetails.set(bill);
                   this.guestState.set('paid');
+                  this.startSessionEndGracePeriod();
                   this.cdr.detectChanges();
                 });
               }
@@ -199,7 +197,6 @@ export class LandingComponent implements OnInit, OnDestroy {
       next: (trackingInfo) => {
         this.zone.run(() => {
           try {
-            console.log('Order tracking data retrieved successfully:', trackingInfo);
             const trackingTableId = trackingInfo.tableId ?? (trackingInfo as any).TableId;
             if (trackingTableId !== undefined && trackingTableId !== null && trackingTableId !== this.tableNumber) {
               this.errorMessage = "Access Denied: The table ID in your session does not match this table.";
@@ -269,8 +266,14 @@ export class LandingComponent implements OnInit, OnDestroy {
       });
 
       const subtotal = orderItems.reduce((acc: number, item: any) => acc + item.totalPrice, 0);
+      const bill = this.billDetails();
+      if (bill && bill.taxRate !== undefined && bill.taxRate !== null) {
+        this.taxPercent = String(bill.taxRate);
+      } else {
+        this.taxPercent = '8';
+      }
       const parsedRate = parseFloat(this.taxPercent);
-      const taxRate = isNaN(parsedRate) ? 0 : parsedRate / 100;
+      const taxRate = isNaN(parsedRate) ? 0.08 : parsedRate / 100;
       const tax = subtotal * taxRate;
       const total = subtotal + tax;
 
@@ -375,17 +378,31 @@ export class LandingComponent implements OnInit, OnDestroy {
   }
 
   public showWaiterModal = signal<boolean>(false);
+  public selectedReasonText = signal<string>('');
   private waiterTimeoutId: any = null;
 
   public callWaiter() {
-    if (this.waiterTimeoutId) {
-      clearTimeout(this.waiterTimeoutId);
-    }
-    this.showWaiterModal.set(true);
-    this.waiterTimeoutId = setTimeout(() => {
-      this.showWaiterModal.set(false);
-      this.waiterTimeoutId = null;
-    }, 4000);
+    this.triggerWaiterCall('ordering');
+  }
+
+  public triggerWaiterCall(reason: 'assistance' | 'ordering' | 'bill') {
+    this.signalRService.guestCallWaiter(reason).then(() => {
+      const text = reason === 'assistance' ? 'General Assistance'
+        : reason === 'ordering' ? 'Order Help'
+          : 'Request Bill';
+      this.selectedReasonText.set(text);
+
+      if (this.waiterTimeoutId) {
+        clearTimeout(this.waiterTimeoutId);
+      }
+      this.showWaiterModal.set(true);
+      this.waiterTimeoutId = setTimeout(() => {
+        this.showWaiterModal.set(false);
+        this.waiterTimeoutId = null;
+      }, 5000);
+    }).catch(err => {
+      console.error("Failed to call waiter:", err);
+    });
   }
 
   public closeWaiterModal() {

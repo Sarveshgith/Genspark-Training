@@ -76,8 +76,40 @@
 
       <!-- Table Header Info Card -->
       <div class="flex items-center justify-between bg-white border border-[#EFE5D3] rounded-3xl p-6 shadow-sm">
-        <div class="space-y-1">
-          <h1 class="text-3xl font-extrabold font-syne text-[#2C2117]">Table {{ order.tableNumber }}</h1>
+        <div class="space-y-2.5">
+          <h1 class="text-3xl font-extrabold font-syne text-[#2C2117] leading-none">Table {{ order.tableNumber }}</h1>
+          <div class="flex flex-wrap gap-2 mt-2">
+            @if (isOverdueAndInPrep()) {
+              <button 
+                [disabled]="isReminderCooldownActive()"
+                (click)="sendChefReminder()"
+                [class]="'px-3.5 py-1.5 rounded-full text-[10px] font-extrabold uppercase tracking-widest transition duration-200 outline-none border flex items-center gap-1 ' + 
+                         (isReminderCooldownActive() 
+                           ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-default' 
+                           : 'bg-[#8C5815] hover:bg-[#A36B21] text-white border-[#8C5815]/20 hover:scale-102 active:scale-98 cursor-pointer shadow-sm')"
+              >
+                <span>{{ isReminderCooldownActive() ? 'Chef Reminded' : 'Remind Chef' }}</span>
+              </button>
+            }
+            @if (order.statusName === 'Pending' || order.statusName === 'InPrep') {
+              <button 
+                [disabled]="isCookFastCooldownActive()"
+                (click)="sendCookFastAlert()"
+                [class]="'px-3.5 py-1.5 rounded-full text-[10px] font-extrabold uppercase tracking-widest transition duration-200 outline-none border flex items-center gap-1 ' + 
+                         (isCookFastCooldownActive() 
+                           ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-default' 
+                           : 'bg-orange-600 hover:bg-orange-700 text-white border-orange-700/20 hover:scale-102 active:scale-98 cursor-pointer shadow-sm')"
+              >
+                <span>🔥 {{ isCookFastCooldownActive() ? 'Cook Fast Sent' : 'Cook Fast' }}</span>
+              </button>
+              <button 
+                (click)="cancelOrder()"
+                class="px-3.5 py-1.5 rounded-full text-[10px] font-extrabold uppercase tracking-widest transition duration-200 outline-none border bg-red-50 text-red-600 border-red-200 hover:bg-red-100 hover:text-red-700 cursor-pointer shadow-sm hover:scale-102 active:scale-98"
+              >
+                Cancel Order
+              </button>
+            }
+          </div>
         </div>
         <div class="text-right space-y-1">
           <span class="inline-block px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-sm"
@@ -111,10 +143,27 @@
                   }
                 </p>
               </div>
-              <span class="text-sm font-bold font-mono-dm text-[#2C2117]">{{ (item.unitPrice * item.quantity) | currency }}</span>
+              <div class="flex items-center space-x-3.5">
+                <span class="text-sm font-bold font-mono-dm text-[#2C2117]">{{ (item.unitPrice * item.quantity) | currency }}</span>
+                @if (order.statusName === 'Pending') {
+                  <button (click)="removeItem(item.id)" class="text-red-500 hover:text-red-750 transition cursor-pointer" title="Remove item">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                    </svg>
+                  </button>
+                }
+              </div>
             </div>
           }
         </div>
+
+        @if (order.statusName === 'Pending') {
+          <div class="flex justify-end pt-2">
+            <button (click)="openAddItems()" class="px-4 py-2 border border-[#8C5815]/30 text-[#8C5815] hover:bg-[#FAF4EC] rounded-xl text-xs font-bold font-syne tracking-wider uppercase transition cursor-pointer flex items-center gap-1.5">
+              <span>+</span> Add Items
+            </button>
+          </div>
+        }
 
         <!-- Financial Totals -->
         <div class="border-t border-[#F5EFE6] pt-6 space-y-3 font-outfit text-sm">
@@ -258,5 +307,89 @@
       </div>
 
     </main>
+  }
+
+  <!-- Add Items Modal -->
+  @if (showAddItemsModal) {
+    <div class="fixed inset-0 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4 z-[99999] animate-scale-in">
+      <div class="bg-white border border-[#EFE5D3] rounded-3xl p-6 w-full max-w-lg shadow-2xl flex flex-col max-h-[85vh] font-sans">
+        <!-- Modal Header -->
+        <div class="flex items-center justify-between border-b border-[#F5EFE6] pb-3 mb-4 shrink-0">
+          <h3 class="text-sm font-extrabold uppercase tracking-widest text-[#2C2117] font-outfit">Add Items to Order</h3>
+          <button (click)="showAddItemsModal = false" class="text-gray-400 hover:text-gray-650 transition cursor-pointer font-bold text-lg leading-none">
+            &times;
+          </button>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="mb-4 shrink-0 relative">
+          <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 text-xs">
+            🔍
+          </span>
+          <input
+            type="text"
+            [(ngModel)]="itemSearchQuery"
+            (ngModelChange)="filterAddItems()"
+            placeholder="Search menu items..."
+            class="w-full bg-[#FAF7F2] text-gray-800 placeholder-gray-400 pl-8 pr-4 py-2 rounded-xl border border-[#EFE5D3] focus:outline-none focus:border-[#C5A059] text-xs"
+          />
+        </div>
+
+        <!-- Items list (scrollable) -->
+        <div class="flex-1 overflow-y-auto space-y-3 pr-1 py-1 min-h-[200px]">
+          @for (item of filteredItems; track item.id) {
+            <div [class]="'p-3 border rounded-2xl transition duration-200 ' + (selectedAddItems[item.id] ? 'border-[#8C5815] bg-[#FAF4EC]/30' : 'border-[#EFE5D3] hover:border-gray-300')">
+              <div class="flex items-center justify-between gap-3">
+                <div (click)="toggleItemSelection(item)" class="flex-1 cursor-pointer">
+                  <h4 class="font-bold text-xs text-[#2C2117]">{{ item.name }}</h4>
+                  <p class="text-[10px] text-gray-505 font-mono-dm mt-0.5">{{ item.price | currency }}</p>
+                </div>
+                
+                <!-- Selection State / Quantity Controls -->
+                @if (selectedAddItems[item.id]) {
+                  <div class="flex items-center space-x-2 shrink-0">
+                    <button (click)="decrementAddQty(item.id)" class="w-7 h-7 bg-white border border-[#EFE5D3] text-gray-700 rounded-lg font-bold flex items-center justify-center hover:bg-gray-50 transition cursor-pointer select-none text-xs">
+                      -
+                    </button>
+                    <span class="w-6 text-center font-bold text-xs text-[#2C2117]">{{ selectedAddItems[item.id].quantity }}</span>
+                    <button (click)="incrementAddQty(item.id)" class="w-7 h-7 bg-white border border-[#EFE5D3] text-gray-700 rounded-lg font-bold flex items-center justify-center hover:bg-gray-50 transition cursor-pointer select-none text-xs">
+                      +
+                    </button>
+                  </div>
+                } @else {
+                  <button (click)="toggleItemSelection(item)" class="px-3 py-1.5 bg-[#FAF7F2] border border-[#EFE5D3] text-[#8C5815] hover:bg-[#8C5815] hover:text-white rounded-xl text-[10px] font-bold transition cursor-pointer">
+                    Select
+                  </button>
+                }
+              </div>
+
+              <!-- Notes field for selected items -->
+              @if (selectedAddItems[item.id]) {
+                <div class="mt-2 pt-2 border-t border-[#F5EFE6]">
+                  <input
+                    type="text"
+                    [(ngModel)]="selectedAddItems[item.id].notes"
+                    placeholder="Add special instructions / notes..."
+                    class="w-full bg-white text-[10px] px-3 py-1.5 border border-[#EFE5D3] rounded-lg focus:outline-none focus:border-[#C5A059]"
+                  />
+                </div>
+              }
+            </div>
+          } @empty {
+            <p class="text-center py-6 text-xs text-gray-400 italic">No available dishes match your search.</p>
+          }
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="border-t border-[#F5EFE6] pt-4 mt-4 flex justify-end gap-3 shrink-0">
+          <button (click)="showAddItemsModal = false" class="px-4 py-2 border border-[#EFE5D3] text-gray-750 hover:bg-gray-50 rounded-xl text-xs font-bold tracking-wider uppercase transition cursor-pointer">
+            Cancel
+          </button>
+          <button (click)="submitAddItems()" [disabled]="isAddingItemsSubmit" class="px-5 py-2 bg-[#8C5815] text-white hover:bg-[#72450F] rounded-xl text-xs font-bold tracking-wider uppercase transition cursor-pointer disabled:bg-gray-300">
+            {{ isAddingItemsSubmit ? 'Saving...' : 'Add Selected' }}
+          </button>
+        </div>
+      </div>
+    </div>
   }
 </div>

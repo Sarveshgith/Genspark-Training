@@ -164,7 +164,7 @@
           </div>
           } @else {
           @for (order of pendingOrders(); track order.id) {
-          <app-order-card class="block" [order]="order" (startCooking)="handleStartCooking($event)"></app-order-card>
+          <app-order-card [id]="'order-card-' + order.id" class="block" [order]="order" (startCooking)="handleStartCooking($event)"></app-order-card>
           }
           }
         </div>
@@ -200,7 +200,7 @@
           </div>
           } @else {
           @for (order of inPrepOrders(); track order.id) {
-          <app-order-card class="block" [order]="order" [cookingStartTime]="timerMap()[order.id]"
+          <app-order-card [id]="'order-card-' + order.id" class="block" [order]="order" [cookingStartTime]="timerMap()[order.id]"
             (markReady)="handleMarkReady($event)"></app-order-card>
           }
           }
@@ -236,7 +236,7 @@
           </div>
           } @else {
           @for (order of readyOrders(); track order.id) {
-          <app-order-card class="block" [order]="order"></app-order-card>
+          <app-order-card [id]="'order-card-' + order.id" class="block" [order]="order"></app-order-card>
           }
           }
         </div>
@@ -252,6 +252,7 @@
     [activeOrders]="activeOrdersForInventory()"
     [messages]="messages()"
     (close)="closeDrawer()"
-    (markAllRead)="markAllMessagesRead()"></app-kds-drawer>
+    (markAllRead)="markAllMessagesRead()"
+    (openOrder)="openOrder($event)"></app-kds-drawer>
 
 </div>
