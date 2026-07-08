@@ -95,7 +95,7 @@ public class RestaurantHub : Hub
             throw new HubException("Unauthorized to send kitchen messages.");
         }
 
-        var allowedTypes = new[] { "order_reminder", "priority_flag", "special_instruction_update", "cancel_warning" };
+        var allowedTypes = new[] { "order_reminder", "priority_flag", "special_instruction_update", "cancel_warning", "cook_fast" };
         if (Array.IndexOf(allowedTypes, type) < 0)
         {
             throw new HubException($"Invalid notification type: {type}");
@@ -133,6 +133,18 @@ public class RestaurantHub : Hub
             }
             _cooldowns[cooldownKey] = DateTime.UtcNow;
         }
+        else if (type == "cook_fast" && orderId.HasValue)
+        {
+            var cooldownKey = $"cook-fast-{orderId.Value}";
+            if (_cooldowns.TryGetValue(cooldownKey, out var lastSent))
+            {
+                if (DateTime.UtcNow - lastSent < TimeSpan.FromMinutes(2))
+                {
+                    throw new HubException("Cook Fast alert is on cooldown. Please wait 2 minutes.");
+                }
+            }
+            _cooldowns[cooldownKey] = DateTime.UtcNow;
+        }
 
         var title = type switch
         {
@@ -140,6 +152,7 @@ public class RestaurantHub : Hub
             "priority_flag" => "Priority Flag",
             "special_instruction_update" => "Special Instruction Update",
             "cancel_warning" => "Cancellation Warning",
+            "cook_fast" => "Cook Fast Request",
             _ => "Kitchen Alert"
         };
 
@@ -149,6 +162,7 @@ public class RestaurantHub : Hub
             "priority_flag" => "High priority preparation request.",
             "special_instruction_update" => string.IsNullOrEmpty(note) ? "Special instructions have been updated." : note,
             "cancel_warning" => "Warning: Order cancellation request.",
+            "cook_fast" => $"Table #{tableId} requested to prepare order #{orderId} faster.",
             _ => ""
         };
 
@@ -156,6 +170,7 @@ public class RestaurantHub : Hub
         {
             "priority_flag" => "high",
             "cancel_warning" => "high",
+            "cook_fast" => "high",
             _ => "medium"
         };
 
