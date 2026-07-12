@@ -177,8 +177,15 @@ public class BillService : IBillService
             if (order != null)
             {
                 var billDto = MapBillToDto(bill);
-                await _signalService.NotifyBillPaidAsync(order.TableId, billDto);
-                await _signalService.NotifyGuestSessionEndedAsync(order.TableId);
+                try
+                {
+                    await _signalService.NotifyBillPaidAsync(order.TableId, billDto);
+                    await _signalService.NotifyGuestSessionEndedAsync(order.TableId);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to send SignalR updates for paid bill ID {BillId}", billId);
+                }
             }
         }
 

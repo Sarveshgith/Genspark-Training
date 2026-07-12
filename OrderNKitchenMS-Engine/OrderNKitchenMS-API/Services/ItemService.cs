@@ -402,10 +402,8 @@ public class ItemService : IItemService
             var requiredQuantity = ingredient.QuantityRequired * quantity;
             if (isAdd)
             {
-                var affected = await _context.Database.ExecuteSqlInterpolatedAsync(
+                await _context.Database.ExecuteSqlInterpolatedAsync(
                     $"UPDATE \"Items\" SET \"StockQuantity\" = \"StockQuantity\" + {requiredQuantity}, \"UpdatedAt\" = {DateTime.UtcNow} WHERE \"Id\" = {ingredient.ItemId}");
-                if (affected == 0)
-                    throw new BusinessRuleException($"Item not found: {ingredient.Item.Name}");
             }
             else
             {

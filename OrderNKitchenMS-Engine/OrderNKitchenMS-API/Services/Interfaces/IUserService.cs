@@ -14,7 +14,7 @@ public interface IUserService
 
     public Task<UserDto> ApproveUserAsync(int id);
 
-    public Task<UserDto> UpdateUserRoleAsync(int id, int roleId);
+    public Task<UserDto> UpdateUserRoleAsync(int id, int roleId, int currentUserId);
 
     public Task<bool> ChangePasswordAsync(int id, string hashedPassword);
 

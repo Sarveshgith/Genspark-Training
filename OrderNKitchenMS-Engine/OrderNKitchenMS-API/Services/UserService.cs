@@ -120,9 +120,15 @@ public class UserService : IUserService
         return MapUserToDto(approvedUser);
     }
 
-    public async Task<UserDto> UpdateUserRoleAsync(int id, int roleId)
+    public async Task<UserDto> UpdateUserRoleAsync(int id, int roleId, int currentUserId)
     {
-        _logger.LogInformation("UpdateUserRoleAsync started for User ID: {Id} to Role ID: {RoleId}", id, roleId);
+        _logger.LogInformation("UpdateUserRoleAsync started for User ID: {Id} to Role ID: {RoleId} by Admin ID: {CurrentUserId}", id, roleId, currentUserId);
+
+        if (id == currentUserId)
+        {
+            _logger.LogWarning("UpdateUserRoleAsync failed: Admin ID {CurrentUserId} attempted to change their own role.", currentUserId);
+            throw new BusinessRuleException("You cannot change your own role.");
+        }
 
         var user = await _userRepository.GetByIdAsync(id);
         if (user == null)

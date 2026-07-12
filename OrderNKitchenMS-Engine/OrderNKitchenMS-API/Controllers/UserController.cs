@@ -52,14 +52,9 @@ public class UserController : ControllerBase
     {
         Validation.ValidateRequest(id, roleUpdateDto);
         var currentUserId = User.GetUserId();
-        if (currentUserId == id)
-        {
-            _logger.LogWarning("UpdateUserRole forbidden: Admin ID {CurrentUserId} attempted to change their own role.", currentUserId);
-            throw new ForbiddenException("You cannot change your own role.");
-        }
 
         _logger.LogInformation("UpdateUserRole requested for ID: {Id} to Role ID: {RoleId}", id, roleUpdateDto.RoleId);
-        var updatedUser = await _userService.UpdateUserRoleAsync(id, roleUpdateDto.RoleId);
+        var updatedUser = await _userService.UpdateUserRoleAsync(id, roleUpdateDto.RoleId, currentUserId);
         _logger.LogInformation("UpdateUserRole completed for ID: {Id}", id);
         return Ok(updatedUser);
     }

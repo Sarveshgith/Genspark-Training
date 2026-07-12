@@ -276,18 +276,4 @@ public class MenuService : IMenuService
             IsAvailable = menuItemCreateDto.IsAvailable
         };
     }
-
-    private static MenuItem MapUpdateDtoToEntity(MenuItemUpdateDto menuItemUpdateDto)
-    {
-        return new MenuItem
-        {
-            Name = menuItemUpdateDto.Name,
-            Description = menuItemUpdateDto.Description,
-            Price = menuItemUpdateDto.Price,
-            CategoryId = menuItemUpdateDto.CategoryId,
-            ImageUrl = menuItemUpdateDto.ImageUrl,
-            PreparationTime = menuItemUpdateDto.PreparationTime,
-            IsAvailable = menuItemUpdateDto.IsAvailable
-        };
-    }
 }

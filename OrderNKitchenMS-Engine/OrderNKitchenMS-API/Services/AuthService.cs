@@ -53,10 +53,10 @@ public class AuthService : IAuthService
             throw new NotFoundException($"Role with ID {userRegisterDto.RoleId} does not exist.");
         }
 
-        if (role.Name != UserRole.Chef && role.Name != UserRole.Waiter)
+        if (role.Name != UserRole.Chef && role.Name != UserRole.Waiter && role.Name != UserRole.Admin)
         {
             _logger.LogWarning("Registration failed: Role {RoleName} is not allowed for registration.", role.Name);
-            throw new BusinessRuleException("Only Chef and Waiter roles can be registered.");
+            throw new BusinessRuleException("Only Admin, Chef, and Waiter roles can be registered.");
         }
 
         var newUser = new User
