@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RunSettings>
+  <DataCollectionRunSettings>
+    <DataCollectors>
+      <DataCollector friendlyName="XPlat Code Coverage">
+        <Configuration>
+          <Format>cobertura</Format>
+          <Exclude>[*]Microsoft.AspNetCore.OpenApi.Generated*,[*]OrderNKitchenMS_API.Controllers.*,[*]OrderNKitchenMS_API.Repositories.*,[*]OrderNKitchenMS_API.Hubs.*,[*]OrderNKitchenMS_API.Utils.*,[*]OrderNKitchenMS_API.Exceptions.*,[*]OrderNKitchenMS_API.Models.*,[*]OrderNKitchenMS_API.Migrations.*,[*]OrderNKitchenMS_API.Data.*,[*]System.Runtime.CompilerServices.*</Exclude>
+          <ExcludeByFile>**/Controllers/**/*.cs,**/Repositories/**/*.cs,**/Hubs/**/*.cs,**/Utils/**/*.cs,**/Exceptions/**/*.cs,**/Models/**/*.cs,**/Migrations/**/*.cs,**/Data/**/*.cs,**/Program.cs</ExcludeByFile>
+        </Configuration>
+      </DataCollector>
+    </DataCollectors>
+  </DataCollectionRunSettings>
+</RunSettings>

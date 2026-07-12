@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Caching.Memory;
 using Moq;
 using NUnit.Framework;
 using OrderNKitchenMS_API.Data;
@@ -22,20 +23,24 @@ public class CategoryServiceTest
 {
     private AppDbContext _context = null!;
     private ICategoryRepository _categoryRepository = null!;
+    private Mock<IMenuItemRepository> _menuItemRepositoryMock = null!;
     private ICategoryService _categoryService = null!;
 
     [SetUp]
     public void Setup()
     {
         var options = new DbContextOptionsBuilder<AppDbContext>()
-            .UseInMemoryDatabase(databaseName: "OrderNKitchenDb")
+            .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
             .Options;
 
         _context = new AppDbContext(options);
         _categoryRepository = new CategoryRepository(_context);
 
         var logger = new Mock<ILogger<CategoryService>>().Object;
-        _categoryService = new CategoryService(_categoryRepository, logger);
+        _menuItemRepositoryMock = new Mock<IMenuItemRepository>();
+        _menuItemRepositoryMock.Setup(m => m.GetAllAsync()).ReturnsAsync(new List<MenuItem>().AsQueryable());
+        var memoryCache = new MemoryCache(new MemoryCacheOptions());
+        _categoryService = new CategoryService(_categoryRepository, _menuItemRepositoryMock.Object, logger, memoryCache);
     }
 
     [TearDown]
@@ -255,5 +260,145 @@ public class CategoryServiceTest
         };
 
         Assert.ThrowsAsync<ConflictException>(async () => await _categoryService.UpdateAsync(14, updateDto));
+    }
+
+    [Test]
+    public async Task GetAllAsync_NoFilters_ReturnsAllCategoriesAndCaches()
+    {
+        // Arrange
+        _context.Categories.AddRange(
+            new Category { Id = 20, Name = "Veg Category", IsNonVeg = false },
+            new Category { Id = 21, Name = "NonVeg Category", IsNonVeg = true }
+        );
+        await _context.SaveChangesAsync();
+
+        // Act
+        var result1 = await _categoryService.GetAllAsync();
+        var result2 = await _categoryService.GetAllAsync(); // hits cache
+
+        // Assert
+        Assert.That(result1.Count(), Is.EqualTo(2));
+        Assert.That(result2.Count(), Is.EqualTo(2));
+    }
+
+    [Test]
+    public async Task GetAllAsync_FilterVeg_ReturnsVegCategoriesOnly()
+    {
+        // Arrange
+        _context.Categories.AddRange(
+            new Category { Id = 22, Name = "Veg Category", IsNonVeg = false },
+            new Category { Id = 23, Name = "NonVeg Category", IsNonVeg = true }
+        );
+        await _context.SaveChangesAsync();
+
+        // Act
+        var result = await _categoryService.GetAllAsync(isNonVeg: false);
+
+        // Assert
+        Assert.That(result.Count(), Is.EqualTo(1));
+        Assert.That(result.First().Name, Is.EqualTo("Veg Category"));
+    }
+
+    [Test]
+    public async Task GetAllAsync_FilterNonVeg_ReturnsNonVegCategoriesOnly()
+    {
+        // Arrange
+        _context.Categories.AddRange(
+            new Category { Id = 24, Name = "Veg Category", IsNonVeg = false },
+            new Category { Id = 25, Name = "NonVeg Category", IsNonVeg = true }
+        );
+        await _context.SaveChangesAsync();
+
+        // Act
+        var result = await _categoryService.GetAllAsync(isNonVeg: true);
+
+        // Assert
+        Assert.That(result.Count(), Is.EqualTo(1));
+        Assert.That(result.First().Name, Is.EqualTo("NonVeg Category"));
+    }
+
+    [Test]
+    public void DeleteAsync_CategoryHasActiveMenuItems_ThrowsBusinessRuleException()
+    {
+        // Arrange
+        var category = new Category { Id = 26, Name = "Desserts", IsNonVeg = false };
+        _context.Categories.Add(category);
+        _context.SaveChanges();
+
+        var mockItem = new MenuItem { Id = 1, Name = "Cake", CategoryId = 26, Price = 10, Description = "Sweet cake", IsDeleted = false, PreparationTime = 10 };
+        _menuItemRepositoryMock.Setup(m => m.GetAllAsync()).ReturnsAsync(new List<MenuItem> { mockItem }.AsQueryable());
+
+        // Act & Assert
+        var ex = Assert.ThrowsAsync<BusinessRuleException>(async () => await _categoryService.DeleteAsync(26));
+        Assert.That(ex.Message, Is.EqualTo("Category cannot be deleted because it contains active menu items."));
+    }
+
+    [Test]
+    public async Task CreateAsync_DuplicateNameSameTypeNonVeg_ThrowsConflictException()
+    {
+        var category = new Category
+        {
+            Id = 30,
+            Name = "Desserts NonVeg",
+            IsNonVeg = true
+        };
+        _context.Categories.Add(category);
+        await _context.SaveChangesAsync();
+
+        var dto = new CategoryCreateDto
+        {
+            Name = "Desserts NonVeg",
+            IsNonVeg = true
+        };
+
+        var ex = Assert.ThrowsAsync<ConflictException>(async () => await _categoryService.CreateAsync(dto));
+        Assert.That(ex.Message, Contains.Substring("Non-Veg"));
+    }
+
+    [Test]
+    public async Task DeleteAsync_CategoryHasOnlyDeletedMenuItems_DeletesSuccessfully()
+    {
+        // Arrange
+        var category = new Category { Id = 31, Name = "Drinks", IsNonVeg = false };
+        _context.Categories.Add(category);
+        await _context.SaveChangesAsync();
+
+        var deletedItem = new MenuItem { Id = 2, Name = "Soda", CategoryId = 31, Price = 2, Description = "Fizzy", IsDeleted = true, PreparationTime = 5 };
+        _menuItemRepositoryMock.Setup(m => m.GetAllAsync()).ReturnsAsync(new List<MenuItem> { deletedItem }.AsQueryable());
+
+        // Act
+        var result = await _categoryService.DeleteAsync(31);
+
+        // Assert
+        Assert.That(result, Is.True);
+        var updated = await _context.Categories.FindAsync(31);
+        Assert.That(updated!.IsDeleted, Is.True);
+    }
+
+    [Test]
+    public async Task UpdateAsync_SameNameAndType_Succeeds()
+    {
+        // Arrange
+        var category = new Category
+        {
+            Id = 32,
+            Name = "Desserts",
+            IsNonVeg = false
+        };
+        _context.Categories.Add(category);
+        await _context.SaveChangesAsync();
+
+        var updateDto = new CategoryUpdateDto
+        {
+            Name = "Desserts",
+            IsNonVeg = false
+        };
+
+        // Act
+        var result = await _categoryService.UpdateAsync(32, updateDto);
+
+        // Assert
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Name, Is.EqualTo("Desserts"));
     }
 }
