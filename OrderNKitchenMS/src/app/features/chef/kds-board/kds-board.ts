@@ -140,6 +140,7 @@ export class KdsBoard implements OnInit, OnDestroy {
             });
 
             this.showToast(`Order #${orderId} cancelled`);
+            this.audioService.playNotificationChime();
           } 
           else if (statusStr === 'InPrep') {
             if (this.inPrepOrders().some(o => o.id === orderId)) {
@@ -203,6 +204,10 @@ export class KdsBoard implements OnInit, OnDestroy {
           else if (statusStr === 'Served' || statusStr === 'Completed') {
             // Clear from ready column
             this.readyOrders.update(orders => orders.filter(o => o.id !== orderId));
+          }
+          else if (statusStr === 'Pending') {
+            this.fetchActiveOrders();
+            this.audioService.playNotificationChime();
           }
         }
       })

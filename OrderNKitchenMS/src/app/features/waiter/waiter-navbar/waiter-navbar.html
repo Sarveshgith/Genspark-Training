@@ -29,12 +29,13 @@
 
     <!-- Right Side Actions -->
     <div class="flex items-center space-x-2 md:space-x-5 shrink-0 relative">
-      <!-- Live Connected status (Icon + text on md/lg, just icon on sm/xs) -->
+      <!-- Waiter Name status -->
       <div
         class="flex items-center space-x-1.5 md:space-x-2 bg-[#FAF4EC] px-2.5 md:px-3 py-1 rounded-full border border-[#8C5815]/10">
         <span class="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-[#1E7E34] animate-pulse"></span>
-        <span class="hidden sm:inline text-[9px] font-bold text-[#8C5815] uppercase tracking-wider font-sans">Live
-          Connected</span>
+        <span class="text-[9px] font-bold text-[#8C5815] uppercase tracking-wider font-sans">
+          {{ authService.getUserName() || 'Waiter' }}
+        </span>
       </div>
 
       <!-- Notification Bell -->

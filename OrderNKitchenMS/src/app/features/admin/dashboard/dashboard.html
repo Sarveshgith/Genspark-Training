@@ -16,7 +16,7 @@
         <span [class]="'relative inline-flex rounded-full h-2.5 w-2.5 ' + (signalRService.isConnected() ? 'bg-emerald-500' : 'bg-red-500')"></span>
       </span>
       <span class="text-xs font-bold font-space text-slate-655 tracking-wide">
-        {{ signalRService.isConnected() ? 'LIVE HUB CONNECTED' : 'OFFLINE - RECONNECTING' }}
+        {{ signalRService.isConnected() ? (authService.getUserName() || 'ADMIN') : 'OFFLINE - RECONNECTING' }}
       </span>
     </div>
   </header>

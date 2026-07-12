@@ -178,7 +178,6 @@
                 <th class="py-4 px-6">Ingredient</th>
                 <th class="py-4 px-6 text-center">Stock Level</th>
                 <th class="py-4 px-6 text-center">Safety Threshold</th>
-                <th class="py-4 px-6 text-center text-slate-400 hidden sm:table-cell">Unit Cost (Placeholder)</th>
                 <th class="py-4 px-6 text-center hidden md:table-cell">Status</th>
                 <th class="py-4 px-6 text-right">Actions</th>
               </tr>
@@ -221,14 +220,8 @@
                     }
                   </td>
 
-                  <!-- Threshold -->
                   <td class="py-4 px-6 text-center text-slate-400 font-mono text-xs">
                     Below {{ item.stockThreshold }} {{ item.unitName }}
-                  </td>
-
-                  <!-- Cost (Placeholder) -->
-                  <td class="py-4 px-6 text-center text-slate-350 italic text-xs hidden sm:table-cell">
-                    {{ item.costPerUnit ? '₹' + (item.costPerUnit | number:'1.2-2') : 'Not Set' }}
                   </td>
 
                   <!-- Status Toggle -->
@@ -382,31 +375,17 @@
         </div>
       </div>
 
-      <!-- Split Row for Threshold & Cost -->
-      <div class="grid grid-cols-2 gap-4">
-        <div>
-          <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Safety Threshold</label>
-          <input 
-            type="number" 
-            [(ngModel)]="formThreshold"
-            name="formThreshold"
-            min="0"
-            required
-            class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 focus:outline-none focus:border-[#F28500] focus:ring-1 focus:ring-[#F28500] bg-slate-50/50" 
-            placeholder="e.g. 10" />
-        </div>
-
-        <div>
-          <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1 text-slate-400">Unit Cost (Placeholder)</label>
-          <input 
-            type="number" 
-            [(ngModel)]="formCost"
-            name="formCost"
-            step="0.01"
-            min="0"
-            class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 focus:outline-none focus:border-[#F28500] focus:ring-1 focus:ring-[#F28500] bg-slate-50/50" 
-            placeholder="e.g. 1.25" />
-        </div>
+      <!-- Row for Threshold -->
+      <div class="mb-4">
+        <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Safety Threshold</label>
+        <input 
+          type="number" 
+          [(ngModel)]="formThreshold"
+          name="formThreshold"
+          min="0"
+          required
+          class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 focus:outline-none focus:border-[#F28500] focus:ring-1 focus:ring-[#F28500] bg-slate-50/50" 
+          placeholder="e.g. 10" />
       </div>
 
       <!-- Active Toggle -->

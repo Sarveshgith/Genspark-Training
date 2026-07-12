@@ -39,21 +39,21 @@
         <div class="bg-white border border-[#EFE5D3] rounded-2xl p-4 text-left text-xs space-y-2">
           <div class="flex justify-between">
             <span class="text-gray-500">Subtotal</span>
-            <span class="font-mono-dm font-semibold">{{ bill.subTotal | currency }}</span>
+            <span class="font-mono-dm font-semibold">{{ bill.subTotal | currency:'INR':'Rs ' }}</span>
           </div>
           <div class="flex justify-between">
             <span class="text-gray-500">Taxes ({{ bill.taxRate }}%)</span>
-            <span class="font-mono-dm font-semibold">{{ (bill.subTotal * bill.taxRate / 100) | currency }}</span>
+            <span class="font-mono-dm font-semibold">{{ (bill.subTotal * bill.taxRate / 100) | currency:'INR':'Rs ' }}</span>
           </div>
           @if (bill.discountAmount > 0) {
             <div class="flex justify-between text-[#1E7E34]">
               <span>Discount</span>
-              <span class="font-mono-dm font-semibold">-{{ bill.discountAmount | currency }}</span>
+              <span class="font-mono-dm font-semibold">-{{ bill.discountAmount | currency:'INR':'Rs ' }}</span>
             </div>
           }
           <div class="flex justify-between text-sm font-bold pt-1.5 border-t border-gray-100">
             <span>Amount Paid</span>
-            <span class="font-mono-dm text-[#9C7A3C]">{{ bill.totalAmount | currency }}</span>
+            <span class="font-mono-dm text-[#9C7A3C]">{{ bill.totalAmount | currency:'INR':'Rs ' }}</span>
           </div>
         </div>
       }
@@ -144,7 +144,7 @@
                 </p>
               </div>
               <div class="flex items-center space-x-3.5">
-                <span class="text-sm font-bold font-mono-dm text-[#2C2117]">{{ (item.unitPrice * item.quantity) | currency }}</span>
+                <span class="text-sm font-bold font-mono-dm text-[#2C2117]">{{ (item.unitPrice * item.quantity) | currency:'INR':'Rs ' }}</span>
                 @if (order.statusName === 'Pending') {
                   <button (click)="removeItem(item.id)" class="text-red-500 hover:text-red-750 transition cursor-pointer" title="Remove item">
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
@@ -169,11 +169,11 @@
         <div class="border-t border-[#F5EFE6] pt-6 space-y-3 font-outfit text-sm">
           <div class="flex justify-between text-[#8C7A6B]">
             <span>Subtotal</span>
-            <span class="font-mono-dm">{{ subtotal | currency }}</span>
+            <span class="font-mono-dm">{{ subtotal | currency:'INR':'Rs ' }}</span>
           </div>
           <div class="flex justify-between text-[#2C2117] font-bold text-base pt-2 border-t border-[#F5EFE6]/60">
             <span>Total Balance</span>
-            <span class="font-mono-dm text-[#9C7A3C]">{{ subtotal | currency }}</span>
+            <span class="font-mono-dm text-[#9C7A3C]">{{ subtotal | currency:'INR':'Rs ' }}</span>
           </div>
           <p class="text-[10px] text-[#8C7A6B] italic font-outfit mt-1 text-right select-none">
             Tax and discounts applied at billing.
@@ -259,21 +259,21 @@
                   </div>
                   <div class="flex justify-between">
                     <span>Subtotal</span>
-                    <span class="font-mono-dm">{{ bill.subTotal | currency }}</span>
+                    <span class="font-mono-dm">{{ bill.subTotal | currency:'INR':'Rs ' }}</span>
                   </div>
                   <div class="flex justify-between">
                     <span>Taxes ({{ bill.taxRate }}%)</span>
-                    <span class="font-mono-dm">{{ (bill.subTotal * bill.taxRate / 100) | currency }}</span>
+                    <span class="font-mono-dm">{{ (bill.subTotal * bill.taxRate / 100) | currency:'INR':'Rs ' }}</span>
                   </div>
                   @if (bill.discountAmount > 0) {
                     <div class="flex justify-between text-[#2E7D32]">
                       <span>Discount</span>
-                      <span class="font-mono-dm font-semibold">-{{ bill.discountAmount | currency }}</span>
+                      <span class="font-mono-dm font-semibold">-{{ bill.discountAmount | currency:'INR':'Rs ' }}</span>
                     </div>
                   }
                   <div class="flex justify-between font-bold text-sm text-[#2C2117] pt-2 border-t border-[#EFE5D3]">
                     <span>Final Total</span>
-                    <span class="font-mono-dm text-[#9C7A3C]">{{ bill.totalAmount | currency }}</span>
+                    <span class="font-mono-dm text-[#9C7A3C]">{{ bill.totalAmount | currency:'INR':'Rs ' }}</span>
                   </div>
                 </div>
 
@@ -342,7 +342,7 @@
               <div class="flex items-center justify-between gap-3">
                 <div (click)="toggleItemSelection(item)" class="flex-1 cursor-pointer">
                   <h4 class="font-bold text-xs text-[#2C2117]">{{ item.name }}</h4>
-                  <p class="text-[10px] text-gray-505 font-mono-dm mt-0.5">{{ item.price | currency }}</p>
+                  <p class="text-[10px] text-gray-505 font-mono-dm mt-0.5">{{ item.price | currency:'INR':'Rs ' }}</p>
                 </div>
                 
                 <!-- Selection State / Quantity Controls -->
@@ -387,6 +387,60 @@
           </button>
           <button (click)="submitAddItems()" [disabled]="isAddingItemsSubmit" class="px-5 py-2 bg-[#8C5815] text-white hover:bg-[#72450F] rounded-xl text-xs font-bold tracking-wider uppercase transition cursor-pointer disabled:bg-gray-300">
             {{ isAddingItemsSubmit ? 'Saving...' : 'Add Selected' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Remove Item Confirmation Modal -->
+  @if (showRemoveConfirmModal) {
+    <div class="fixed inset-0 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4 z-[99999] animate-fade-in">
+      <div class="bg-white border border-[#EFE5D3] rounded-3xl p-6 w-full max-w-sm shadow-2xl flex flex-col items-center text-center space-y-4 font-sans">
+        <!-- Warning Icon -->
+        <div class="w-12 h-12 bg-red-50 border border-red-100 rounded-full flex items-center justify-center text-red-500 text-xl shadow-inner">
+          ⚠️
+        </div>
+        <div class="space-y-1">
+          <h3 class="text-sm font-extrabold uppercase tracking-widest text-[#2C2117] font-outfit">Remove Item?</h3>
+          <p class="text-xs text-gray-500 font-light leading-relaxed">
+            Are you sure you want to remove this item from the order? This action cannot be undone.
+          </p>
+        </div>
+        <!-- Action Buttons -->
+        <div class="flex items-center justify-center gap-3 w-full border-t border-[#F5EFE6] pt-4 mt-2 shrink-0">
+          <button (click)="showRemoveConfirmModal = false; itemToRemoveId = null" class="flex-1 px-4 py-2 border border-[#EFE5D3] text-gray-700 hover:bg-gray-50 rounded-xl text-xs font-bold tracking-wider uppercase transition cursor-pointer">
+            No, Keep
+          </button>
+          <button (click)="confirmRemoveItem()" class="flex-1 px-4 py-2 bg-red-600 text-white hover:bg-red-700 rounded-xl text-xs font-bold tracking-wider uppercase transition cursor-pointer shadow-sm">
+            Yes, Remove
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Cancel Order Confirmation Modal -->
+  @if (showCancelConfirmModal) {
+    <div class="fixed inset-0 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4 z-[99999] animate-fade-in">
+      <div class="bg-white border border-[#EFE5D3] rounded-3xl p-6 w-full max-w-sm shadow-2xl flex flex-col items-center text-center space-y-4 font-sans">
+        <!-- Warning Icon -->
+        <div class="w-12 h-12 bg-red-50 border border-red-100 rounded-full flex items-center justify-center text-red-500 text-xl shadow-inner">
+          ⚠️
+        </div>
+        <div class="space-y-1">
+          <h3 class="text-sm font-extrabold uppercase tracking-widest text-[#2C2117] font-outfit">Cancel Order?</h3>
+          <p class="text-xs text-gray-500 font-light leading-relaxed">
+            Are you sure you want to cancel this order? This will release the table and return ingredients to stock.
+          </p>
+        </div>
+        <!-- Action Buttons -->
+        <div class="flex items-center justify-center gap-3 w-full border-t border-[#F5EFE6] pt-4 mt-2 shrink-0">
+          <button (click)="showCancelConfirmModal = false" class="flex-1 px-4 py-2 border border-[#EFE5D3] text-gray-700 hover:bg-gray-50 rounded-xl text-xs font-bold tracking-wider uppercase transition cursor-pointer">
+            No, Keep
+          </button>
+          <button (click)="confirmCancelOrder()" class="flex-1 px-4 py-2 bg-red-600 text-white hover:bg-red-700 rounded-xl text-xs font-bold tracking-wider uppercase transition cursor-pointer shadow-sm">
+            Yes, Cancel
           </button>
         </div>
       </div>

@@ -50,6 +50,11 @@ export class AuthService {
         return user ? user.id : null;
     }
 
+    public getUserName(): string | null {
+        const user = this.userSubject.value;
+        return user ? user.name : null;
+    }
+
     public login(loginModel: LoginModel) {
         let url = classUrl + "login";
         return this.http.post<LoginResponseModel>(url, loginModel, {

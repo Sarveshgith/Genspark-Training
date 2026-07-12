@@ -38,7 +38,7 @@ export class Dashboard implements OnInit, OnDestroy {
   private billService = inject(BillService);
   private inventoryService = inject(InventoryService);
   public signalRService = inject(SignalRService);
-  private authService = inject(AuthService);
+  public authService = inject(AuthService);
   private cdr = inject(ChangeDetectorRef);
   private zone = inject(NgZone);
   private router = inject(Router);

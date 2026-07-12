@@ -312,7 +312,7 @@
         <!-- Total Price -->
         <div class="flex items-center justify-between border-t border-slate-800 pt-4">
           <span class="text-xs font-medium font-syne text-slate-400 uppercase tracking-widest">Total Amount</span>
-          <span class="text-xl sm:text-2xl font-semibold font-mono-dm text-[#F28500]">{{ order().totalAmount | currency }}</span>
+          <span class="text-xl sm:text-2xl font-semibold font-mono-dm text-[#F28500]">{{ order().totalAmount | currency:'INR':'Rs ' }}</span>
         </div>
 
       </div>

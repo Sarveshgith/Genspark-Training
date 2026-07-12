@@ -136,11 +136,11 @@
                   Qty: <span class="font-semibold text-[#2C2117]">{{ item.quantity }}</span>
                   @if (item.unitPrice) {
                   <span class="mx-1">•</span> Unit Price: <span class="font-semibold text-[#2C2117]">{{ item.unitPrice |
-                    currency }}</span>
+                    currency:'INR':'Rs ' }}</span>
                   }
                 </div>
               </div>
-              <span class="font-bold font-mono-dm text-[#2C2117]">{{ (item.unitPrice * item.quantity) | currency
+              <span class="font-bold font-mono-dm text-[#2C2117]">{{ (item.unitPrice * item.quantity) | currency:'INR':'Rs '
                 }}</span>
             </div>
             }
@@ -151,22 +151,22 @@
           @if (billDetails()) {
           <div class="flex justify-between text-[#8C7A6B]">
             <span>Subtotal</span>
-            <span class="font-mono-dm text-[#2C2117]">{{ billDetails()?.subTotal | currency }}</span>
+            <span class="font-mono-dm text-[#2C2117]">{{ billDetails()?.subTotal | currency:'INR':'Rs ' }}</span>
           </div>
           <div class="flex justify-between text-[#8C7A6B]">
             <span>Tax ({{ billDetails()?.taxRate }}%)</span>
             <span class="font-mono-dm text-[#2C2117]">{{ ((billDetails()?.subTotal * billDetails()?.taxRate) / 100) |
-              currency }}</span>
+              currency:'INR':'Rs ' }}</span>
           </div>
           @if (billDetails()?.discountAmount > 0) {
           <div class="flex justify-between text-[#2E7D32]">
             <span>Discount</span>
-            <span class="font-mono-dm font-bold">-{{ billDetails()?.discountAmount | currency }}</span>
+            <span class="font-mono-dm font-bold">-{{ billDetails()?.discountAmount | currency:'INR':'Rs ' }}</span>
           </div>
           }
           <div class="flex justify-between font-bold text-lg text-[#2C2117] pt-3 border-t border-[#F5EFE6]">
             <span>Grand Total</span>
-            <span class="font-mono-dm text-[#9C7A3C] text-xl">{{ billDetails()?.totalAmount | currency }}</span>
+            <span class="font-mono-dm text-[#9C7A3C] text-xl">{{ billDetails()?.totalAmount | currency:'INR':'Rs ' }}</span>
           </div>
           }
         </div>
@@ -222,7 +222,7 @@
       <div
         class="bg-[#F4F9F4] border border-[#D0E7D2] rounded-2xl py-4 px-6 max-w-xs mx-auto flex items-center justify-between">
         <span class="text-xs uppercase font-bold tracking-wider text-[#2E7D32]">Total Settle</span>
-        <span class="text-xl font-bold font-mono-dm text-[#2E7D32]">{{ billDetails()?.totalAmount | currency }}</span>
+        <span class="text-xl font-bold font-mono-dm text-[#2E7D32]">{{ billDetails()?.totalAmount | currency:'INR':'Rs ' }}</span>
       </div>
 
       <div class="border-t border-[#F5EFE6] pt-6 flex flex-col items-center justify-center space-y-2">

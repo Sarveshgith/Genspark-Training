@@ -124,10 +124,16 @@ export class LandingComponent implements OnInit, OnDestroy {
             const signalSub = this.signalRService.orderUpdate$.subscribe({
               next: (updatedTrackingInfo) => {
                 this.zone.run(() => {
+                  if (this.sessionEnding()) {
+                    return;
+                  }
                   this.rawOrderDetails = updatedTrackingInfo;
                   this.enrichOrderDetails();
                   if (this.rawOrderDetails && this.rawOrderDetails.orderId) {
                     this.fetchBillDetails(this.rawOrderDetails.orderId);
+                  }
+                  if (this.rawOrderDetails && (this.rawOrderDetails.status === 'Completed' || this.rawOrderDetails.status === 'Cancelled')) {
+                    this.startSessionEndGracePeriod();
                   }
                   this.cdr.detectChanges();
                 });
@@ -138,6 +144,9 @@ export class LandingComponent implements OnInit, OnDestroy {
             const tablesSub = this.signalRService.tablesUpdated$.subscribe({
               next: () => {
                 this.zone.run(() => {
+                  if (this.sessionEnding()) {
+                    return;
+                  }
                   console.log('Table state update signal received. Refreshing guest order status...');
                   this.fetchOrderTracking();
                 });
@@ -148,6 +157,9 @@ export class LandingComponent implements OnInit, OnDestroy {
             const billGenSub = this.billService.billGenerated$.subscribe({
               next: (bill) => {
                 this.zone.run(() => {
+                  if (this.sessionEnding()) {
+                    return;
+                  }
                   console.log('Real-time bill generated event received:', bill);
                   this.billDetails.set(bill);
                   this.guestState.set('bill');
@@ -193,9 +205,17 @@ export class LandingComponent implements OnInit, OnDestroy {
   }
 
   public fetchOrderTracking() {
+    if (this.sessionEnding()) {
+      return;
+    }
     this.orderService.trackOrder().subscribe({
       next: (trackingInfo) => {
         this.zone.run(() => {
+          if (this.sessionEnding()) {
+            this.isLoading = false;
+            this.cdr.detectChanges();
+            return;
+          }
           try {
             const trackingTableId = trackingInfo.tableId ?? (trackingInfo as any).TableId;
             if (trackingTableId !== undefined && trackingTableId !== null && trackingTableId !== this.tableNumber) {
@@ -215,6 +235,9 @@ export class LandingComponent implements OnInit, OnDestroy {
             } else {
               this.guestState.set('waiting');
             }
+            if (this.rawOrderDetails && (this.rawOrderDetails.status === 'Completed' || this.rawOrderDetails.status === 'Cancelled')) {
+              this.startSessionEndGracePeriod();
+            }
           } catch (e) {
             console.error('Error in next/enrich callback of fetchOrderTracking:', e);
             this.errorMessage = "Error parsing order details: " + e;
@@ -226,6 +249,11 @@ export class LandingComponent implements OnInit, OnDestroy {
       },
       error: (err) => {
         this.zone.run(() => {
+          if (this.sessionEnding()) {
+            this.isLoading = false;
+            this.cdr.detectChanges();
+            return;
+          }
           console.error('Order tracking fetch error:', err);
           if (err.status === 401) {
             this.errorMessage = "Session Expired. Please scan the QR code again.";
@@ -300,9 +328,15 @@ export class LandingComponent implements OnInit, OnDestroy {
   }
 
   public fetchBillDetails(orderId: number) {
+    if (this.sessionEnding()) {
+      return;
+    }
     this.billService.getBillByOrderId(orderId).subscribe({
       next: (bill) => {
         this.zone.run(() => {
+          if (this.sessionEnding()) {
+            return;
+          }
           this.billDetails.set(bill);
           if (bill) {
             if (bill.statusName === 'Paid') {
@@ -320,6 +354,9 @@ export class LandingComponent implements OnInit, OnDestroy {
       },
       error: (err) => {
         this.zone.run(() => {
+          if (this.sessionEnding()) {
+            return;
+          }
           if (err?.status === 401) {
             this.errorMessage = "Session Expired. Please scan the QR code again.";
           }

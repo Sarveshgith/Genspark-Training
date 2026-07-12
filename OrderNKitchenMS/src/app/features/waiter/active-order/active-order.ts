@@ -41,6 +41,11 @@ export class ActiveOrderComponent implements OnInit, OnDestroy {
   public selectedAddItems: { [itemId: number]: { quantity: number; notes: string } } = {};
   public isAddingItemsSubmit: boolean = false;
 
+  // Remove Item Confirm State
+  public showRemoveConfirmModal: boolean = false;
+  public showCancelConfirmModal: boolean = false;
+  public itemToRemoveId: number | null = null;
+
   public tableId: number = 0;
   public isLoading: boolean = true;
   public errorMessage: string | null = null;
@@ -480,20 +485,29 @@ export class ActiveOrderComponent implements OnInit, OnDestroy {
 
   public removeItem(orderItemId: number): void {
     if (!this.order) return;
-    if (!confirm("Are you sure you want to remove this item from the order?")) return;
+    this.itemToRemoveId = orderItemId;
+    this.showRemoveConfirmModal = true;
+  }
 
+  public confirmRemoveItem(): void {
+    if (!this.order || this.itemToRemoveId === null) return;
+    const orderItemId = this.itemToRemoveId;
+    
     this.billError = null;
     this.billSuccess = null;
+    this.showRemoveConfirmModal = false;
 
     this.orderService.removeOrderItem(this.order.id, orderItemId).subscribe({
       next: () => {
         this.zone.run(() => {
           this.billSuccess = "Item successfully removed from the order.";
+          this.itemToRemoveId = null;
           this.fetchActiveOrder();
         });
       },
       error: (err) => {
         this.zone.run(() => {
+          this.itemToRemoveId = null;
           this.billError = err.error?.message || err.message || "Failed to remove item from order.";
           this.cdr.detectChanges();
         });
@@ -503,25 +517,28 @@ export class ActiveOrderComponent implements OnInit, OnDestroy {
 
   public cancelOrder(): void {
     if (!this.order) return;
-    
-    if (confirm("Are you sure you want to cancel this order? This will release the table and return ingredients to stock.")) {
-      this.billError = null;
-      this.billSuccess = null;
-      this.orderService.updateOrderStatus(this.order.id, 6).subscribe({
-        next: () => {
-          this.zone.run(() => {
-            this.billSuccess = "Order has been cancelled.";
-            this.fetchActiveOrder();
-          });
-        },
-        error: (err) => {
-          this.zone.run(() => {
-            console.error("Failed to cancel order:", err);
-            this.billError = err.error?.message || err.message || "Failed to cancel order.";
-            this.cdr.detectChanges();
-          });
-        }
-      });
-    }
+    this.showCancelConfirmModal = true;
+  }
+
+  public confirmCancelOrder(): void {
+    if (!this.order) return;
+    this.showCancelConfirmModal = false;
+    this.billError = null;
+    this.billSuccess = null;
+    this.orderService.updateOrderStatus(this.order.id, 6).subscribe({
+      next: () => {
+        this.zone.run(() => {
+          this.billSuccess = "Order has been cancelled.";
+          this.fetchActiveOrder();
+        });
+      },
+      error: (err) => {
+        this.zone.run(() => {
+          console.error("Failed to cancel order:", err);
+          this.billError = err.error?.message || err.message || "Failed to cancel order.";
+          this.cdr.detectChanges();
+        });
+      }
+    });
   }
 }
