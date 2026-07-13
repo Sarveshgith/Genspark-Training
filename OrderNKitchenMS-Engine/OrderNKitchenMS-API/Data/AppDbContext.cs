@@ -16,10 +16,17 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Bill> Bills => Set<Bill>();
     public DbSet<Item> Items => Set<Item>();
     public DbSet<MenuItemIngredient> MenuItemIngredients => Set<MenuItemIngredient>();
+    public DbSet<BillSplit> BillSplits => Set<BillSplit>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<BillSplit>()
+            .HasOne(bs => bs.Bill)
+            .WithMany(b => b.Splits)
+            .HasForeignKey(bs => bs.BillId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<MenuItemIngredient>()
             .HasOne(mi => mi.MenuItem)

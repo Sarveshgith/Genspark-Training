@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using OrderNKitchenMS_API.Models.Enums;
+using System.Collections.Generic;
 
 namespace OrderNKitchenMS_API.Models.Entities;
 
@@ -20,4 +21,6 @@ public class Bill : BaseEntity
     public decimal TotalAmount {get; set;}
 
     public BillStatus Status {get; set;} = BillStatus.Pending;
+
+    public ICollection<BillSplit> Splits { get; set; } = new List<BillSplit>();
 }

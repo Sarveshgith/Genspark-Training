@@ -16,4 +16,8 @@ public interface IBillRepository
     public Task<bool> UpdateStatusAsync(int id, BillStatus newStatus);
 
     public Task<Bill?> GetByIdAsync(int id);
+    
+    public Task<BillSplit?> GetBillSplitByIdAsync(int splitId);
+    
+    public Task<bool> UpdateBillSplitStatusAsync(int splitId, BillStatus status);
 }

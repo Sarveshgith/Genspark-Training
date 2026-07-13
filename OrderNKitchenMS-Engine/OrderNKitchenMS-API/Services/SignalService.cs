@@ -56,6 +56,13 @@ public class SignalService : ISignalService
             .SendAsync("bill_paid", billDto);
     }
 
+    public async Task NotifyBillSplitPaidAsync(int tableId, int splitId, decimal amount)
+    {
+        _logger.LogInformation("Notifying table-{TableId} about bill split paid: SplitId {SplitId} for {Amount}", tableId, splitId, amount);
+        await _hubContext.Clients.Group($"table-{tableId}")
+            .SendAsync("bill_split_paid", new { SplitId = splitId, Amount = amount });
+    }
+
     public async Task NotifyGuestSessionEndedAsync(int tableId)
     {
         _logger.LogInformation("Notifying table-{TableId} that the guest session has ended.", tableId);
