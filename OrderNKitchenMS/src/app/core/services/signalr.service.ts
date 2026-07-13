@@ -40,6 +40,11 @@ export class SignalRService {
         return this.billPaidSubject.asObservable();
     }
 
+    private billSplitPaidSubject = new Subject<{ splitId: number, amount: number }>();
+    public get billSplitPaid$(): Observable<{ splitId: number, amount: number }> {
+        return this.billSplitPaidSubject.asObservable();
+    }
+
     private adminAlertSubject = new Subject<any>();
     public get adminAlert$(): Observable<any> {
         return this.adminAlertSubject.asObservable();
@@ -139,6 +144,11 @@ export class SignalRService {
         this.hubConnection.on("bill_paid", (bill) => {
             console.log("Bill paid received:", bill);
             this.billPaidSubject.next(bill);
+        });
+
+        this.hubConnection.on("bill_split_paid", (data: { splitId: number, amount: number }) => {
+            console.log("Bill split paid received:", data);
+            this.billSplitPaidSubject.next(data);
         });
 
         this.hubConnection.on("ReceiveAdminAlert", (alert) => {

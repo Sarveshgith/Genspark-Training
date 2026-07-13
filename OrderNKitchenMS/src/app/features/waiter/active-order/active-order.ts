@@ -56,7 +56,10 @@ export class ActiveOrderComponent implements OnInit, OnDestroy {
   public showBillForm: boolean = false;
   public taxRateInput: number = 8;
   public discountAmountInput: number = 0;
+  public isSplittingBill: boolean = false;
+  public splitBetweenPeopleInput: number = 1;
   public isPaymentComplete: boolean = false;
+  public processingSplits = new Set<number>();
 
   public elapsedDisplay: string = '0s';
   private timerId: any;
@@ -252,6 +255,8 @@ export class ActiveOrderComponent implements OnInit, OnDestroy {
     this.showBillForm = true;
     this.taxRateInput = parseFloat(this.taxPercent) || 8;
     this.discountAmountInput = 0;
+    this.isSplittingBill = false;
+    this.splitBetweenPeopleInput = 1;
   }
 
   public submitGenerateBill() {
@@ -264,6 +269,10 @@ export class ActiveOrderComponent implements OnInit, OnDestroy {
       this.billError = `Discount cannot exceed the subtotal amount (${this.subtotal}).`;
       return;
     }
+    if (this.isSplittingBill && this.splitBetweenPeopleInput < 1) {
+      this.billError = "Number of people to split the bill between must be at least 1.";
+      return;
+    }
 
     this.isGeneratingBill = true;
     this.billError = null;
@@ -272,7 +281,8 @@ export class ActiveOrderComponent implements OnInit, OnDestroy {
     const payload = {
       orderId: this.order.id,
       taxRate: this.taxRateInput,
-      discountAmount: this.discountAmountInput
+      discountAmount: this.discountAmountInput,
+      splitBetweenPeople: this.isSplittingBill ? this.splitBetweenPeopleInput : 1
     };
 
     this.billService.createBill(payload).subscribe({
@@ -314,6 +324,38 @@ export class ActiveOrderComponent implements OnInit, OnDestroy {
         this.zone.run(() => {
           this.isMarkingPaid = false;
           this.billError = err.error?.message || err.message || "Failed to process payment.";
+          this.cdr.detectChanges();
+        });
+      }
+    });
+  }
+
+  public paySplit(splitId: number) {
+    if (!this.bill) return;
+    this.billError = null;
+    this.billSuccess = null;
+    this.processingSplits.add(splitId);
+
+    this.billService.payBillSplit(splitId).subscribe({
+      next: () => {
+        this.zone.run(() => {
+          this.processingSplits.delete(splitId);
+          this.billSuccess = "Split paid successfully!";
+          
+          // Eagerly update the local state so the button disappears instantly
+          if (this.bill && this.bill.splits) {
+            const splitIndex = this.bill.splits.findIndex(s => s.id === splitId);
+            if (splitIndex !== -1) {
+              this.bill.splits[splitIndex].statusName = 'Paid';
+            }
+          }
+          this.cdr.detectChanges();
+        });
+      },
+      error: (err) => {
+        this.zone.run(() => {
+          this.processingSplits.delete(splitId);
+          this.billError = err.error?.message || err.message || "Failed to process split payment.";
           this.cdr.detectChanges();
         });
       }

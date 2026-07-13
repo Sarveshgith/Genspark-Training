@@ -174,9 +174,29 @@
         <div class="bg-[#FAF8F4] border border-[#EFE5D3] rounded-2xl p-6 text-center space-y-4">
           <span class="text-xs font-bold uppercase tracking-wider text-[#8C7A6B] block">Scan to Pay via UPI</span>
           @if (billDetails()) {
-          <img
-            src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=upi://pay?pa=ambrosia@upi%26pn=Ambrosia%26am={{billDetails()?.totalAmount}}%26cu=INR"
-            alt="UPI QR Code" class="mx-auto border-4 border-white shadow-md rounded-2xl w-44 h-44">
+            @if (billDetails()?.splits && billDetails()?.splits?.length > 1) {
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                @for (split of billDetails()?.splits; track split.id; let i = $index) {
+                  @if (split.statusName === 'Pending') {
+                    <div class="flex flex-col items-center p-3 bg-white border border-[#EFE5D3] rounded-xl shadow-sm">
+                      <span class="text-xs font-semibold text-[#8C7A6B] mb-2">Split {{ i + 1 }} - {{ split.amount | currency }}</span>
+                      <img
+                        src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=ambrosia@upi%26pn=Ambrosia%26am={{split.amount}}%26cu=INR"
+                        alt="UPI QR Code Split {{ i + 1 }}" class="border-2 border-[#EFE5D3] rounded-xl w-32 h-32">
+                    </div>
+                  } @else {
+                    <div class="flex flex-col items-center justify-center p-3 bg-green-50 border border-green-200 rounded-xl shadow-sm h-full">
+                      <span class="text-2xl mb-1">✓</span>
+                      <span class="text-xs font-bold text-green-700">Split {{ i + 1 }} Paid</span>
+                    </div>
+                  }
+                }
+              </div>
+            } @else {
+              <img
+                src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=upi://pay?pa=ambrosia@upi%26pn=Ambrosia%26am={{billDetails()?.totalAmount}}%26cu=INR"
+                alt="UPI QR Code" class="mx-auto border-4 border-white shadow-md rounded-2xl w-44 h-44">
+            }
           }
           <div class="text-xxs text-[#8C7A6B] italic">
             Accepts all major UPI apps (GPay, PhonePe, Paytm, BHIM)

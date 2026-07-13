@@ -223,6 +223,26 @@
                              class="w-full px-3 py-2 bg-white border border-[#EFE5D3] rounded-xl text-sm text-[#2C2117] focus:outline-none focus:border-[#C5A059]">
                     </div>
 
+                    <div class="space-y-1.5">
+                      <div class="flex items-center justify-between">
+                        <label class="block text-xxs font-bold uppercase text-[#8C7A6B]">Split Bill</label>
+                        <button (click)="isSplittingBill = !isSplittingBill" type="button"
+                                class="px-4 py-2 bg-[#8C5815] text-white border border-[#72450F] rounded-xl text-xs font-bold font-syne tracking-wider uppercase transition hover:bg-[#72450F] shadow-sm">
+                          {{ isSplittingBill ? 'Cancel Split' : 'Split Bill' }}
+                        </button>
+                      </div>
+                      @if (isSplittingBill) {
+                        <div class="mt-2 space-y-1.5 animate-fade-in">
+                          <label class="block text-xxs font-bold uppercase text-[#8C7A6B]">Split Between People</label>
+                          <input type="number" [(ngModel)]="splitBetweenPeopleInput" name="splitBetweenPeopleInput" min="1" step="1"
+                                 class="w-full px-3 py-2 bg-white border border-[#EFE5D3] rounded-xl text-sm text-[#2C2117] focus:outline-none focus:border-[#C5A059]">
+                          @if (splitBetweenPeopleInput < 1) {
+                            <p class="text-xs text-red-500 mt-1">Number of people must be at least 1.</p>
+                          }
+                        </div>
+                      }
+                    </div>
+
                     <div class="flex space-x-3 pt-2">
                       <button (click)="submitGenerateBill()" [disabled]="isGeneratingBill"
                               class="flex-1 py-2.5 bg-[#8C5815] text-white hover:bg-[#72450F] rounded-xl text-xs font-bold font-syne tracking-wider uppercase transition cursor-pointer disabled:bg-gray-300">
@@ -278,16 +298,42 @@
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
-                  <button
-                    (click)="markAsPaid()"
-                    [disabled]="isMarkingPaid"
-                    class="py-3.5 bg-[#1E7E34] text-white hover:bg-[#155A24] rounded-2xl font-bold font-syne tracking-wider text-xs transition duration-200 cursor-pointer shadow-sm disabled:bg-gray-300"
-                  >
-                    {{ isMarkingPaid ? 'PROCESSING...' : 'MARK PAID' }}
-                  </button>
+                  <!-- Split Iteration -->
+                  @if (bill.splits && bill.splits.length > 1) {
+                    <div class="col-span-2 space-y-3 mt-2 border-t border-[#EFE5D3] pt-4">
+                      <h4 class="text-xs font-extrabold uppercase tracking-wider text-[#2C2117]">Bill Splits</h4>
+                      <div class="space-y-2">
+                        @for (split of bill.splits; track split.id; let i = $index) {
+                          <div class="flex items-center justify-between p-3 bg-white border border-[#EFE5D3] rounded-xl text-sm shadow-sm">
+                            <span class="font-semibold text-gray-700">Split {{ i + 1 }}</span>
+                            <span class="font-mono-dm">{{ split.amount | currency }}</span>
+                            @if (split.statusName === 'Pending') {
+                              <button (click)="paySplit(split.id)"
+                                      [disabled]="processingSplits.has(split.id)"
+                                      class="px-4 py-2 bg-[#1E7E34] text-white rounded-xl text-xs font-bold font-syne tracking-wider uppercase transition hover:bg-[#155A24] disabled:bg-gray-400 disabled:cursor-not-allowed shadow-sm">
+                                {{ processingSplits.has(split.id) ? 'PROCESSING...' : 'CONFIRM PAYMENT' }}
+                              </button>
+                            } @else if (split.statusName === 'Paid') {
+                              <span class="px-2 py-1 bg-green-100 text-green-700 rounded-md text-xs font-bold">
+                                Paid ✓
+                              </span>
+                            }
+                          </div>
+                        }
+                      </div>
+                    </div>
+                  } @else {
+                    <button
+                      (click)="markAsPaid()"
+                      [disabled]="isMarkingPaid"
+                      class="py-3.5 bg-[#1E7E34] text-white hover:bg-[#155A24] rounded-2xl font-bold font-syne tracking-wider text-xs transition duration-200 cursor-pointer shadow-sm disabled:bg-gray-300"
+                    >
+                      {{ isMarkingPaid ? 'PROCESSING...' : 'MARK PAID' }}
+                    </button>
+                  }
                   <button
                     (click)="downloadPdf()"
-                    class="py-3.5 bg-white border border-[#EFE5D3] text-gray-700 hover:bg-gray-50 rounded-2xl font-bold font-syne tracking-wider text-xs transition duration-200 cursor-pointer shadow-sm"
+                    class="py-3.5 bg-white border border-[#EFE5D3] text-gray-700 hover:bg-gray-50 rounded-2xl font-bold font-syne tracking-wider text-xs transition duration-200 cursor-pointer shadow-sm col-span-1"
                   >
                     DOWNLOAD PDF
                   </button>
