@@ -18,8 +18,11 @@ npm run build -- --configuration production
 
 echo "Deploying..."
 
+echo "Deploying..."
+
 npx -y @azure/static-web-apps-cli deploy \
     dist/OrderNKitchenMS/browser \
-    --deployment-token "$SWA_DEPLOYMENT_TOKEN"
+    --deployment-token "$SWA_DEPLOYMENT_TOKEN" \
+    --env production
 
 echo "Done."

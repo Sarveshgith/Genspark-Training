@@ -130,6 +130,7 @@ echo ""
 echo "Updating Helm Repositories..."
 helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 helm repo add csi-secrets-store-provider-azure https://azure.github.io/secrets-store-csi-driver-provider-azure/charts
+helm repo add jetstack https://charts.jetstack.io
 helm repo update
 
 DNS_LABEL="restaurant-api-srvsh0502"
@@ -144,6 +145,15 @@ helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx \
 
 echo "NGINX Ingress ready."
 echo "Using DNS Label: $DNS_LABEL"
+echo ""
+
+echo "Installing cert-manager..."
+helm upgrade --install cert-manager jetstack/cert-manager \
+    --namespace cert-manager \
+    --create-namespace \
+    --set crds.enabled=true \
+    --wait
+echo "cert-manager ready."
 echo ""
 
 # -----------------------------------------------------------------------------
@@ -199,6 +209,10 @@ do
 done
 
 echo "Generated manifests."
+echo ""
+
+echo "Applying ClusterIssuer..."
+kubectl apply -f generated/clusterissuer.yaml
 echo ""
 
 # Add local developer IP to PostgreSQL firewall so local dotnet ef runs work
