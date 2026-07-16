@@ -1,0 +1,15 @@
+{
+  "/api": {
+    "target": "http://restaurant-api-srvsh0502.southindia.cloudapp.azure.com",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "info"
+  },
+  "/restaurantHub": {
+    "target": "http://restaurant-api-srvsh0502.southindia.cloudapp.azure.com",
+    "secure": false,
+    "changeOrigin": true,
+    "ws": true,
+    "logLevel": "info"
+  }
+}

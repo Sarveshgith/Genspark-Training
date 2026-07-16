@@ -145,6 +145,14 @@
             <img [src]="(item.imageUrl && item.imageUrl !== 'none') ? item.imageUrl : '/fallback_dish.png'" [alt]="item.name"
               [class]="'w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ' + (!item.isAvailable ? 'grayscale opacity-70' : '')" />
 
+            <!-- Going Hot Tag -->
+            @if (!isWaiter() && hotItemIds().has(item.id)) {
+            <span
+              class="absolute top-3 left-3 bg-gradient-to-r from-amber-500 to-orange-600 text-white border border-amber-400/30 px-2.5 py-0.5 rounded-full text-[9px] font-bold tracking-wider shadow-md shadow-orange-500/20 uppercase flex items-center gap-1 select-none animate-pulse">
+              🔥 Going Hot
+            </span>
+            }
+
             <!-- Unavailable Tag -->
             @if (!item.isAvailable) {
             <span

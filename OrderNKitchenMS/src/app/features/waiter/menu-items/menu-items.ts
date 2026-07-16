@@ -5,6 +5,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { MenuService } from '../../../core/services/menu.service';
+import { ReportService } from '../../../core/services/report.service';
 import { MenuItemModel, CategoryModel } from '../../../core/models/menu.model';
 import { AuthService } from '../../../core/services/auth.service';
 import { OrderService } from '../../../core/services/order.service';
@@ -26,9 +27,12 @@ export interface CartItem {
 })
 export class MenuItems implements OnInit {
   public menuService = inject(MenuService);
+  public reportService = inject(ReportService);
   public orderService = inject(OrderService);
   public authService = inject(AuthService);
   private route = inject(ActivatedRoute);
+
+  public hotItemIds = signal<Set<number>>(new Set<number>());
 
   // Readonly computed signals as requested
   public readonly isWaiter = computed(() => this.authService.getRole()?.toLowerCase() === 'waiter');
@@ -89,6 +93,7 @@ export class MenuItems implements OnInit {
 
   ngOnInit(): void {
     this.fetchCategories();
+    this.fetchHotItems();
     if (this.isWaiter()) {
       this.fetchTables();
     }
@@ -96,6 +101,40 @@ export class MenuItems implements OnInit {
       const tableId = params['tableId'];
       if (tableId) {
         this.selectedTableId.set(Number(tableId));
+      }
+    });
+  }
+
+  fetchHotItems(): void {
+    if (this.isWaiter()) return;
+
+    this.menuService.getMenuItems({ pageSize: 100 }).subscribe({
+      next: (allItems) => {
+        this.reportService.getTopSellingItems(20).subscribe({
+          next: (topSelling) => {
+            const hotIds = new Set<number>();
+            const seenCategoryIds = new Set<number>();
+            for (const topItem of topSelling) {
+              const match = allItems.find(item => item.name.trim().toLowerCase() === topItem.itemName.trim().toLowerCase());
+              if (match) {
+                if (!seenCategoryIds.has(match.categoryId)) {
+                  hotIds.add(match.id);
+                  seenCategoryIds.add(match.categoryId);
+                  if (hotIds.size >= 3) {
+                    break;
+                  }
+                }
+              }
+            }
+            this.hotItemIds.set(hotIds);
+          },
+          error: (err) => {
+            console.error('Failed to load top selling items:', err);
+          }
+        });
+      },
+      error: (err) => {
+        console.error('Failed to load menu items for hot tags computation:', err);
       }
     });
   }

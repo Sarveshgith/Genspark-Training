@@ -50,6 +50,12 @@ export class TableManager implements OnInit, OnDestroy {
   // Deletion state
   public deleteConfirmTableId = signal<number | null>(null);
 
+  // QR Code & security states
+  public selectedTableForQr = signal<TableModel | null>(null);
+  public qrCodeUrl = signal<string | null>(null);
+  public isGeneratingQr = signal<boolean>(false);
+  public isRotatingSecret = signal<boolean>(false);
+
   private subscriptions: Subscription = new Subscription();
   private timeIntervalId: any;
 
@@ -380,6 +386,101 @@ export class TableManager implements OnInit, OnDestroy {
         });
         console.error('Failed to delete table:', err);
         deleteDialog.close();
+      }
+    });
+  }
+
+  // QR Code Details modal
+  public openQrModal(table: TableModel, dialog: HTMLDialogElement): void {
+    this.selectedTableForQr.set(table);
+    this.qrCodeUrl.set(null);
+    this.isGeneratingQr.set(true);
+    dialog.showModal();
+
+    this.tableService.getTableQRCode(table.id).subscribe({
+      next: (blob: Blob) => {
+        this.zone.run(() => {
+          if (this.qrCodeUrl()) {
+            URL.revokeObjectURL(this.qrCodeUrl()!);
+          }
+          const url = URL.createObjectURL(blob);
+          this.qrCodeUrl.set(url);
+          this.isGeneratingQr.set(false);
+          this.cdr.detectChanges();
+        });
+      },
+      error: (err) => {
+        this.zone.run(() => {
+          this.isGeneratingQr.set(false);
+          this.toastService.error('Failed to generate QR code image.');
+        });
+        console.error('Error fetching QR code blob:', err);
+      }
+    });
+  }
+
+  public closeQrModal(dialog: HTMLDialogElement): void {
+    dialog.close();
+    const url = this.qrCodeUrl();
+    if (url) {
+      URL.revokeObjectURL(url);
+    }
+    this.qrCodeUrl.set(null);
+    this.selectedTableForQr.set(null);
+  }
+
+  public downloadQrCode(): void {
+    const url = this.qrCodeUrl();
+    const table = this.selectedTableForQr();
+    if (!url || !table) return;
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `table_${table.number}_qrcode.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    this.toastService.success(`Downloaded QR Code for Table #${table.number}`);
+  }
+
+  public rotateSecret(): void {
+    const table = this.selectedTableForQr();
+    if (!table) return;
+
+    this.isRotatingSecret.set(true);
+    this.tableService.regenerateSecret(table.id).subscribe({
+      next: () => {
+        this.zone.run(() => {
+          this.toastService.success(`Rotated security secret for Table #${table.number}.`);
+          // Re-fetch the QR code
+          this.tableService.getTableQRCode(table.id).subscribe({
+            next: (blob: Blob) => {
+              this.zone.run(() => {
+                if (this.qrCodeUrl()) {
+                  URL.revokeObjectURL(this.qrCodeUrl()!);
+                }
+                const url = URL.createObjectURL(blob);
+                this.qrCodeUrl.set(url);
+                this.isRotatingSecret.set(false);
+                this.cdr.detectChanges();
+              });
+            },
+            error: (err) => {
+              this.zone.run(() => {
+                this.isRotatingSecret.set(false);
+                this.toastService.error('Failed to reload rotated QR code.');
+              });
+              console.error('Error reloading QR code:', err);
+            }
+          });
+        });
+      },
+      error: (err) => {
+        this.zone.run(() => {
+          this.isRotatingSecret.set(false);
+          this.toastService.error(err.error?.message || 'Failed to rotate secret.');
+        });
+        console.error('Error rotating secret:', err);
       }
     });
   }

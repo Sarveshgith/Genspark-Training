@@ -23,7 +23,7 @@ public class OrderController : ControllerBase
         _logger = logger;
     }
 
-    [Authorize(Policy = "AdminOnly")]
+    [Authorize(Policy = "AllStaff")]
     [HttpGet]
     public async Task<ActionResult<IEnumerable<OrderDto>>> GetOrders([FromQuery] QueryOrderDto query)
     {

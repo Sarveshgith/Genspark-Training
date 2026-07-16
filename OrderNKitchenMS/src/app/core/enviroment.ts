@@ -1,3 +1,3 @@
-export const baseUrl = "http://localhost:5182/api/"
+export const baseUrl = "http://restaurant-api-srvsh0502.southindia.cloudapp.azure.com/api/";
 
-export const signalrUrl = "http://localhost:5182/restaurantHub";
+export const signalrUrl = "http://restaurant-api-srvsh0502.southindia.cloudapp.azure.com/restaurantHub";

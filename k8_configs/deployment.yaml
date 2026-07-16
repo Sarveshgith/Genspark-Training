@@ -1,0 +1,81 @@
+# ============================================================================
+# Deployment
+# ----------------------------------------------------------------------------
+# Purpose: Deploys the Restaurant Management System API.
+# ============================================================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: restaurant-api
+  namespace: $KUBERNETES_NAMESPACE
+  labels:
+    app: restaurant-api
+spec:
+  replicas: 1
+  revisionHistoryLimit: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: restaurant-api
+  template:
+    metadata:
+      labels:
+        app: restaurant-api
+        azure.workload.identity/use: "true"
+    spec:
+      serviceAccountName: $SERVICE_ACCOUNT_NAME
+      imagePullSecrets:
+        - name: acr-pull
+      containers:
+        - name: restaurant-api
+          image: $ACR_LOGIN_SERVER/restaurant-api:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: restaurant-config
+          volumeMounts:
+            - name: secrets-store
+              mountPath: "/mnt/secrets-store"
+              readOnly: true
+          startupProbe:
+            httpGet:
+              path: /health/live
+              port: 8080
+            failureThreshold: 12
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /health/live
+              port: 8080
+            initialDelaySeconds: 0
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: 8080
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            timeoutSeconds: 10
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "250m"
+              memory: "512Mi"
+      volumes:
+        - name: secrets-store
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: restaurant-keyvault

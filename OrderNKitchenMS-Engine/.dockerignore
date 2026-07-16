@@ -1,0 +1,57 @@
+# Build artifacts
+**/bin/
+**/obj/
+
+
+# IDE
+.vs/
+.vscode/
+.idea/
+
+# User files
+*.user
+*.suo
+
+# Git
+.git
+.gitignore
+
+# Environment files
+.env
+.env.*
+
+# Logs
+Logs/
+*.log
+
+# Database files
+*.db
+*.db-shm
+*.db-wal
+
+# Tests
+OrderNKitchenMS-API.Test/
+
+# Coverage
+CoverageReport/
+
+# Documentation (optional)
+Documentation/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+Dockerfile*
+docker-compose*
+.dockerignore
+
+# Kubernetes
+k8-configs/
+
+# Scripts (optional)
+scripts/
+
+# Markdown
+*.md

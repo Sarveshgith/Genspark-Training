@@ -461,6 +461,19 @@ namespace OrderNKitchenMS_API.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("Users");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedAt = new DateTime(2026, 5, 28, 11, 4, 45, 313, DateTimeKind.Utc).AddTicks(3490),
+                            Email = "admin@restaurant.com",
+                            IsDeleted = false,
+                            IsPending = false,
+                            Name = "Admin User",
+                            PasswordHash = "AQAAAAIAAYagAAAAECu/g2+cvNOWYTIgNN2tcIkCuIZ7o5eTFcoankqklejcCqvF3QqAYQSHjNrCzMaJzQ==",
+                            RoleId = 1
+                        });
                 });
 
             modelBuilder.Entity("OrderNKitchenMS_API.Models.Entities.Bill", b =>

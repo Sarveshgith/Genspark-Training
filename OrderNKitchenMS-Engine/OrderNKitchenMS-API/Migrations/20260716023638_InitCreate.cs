@@ -9,7 +9,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace OrderNKitchenMS_API.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialPostgres : Migration
+    public partial class InitCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -76,6 +76,7 @@ namespace OrderNKitchenMS_API.Migrations
                     Status = table.Column<int>(type: "integer", nullable: false),
                     Capacity = table.Column<int>(type: "integer", nullable: false),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
+                    Secret = table.Column<string>(type: "text", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
@@ -126,6 +127,7 @@ namespace OrderNKitchenMS_API.Migrations
                     Address = table.Column<string>(type: "character varying(250)", maxLength: 250, nullable: true),
                     RoleId = table.Column<int>(type: "integer", nullable: false),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
+                    IsPending = table.Column<bool>(type: "boolean", nullable: false, defaultValue: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
@@ -176,7 +178,8 @@ namespace OrderNKitchenMS_API.Migrations
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     TableId = table.Column<int>(type: "integer", nullable: false),
-                    AssignedUserId = table.Column<int>(type: "integer", nullable: true),
+                    AssignedChefId = table.Column<int>(type: "integer", nullable: true),
+                    AssignedWaiterId = table.Column<int>(type: "integer", nullable: true),
                     Status = table.Column<int>(type: "integer", nullable: false),
                     TotalAmount = table.Column<decimal>(type: "numeric", nullable: false),
                     CompletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
@@ -193,8 +196,14 @@ namespace OrderNKitchenMS_API.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Orders_Users_AssignedUserId",
-                        column: x => x.AssignedUserId,
+                        name: "FK_Orders_Users_AssignedChefId",
+                        column: x => x.AssignedChefId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Orders_Users_AssignedWaiterId",
+                        column: x => x.AssignedWaiterId,
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -265,8 +274,14 @@ namespace OrderNKitchenMS_API.Migrations
                     { 1, new DateTime(2026, 5, 28, 11, 4, 45, 313, DateTimeKind.Utc).AddTicks(3490), 1, null },
                     { 2, new DateTime(2026, 5, 28, 11, 4, 45, 313, DateTimeKind.Utc).AddTicks(3780), 2, null },
                     { 3, new DateTime(2026, 5, 28, 11, 4, 45, 313, DateTimeKind.Utc).AddTicks(3780), 3, null },
-                    { 4, new DateTime(2026, 5, 28, 11, 4, 45, 313, DateTimeKind.Utc).AddTicks(3780), 4, null }
+                    { 4, new DateTime(2026, 5, 28, 11, 4, 45, 313, DateTimeKind.Utc).AddTicks(3780), 4, null },
+                    { 5, new DateTime(2026, 5, 28, 11, 4, 45, 313, DateTimeKind.Utc).AddTicks(3780), 5, null }
                 });
+
+            migrationBuilder.InsertData(
+                table: "Users",
+                columns: new[] { "Id", "Address", "CreatedAt", "Email", "IsDeleted", "Name", "PasswordHash", "PhoneNumber", "RoleId", "UpdatedAt" },
+                values: new object[] { 1, null, new DateTime(2026, 5, 28, 11, 4, 45, 313, DateTimeKind.Utc).AddTicks(3490), "admin@restaurant.com", false, "Admin User", "AQAAAAIAAYagAAAAECu/g2+cvNOWYTIgNN2tcIkCuIZ7o5eTFcoankqklejcCqvF3QqAYQSHjNrCzMaJzQ==", null, 1, null });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Bills_OrderId",
@@ -274,19 +289,41 @@ namespace OrderNKitchenMS_API.Migrations
                 column: "OrderId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Categories_Name_IsNonVeg",
+                table: "Categories",
+                columns: new[] { "Name", "IsNonVeg" },
+                unique: true,
+                filter: "\"IsDeleted\" = FALSE");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Items_Name",
+                table: "Items",
+                column: "Name",
+                unique: true,
+                filter: "\"IsActive\" = TRUE");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_MenuItemIngredients_ItemId",
                 table: "MenuItemIngredients",
                 column: "ItemId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_MenuItemIngredients_MenuItemId",
+                name: "IX_MenuItemIngredients_MenuItemId_ItemId",
                 table: "MenuItemIngredients",
-                column: "MenuItemId");
+                columns: new[] { "MenuItemId", "ItemId" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_MenuItems_CategoryId",
                 table: "MenuItems",
                 column: "CategoryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MenuItems_Name",
+                table: "MenuItems",
+                column: "Name",
+                unique: true,
+                filter: "\"IsDeleted\" = FALSE");
 
             migrationBuilder.CreateIndex(
                 name: "IX_OrderItems_MenuItemId",
@@ -299,9 +336,14 @@ namespace OrderNKitchenMS_API.Migrations
                 column: "OrderId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Orders_AssignedUserId",
+                name: "IX_Orders_AssignedChefId",
                 table: "Orders",
-                column: "AssignedUserId");
+                column: "AssignedChefId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Orders_AssignedWaiterId",
+                table: "Orders",
+                column: "AssignedWaiterId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Orders_TableId",
@@ -312,6 +354,13 @@ namespace OrderNKitchenMS_API.Migrations
                 name: "IX_Tables_Number",
                 table: "Tables",
                 column: "Number",
+                unique: true,
+                filter: "\"IsDeleted\" = FALSE");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Tables_Secret",
+                table: "Tables",
+                column: "Secret",
                 unique: true);
 
             migrationBuilder.CreateIndex(

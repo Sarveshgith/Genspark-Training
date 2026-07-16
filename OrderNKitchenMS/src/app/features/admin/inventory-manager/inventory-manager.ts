@@ -213,7 +213,7 @@ export class InventoryManager implements OnInit {
   // CRUD: Form Submit
   public onFormSubmit(dialog: HTMLDialogElement): void {
     const name = this.formName.trim();
-    const unit = this.formUnit;
+    const unit = Number(this.formUnit);
     const stockQuantity = this.formQuantity;
     const stockThreshold = this.formThreshold;
     const costPerUnit = this.formCost;

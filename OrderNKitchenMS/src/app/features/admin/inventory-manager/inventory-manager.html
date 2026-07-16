@@ -172,7 +172,7 @@
       <!-- Ingredients Table -->
       <main class="bg-white border border-slate-150 rounded-3xl shadow-sm overflow-hidden">
         <div class="overflow-x-auto">
-          <table class="w-full text-left border-collapse">
+          <table class="w-full min-w-[750px] text-left border-collapse">
             <thead>
               <tr class="bg-slate-50 text-[10px] font-bold text-slate-400 uppercase tracking-wider font-space border-b border-slate-150">
                 <th class="py-4 px-6">Ingredient</th>
@@ -354,11 +354,11 @@
             name="formUnit"
             required
             class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 focus:outline-none focus:border-[#F28500] bg-slate-50/50 cursor-pointer">
-            <option [value]="1">Grams</option>
-            <option [value]="2">Milliliters</option>
-            <option [value]="3">Pieces</option>
-            <option [value]="4">Kilograms</option>
-            <option [value]="5">Liters</option>
+            <option [ngValue]="1">Grams</option>
+            <option [ngValue]="2">Milliliters</option>
+            <option [ngValue]="3">Pieces</option>
+            <option [ngValue]="4">Kilograms</option>
+            <option [ngValue]="5">Liters</option>
           </select>
         </div>
 
@@ -457,7 +457,7 @@
               [(ngModel)]="drawerAddIngredientId"
               class="w-full text-xs rounded-xl border border-slate-200 px-3 py-2 bg-white focus:outline-none cursor-pointer">
               @for (ing of activeInventoryItemsForRecipes(); track ing.id) {
-                <option [value]="ing.id">{{ ing.name }} (in {{ ing.unitName }})</option>
+                <option [ngValue]="ing.id">{{ ing.name }} (in {{ ing.unitName }})</option>
               }
             </select>
           </div>

@@ -32,4 +32,15 @@ export class TableService {
     public deleteTable(id: number): Observable<void> {
         return this.http.delete<void>(baseUrl + "tables/" + id);
     }
+
+    public getTableQRCode(tableId: number): Observable<Blob> {
+        return this.http.get(baseUrl + "tables/qrcode", {
+            params: { tableId: tableId.toString() },
+            responseType: 'blob'
+        });
+    }
+
+    public regenerateSecret(id: number): Observable<void> {
+        return this.http.patch<void>(baseUrl + "tables/" + id + "/regenerate-secret", {});
+    }
 }

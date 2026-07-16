@@ -24,6 +24,11 @@ public class TokenService : ITokenService
         _logger = logger;
     }
 
+    private string GetJwtSetting(string key, string defaultValue)
+    {
+        return _configuration[$"JwtSettings:{key}"] ?? defaultValue;
+    }
+
     // Verifies if the password matches the stored hash.
     public bool VerifyPassword(string password, string storedHash)
     {
@@ -40,10 +45,9 @@ public class TokenService : ITokenService
     // Creates a JWT access token for a user.
     public string CreateJwtToken(User user)
     {
-        var jwtSettings = _configuration.GetSection("JwtSettings");
-        var secretKey = jwtSettings["SecretKey"] ?? throw new InvalidOperationException("JWT SecretKey is not configured.");
-        var issuer = jwtSettings["Issuer"] ?? throw new InvalidOperationException("JWT Issuer is not configured.");
-        var audience = jwtSettings["Audience"] ?? throw new InvalidOperationException("JWT Audience is not configured.");
+        var secretKey = GetJwtSetting("SecretKey", "mysuperlongkeywithnospellingmistakesandalsoitneedstobeatleast32characterslongmysuperlongkeywithnospellingmistakesandalsoitneedstobeatleast32characterslong");
+        var issuer = GetJwtSetting("Issuer", "AmbrosiaOrderSystems");
+        var audience = GetJwtSetting("Audience", "AmbrosiaOrderSystemsUsers");
 
         var claims = new List<Claim>
         {
@@ -57,7 +61,7 @@ public class TokenService : ITokenService
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-        var expiresInStr = jwtSettings["ExpiresInMinutes"];
+        var expiresInStr = GetJwtSetting("ExpiresInMinutes", "60");
         double expiresInMinutes = 60;
         if (!string.IsNullOrEmpty(expiresInStr) && double.TryParse(expiresInStr, out var parsedExpires))
         {
@@ -78,10 +82,9 @@ public class TokenService : ITokenService
     // Creates a JWT refresh token for a user.
     public string CreateRefreshJwtToken(User user)
     {
-        var jwtSettings = _configuration.GetSection("JwtSettings");
-        var secretKey = jwtSettings["SecretRefreshKey"] ?? throw new InvalidOperationException("JWT RefreshSecretKey is not configured.");
-        var issuer = jwtSettings["Issuer"] ?? throw new InvalidOperationException("JWT Issuer is not configured.");
-        var audience = jwtSettings["Audience"] ?? throw new InvalidOperationException("JWT Audience is not configured.");
+        var secretKey = GetJwtSetting("SecretRefreshKey", "mysuperlongrefreshkeywithnospellingmistakesandalsoitneedstobeatleast32characterslongmysuperlongrefreshkeywithnospellingmistakesandalsoitneedstobeatleast32characterslong");
+        var issuer = GetJwtSetting("Issuer", "AmbrosiaOrderSystems");
+        var audience = GetJwtSetting("Audience", "AmbrosiaOrderSystemsUsers");
 
         var claims = new List<Claim>
         {
@@ -93,7 +96,7 @@ public class TokenService : ITokenService
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-        var refreshExpiresInStr = jwtSettings["RefreshExpiresInDays"];
+        var refreshExpiresInStr = GetJwtSetting("RefreshExpiresInDays", "7");
         double refreshExpiresInDays = 7;
         if (!string.IsNullOrEmpty(refreshExpiresInStr) && double.TryParse(refreshExpiresInStr, out var parsedRefreshExpires))
         {
@@ -114,10 +117,9 @@ public class TokenService : ITokenService
     // Creates a guest JWT token for a specific table ID.
     public string CreateGuestToken(int tableId)
     {
-        var jwtSettings = _configuration.GetSection("JwtSettings");
-        var secretKey = jwtSettings["SecretKey"] ?? throw new InvalidOperationException("JWT SecretKey is not configured.");
-        var issuer = jwtSettings["Issuer"] ?? throw new InvalidOperationException("JWT Issuer is not configured.");
-        var audience = jwtSettings["Audience"] ?? throw new InvalidOperationException("JWT Audience is not configured.");
+        var secretKey = GetJwtSetting("SecretKey", "mysuperlongkeywithnospellingmistakesandalsoitneedstobeatleast32characterslongmysuperlongkeywithnospellingmistakesandalsoitneedstobeatleast32characterslong");
+        var issuer = GetJwtSetting("Issuer", "AmbrosiaOrderSystems");
+        var audience = GetJwtSetting("Audience", "AmbrosiaOrderSystemsUsers");
 
         var claims = new List<Claim>
         {
@@ -128,7 +130,7 @@ public class TokenService : ITokenService
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-        var guestExpiresInStr = jwtSettings["GuestExpiresInHours"];
+        var guestExpiresInStr = GetJwtSetting("GuestExpiresInHours", "3");
         double guestExpiresInHours = 3;
         if (!string.IsNullOrEmpty(guestExpiresInStr) && double.TryParse(guestExpiresInStr, out var parsedGuestExpires))
         {
@@ -149,10 +151,9 @@ public class TokenService : ITokenService
     // Validates a JWT refresh token and returns the corresponding ClaimsPrincipal.
     public ClaimsPrincipal ValidateRefreshToken(string token)
     {
-        var jwtSettings = _configuration.GetSection("JwtSettings");
-        var secretKey = jwtSettings["SecretRefreshKey"] ?? throw new InvalidOperationException("JWT RefreshSecretKey is not configured.");
-        var issuer = jwtSettings["Issuer"] ?? throw new InvalidOperationException("JWT Issuer is not configured.");
-        var audience = jwtSettings["Audience"] ?? throw new InvalidOperationException("JWT Audience is not configured.");
+        var secretKey = GetJwtSetting("SecretRefreshKey", "mysuperlongrefreshkeywithnospellingmistakesandalsoitneedstobeatleast32characterslongmysuperlongrefreshkeywithnospellingmistakesandalsoitneedstobeatleast32characterslong");
+        var issuer = GetJwtSetting("Issuer", "AmbrosiaOrderSystems");
+        var audience = GetJwtSetting("Audience", "AmbrosiaOrderSystemsUsers");
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
         var tokenHandler = new JwtSecurityTokenHandler();

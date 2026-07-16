@@ -14,9 +14,31 @@ using Serilog;
 using OrderNKitchenMS_API.Hubs;
 using DotNetEnv;
 
-Env.Load();
-
 var builder = WebApplication.CreateBuilder(args);
+
+if (builder.Environment.IsDevelopment())
+{
+    Env.Load();
+}
+
+// In production, the CSI Secret Store driver mounts each Key Vault secret as a
+// file inside /mnt/secrets-store/<objectName>. We add these as configuration
+// sources so IConfiguration.GetValue / GetConnectionString resolve them
+// without needing the Kubernetes Secret sync (secretObjects) step, which is
+// the source of the CreateContainerConfigError.
+const string csiMountPath = "/mnt/secrets-store";
+if (Directory.Exists(csiMountPath))
+{
+    foreach (var file in Directory.EnumerateFiles(csiMountPath))
+    {
+        // The objectName uses "--" as a hierarchy separator (Azure KV limitation).
+        // Replace "--" with ":" so .NET IConfiguration understands the key path.
+        // e.g. "ConnectionStrings--DefaultConnection" → "ConnectionStrings:DefaultConnection"
+        var key = Path.GetFileName(file).Replace("--", ":");
+        var value = File.ReadAllText(file).Trim();
+        builder.Configuration[key] = value;
+    }
+}
 
 //AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
@@ -31,7 +53,9 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAngularApp", policy =>
     {
-        policy.WithOrigins("http://localhost:4200") 
+        var allowedOrigins = builder.Configuration["AllowedOrigins"] ?? "http://localhost:4200";
+        var origins = allowedOrigins.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        policy.WithOrigins(origins) 
               .WithHeaders("Content-Type", "Authorization", "Accept", "X-Requested-With", "x-signalr-user-agent")
               .WithMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
               .AllowCredentials();
@@ -45,21 +69,27 @@ builder.Services.AddOpenApi();
 builder.Services.AddControllers();
 builder.Services.AddMemoryCache();
 
-builder.Services.AddSignalR();
+builder.Services.AddSignalR()
+    .AddAzureSignalR(builder.Configuration["SignalR:ConnectionString"]);
 
 //JWT Authentication
+var jwtSecretKey = builder.Configuration["JwtSettings:SecretKey"] 
+                   ?? "mysuperlongkeywithnospellingmistakesandalsoitneedstobeatleast32characterslongmysuperlongkeywithnospellingmistakesandalsoitneedstobeatleast32characterslong";
+var jwtIssuer = builder.Configuration["JwtSettings:Issuer"] ?? "AmbrosiaOrderSystems";
+var jwtAudience = builder.Configuration["JwtSettings:Audience"] ?? "AmbrosiaOrderSystemsUsers";
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
-            ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
+            ValidIssuer = jwtIssuer,
             ValidateAudience = true,
-            ValidAudience = builder.Configuration["JwtSettings:Audience"],
+            ValidAudience = jwtAudience,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:SecretKey"]!)),
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecretKey)),
         };
 
         options.Events = new JwtBearerEvents
@@ -114,8 +144,24 @@ builder.Services.AddAuthorization(options =>
         ));
 });
 
-var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING") 
-                       ?? builder.Configuration.GetConnectionString("DefaultConnection");
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+if (string.IsNullOrEmpty(connectionString))
+{
+    var dbHost = builder.Configuration["DB_HOST"];
+    var dbPort = builder.Configuration["DB_PORT"] ?? "5432";
+    var dbDatabase = builder.Configuration["DB_DATABASE"] ?? builder.Configuration["DB_NAME"];
+    var dbUsername = builder.Configuration["DB_USERNAME"] ?? builder.Configuration["DB_USER"];
+    var dbPassword = builder.Configuration["DB_PASSWORD"];
+
+    if (!string.IsNullOrEmpty(dbHost) && !string.IsNullOrEmpty(dbDatabase) && !string.IsNullOrEmpty(dbUsername) && !string.IsNullOrEmpty(dbPassword))
+    {
+        connectionString = $"Host={dbHost};Port={dbPort};Database={dbDatabase};Username={dbUsername};Password={dbPassword};";
+    }
+    else
+    {
+        connectionString = builder.Configuration["DB_CONNECTION_STRING"] ?? string.Empty;
+    }
+}
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString));
@@ -176,6 +222,36 @@ if (app.Environment.IsDevelopment())
 }
 
 app.MapHub<RestaurantHub>("/restaurantHub");
+
+app.MapGet("/health/live", () => Results.Ok(new { Status = "Healthy" }));
+app.MapGet("/health/ready", async (AppDbContext dbContext) => 
+{
+    try 
+    {
+        var canConnect = await dbContext.Database.CanConnectAsync();
+        return canConnect ? Results.Ok(new { Status = "Ready" }) : Results.Problem("Database connection failed", statusCode: 500);
+    }
+    catch (Exception ex)
+    {
+        return Results.Problem($"Database check failed: {ex.Message}", statusCode: 500);
+    }
+});
+
+app.MapGet("/api/health", async (AppDbContext dbContext) => {
+    try 
+    {
+        var canConnect = await dbContext.Database.CanConnectAsync();
+        if (canConnect)
+        {
+            return Results.Ok(new { Status = "Healthy", Database = "Connected" });
+        }
+        return Results.Problem("Database connection failed", statusCode: 500);
+    }
+    catch (Exception ex)
+    {
+        return Results.Problem($"Database check failed: {ex.Message}", statusCode: 500);
+    }
+});
 
 app.UseHttpsRedirection();
 

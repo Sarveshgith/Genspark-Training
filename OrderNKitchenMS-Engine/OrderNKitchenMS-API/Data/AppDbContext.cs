@@ -42,6 +42,21 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 new Role { Id = 4, Name = UserRole.Deliveryman, CreatedAt = new DateTime(2026, 5, 28, 11, 4, 45, 313, DateTimeKind.Utc).AddTicks(3780) },
                 new Role { Id = 5, Name = UserRole.Waiter, CreatedAt = new DateTime(2026, 5, 28, 11, 4, 45, 313, DateTimeKind.Utc).AddTicks(3780) }
             );
+        
+        var defaultAdmin = new User 
+        { 
+            Id = 1, 
+            Name = "Admin User", 
+            Email = "admin@restaurant.com", 
+            PasswordHash = "AQAAAAIAAYagAAAAECu/g2+cvNOWYTIgNN2tcIkCuIZ7o5eTFcoankqklejcCqvF3QqAYQSHjNrCzMaJzQ==", 
+            RoleId = 1, 
+            IsDeleted = false, 
+            IsPending = false,
+            CreatedAt = new DateTime(2026, 5, 28, 11, 4, 45, 313, DateTimeKind.Utc).AddTicks(3490) 
+        };
+
+        modelBuilder.Entity<User>()
+            .HasData(defaultAdmin);
         modelBuilder.Entity<User>()
             .HasOne(u => u.Role)
             .WithMany(r => r.Users)

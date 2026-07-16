@@ -56,6 +56,7 @@ public class ReportController : ControllerBase
     }
 
     [HttpGet("menu/top-items")]
+    [AllowAnonymous]
     public async Task<ActionResult<IEnumerable<TopSellingItemDto>>> GetTopSellingItems([FromQuery] int limit = 5)
     {
         Validation.ValidateId(limit, nameof(limit), "Limit must be greater than zero.");

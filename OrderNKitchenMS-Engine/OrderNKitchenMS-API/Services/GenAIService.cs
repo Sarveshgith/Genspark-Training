@@ -9,12 +9,13 @@ public class GenAIService : IGenAIService
 {
     private readonly IConfiguration _configuration;
     private readonly ILogger<GenAIService> _logger;
-    private readonly string? _apiKey = Environment.GetEnvironmentVariable("GEMINI_API_KEY");
+    private readonly string? _apiKey;
 
     public GenAIService(IConfiguration configuration, ILogger<GenAIService> logger)
     {
         _configuration = configuration;
         _logger = logger;
+        _apiKey = _configuration["GEMINI_API_KEY"];
     }
 
     public async Task<string> GetDishStoryAsync(string dishName)

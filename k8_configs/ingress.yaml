@@ -1,0 +1,26 @@
+# ============================================================================
+# Ingress
+# ----------------------------------------------------------------------------
+# Purpose: Exposes the Restaurant Management API to the Internet.
+# ============================================================================
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: restaurant-api-ingress
+  namespace: $KUBERNETES_NAMESPACE
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/proxy-body-size: "20m"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: $API_HOSTNAME
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: restaurant-api-service
+                port:
+                  number: 80

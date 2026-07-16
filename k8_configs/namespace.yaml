@@ -1,0 +1,25 @@
+# ============================================================================
+# Namespace
+# ----------------------------------------------------------------------------
+# Purpose:
+#   Creates an isolated namespace for the Restaurant Management System.
+#
+# Why use a namespace?
+#   • Keeps application resources grouped together.
+#   • Prevents naming collisions with other applications.
+#   • Makes resource management easier.
+#   • Allows future resource quotas and network policies.
+#
+# All application resources (Deployment, Service, ConfigMap,
+# SecretProviderClass, Ingress, etc.) will be deployed into this namespace.
+# ============================================================================
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: $KUBERNETES_NAMESPACE
+  labels:
+    app.kubernetes.io/name: restaurant-management-system
+    app.kubernetes.io/part-of: restaurant-management-system
+    app.kubernetes.io/managed-by: kubectl
+    environment: production

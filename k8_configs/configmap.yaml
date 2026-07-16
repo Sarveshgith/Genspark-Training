@@ -1,0 +1,31 @@
+# ============================================================================
+# ConfigMap
+# ----------------------------------------------------------------------------
+# Purpose: Stores NON-SENSITIVE application configuration.
+# ============================================================================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: restaurant-config
+  namespace: $KUBERNETES_NAMESPACE
+  labels:
+    app.kubernetes.io/name: restaurant-api
+    app.kubernetes.io/component: backend
+    app.kubernetes.io/part-of: restaurant-management-system
+data:
+  ASPNETCORE_ENVIRONMENT: "Production"
+  ASPNETCORE_URLS: "http://+:8080"
+  Logging__LogLevel__Default: "Information"
+  Logging__LogLevel__Microsoft: "Warning"
+  Logging__LogLevel__Microsoft_AspNetCore: "Warning"
+  AllowedOrigins: "$ALLOWED_ORIGINS"
+  Application__Name: "Restaurant Management System"
+  Application__Version: "1.0"
+  Application__Environment: "Production"
+  Features__EnableSwagger: "false"
+  Features__EnableDetailedErrors: "false"
+  Features__SeedDatabase: "false"
+  Cache__DefaultExpirationMinutes: "30"
+  RateLimiting__PermitLimit: "100"
+  RateLimiting__WindowMinutes: "1"
+  QrSettings__BaseUrl: "$FRONTEND_URL"

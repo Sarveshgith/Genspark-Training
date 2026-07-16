@@ -219,15 +219,20 @@
             </div>
 
             <!-- Action buttons panel -->
-            <div class="flex items-center space-x-2 pt-1 select-none">
+            <div class="grid grid-cols-3 gap-2 pt-1 select-none">
               <button 
                 (click)="startEdit(table)"
-                class="flex-1 py-1.5 rounded-xl bg-slate-50 border border-slate-200 hover:bg-slate-100 text-slate-700 font-bold text-xs uppercase tracking-wide cursor-pointer transition">
+                class="py-1.5 rounded-xl bg-slate-50 border border-slate-200 hover:bg-slate-100 text-slate-700 font-bold text-xs uppercase tracking-wide cursor-pointer transition text-center">
                 ✏️ Edit
               </button>
               <button 
+                (click)="openQrModal(table, qrDialog)"
+                class="py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-200 text-[#F28500] font-bold text-xs uppercase tracking-wide cursor-pointer transition text-center flex items-center justify-center space-x-1">
+                <span>🔳</span> <span>QR</span>
+              </button>
+              <button 
                 (click)="triggerDelete(table.id, deleteDialog)"
-                class="p-1.5 bg-red-50 hover:bg-red-100 border border-red-150 text-red-650 rounded-xl cursor-pointer transition">
+                class="py-1.5 bg-red-50 hover:bg-red-100 border border-red-150 text-red-655 rounded-xl cursor-pointer transition flex items-center justify-center text-center">
                 🗑️
               </button>
             </div>
@@ -369,6 +374,95 @@
           (click)="confirmDelete(deleteDialog)"
           class="flex-1 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold uppercase tracking-wide transition duration-150 cursor-pointer">
           Yes, Delete
+        </button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- QR CODE DETAILS MODAL -->
+  <dialog 
+    #qrDialog 
+    closedby="any" 
+    (click)="onDialogClick($event, qrDialog)"
+    class="rounded-3xl border border-slate-200 shadow-2xl p-7 bg-white max-w-md w-full focus:outline-none relative">
+    
+    <!-- Header -->
+    <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-5">
+      <h3 class="text-lg font-bold font-syne text-[#0F172A]">Table #{{ selectedTableForQr()?.number }} QR Code</h3>
+      <button 
+        (click)="closeQrModal(qrDialog)" 
+        class="p-1 hover:bg-slate-100 text-slate-400 hover:text-slate-655 rounded-full transition cursor-pointer border-none outline-none text-lg leading-none">
+        ×
+      </button>
+    </div>
+
+    <!-- Modal Content -->
+    <div class="space-y-6 font-space">
+      <!-- QR Image Frame -->
+      <div class="flex flex-col items-center justify-center bg-slate-50 border border-slate-150 rounded-2xl p-6 min-h-60 relative">
+        @if (isGeneratingQr()) {
+          <div class="flex flex-col items-center space-y-3">
+            <span class="animate-spin text-3xl text-[#F28500]">🔄</span>
+            <span class="text-xs text-slate-400">Generating QR Code...</span>
+          </div>
+        } @else {
+          @if (qrCodeUrl()) {
+            <img 
+              [src]="qrCodeUrl()" 
+              alt="Table QR Code" 
+              class="w-48 h-48 object-contain rounded-lg border border-slate-200 bg-white p-2 shadow-sm transition-transform hover:scale-105" />
+            <p class="text-[10px] text-slate-400 mt-3 text-center">
+              Scan this code to access ordering services for Table #{{ selectedTableForQr()?.number }}.
+            </p>
+          } @else {
+            <p class="text-xs text-red-555 text-center font-bold">Failed to load QR code image.</p>
+          }
+        }
+      </div>
+
+      <!-- Action Panel: Download QR -->
+      @if (qrCodeUrl() && !isGeneratingQr()) {
+        <button 
+          (click)="downloadQrCode()"
+          class="w-full py-2.5 px-4 bg-[#F28500] hover:bg-[#D97200] text-white font-bold text-xs uppercase tracking-wide rounded-xl shadow-md transition cursor-pointer flex items-center justify-center space-x-2">
+          <span>📥</span>
+          <span>Download QR Code Image</span>
+        </button>
+      }
+
+      <!-- Rotate Security Secret Section -->
+      <div class="border-t border-slate-100 pt-5 space-y-3">
+        <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-start space-x-3 text-xs">
+          <span class="text-base select-none mt-0.5">⚠️</span>
+          <div>
+            <h4 class="font-bold text-amber-900 leading-tight">Security Secret Rotation</h4>
+            <p class="mt-1 text-amber-800 leading-normal">
+              Rotating the secret will instantly invalidate all old QR codes/scans. Current dining guests will be disconnected and will need to scan the new QR code.
+            </p>
+          </div>
+        </div>
+
+        <button 
+          (click)="rotateSecret()"
+          [disabled]="isRotatingSecret()"
+          [ngClass]="{'opacity-50 cursor-not-allowed': isRotatingSecret()}"
+          class="w-full py-2.5 px-4 bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs uppercase tracking-wide rounded-xl shadow-sm transition cursor-pointer flex items-center justify-center space-x-2">
+          @if (isRotatingSecret()) {
+            <span class="animate-spin">🔄</span>
+            <span>Rotating Secret...</span>
+          } @else {
+            <span>🔄</span>
+            <span>Rotate Access Secret</span>
+          }
+        </button>
+      </div>
+
+      <!-- Footer Close -->
+      <div class="pt-2">
+        <button 
+          (click)="closeQrModal(qrDialog)"
+          class="w-full py-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-655 font-bold text-xs uppercase tracking-wide transition cursor-pointer text-center">
+          Close Dialog
         </button>
       </div>
     </div>

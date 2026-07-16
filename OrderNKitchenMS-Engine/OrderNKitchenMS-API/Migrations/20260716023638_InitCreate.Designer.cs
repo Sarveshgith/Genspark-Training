@@ -12,8 +12,8 @@ using OrderNKitchenMS_API.Data;
 namespace OrderNKitchenMS_API.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260616091845_AddCategoryUniquenessIndex")]
-    partial class AddCategoryUniquenessIndex
+    [Migration("20260716023638_InitCreate")]
+    partial class InitCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -389,6 +389,10 @@ namespace OrderNKitchenMS_API.Migrations
                     b.Property<int>("Number")
                         .HasColumnType("integer");
 
+                    b.Property<string>("Secret")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<int>("Status")
                         .HasColumnType("integer");
 
@@ -400,6 +404,9 @@ namespace OrderNKitchenMS_API.Migrations
                     b.HasIndex("Number")
                         .IsUnique()
                         .HasFilter("\"IsDeleted\" = FALSE");
+
+                    b.HasIndex("Secret")
+                        .IsUnique();
 
                     b.ToTable("Tables");
                 });
@@ -427,6 +434,11 @@ namespace OrderNKitchenMS_API.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
+                    b.Property<bool>("IsPending")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -452,6 +464,19 @@ namespace OrderNKitchenMS_API.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("Users");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedAt = new DateTime(2026, 5, 28, 11, 4, 45, 313, DateTimeKind.Utc).AddTicks(3490),
+                            Email = "admin@restaurant.com",
+                            IsDeleted = false,
+                            IsPending = false,
+                            Name = "Admin User",
+                            PasswordHash = "AQAAAAIAAYagAAAAECu/g2+cvNOWYTIgNN2tcIkCuIZ7o5eTFcoankqklejcCqvF3QqAYQSHjNrCzMaJzQ==",
+                            RoleId = 1
+                        });
                 });
 
             modelBuilder.Entity("OrderNKitchenMS_API.Models.Entities.Bill", b =>

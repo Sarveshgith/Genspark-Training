@@ -1,0 +1,23 @@
+# ============================================================================
+# Service
+# ----------------------------------------------------------------------------
+# Purpose: Provides a stable network endpoint for the Restaurant Management API.
+# ============================================================================
+apiVersion: v1
+kind: Service
+metadata:
+  name: restaurant-api-service
+  namespace: $KUBERNETES_NAMESPACE
+  labels:
+    app.kubernetes.io/name: restaurant-api
+    app.kubernetes.io/component: backend
+    app.kubernetes.io/part-of: restaurant-management-system
+spec:
+  type: ClusterIP
+  selector:
+    app: restaurant-api
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 8080

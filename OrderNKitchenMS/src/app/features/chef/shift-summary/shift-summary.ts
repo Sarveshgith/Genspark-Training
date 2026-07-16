@@ -42,7 +42,7 @@ export class ShiftSummary implements OnInit, OnChanges {
     this.isLoading.set(true);
     this.error.set(null);
 
-    this.orderService.getActiveOrders().subscribe({
+    this.orderService.getOrders({ pageSize: 1000 }).subscribe({
       next: (orders) => {
         const today = new Date().toDateString();
         
@@ -50,8 +50,8 @@ export class ShiftSummary implements OnInit, OnChanges {
         const todayOrders = orders.filter(o => new Date(o.createdAt).toDateString() === today);
         this.totalActiveCount.set(todayOrders.length);
 
-        // Prepared/Completed (Ready or Served) orders today
-        const completed = todayOrders.filter(o => o.status === 3 || o.status === 4);
+        // Prepared/Completed (Ready, Served, or Completed) orders today
+        const completed = todayOrders.filter(o => o.status === 3 || o.status === 4 || o.status === 5);
         this.completedCount.set(completed.length);
 
         // Average preparation time logic
