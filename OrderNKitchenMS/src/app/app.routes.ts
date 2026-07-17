@@ -8,21 +8,25 @@ export const routes: Routes = [
 
 	{
 		path: 'login',
+		title: 'Login | Ambrosia',
 		loadComponent: () => import('./features/auth/login/login').then(m => m.Login)
 	},
 
 	{
 		path: 'register',
+		title: 'Register | Ambrosia',
 		loadComponent: () => import('./features/auth/register/register').then(m => m.Register)
 	},
 
 	{
 		path: 'pending-approval',
+		title: 'Pending Approval | Ambrosia',
 		loadComponent: () => import('./features/auth/pending-approval/pending-approval').then(m => m.PendingApproval)
 	},
 
 	{
 		path: 'kitchen',
+		title: 'Chef Dashboard | Ambrosia',
 		loadComponent: () => import('./features/chef/kds-board/kds-board').then(m => m.KdsBoard),
 		canActivate: [RoleGuard],
 		data: { roles: ['Chef'] }
@@ -30,6 +34,7 @@ export const routes: Routes = [
 
 	{
 		path: 'waiter/menu',
+		title: 'Waiter Menu | Ambrosia',
 		loadComponent: () => import('./features/waiter/menu-items/menu-items').then(m => m.MenuItems),
 		canActivate: [RoleGuard],
 		data: { roles: ['Waiter'] }
@@ -37,6 +42,7 @@ export const routes: Routes = [
 
 	{
 		path: 'waiter/tables',
+		title: 'Waiter Dashboard | Ambrosia',
 		loadComponent: () => import('./features/waiter/table-view/table-view').then(m => m.TableView),
 		canActivate: [RoleGuard],
 		data: { roles: ['Waiter'] }
@@ -44,6 +50,7 @@ export const routes: Routes = [
 
 	{
 		path: 'dashboard',
+		title: 'Admin Dashboard | Ambrosia',
 		loadComponent: () => import('./features/admin/dashboard/dashboard').then(m => m.Dashboard),
 		canActivate: [RoleGuard],
 		data: { roles: ['Admin'] }
@@ -51,6 +58,7 @@ export const routes: Routes = [
 
 	{
 		path: 'orders',
+		title: 'Orders | Ambrosia',
 		loadComponent: () => import('./features/admin/order-list/order-list').then(m => m.OrderList),
 		canActivate: [RoleGuard],
 		data: { roles: ['Admin'] }
@@ -58,6 +66,7 @@ export const routes: Routes = [
 
 	{
 		path: 'tables',
+		title: 'Tables | Ambrosia',
 		loadComponent: () => import('./features/admin/table-manager/table-manager').then(m => m.TableManager),
 		canActivate: [RoleGuard],
 		data: { roles: ['Admin'] }
@@ -65,6 +74,7 @@ export const routes: Routes = [
 
 	{
 		path: 'inventory',
+		title: 'Inventory | Ambrosia',
 		loadComponent: () => import('./features/admin/inventory-manager/inventory-manager').then(m => m.InventoryManager),
 		canActivate: [RoleGuard],
 		data: { roles: ['Admin'] }
@@ -72,6 +82,7 @@ export const routes: Routes = [
 
 	{
 		path: 'menu-manager',
+		title: 'Menu Manager | Ambrosia',
 		loadComponent: () => import('./features/admin/menu-manager/menu-manager').then(m => m.MenuManager),
 		canActivate: [RoleGuard],
 		data: { roles: ['Admin'] }
@@ -79,6 +90,7 @@ export const routes: Routes = [
 
 	{
 		path: 'category-manager',
+		title: 'Category Manager | Ambrosia',
 		loadComponent: () => import('./features/admin/category-manager/category-manager').then(m => m.CategoryManager),
 		canActivate: [RoleGuard],
 		data: { roles: ['Admin'] }
@@ -86,6 +98,7 @@ export const routes: Routes = [
 
 	{
 		path: 'users',
+		title: 'Users | Ambrosia',
 		loadComponent: () => import('./features/admin/user-manager/user-manager').then(m => m.UserManager),
 		canActivate: [RoleGuard],
 		data: { roles: ['Admin'] }
@@ -93,6 +106,7 @@ export const routes: Routes = [
 
 	{
 		path: 'reports',
+		title: 'Reports | Ambrosia',
 		loadComponent: () => import('./features/admin/reports/reports').then(m => m.ReportsComponent),
 		canActivate: [RoleGuard],
 		data: { roles: ['Admin'] }
@@ -100,6 +114,7 @@ export const routes: Routes = [
 
 	{
 		path: 'waiter/active-order/:tableId',
+		title: 'Active Order | Ambrosia',
 		loadComponent: () => import('./features/waiter/active-order/active-order').then(m => m.ActiveOrderComponent),
 		canActivate: [RoleGuard],
 		data: { roles: ['Waiter'] }
@@ -107,23 +122,27 @@ export const routes: Routes = [
 
 	{
 		path: 'guest/landing',
+		title: 'Ambrosia',
 		loadComponent: () => import('./features/guest/landing-component/landing-component').then(m => m.LandingComponent),
 		canActivate: [GuestGuard]
 	},
 
 	{
 		path: 'guest/menu',
+		title: 'Ambrosia',
 		loadComponent: () => import('./features/waiter/menu-items/menu-items').then(m => m.MenuItems),
 		canActivate: [GuestGuard]
 	},
 
 	{
 		path: 'guest/:secret',
+		title: 'Ambrosia',
 		loadComponent: () => import('./features/guest/landing-component/landing-component').then(m => m.LandingComponent)
 	},
 
 	{
 		path: 'session-ended',
+		title: 'Session Ended | Ambrosia',
 		loadComponent: () => import('./features/guest/session-ended/session-ended').then(m => m.SessionEndedComponent),
 		canActivate: [SessionEndedGuard]
 	},

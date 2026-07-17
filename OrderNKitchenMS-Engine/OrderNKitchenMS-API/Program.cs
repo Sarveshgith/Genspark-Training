@@ -204,6 +204,36 @@ builder.Services.AddProblemDetails();
 
 var app = builder.Build();
 
+// Auto-migrate and setup DB reports functions
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var context = services.GetRequiredService<AppDbContext>();
+    try
+    {
+        context.Database.Migrate();
+        var sqlPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "Reports_Setup.sql");
+        if (!File.Exists(sqlPath))
+        {
+            sqlPath = Path.Combine(AppContext.BaseDirectory, "Data", "Reports_Setup.sql");
+        }
+        if (File.Exists(sqlPath))
+        {
+            var sql = File.ReadAllText(sqlPath);
+            context.Database.ExecuteSqlRaw(sql);
+            Log.Information("Reports functions and views set up successfully.");
+        }
+        else
+        {
+            Log.Warning("Reports_Setup.sql was not found at path: {Path}", sqlPath);
+        }
+    }
+    catch (Exception ex)
+    {
+        Log.Error(ex, "Database migration or Reports functions setup failed.");
+    }
+}
+
 app.UseExceptionHandler();
 
 //Strictly follow Content-Type, Avoid Clickjacking, Omit Referrer headers

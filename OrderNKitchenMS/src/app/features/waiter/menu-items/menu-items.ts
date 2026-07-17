@@ -257,7 +257,6 @@ export class MenuItems implements OnInit {
   fetchCategories(): void {
     this.menuService.getMenuCategories().subscribe({
       next: (cats) => {
-        console.log('Categories fetched:', cats);
         this.categories.set(cats);
         this.fetchMenuItems();
       },
@@ -271,7 +270,6 @@ export class MenuItems implements OnInit {
   fetchTables(): void {
     this.orderService.getTables().subscribe({
       next: (tbls: TableModel[]) => {
-        console.log('Tables fetched:', tbls);
         this.tables.set(tbls.filter((t: TableModel) => !t.isDeleted));
       },
       error: (err: any) => {
@@ -312,7 +310,6 @@ export class MenuItems implements OnInit {
   }
 
   handleClick(item: MenuItemModel): void {
-    console.log('Item clicked:', item);
     if (this.isWaiter()) {
       if (!item.isAvailable) return;
 
@@ -409,7 +406,6 @@ export class MenuItems implements OnInit {
 
     this.orderService.createOrder(payload).subscribe({
       next: (res) => {
-        console.log('Order created successfully:', res);
         this.checkoutSuccess.set(`Order placed successfully for Table ${res.tableNumber}!`);
         this.cartItems.set([]);
         this.selectedTableId.set(null);

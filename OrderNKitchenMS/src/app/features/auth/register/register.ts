@@ -67,7 +67,6 @@ export class Register {
 
     this.authService.register(registerData).subscribe({
       next: (user) => {
-        console.log('Registration successful:', user);
         this.toastService.success('Registration successful!');
         this.registerForm.reset({
           email: '',

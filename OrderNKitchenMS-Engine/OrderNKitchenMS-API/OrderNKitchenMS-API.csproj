@@ -47,4 +47,10 @@
     <Folder Include="Utils/" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Data\Reports_Setup.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
