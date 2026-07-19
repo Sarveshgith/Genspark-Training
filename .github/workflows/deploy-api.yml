@@ -56,7 +56,7 @@ jobs:
 
       - name: Login to Azure Container Registry
         run: |
-          echo "${{ secrets.ACR_PASSWORD }}" | docker login \
+          echo "${{ secrets.ACR_SECRET }}" | docker login \
           "${{ vars.ACR_LOGIN_SERVER }}" \
           --username "${{ vars.ACR_USERNAME }}" \
           --password-stdin
