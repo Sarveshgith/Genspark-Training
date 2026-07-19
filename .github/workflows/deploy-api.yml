@@ -145,7 +145,7 @@ jobs:
         run: |
           for i in {1..20}; do
             STATUS=$(curl -k -o /dev/null -s -w "%{http_code}" \
-            https://${{ vars.INGRESS_HOST }}/health)
+            https://${{ vars.INGRESS_HOST }}/health/live)
 
             echo "Status: $STATUS"
 
