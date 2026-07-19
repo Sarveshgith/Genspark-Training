@@ -1,0 +1,165 @@
+name: Deploy Backend to AKS
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'OrderNKitchenMS-Engine/**'
+      - 'k8_configs/**'
+      - '.github/workflows/deploy-api.yml'
+
+  workflow_dispatch:
+
+jobs:
+  deploy:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      #########################################################
+      # Checkout
+      #########################################################
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      #########################################################
+      # .NET
+      #########################################################
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore
+        run: |
+          dotnet restore OrderNKitchenMS-Engine/OrderNKitchenMS-API/OrderNKitchenMS-API.csproj
+
+      - name: Build
+        run: |
+          dotnet build \
+          OrderNKitchenMS-Engine/OrderNKitchenMS-API/OrderNKitchenMS-API.csproj \
+          --configuration Release \
+          --no-restore
+
+      - name: Run Tests
+        run: |
+          dotnet test \
+          OrderNKitchenMS-Engine/OrderNKitchenMS-API.Test/OrderNKitchenMS-API.Test.csproj \
+          --configuration Release
+
+      #########################################################
+      # Docker Login
+      #########################################################
+
+      - name: Login to Azure Container Registry
+        run: |
+          echo "${{ secrets.ACR_PASSWORD }}" | docker login \
+          "${{ vars.ACR_LOGIN_SERVER }}" \
+          --username "${{ vars.ACR_USERNAME }}" \
+          --password-stdin
+
+      #########################################################
+      # Build Docker Image
+      #########################################################
+
+      - name: Build Docker Image
+        run: |
+          IMAGE=${{ vars.ACR_LOGIN_SERVER }}/restaurant-api:${{ github.sha }}
+
+          docker build \
+            -t $IMAGE \
+            OrderNKitchenMS-Engine
+
+      #########################################################
+      # Push Image
+      #########################################################
+
+      - name: Push Docker Image
+        run: |
+          IMAGE=${{ vars.ACR_LOGIN_SERVER }}/restaurant-api:${{ github.sha }}
+
+          docker push $IMAGE
+
+      #########################################################
+      # Configure kubectl
+      #########################################################
+
+      - name: Configure kubectl
+        run: |
+          mkdir -p ~/.kube
+
+          echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > ~/.kube/config
+
+          chmod 600 ~/.kube/config
+
+      #########################################################
+      # Verify Cluster
+      #########################################################
+
+      - name: Verify Cluster
+        run: |
+          kubectl get nodes
+          kubectl get pods -n restaurant-ms
+
+      #########################################################
+      # Update Deployment
+      #########################################################
+
+      - name: Update AKS Deployment
+        run: |
+          kubectl set image \
+          deployment/restaurant-api \
+          restaurant-api=${{ vars.ACR_LOGIN_SERVER }}/restaurant-api:${{ github.sha }} \
+          -n restaurant-ms
+
+      #########################################################
+      # Wait for Rollout
+      #########################################################
+
+      - name: Wait for Rollout
+        run: |
+          kubectl rollout status \
+          deployment/restaurant-api \
+          -n restaurant-ms \
+          --timeout=300s
+
+      #########################################################
+      # Verify
+      #########################################################
+
+      - name: Verify Deployment
+        run: |
+          kubectl get deployment restaurant-api -n restaurant-ms
+          kubectl get pods -n restaurant-ms
+
+      - name: Verify rollout
+        run: |
+          kubectl rollout status deployment/restaurant-api \
+            -n restaurant-ms \
+            --timeout=300s
+
+      - name: Smoke Test
+        run: |
+          for i in {1..20}; do
+            STATUS=$(curl -k -o /dev/null -s -w "%{http_code}" \
+            https://${{ vars.INGRESS_HOST }}/health)
+
+            echo "Status: $STATUS"
+
+            if [ "$STATUS" = "200" ]; then
+              exit 0
+            fi
+
+            sleep 15
+          done
+
+          echo "Deployment failed"
+
+          kubectl logs deployment/restaurant-api \
+            -n restaurant-ms \
+            --tail=100
+
+          exit 1
