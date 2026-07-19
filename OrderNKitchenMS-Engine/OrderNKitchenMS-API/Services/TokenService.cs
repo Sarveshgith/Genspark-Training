@@ -29,6 +29,16 @@ public class TokenService : ITokenService
         return _configuration[$"JwtSettings:{key}"] ?? defaultValue;
     }
 
+    private string GetRequiredJwtSetting(string key)
+    {
+        var value = _configuration[$"JwtSettings:{key}"];
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            throw new InvalidOperationException($"Required JWT setting 'JwtSettings:{key}' is missing.");
+        }
+        return value;
+    }
+
     // Verifies if the password matches the stored hash.
     public bool VerifyPassword(string password, string storedHash)
     {
@@ -45,9 +55,9 @@ public class TokenService : ITokenService
     // Creates a JWT access token for a user.
     public string CreateJwtToken(User user)
     {
-        var secretKey = GetJwtSetting("SecretKey", "mysuperlongkeywithnospellingmistakesandalsoitneedstobeatleast32characterslongmysuperlongkeywithnospellingmistakesandalsoitneedstobeatleast32characterslong");
-        var issuer = GetJwtSetting("Issuer", "AmbrosiaOrderSystems");
-        var audience = GetJwtSetting("Audience", "AmbrosiaOrderSystemsUsers");
+        var secretKey = GetRequiredJwtSetting("SecretKey");
+        var issuer = GetRequiredJwtSetting("Issuer");
+        var audience = GetRequiredJwtSetting("Audience");
 
         var claims = new List<Claim>
         {
@@ -82,9 +92,9 @@ public class TokenService : ITokenService
     // Creates a JWT refresh token for a user.
     public string CreateRefreshJwtToken(User user)
     {
-        var secretKey = GetJwtSetting("SecretRefreshKey", "mysuperlongrefreshkeywithnospellingmistakesandalsoitneedstobeatleast32characterslongmysuperlongrefreshkeywithnospellingmistakesandalsoitneedstobeatleast32characterslong");
-        var issuer = GetJwtSetting("Issuer", "AmbrosiaOrderSystems");
-        var audience = GetJwtSetting("Audience", "AmbrosiaOrderSystemsUsers");
+        var secretKey = GetRequiredJwtSetting("SecretRefreshKey");
+        var issuer = GetRequiredJwtSetting("Issuer");
+        var audience = GetRequiredJwtSetting("Audience");
 
         var claims = new List<Claim>
         {
@@ -117,9 +127,9 @@ public class TokenService : ITokenService
     // Creates a guest JWT token for a specific table ID.
     public string CreateGuestToken(int tableId)
     {
-        var secretKey = GetJwtSetting("SecretKey", "mysuperlongkeywithnospellingmistakesandalsoitneedstobeatleast32characterslongmysuperlongkeywithnospellingmistakesandalsoitneedstobeatleast32characterslong");
-        var issuer = GetJwtSetting("Issuer", "AmbrosiaOrderSystems");
-        var audience = GetJwtSetting("Audience", "AmbrosiaOrderSystemsUsers");
+        var secretKey = GetRequiredJwtSetting("SecretKey");
+        var issuer = GetRequiredJwtSetting("Issuer");
+        var audience = GetRequiredJwtSetting("Audience");
 
         var claims = new List<Claim>
         {
@@ -151,9 +161,9 @@ public class TokenService : ITokenService
     // Validates a JWT refresh token and returns the corresponding ClaimsPrincipal.
     public ClaimsPrincipal ValidateRefreshToken(string token)
     {
-        var secretKey = GetJwtSetting("SecretRefreshKey", "mysuperlongrefreshkeywithnospellingmistakesandalsoitneedstobeatleast32characterslongmysuperlongrefreshkeywithnospellingmistakesandalsoitneedstobeatleast32characterslong");
-        var issuer = GetJwtSetting("Issuer", "AmbrosiaOrderSystems");
-        var audience = GetJwtSetting("Audience", "AmbrosiaOrderSystemsUsers");
+        var secretKey = GetRequiredJwtSetting("SecretRefreshKey");
+        var issuer = GetRequiredJwtSetting("Issuer");
+        var audience = GetRequiredJwtSetting("Audience");
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
         var tokenHandler = new JwtSecurityTokenHandler();
