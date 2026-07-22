@@ -22,6 +22,10 @@ export class BillService {
     return this.signalR.billPaid$;
   }
 
+  public get billSplitPaid$(): Observable<{ splitId: number, amount: number }> {
+    return this.signalR.billSplitPaid$;
+  }
+
   constructor(private http: HttpClient, private signalR: SignalRService) {
     this.signalR.billGenerated$.subscribe((bill: BillDto) => {
       this._bill.set(bill);
@@ -29,6 +33,17 @@ export class BillService {
     this.signalR.billPaid$.subscribe((bill: BillDto) => {
       if (this._bill() && this._bill()!.id === bill.id) {
         this._bill.set(bill);
+      }
+    });
+    this.signalR.billSplitPaid$.subscribe((data: { splitId: number, amount: number }) => {
+      const currentBill = this._bill();
+      if (currentBill && currentBill.splits) {
+        const splitIndex = currentBill.splits.findIndex(s => s.id === data.splitId);
+        if (splitIndex !== -1) {
+          const updatedSplits = [...currentBill.splits];
+          updatedSplits[splitIndex] = { ...updatedSplits[splitIndex], statusName: "Paid" };
+          this._bill.set({ ...currentBill, splits: updatedSplits });
+        }
       }
     });
   }
@@ -53,5 +68,9 @@ export class BillService {
 
   public getBillPdfUrl(orderId: number): string {
     return `${this.classUrl}/order/${orderId}/pdf`;
+  }
+
+  public payBillSplit(splitId: number): Observable<void> {
+    return this.http.patch<void>(`${this.classUrl}/splits/${splitId}/pay`, {});
   }
 }

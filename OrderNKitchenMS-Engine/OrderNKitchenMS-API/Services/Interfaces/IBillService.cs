@@ -16,5 +16,7 @@ public interface IBillService
 
     public Task<bool> UpdateBillStatusAsync(int billId, string newStatus);
 
+    public Task<bool> PayBillSplitAsync(int splitId);
+
     public Task<byte[]> GenerateBillPdfAsync(int orderId);
 }

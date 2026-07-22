@@ -72,6 +72,16 @@ public class BillController : ControllerBase
     }
 
     [Authorize(Policy = "All")]
+    [HttpPatch("splits/{splitId:int}/pay")]
+    public async Task<IActionResult> PayBillSplit(int splitId)
+    {
+        Validation.ValidateId(splitId);
+        _logger.LogInformation("PayBillSplit requested for Split ID: {SplitId}", splitId);
+        await _billService.PayBillSplitAsync(splitId);
+        return NoContent();
+    }
+
+    [Authorize(Policy = "All")]
     [HttpGet("order/{orderid:int}/pdf")]
     public async Task<IActionResult> GenerateBillPdf(int orderid)
     {

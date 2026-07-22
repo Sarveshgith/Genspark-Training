@@ -25,7 +25,7 @@ public class BillRepository : IBillRepository
 
     public async Task<Bill?> GetBillByOrderIdAsync(int orderId)
     {
-        var bill = await _context.Bills.FirstOrDefaultAsync(b => b.OrderId == orderId);
+        var bill = await _context.Bills.Include(b => b.Splits).FirstOrDefaultAsync(b => b.OrderId == orderId);
         if (bill == null)
         {
             return null;
@@ -40,7 +40,7 @@ public class BillRepository : IBillRepository
 
     public async Task<Bill?> GetByIdAsync(int id)
     {
-        return await _context.Bills.FindAsync(id);
+        return await _context.Bills.Include(b => b.Splits).FirstOrDefaultAsync(b => b.Id == id);
     }
 
     public async Task<Bill?> UpdateBillAsync(int id, Bill updatedBill)
@@ -71,6 +71,24 @@ public class BillRepository : IBillRepository
         }
 
         bill.Status = newStatus;
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
+    public async Task<BillSplit?> GetBillSplitByIdAsync(int splitId)
+    {
+        return await _context.BillSplits.Include(bs => bs.Bill).ThenInclude(b => b.Splits).FirstOrDefaultAsync(bs => bs.Id == splitId);
+    }
+
+    public async Task<bool> UpdateBillSplitStatusAsync(int splitId, BillStatus status)
+    {
+        var split = await _context.BillSplits.FindAsync(splitId);
+        if (split == null)
+        {
+            return false;
+        }
+
+        split.Status = status;
         await _context.SaveChangesAsync();
         return true;
     }

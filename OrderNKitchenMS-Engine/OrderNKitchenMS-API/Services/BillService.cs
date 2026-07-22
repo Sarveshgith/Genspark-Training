@@ -67,6 +67,21 @@ public class BillService : IBillService
         }
 
         var bill = MapBillCreateDtoToEntity(order, billCreateDto, subTotal);
+
+        int splitsCount = Math.Max(1, billCreateDto.SplitBetweenPeople);
+        decimal splitAmount = Math.Round(bill.TotalAmount / splitsCount, 2);
+        decimal remainder = bill.TotalAmount - (splitAmount * splitsCount);
+
+        for (int i = 0; i < splitsCount; i++)
+        {
+            var split = new BillSplit
+            {
+                Amount = splitAmount + (i == 0 ? remainder : 0),
+                Status = BillStatus.Pending
+            };
+            bill.Splits.Add(split);
+        }
+
         await _billRepository.CreateBillAsync(bill);
         _logger.LogInformation("CreateBillAsync succeeded. Generated Bill ID: {BillId} for Order ID: {OrderId}", bill.Id, bill.OrderId);
         var billDto = MapBillToDto(bill);
@@ -193,6 +208,45 @@ public class BillService : IBillService
         return true;
     }
 
+    public async Task<bool> PayBillSplitAsync(int splitId)
+    {
+        _logger.LogInformation("PayBillSplitAsync started for Split ID: {SplitId}", splitId);
+        
+        var split = await _billRepository.GetBillSplitByIdAsync(splitId);
+        if (split == null)
+        {
+            _logger.LogWarning("PayBillSplitAsync failed: Split with ID {SplitId} not found.", splitId);
+            throw new NotFoundException($"Bill split with ID {splitId} not found.");
+        }
+
+        if (split.Status != BillStatus.Pending)
+        {
+            _logger.LogWarning("PayBillSplitAsync failed: Split ID {SplitId} is already {Status}", splitId, split.Status);
+            throw new BusinessRuleException($"Cannot pay split that is already in state '{split.Status}'.");
+        }
+
+        bool isUpdated = await _billRepository.UpdateBillSplitStatusAsync(splitId, BillStatus.Paid);
+        if (!isUpdated)
+        {
+            return false;
+        }
+
+        var order = await _orderService.GetOrderByIdAsync(split.Bill.OrderId);
+        if (order != null)
+        {
+            await _signalService.NotifyBillSplitPaidAsync(order.TableId, splitId, split.Amount);
+        }
+
+        var bill = await _billRepository.GetByIdAsync(split.BillId);
+        if (bill != null && bill.Splits.All(s => s.Status == BillStatus.Paid))
+        {
+            _logger.LogInformation("All splits paid for Bill ID {BillId}. Updating entire bill status.", bill.Id);
+            await UpdateBillStatusAsync(bill.Id, "Paid");
+        }
+
+        return true;
+    }
+
     // Generates a PDF document for a bill.
     public async Task<byte[]> GenerateBillPdfAsync(int orderId)
     {
@@ -216,7 +270,18 @@ public class BillService : IBillService
             DiscountAmount = bill.DiscountAmount,
             TotalAmount = bill.TotalAmount,
             StatusName = bill.Status.ToString(),
-            CreatedAt = bill.CreatedAt
+            CreatedAt = bill.CreatedAt,
+            Splits = bill.Splits?.Select(MapBillSplitToDto).ToList() ?? []
+        };
+    }
+
+    private static BillSplitDto MapBillSplitToDto(BillSplit split)
+    {
+        return new BillSplitDto
+        {
+            Id = split.Id,
+            Amount = split.Amount,
+            StatusName = split.Status.ToString()
         };
     }
 

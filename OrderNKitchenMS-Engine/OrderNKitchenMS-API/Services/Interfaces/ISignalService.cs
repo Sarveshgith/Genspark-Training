@@ -18,6 +18,7 @@ public interface ISignalService
     //Bill signals
     public Task NotifyBillGeneratedAsync(int tableId, BillDto billDto);
     public Task NotifyBillPaidAsync(int tableId, BillDto billDto);
+    public Task NotifyBillSplitPaidAsync(int tableId, int splitId, decimal amount);
     public Task NotifyGuestSessionEndedAsync(int tableId);
 
 
